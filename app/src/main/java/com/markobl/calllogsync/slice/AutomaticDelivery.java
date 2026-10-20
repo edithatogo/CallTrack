@@ -3,6 +3,9 @@ package com.markobl.calllogsync.slice;
 /** Activation-bound one-page runner. Scheduler repeats incomplete work; old workers fail closed. */
 public final class AutomaticDelivery {
     public interface Progress extends ScanDelivery.Progress {
+        java.util.List<String> pending(
+                DurableDelivery.Operation operation, long calendar, int limit);
+
         void rollover(
                 DurableDelivery.Operation operation,
                 PagedCalls.Checkpoint expected,
@@ -13,12 +16,14 @@ public final class AutomaticDelivery {
     private final PagedCalls.Source source;
     private final Progress progress;
     private final ScanDelivery scan;
+    private final DurableDelivery delivery;
 
     public AutomaticDelivery(
             ActivationControl activation,
             PagedCalls.Source source,
             Progress progress,
             DurableDelivery delivery) {
+        this.delivery = delivery;
         this.activation = activation;
         this.source = source;
         this.progress = progress;
@@ -30,6 +35,43 @@ public final class AutomaticDelivery {
         synchronized (DurableDelivery.DELIVERY_LOCK) {
             try {
                 if (!activation.allowed(worker)) return stopped(DurableDelivery.Result.PAUSED);
+                java.util.List<String> pending =
+                        progress.pending(worker.operation(), worker.calendar, limit);
+                if (pending == null
+                        || pending.size() > limit
+                        || new java.util.HashSet<>(pending).size() != pending.size())
+                    throw new IllegalStateException("Invalid pending batch");
+                if (!pending.isEmpty()) {
+                    int handled = 0, delivered = 0, review = 0;
+                    for (String key : pending) {
+                        if (key == null || key.isEmpty())
+                            throw new IllegalStateException("Invalid pending key");
+                        DurableDelivery.Result result =
+                                delivery.resume(
+                                        key,
+                                        worker.calendar,
+                                        worker.operation(),
+                                        () -> activation.allowed(worker));
+                        switch (result) {
+                            case SAVED:
+                            case RECOVERED:
+                            case ALREADY_LOGGED:
+                                delivered++;
+                                break;
+                            case REVIEW_REQUIRED:
+                            case SOURCE_CHANGED:
+                                review++;
+                                break;
+                            default:
+                                return new ScanDelivery.Batch(
+                                        handled, delivered, 0, review, false, result);
+                        }
+                        handled++;
+                    }
+                    // A separate invocation continues recovery or scans; never touch source in this
+                    // batch.
+                    return new ScanDelivery.Batch(handled, delivered, 0, review, false, null);
+                }
                 PagedCalls.Checkpoint checkpoint = progress.get(worker.operation());
                 if (checkpoint != null && checkpoint.lastId == checkpoint.upperId) {
                     PagedCalls.Checkpoint next = PagedCalls.extend(source, checkpoint);

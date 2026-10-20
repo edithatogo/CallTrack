@@ -137,3 +137,18 @@ and rechecks authorization under the shared delivery lock. Empty-to-first-call a
 later-call scans use this same path. Deleted/changed processed anchors require review.
 Source-independent pending recovery, scheduler/UI wiring and historical snapshots
 remain required; the new runner is not yet launched automatically by Android.
+
+
+## Recovery before source traversal
+
+AutomaticDelivery queries at most the requested page size (1–500) pending keys,
+restricted to exact operation owner/generation and destination. Only READY,
+IN_FLIGHT and ATTEMPTED qualify. Terminal receipts, unowned legacy work, cancelled/
+older generations and other destinations remain excluded. Resume each through the
+existing durable protocol before reading any source anchor. A nonempty recovery
+batch returns incomplete even when all its rows finish; the next invocation checks
+remaining work then starts scanning. Terminal review is counted and removed from
+future pending selection; permission, pause or provider failure stops the batch.
+No source checkpoint advances during recovery. Existing receipt marker/known-ID
+verification decides recovery; absence never licenses blind reinsertion. Pending
+rows belonging to paused/old operations still need explicit user recovery controls.

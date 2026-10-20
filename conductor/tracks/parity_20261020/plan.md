@@ -144,3 +144,17 @@ removed. Exact inputs/artifacts/native outputs in rollover-evidence.json. No And
 scheduler/UI/full-runner native acceptance inferred. Next integrate bounded pending
 recovery before source traversal, then frozen historical import and scheduling/UI.
 Full-track review/fixes/archive remain outstanding.
+
+
+## Source-independent pending recovery checkpoint
+
+AutomaticDelivery recovers bounded owner/generation/destination-scoped pending
+intents before touching call-source state. A test-first crash-after-insert regression
+verifies recovery without any source access or duplicate insert. Native SQLite query
+test verifies limits, terminal-state exclusion, unrelated owner/generation/destination
+exclusion, reopen and review removal. Source-bound build62 JVM tests/APKs/lint and
+25 host tests pass;17 API36 native checks pass with packages removed. Exact inputs/
+artifacts/native outputs in pending-evidence.json. No full native calendar recovery,
+scheduler or UI acceptance inferred. Next implement frozen historical preview/
+confirmation/progress/cancel/resume and read-only legacy matching, then scheduling,
+user controls and complete emulator acceptance. Full review/fixes/archive remain open.
