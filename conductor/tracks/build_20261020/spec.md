@@ -14,7 +14,7 @@ Reproducible build, bounded device evidence and documented fork decision.
 
 ## Inputs and dependencies
 
-Prerequisites: [baseline](../baseline_20261020/index.md). Requirement references: R08, R13, R26 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
+Prerequisites: [baseline](../../archive/baseline_20261020/index.md). Requirement references: R08, R13, R26 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
 
 ## Required outputs
 

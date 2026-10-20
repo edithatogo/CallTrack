@@ -1,10 +1,6 @@
 # Tracks registry
 
-All tracks are planned, not implemented. Discovery deliverables are required work within each track; earlier research is input to refresh. Later implementation phases are conditional on track findings. See [workflow](workflow.md).
-
----
-- [x] **Track: CallTrack and FOSS capability mapping** (M0)
-  *Link: [Track](tracks/baseline_20261020/index.md)*
+Remaining active tracks are planned, not implemented. Track 1 is complete and archived. Discovery deliverables are required work within each track; earlier research is input to refresh. Later implementation phases are conditional on track findings. See [workflow](workflow.md).
 
 ---
 - [ ] **Track: Fork feasibility and build qualification** (M1)
@@ -53,3 +49,5 @@ All tracks are planned, not implemented. Discovery deliverables are required wor
 ---
 - [ ] **Track: Rust and reusable component evaluation** (Before M5/M7 decisions)
   *Link: [Track](tracks/rust_20261020/index.md)*
+
+Completed tracks are retained in the [archive index](archive/index.md).

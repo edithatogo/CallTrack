@@ -32,7 +32,7 @@ Evidence below is static implementation evidence, not proof of behaviour on mode
 
 No custom public HTTP API is apparent in the inspected manifest or main classes. The relevant API map is Android `CallLog.Calls` → transformation → `CalendarContract.Events`, with `TelephonyManager`/PHONE_STATE triggering, SharedPreferences configuration and calendar observation. Legacy content URI strings are present but do not prove active use. The manifest has phone-state, contacts and calendar permissions, no INTERNET permission and no explicit READ_CALL_LOG permission. Modern permissions must be designed afresh.
 
-Static follow-up completed in [Track 1 findings](../tracks/baseline_20261020/findings.md): preferences, calendar fallbacks, labels and scan semantics are mapped. The auto path examines at most **four rows**, not five inserts. Runtime display/provider validation is assigned to later tracks; no emulator execution occurred. Do not reproduce legacy defects merely to match implementation.
+Static follow-up completed in [Track 1 findings](../archive/baseline_20261020/findings.md): preferences, calendar fallbacks, labels and scan semantics are mapped. The auto path examines at most **four rows**, not five inserts. Runtime display/provider validation is assigned to later tracks; no emulator execution occurred. Do not reproduce legacy defects merely to match implementation.
 
 ## FOSS capability and implementation map
 
@@ -57,4 +57,4 @@ Callvent remains a commercial feature reference (notes, reminders, tags, batch s
 
 ## Completed static mapping
 
-The [Track 1 findings](../tracks/baseline_20261020/findings.md) supersede preliminary interpretations here; [uncertainties](../tracks/baseline_20261020/requirements.md) identify remaining downstream evidence.
+The [Track 1 findings](../archive/baseline_20261020/findings.md) supersede preliminary interpretations here; [uncertainties](../archive/baseline_20261020/requirements.md) identify remaining downstream evidence.

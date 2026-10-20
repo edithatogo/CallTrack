@@ -60,4 +60,4 @@ The [track registry](tracks.md) now owns execution. These inventories are planni
 
 ## Track 1 mapping outcome
 
-Static mapping completed; see [findings](tracks/baseline_20261020/findings.md), [refined acceptance and assigned uncertainties](tracks/baseline_20261020/requirements.md) and [25 synthetic acceptance scenarios](tracks/baseline_20261020/fixtures.json). CallTrack automatic scan is four examined rows; endpoint tests in ACS read real history; neither behaviour is a successor requirement. R01–R27 remain an evolving inventory: later-track evidence and unresolved product policies are explicit in U01–U12.
+Static mapping completed; see [findings](archive/baseline_20261020/findings.md), [refined acceptance and assigned uncertainties](archive/baseline_20261020/requirements.md) and [25 synthetic acceptance scenarios](archive/baseline_20261020/fixtures.json). CallTrack automatic scan is four examined rows; endpoint tests in ACS read real history; neither behaviour is a successor requirement. R01–R27 remain an evolving inventory: later-track evidence and unresolved product policies are explicit in U01–U12.

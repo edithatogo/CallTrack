@@ -18,4 +18,4 @@ Update this file when a dependency is actually selected, including track/decisio
 
 ## Track 1 evidence update
 
-[Static dependency/custom-code inventory](tracks/baseline_20261020/findings.md) is complete at pinned sources. Androguard4.1.4 was used only in the excluded local analysis environment; it is not an app dependency. No production stack change or fork adoption occurred. Build qualification and transitive dependency resolution remain in the build track.
+[Static dependency/custom-code inventory](archive/baseline_20261020/findings.md) is complete at pinned sources. Androguard4.1.4 was used only in the excluded local analysis environment; it is not an app dependency. No production stack change or fork adoption occurred. Build qualification and transitive dependency resolution remain in the build track.

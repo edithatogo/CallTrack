@@ -10,5 +10,7 @@
   "implementation_status": "not-applicable-research-only",
   "review_status": "passed-with-fixes",
   "completed_at": "2026-10-20",
-  "implementation_commit": "f5fb750"
+  "implementation_commit": "f5fb750",
+  "archived": true,
+  "archived_at": "2026-10-20"
 }

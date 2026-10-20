@@ -14,7 +14,7 @@ Evidence-backed capability matrix and useful second-platform scope; rejection/de
 
 ## Inputs and dependencies
 
-Prerequisites: [baseline](../baseline_20261020/index.md). Requirement references: R24 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
+Prerequisites: [baseline](../../archive/baseline_20261020/index.md). Requirement references: R24 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
 
 ## Required outputs
 

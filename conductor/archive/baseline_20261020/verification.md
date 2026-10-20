@@ -32,3 +32,7 @@ The completed deliverable is a source-grounded static map and assigned uncertain
 ## Review check record
 
 `python3 -m unittest discover -s tests -v`: 5/5 PASS, including injected broken-link, cycle, duplicate-ID and unmapped-requirement failures. `python3 scripts/verify_conductor.py --private-sources`: PASS. `git diff --check`: PASS. Final archive checks recorded after move.
+
+## Archive completion audit
+
+The completed track is retained under conductor/archive/baseline_20261020 and removed from the active registry. Prerequisite IDs remain stable; downstream document links point to the archived evidence. Re-ran the five verifier tests, source-digest/document checks and whitespace checks after the move. All passed. No unresolved review finding remains; U01–U12 are explicitly handed to later tracks.
