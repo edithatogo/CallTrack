@@ -1,0 +1,59 @@
+# Consolidated requirements — draft
+
+Source vocabulary: CT = supplied CallTrack static evidence; ACS = AndroidCallLogSync source; CLC = Call-Log-to-Cal source; NEW = proposed quality/product requirement, not legacy functionality. See [audit](research/baseline-audit.md).
+
+| ID | Requirement | Origin | Milestone | Acceptance evidence |
+|---|---|---|---|---|
+| R01 | Enable/pause automatic logging; filter incoming/outgoing/missed independently | CT | M3 | Each type enabled/disabled produces expected count; pausing prevents writes |
+| R02 | Select an available writable device calendar; handle removal/read-only changes | CT + NEW | M2–M3 | Test calendar selection survives restart; inaccessible destination gives recoverable status |
+| R03 | Automatic calendar events with direction, name/number/unknown fallback and duration | CT | M3 | Controlled calls agree with system log and actual calendar readback |
+| R04 | Correct event timestamps/timezone; explicit zero-duration display policy | CT + NEW | M3 | Seconds, midnight, timezone changes and zero-duration fixtures pass |
+| R05 | Optional historical import with date range, preview, cancellation and progress | CT + NEW | M3 | Repeated import creates no duplicate; interruption resumes safely |
+| R06 | Stable identity, durable event mapping and retry recovery | CT weak dedup + ACS checkpoint + NEW | M3 | Concurrent triggers and crash between event insert/checkpoint yield one event |
+| R07 | Preserve user-edited events and intentional deletions; explicit resync policy | NEW | M3 | Editing title/notes does not cause overwrite or duplicate; deleted event not silently recreated |
+| R08 | Runtime permissions, revocation and missing-provider recovery | ACS + NEW | M2–M3 | Denial/regrant and calendar loss produce clear state, no crashes |
+| R09 | Background reliability and catch-up | CT + ACS + NEW | M3 | Reboot, process death, offline and Doze tests; after force-stop, reopening catches up |
+| R10 | Local calendar mode needs no project backend/account | CT | M2–M3 | Writes work offline; external calendar sync is separately verified and attributed to provider |
+| R11 | Explain sync state and failures; redact diagnostics | ACS + NEW | M3 | Pending/succeeded/failed distinguishable; logs omit numbers/names/tokens |
+| R12 | Optional endpoint output with documented versioned contract | ACS | Later optional | TLS, authentication, retry and receiving-side idempotency tested; disabled by default |
+| R13 | FOSS distribution and contributor reproducibility | User | M1/M4 | Licence notices, build instructions, CI, source/release matching and signing/update policy |
+| R14 | Incremental Kotlin migration with preserved behaviour/data | User | M5 | Before/after parity fixtures and upgrade tests pass |
+| R15 | Optional Compose UI migration | User | M6 | Screen-by-screen accessibility, state restoration and navigation parity |
+| R16 | Optional KMP shared processing core | User | M7 | Shared contract suite passes on Android and selected second target |
+| R17 | Optional Compose Multiplatform interface | User | M8 | Demonstrated second-platform user workflow; Android regression suite passes |
+| R18 | Notes, tags, reminders, CSV/ICS export, SMS support | CLC/Callvent inspirations | Later candidates | Separate prioritisation; not required for CallTrack parity |
+
+## Proposed contract boundaries
+
+- `CallSource`: records with source namespace, source ID, timestamp, direction, duration seconds, number presentation, optional name and SIM identity. A call-log row ID alone is not globally stable across restore/devices.
+- `EventMapper`: pure transformation into title, description, start/end instants and presentation metadata. Locale/timezone and zero-duration policy explicit.
+- `CalendarSink`: list writable calendars, insert/read events and return destination identity; no dependence on privileged sync-adapter fields.
+- `SyncLedger`: source-to-event mapping, payload fingerprint, last-written fingerprint, pending/succeeded/failed/conflict states and reconciliation. An insert and ledger write span different stores: design recovery for that gap.
+- `Scheduler`/`PermissionGateway`: native platform adapters. Trigger observation for responsiveness; periodic reconciliation for recovery; avoid promising exact background timing.
+- `EndpointSink`: optional later adapter, isolated from local calendar path.
+
+These are internal design proposals, not recovered CallTrack APIs. Keep boundaries small; do not build a generic plugin framework in advance.
+
+## Decisions to resolve during milestones
+
+Define logging latency target, retained history and diagnostic retention; select test/destination calendar; decide zero-duration rendering, rejected/blocked/voicemail treatment, multi-SIM scope, calendar deletion/resync semantics and imported legacy-event matching. Explicitly exclude audio recording and guaranteed third-party VoIP capture from parity. Optional SMS must not expand initial permissions.
+
+## Future-state additions (2026-10-20)
+
+The following are proposed extensions, not changes to the minimum parity release. See [architecture and feature evaluation](research/future-architecture.md).
+
+| ID | Requirement | Stage | Acceptance |
+|---|---|---|---|
+| R19 | Provider-neutral device calendar support, including Outlook where exposed | M2/M3 qualification | Event created locally and verified in actual provider; unsupported account/profile reported clearly |
+| R20 | Direct Microsoft Graph destination if local route is insufficient | Integration track after M3 | Personal/work test accounts, token refresh/revocation, throttling, timezone and duplicate-retry suite |
+| R21 | Rules for work/personal routing, exclusions and redaction | Post-parity | Dry-run preview and deterministic precedence; no unintended cross-profile data movement |
+| R22 | Notes, outcomes, contact timeline and callback workflow | Post-parity | User edits persist independently of regenerated event fields |
+| R23 | Portable export/restore and conservative legacy migration | M3 preview; fuller post-parity | Round-trip, ambiguous matches and restore identity tests |
+| R24 | Capability-aware iOS companion | Early feasibility; M7/M8 implementation | Supported manual/import workflow first; automatic capture only if separately demonstrated |
+| R25 | Per-destination mappings, conflict policies and loop prevention | Integration track | Same underlying calendar reached by two routes cannot silently duplicate events |
+| R26 | Dependency and Rust feasibility evaluation | M1 planning; bounded spike before M5/M7 | Compatible version matrix and tests; adopt Rust only for demonstrated benefit |
+| R27 | Retention, private/free event defaults and redacted diagnostics | M3/M4 | Provider readback and privacy controls tested; deletion scopes explicit |
+
+## Conductor execution policy (2026-10-20)
+
+The [track registry](tracks.md) now owns execution. These inventories are planning hypotheses and dated evidence, not fully specified future implementations. Each later track must map, understand, research and document its requirements and dependency options when activated. Dependencies can be temporary prototype aids, enduring replacements for existing libraries, or replacements for app-owned/native code. Decisions require explicit purpose, evidence, promotion/removal criteria and recovery. See [workflow](workflow.md). All tracks remain pending.

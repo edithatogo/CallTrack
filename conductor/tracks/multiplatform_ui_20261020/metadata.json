@@ -1,0 +1,14 @@
+{
+  "track_id": "multiplatform_ui_20261020",
+  "type": "research-led-development",
+  "status": "new",
+  "milestone": "M8",
+  "created_at": "2026-10-20",
+  "updated_at": "2026-10-20",
+  "depends_on": [
+    "compose_20261020",
+    "kmp_20261020"
+  ],
+  "requirements": "R17, R24",
+  "implementation_status": "conditional-not-started"
+}

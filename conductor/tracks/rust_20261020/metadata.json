@@ -1,0 +1,13 @@
+{
+  "track_id": "rust_20261020",
+  "type": "research-led-development",
+  "status": "new",
+  "milestone": "Before M5/M7 decisions",
+  "created_at": "2026-10-20",
+  "updated_at": "2026-10-20",
+  "depends_on": [
+    "build_20261020"
+  ],
+  "requirements": "R26",
+  "implementation_status": "conditional-not-started"
+}

@@ -1,0 +1,13 @@
+{
+  "track_id": "productivity_20261020",
+  "type": "research-led-development",
+  "status": "new",
+  "milestone": "Post-M4",
+  "created_at": "2026-10-20",
+  "updated_at": "2026-10-20",
+  "depends_on": [
+    "release_20261020"
+  ],
+  "requirements": "R18, R21\u2013R23, R27",
+  "implementation_status": "conditional-not-started"
+}
