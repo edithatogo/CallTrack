@@ -3,7 +3,7 @@
 All tracks are planned, not implemented. Discovery deliverables are required work within each track; earlier research is input to refresh. Later implementation phases are conditional on track findings. See [workflow](workflow.md).
 
 ---
-- [~] **Track: CallTrack and FOSS capability mapping** (M0)
+- [x] **Track: CallTrack and FOSS capability mapping** (M0)
   *Link: [Track](tracks/baseline_20261020/index.md)*
 
 ---

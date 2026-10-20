@@ -1,6 +1,6 @@
 # CallTrack and FOSS capability mapping
 
-Milestone: M0. Type: research-led development. Status: static mapping deliverables implemented; final review pending.
+Milestone: M0. Type: research-led development. Status: static mapping complete; review findings fixed.
 
 ## Objective
 
