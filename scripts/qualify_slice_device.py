@@ -60,9 +60,10 @@ def qualify(serial):
         receipt['android'] = command('shell', 'getprop', 'ro.build.version.release')
         receipt['sdk'] = command('shell', 'getprop', 'ro.build.version.sdk')
         for package, apk in zip((PACKAGE, TEST_PACKAGE), apks):
+            # A timeout is an unknown outcome, not evidence that installation did not occur.
+            installed.append(package)
             if 'Success' not in command('install', str(apk)):
                 raise RuntimeError('Installation not confirmed')
-            installed.append(package)
         launch = command('shell', 'am', 'start', '-W', '-n', PACKAGE + '/com.markobl.calllogsync.slice.CalendarSliceActivity')
         if 'Status: ok' not in launch or not command('shell', 'pidof', PACKAGE):
             raise RuntimeError('Cold launch not confirmed')
@@ -93,14 +94,20 @@ def qualify(serial):
         receipt['fixture_cleanup_verified'] = fixture_clean if fixture_possible else True
         # Preserve the cleanup instrumentation if fixture removal cannot be verified.
         if receipt['fixture_cleanup_verified']:
-            try:
-                for package in reversed(installed):
-                    if 'Success' not in command('uninstall', package):
-                        raise RuntimeError('Uninstall not confirmed')
-                receipt['packages_removed'] = all('package:' + p not in command('shell', 'pm', 'list', 'packages', p).splitlines() for p in installed)
-            except Exception as error:
-                receipt['packages_removed'] = False
-                receipt['cleanup_error'] = str(error)
+            removal_checks = []
+            for package in reversed(installed):
+                try:
+                    # A failed/uncertain install may have left no package; absence is the gate.
+                    command('uninstall', package)
+                except Exception as error:
+                    receipt.setdefault('uninstall_notes', []).append(str(error))
+                try:
+                    absent = 'package:' + package not in command('shell', 'pm', 'list', 'packages', package).splitlines()
+                    removal_checks.append(absent)
+                except Exception as error:
+                    removal_checks.append(False)
+                    receipt['cleanup_error'] = str(error)
+            receipt['packages_removed'] = all(removal_checks)
         else:
             receipt['packages_removed'] = False
         if not receipt['fixture_cleanup_verified'] or not receipt['packages_removed']:

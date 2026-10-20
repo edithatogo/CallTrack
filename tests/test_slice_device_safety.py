@@ -75,6 +75,21 @@ class DeviceSafety(unittest.TestCase):
         self.assertTrue(receipt['fixture_cleanup_verified'])
         self.assertTrue(receipt['packages_removed'])
 
+    def test_install_timeout_still_cleans_attempted_package(self):
+        self.fail_cleanup = False
+        normal = self.fake_run
+        def timeout_install(command, **kwargs):
+            if command[3] == 'install':
+                self.calls.append(command[3:])
+                raise subprocess.TimeoutExpired(command, 180)
+            return normal(command, **kwargs)
+        identities = ["package: name='" + p + "'" for p in (DEVICE.PACKAGE, DEVICE.TEST_PACKAGE)]
+        with patch.object(DEVICE, 'ROOT', self.root), patch.object(DEVICE, 'inputs', return_value={}), patch.object(
+            DEVICE.subprocess, 'check_output', side_effect=identities
+        ), patch.object(DEVICE.subprocess, 'run', side_effect=timeout_install):
+            self.assertEqual(1, DEVICE.qualify('synthetic-device'))
+        self.assertTrue(any(args[0] == 'uninstall' and args[1] == DEVICE.PACKAGE for args in self.calls))
+
     def test_failed_build_never_installs(self):
         self.build['exit_code'] = 1
         self.receipt.write_text(json.dumps(self.build))
