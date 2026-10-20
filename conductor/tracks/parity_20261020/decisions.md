@@ -396,3 +396,29 @@ needed: this is explicit publication of previously collected frozen data. It doe
 not reactivate the original automatic/import policy or change original source facts.
 English/German copy distinguishes checking, suppression and insertion reapproval.
 Native positive calendar/permission/lifecycle interaction remains a separate gate.
+
+
+## Frozen-payload retention
+
+Seven days from the first committed storage timestamp bounds retention of frozen
+personal event bodies. Source-call dates do not determine payload age. Schema6
+adds payload_saved_at; schema1–5 migration preserves receipts, pending work and
+checkpoints, assigning existing payloads an explicit seven-day grace from migration
+because their storage age is unknown. Pending transitions preserve the timestamp;
+a fresh payload collected after clearing starts a new window. No new dependency.
+
+Reads check age, and app/worker entry points clear at most50 expired rows per pass;
+a recovery control permits another bounded pass. This is opportunistic clearing,
+not a scheduled deadline or forensic erasure. Inactivity and clock rollback may
+delay it. IDs, hashes, source facts, ownership and calendar effects remain intact.
+The shared delivery lock protects read/clear/write against concurrent effect-state
+publication; each body/age write commits as one SQLite transaction.
+
+Expired READY becomes EXPIRED_READY, retaining proof that no insertion was attempted.
+Neither automatic delivery nor read-only recovery can insert or discard that proof.
+Already-attempted work retains its state/known ID/marker for reconciliation without
+the body. A confirmed historical import may collect fresh source data only after
+matching the current source signature and known facts, under its confirmed operation
+and cancellation guard. Suppression remains a separate explicit action and cannot
+be reapproved. No data downgrade or automatic calendar/source deletion is supplied.
+Retirement/replacement by a persistence library requires preserving these contracts.

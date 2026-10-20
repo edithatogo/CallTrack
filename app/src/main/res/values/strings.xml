@@ -166,4 +166,9 @@
     <string name="reapproval_changed">This record changed or an insertion may already have been attempted. Refresh and check the existing effect; no new insertion was approved.</string>
     <string name="reapproval_paused">Insertion approval stopped before completion. Refresh the record before retrying; the pending intent remains tracked.</string>
     <string name="reapproval_failed">The reapproved insertion could not be verified. Check its existing effect before another action; a calendar event may already exist.</string>
+
+    <string name="recovery_expired">Pending payload expired — no insertion attempted</string>
+    <string name="retention_policy">Pending personal event payloads expire after seven days from storage, checked on access and in bounded maintenance batches. Existing payloads of unknown age receive seven days from migration. Phone history dates do not determine this age. IDs, hashes, source facts and calendar events remain. Expired never-attempted work requires a confirmed import to collect fresh source data; it is never inserted automatically. Offline or inactive apps may defer clearing until their next check.</string>
+    <string name="retention_run">Clear expired pending payloads now</string>
+    <string name="retention_result">%1$d expired payloads cleared in this pass. More may remain. Receipt metadata and calendar events were retained.</string>
 </resources>

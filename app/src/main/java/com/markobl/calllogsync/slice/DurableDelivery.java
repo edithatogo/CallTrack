@@ -18,7 +18,8 @@ public final class DurableDelivery {
         CONFIRMED,
         REVIEW,
         SUPPRESSED,
-        LEGACY
+        LEGACY,
+        EXPIRED_READY
     }
 
     public enum Result {
@@ -186,7 +187,10 @@ public final class DurableDelivery {
         Intent state(State next, long id) {
             // Confirmed/review receipts need hashes and identity, not names/numbers in payload.
             CallEvent retained =
-                    next == State.CONFIRMED || next == State.REVIEW || next == State.SUPPRESSED
+                    next == State.CONFIRMED
+                                    || next == State.REVIEW
+                                    || next == State.SUPPRESSED
+                                    || next == State.EXPIRED_READY
                             ? null
                             : payload;
             return new Intent(
@@ -303,7 +307,57 @@ public final class DurableDelivery {
         }
     }
 
+    /**
+     * Only an explicitly confirmed historical import may collect a fresh payload for expired READY.
+     */
+    Result reapproveExpired(
+            CallRecord call,
+            long calendar,
+            String timezone,
+            Operation operation,
+            BooleanSupplier confirmed) {
+        synchronized (DELIVERY_LOCK) {
+            try {
+                if (!confirmed.getAsBoolean()) return Result.PAUSED;
+                if (operation == null || !operation.owner.startsWith("import/"))
+                    return Result.REVIEW_REQUIRED;
+                Intent prior = store.get(call.key(), calendar);
+                if (prior == null || prior.state != State.EXPIRED_READY || prior.eventId >= 0)
+                    return Result.REVIEW_REQUIRED;
+                String signature = CallIdentity.signature(call);
+                if (prior.sourceSignature == null
+                        || !prior.sourceSignature.equals(signature)
+                        || prior.facts != null && !prior.facts.agrees(call))
+                    return Result.SOURCE_CHANGED;
+                if (!sink.writable(calendar)) return Result.DESTINATION_UNAVAILABLE;
+                CallEvent event = CallEvent.from(call, timezone);
+                if (!confirmed.getAsBoolean()) return Result.PAUSED;
+                Intent refreshed =
+                        new Intent(
+                                State.READY,
+                                call.key(),
+                                calendar,
+                                signature,
+                                event.marker,
+                                event.fingerprint(),
+                                -1,
+                                event,
+                                operation,
+                                SourceFacts.from(call));
+                store.put(refreshed);
+                return attempt(refreshed, confirmed);
+            } catch (SecurityException denied) {
+                return Result.PERMISSION_REQUIRED;
+            } catch (ArithmeticException | IllegalArgumentException invalid) {
+                return Result.INVALID_CALL;
+            } catch (RuntimeException failed) {
+                return Result.FAILED;
+            }
+        }
+    }
+
     private Result attempt(Intent intent, BooleanSupplier allowed) {
+        if (intent.state == State.EXPIRED_READY) return Result.REVIEW_REQUIRED;
         if (intent.state == State.REVIEW || intent.state == State.SUPPRESSED)
             return Result.REVIEW_REQUIRED;
         if (intent.eventId >= 0) return verify(intent, false);
