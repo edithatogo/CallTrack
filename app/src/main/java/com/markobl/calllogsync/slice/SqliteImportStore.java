@@ -47,6 +47,40 @@ public final class SqliteImportStore extends SQLiteOpenHelper implements Histori
         db.execSQL("ALTER TABLE candidates ADD COLUMN outcome TEXT");
     }
 
+    public static final class ListedSession {
+        public final long cursor;
+        public final HistoricalImport.Session session;
+
+        ListedSession(long cursor, HistoricalImport.Session session) {
+            this.cursor = cursor;
+            this.session = session;
+        }
+    }
+
+    /** Stable within normal append/update activity; display cursors never authorize delivery. */
+    public List<ListedSession> sessions(long beforeExclusive, int limit) {
+        if (beforeExclusive != -1 && beforeExclusive < 1 || limit < 1 || limit > 50)
+            throw new IllegalArgumentException("Invalid session page");
+        List<ListedSession> rows = new ArrayList<>();
+        try (Cursor cursor =
+                getReadableDatabase()
+                        .query(
+                                "sessions",
+                                new String[] {"rowid", "body"},
+                                beforeExclusive == -1 ? null : "rowid<?",
+                                beforeExclusive == -1
+                                        ? null
+                                        : new String[] {Long.toString(beforeExclusive)},
+                                null,
+                                null,
+                                "rowid DESC",
+                                Integer.toString(limit))) {
+            while (cursor.moveToNext())
+                rows.add(new ListedSession(cursor.getLong(0), decode(cursor.getString(1))));
+        }
+        return java.util.Collections.unmodifiableList(rows);
+    }
+
     @Override
     public void create(HistoricalImport.Session session) {
         if (session.phase != HistoricalImport.Phase.BUILDING

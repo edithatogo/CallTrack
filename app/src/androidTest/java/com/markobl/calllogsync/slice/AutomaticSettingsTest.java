@@ -67,4 +67,35 @@ public class AutomaticSettingsTest {
             instrumentation.runOnMainSync(activity::finish);
         }
     }
+
+    @Test
+    public void openingImportsDoesNotCreatePreviewOrConfirmWithoutAccess() {
+        android.app.Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        Context context = instrumentation.getTargetContext();
+        try (SqliteImportStore store = new SqliteImportStore(context)) {
+            assertTrue(store.sessions(-1, 10).isEmpty());
+        }
+        Activity activity =
+                instrumentation.startActivitySync(
+                        new Intent(context, HistoricalImportActivity.class)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        try {
+            instrumentation.runOnMainSync(
+                    () -> {
+                        assertFalse(activity.findViewById(R.id.import_create).isEnabled());
+                        assertFalse(activity.findViewById(R.id.import_confirm).isEnabled());
+                        assertFalse(activity.findViewById(R.id.import_continue).isEnabled());
+                        assertEquals(
+                                activity.getString(R.string.import_none),
+                                ((TextView) activity.findViewById(R.id.import_summary))
+                                        .getText()
+                                        .toString());
+                    });
+            try (SqliteImportStore store = new SqliteImportStore(context)) {
+                assertTrue(store.sessions(-1, 10).isEmpty());
+            }
+        } finally {
+            instrumentation.runOnMainSync(activity::finish);
+        }
+    }
 }

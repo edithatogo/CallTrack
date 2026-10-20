@@ -75,4 +75,33 @@
     <string name="auto_run_failed">Der letzte Hintergrundversuch ist fehlgeschlagen. Ausstehende Einträge bleiben zur Wiederherstellung erhalten.</string>
     <string name="auto_failure_count">Erfasste fehlgeschlagene Hintergrundversuche in diesem Protokollierungszeitraum: %1$d. Frühere Versuche sind möglicherweise nicht verfügbar. Dies zählt keine fehlgeschlagenen Anrufe.</string>
     <string name="auto_unknown">Der Status des letzten Versuchs ist nicht verfügbar. Aktualisiere den Status oder fordere eine Wiederherstellung an.</string>
+
+    <string name="import_open">Historische Importe</string>
+    <string name="import_intro">Prüfe einen historischen Zeitraum vor dem Import. Datumsangaben verwenden %1$s und das Format YYYY-MM-DD. Das Enddatum ist ausgeschlossen. Die Vorschau schreibt keine Termine. Beim Schließen oder Anhalten bleibt die gespeicherte Sitzung zur Fortsetzung erhalten.</string>
+    <string name="import_from">Startdatum (einschließlich, YYYY-MM-DD)</string>
+    <string name="import_to">Enddatum (ausschließlich, YYYY-MM-DD)</string>
+    <string name="import_create">Schreibgeschützte Vorschau erstellen</string>
+    <string name="import_none">Keine Importsitzung ausgewählt.</string>
+    <string name="import_continue">Ausgewählte Vorschau / Import fortsetzen</string>
+    <string name="import_confirm">Historischen Import bestätigen</string>
+    <string name="import_confirm_text">Die festgelegte Menge von %1$d Anrufen in %2$s importieren? Zeitraum: %3$s. Aktuelle Anrufdaten werden vor dem Schreiben geprüft. Geänderte oder gelöschte Termine werden nicht automatisch neu erstellt. Einige Einträge müssen möglicherweise geprüft werden.</string>
+    <string name="import_stop">Diesen Lauf anhalten; Sitzung behalten</string>
+    <string name="import_stopping">Der Lauf wird am nächsten sicheren Punkt angehalten. Die Sitzung kann später fortgesetzt werden.</string>
+    <string name="import_cancel">Verbleibende Vorgänge abbrechen</string>
+    <string name="import_cancel_text">Alle verbleibenden Vorgänge dieser Sitzung abbrechen? Bereits erfolgte Änderungen bleiben erhalten. Eine abgebrochene Sitzung kann nicht fortgesetzt werden. Erstelle bei Bedarf eine neue Vorschau.</string>
+    <string name="import_history">Gespeicherte Importsitzungen</string>
+    <string name="import_newer">Neuere Sitzungen</string>
+    <string name="import_older">Ältere Sitzungen</string>
+    <string name="import_invalid_range">Gib gültige Datumsangaben im Format YYYY-MM-DD ein. Das ausgeschlossene Enddatum muss nach dem Start liegen. Die Daten müssen in der ausgewählten Zeitzone existieren und innerhalb des unterstützten Zeitraums liegen.</string>
+    <string name="import_another">Eine weitere Vorschau erstellen? Die vorherige Sitzung bleibt gespeichert und angehalten. Du kannst sie aus der Liste gespeicherter Sitzungen auswählen.</string>
+    <string name="import_blocked">Der Lauf wurde angehalten und das Ergebnis gespeichert. Prüfe vor dem Fortsetzen Berechtigungen, Zielkalender und zu prüfende Einträge. Der Fortschritt wurde nicht geschätzt.</string>
+    <string name="import_progress">%1$s\n%2$s\nZielkalender: %3$s\nAnrufarten: %4$s\nKandidaten: %5$d; geprüft: %6$d; zu prüfen: %7$d. Geprüft umfasst bestehende Termine, die in diesem Import kontrolliert wurden.</string>
+    <string name="import_building">Vorschau wird erstellt — keine Kalenderänderungen</string>
+    <string name="import_preview">Vorschau bereit — Bestätigung erforderlich</string>
+    <string name="import_confirmed">Bestätigt — fortsetzbare Vorgänge vorhanden</string>
+    <string name="import_complete">Sitzung abgeschlossen</string>
+    <string name="import_cancelled">Sitzung abgebrochen</string>
+    <string name="import_review">Quelle geändert — neue Vorschau erstellen</string>
+    <string name="import_empty_history">Keine gespeicherten Sitzungen auf dieser Seite.</string>
+    <string name="import_failed">Diese Aktion konnte nicht bestätigt werden. Gespeicherter Sitzungsfortschritt und Übertragungsnachweise bleiben verfügbar. Wähle vor einem erneuten Versuch die gespeicherte Sitzung zum Aktualisieren aus.</string>
 </resources>

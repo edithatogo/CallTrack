@@ -44,6 +44,7 @@
             android:theme="@style/Theme.CallHistory.NoActionBar">
 
         </activity>
+        <activity android:name=".slice.HistoricalImportActivity" android:exported="false" />
         <activity android:name=".slice.AutomaticSettingsActivity" android:exported="false" />
         <activity android:name=".slice.CalendarSliceActivity" android:exported="true">
             <intent-filter>

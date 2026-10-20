@@ -3,6 +3,7 @@ package com.markobl.calllogsync.slice;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
@@ -107,6 +108,12 @@ public final class AutomaticSettingsActivity extends Activity {
         refresh.setText(R.string.auto_refresh);
         layout.addView(refresh);
         refresh.setOnClickListener(v -> load(false));
+        Button imports = new Button(this);
+        imports.setId(R.id.open_imports);
+        imports.setText(R.string.import_open);
+        imports.setOnClickListener(
+                v -> startActivity(new Intent(this, HistoricalImportActivity.class)));
+        layout.addView(imports);
         ScrollView scroll = new ScrollView(this);
         scroll.addView(layout);
         setContentView(scroll);
