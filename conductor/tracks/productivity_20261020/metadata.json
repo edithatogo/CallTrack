@@ -1,10 +1,10 @@
 {
   "track_id": "productivity_20261020",
   "type": "research-led-development",
-  "status": "new",
+  "status": "in_progress",
   "milestone": "Post-M4",
   "created_at": "2026-10-20",
-  "updated_at": "2026-10-20",
+  "updated_at": "2026-10-21",
   "depends_on": [
     "release_20261020"
   ],
