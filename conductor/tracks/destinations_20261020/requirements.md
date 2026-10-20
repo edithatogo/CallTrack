@@ -18,6 +18,7 @@ payload/redaction. Track4 delivery foundation must stabilize before integration.
 | I10 | Privacy/event semantics | Selected destination preview, no attendees/reminders by default, actual duration retained, supported timezone mapping/precision/DST and private/free normalization tested; private flag is not ACL security |
 | I11 | Cursors, retention and deletion | Page/cursor progress committed safely; cursor reset rebuilds mirror only; distinguish app uninstall/local data purge/credential revoke/explicit remote deletion; no mass remote deletion |
 | I12 | Schema and route migration | Preserve schema1/2 receipts and old readers/recovery; cannot cast remote IDs to long; no dual writes during migration; rollback retains ownership/review evidence |
+| I13 | R12 optional endpoint output, disabled by default | Named receiver need, HTTPS/auth, versioned schema and acknowledgement, receiver-side idempotency/readback, data minimization and retry/retention contracts tested before enabling |
 
 ## Proposed port contract, no new API committed
 
@@ -46,3 +47,26 @@ Never collapse a transport timeout into a definite failed insertion.
 These are specified fixtures, not executed HTTP or SDK contract tests. The
 [qualification protocol](qualification.md) requires actual native/provider readback
 before promotion. No live connector is justified by documentation support alone.
+
+## R12 endpoint output contract (future, disabled by default)
+
+An optional endpoint is a separate destination, not a calendar provider or an
+unrestricted URL callback. First identify a receiver/workflow; no endpoint or
+service is selected. The older upstream configurable HTTP POST/Number and Token
+header behavior is not approved as the successor contract.
+
+Before implementation agree a versioned request schema containing an opaque
+operation/source binding, payload version, timestamp/timezone/actual duration and
+explicit redaction policy. Never place phone identity or credentials in URLs or
+telemetry. Scope credentials to the selected HTTPS origin, validate redirects and
+certificate handling, and define server/client size limits and schema rejection.
+
+Receiver deduplicates by operation ID with a durable payload fingerprint: repeated
+same operation returns the existing receipt; same key/different payload reports a
+conflict. Specify acknowledgement and query/reconciliation semantics, retention
+window and expiry before selecting HTTP codes. A200/202 alone cannot establish
+calendar delivery or completed downstream processing. Timeout/cancel after POST
+requires reconciliation; no automatic fresh operation ID or blind replay after
+receiver deduplication expiry. Test receiver crash/commit/response-loss, schema
+upgrade/rejection, auth revoke, rate limits and receipt recovery using synthetic
+inputs. No receiver-side tests have run and no Internet capability is enabled.

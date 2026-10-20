@@ -1,7 +1,7 @@
 # Dependency decision INT-D01
 
 - Owner/date/refresh: Track10,2026-10-21. Requirements R12/R19/R20/R25,
-  I01–I12. Evidence: [findings](findings.md), [verification](verification.md).
+  I01–I13. Evidence: [findings](findings.md), [verification](verification.md).
 - Problem: additional calendar/provider coverage must not create duplicate events,
   competing ledgers or unnecessary credentials/consent.
 - Existing implementation: CalendarContract/AndroidCalendarSink plus schema2
@@ -22,7 +22,7 @@
   resolve the actual native-route gap, consent, account coverage or remote marker
   survival. No prototype is selected; specify cases first and execute at reopening
   against an explicitly selected synthetic test destination with end-to-end readback.
-- Contract/error/security/upgrade tests: I01–I12 and qualification protocol define
+- Contract/error/security/upgrade tests: I01–I13 and qualification protocol define
   route identity, uncertain writes,409/412/auth/throttle/cursor handling, source and
   data migration, privacy and loop tests. These are acceptance specifications only.
 - Decision: **retain native-provider-first route; defer direct connectors and
@@ -44,3 +44,7 @@
   Track8 must not freeze integer IDs into common contracts; Track11 owns CRM/tasks
   needs and Track12 owns native companion capability. Reopen INT-D01 before adding
   network/auth dependencies or enabling new routing/fan-out.
+
+R12 endpoint implementation is also deferred: no receiver/workflow has been selected.
+I13 requires receiving-side idempotency and a versioned HTTPS/auth contract; the
+legacy HTTP/header behavior is not selected. No endpoint prototype exists.
