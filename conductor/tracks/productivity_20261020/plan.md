@@ -1,31 +1,37 @@
 # Plan: Call journal and productivity requirements
 
-All tasks pending. Discovery is real track work. Implementation is conditional; do not mark it complete when only research/prototypes exist.
+Research completed with justified implementation deferral. Candidate ordering is provisional; validated workflow/feature acceptance remains open.
 
 ## Phase 1: Discovery and mapping
 
-- [ ] Task: Map notes, tags, reminders, routing, search, exports and timesheet workflows with user priorities
-- [ ] Task: Research reusable search/export/backup/rules components and existing native facilities
-- [ ] Task: Document prioritised feature specs, privacy/data ownership and acceptance; defer unneeded features
-- [ ] Task: Write findings and refine track requirements/acceptance with source provenance
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- [x] Task: Map notes, tags, reminders, routing, search, exports and timesheet workflows with user priorities
+- [x] Task: Research reusable search/export/backup/rules components and existing native facilities
+- [x] Task: Document prioritised feature specs, privacy/data ownership and acceptance; defer unneeded features
+- [x] Task: Write findings and refine track requirements/acceptance with source provenance
+- [x] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
 
 ## Phase 2: Options and dependency decision
 
-- [ ] Task: Compare retained/native/custom implementation with dependencies and deferral
-- [ ] Task: Run a bounded prototype only where it resolves uncertainty; identify temporary dependencies and expiry criteria
-- [ ] Task: Record decision, update spec and implementation tasks; propagate any changed prerequisite assumptions
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- [x] Task: Compare retained/native/custom implementation with dependencies and deferral
+- [x] Task: Run a bounded prototype only where it resolves uncertainty; identify temporary dependencies and expiry criteria
+- [x] Task: Record decision, update spec and implementation tasks; propagate any changed prerequisite assumptions
+- [x] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
 
 ## Phase 3: Conditional implementation and verification
 
-- [ ] Task: If adopted, write meaningful failing contract/regression tests before changing behaviour
-- [ ] Task: Implement the selected bounded change and any data/config migration; remove superseded code only after parity
-- [ ] Task: Verify tests plus applicable device/provider readback and rollback; otherwise document justified deferral
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- N/A: failing implementation contracts; no executable behavior selected.
+- N/A: production features, migration or dependency adoption under PROD-D01.
+- [x] Task: Verify tests plus applicable device/provider readback and rollback; otherwise document justified deferral
+- [x] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
 
 ## Phase 4: Handoff
 
-- [ ] Task: Update consolidated requirements, stack and dependency decisions with actual outcomes
-- [ ] Task: Document residual gaps, next-track inputs and checkpoint evidence
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- [x] Task: Update consolidated requirements, stack and dependency decisions with actual outcomes
+- [x] Task: Document residual gaps, next-track inputs and checkpoint evidence
+- [x] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+
+## History and remaining checkpoint
+
+- `1f3b07c`: activate research track.
+- [~] Formal review, host/link/source verification and archive.
+- User priorities remain optional input; no answer is taken as validation.

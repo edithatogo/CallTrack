@@ -27,3 +27,11 @@ Prioritised validated feature slices and dependency decisions before each implem
 ## Out of scope
 
 No automatic adoption of shortlisted technology, wholesale rewrite, paid service, unqualified platform parity or public release. Cross-track responsibilities remain with their owning tracks. A negative feasibility result or justified deferral is an acceptable research outcome.
+
+## Refined research disposition,2026-10-21
+
+[PROD-D01](decisions.md) defers production features pending selected user workflow,
+retention/recovery decisions and Track4/5 acceptance. [J01–J12](requirements.md)
+map candidate slices and future validation. Ordering is provisional unless a user
+answer is recorded. Research may close with this justified deferral; no journal or
+validated product-feature acceptance is claimed and no prototype is selected.
