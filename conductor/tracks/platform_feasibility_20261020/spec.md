@@ -30,7 +30,7 @@ No automatic adoption of shortlisted technology, wholesale rewrite, paid service
 
 ## Shared-core research handoff
 
-[Track8 findings](../kmp_20261020/findings.md) propose manual/import companion
+[Track8 findings](../../archive/kmp_20261020/findings.md) propose manual/import companion
 workflows without selecting a platform. Qualify supported acquisition, calendar,
 background and packaging capabilities here before reopening KMP-D01. No native
 companion or target feasibility is established by that research closure.

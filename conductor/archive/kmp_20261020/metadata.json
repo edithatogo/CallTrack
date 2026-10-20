@@ -1,0 +1,20 @@
+{
+  "track_id": "kmp_20261020",
+  "type": "research-led-development",
+  "status": "completed",
+  "milestone": "M7",
+  "created_at": "2026-10-20",
+  "updated_at": "2026-10-21",
+  "depends_on": [
+    "kotlin_20261020",
+    "platform_feasibility_20261020"
+  ],
+  "requirements": "R16, R24, R26",
+  "implementation_status": "deferred",
+  "archived": true,
+  "archived_at": "2026-10-21",
+  "research_outcome": "defer",
+  "production_migration_complete": false,
+  "cross_target_contracts_passed": false,
+  "prerequisite_disposition": "research-only; implementation gates remain open"
+}

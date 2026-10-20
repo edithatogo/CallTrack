@@ -14,7 +14,7 @@ Useful shared-core decision and equivalent contract tests on chosen targets.
 
 ## Inputs and dependencies
 
-Prerequisites: [kotlin](../kotlin_20261020/index.md), [platform_feasibility](../platform_feasibility_20261020/index.md). Requirement references: R16, R24, R26 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
+Prerequisites: [kotlin](../../tracks/kotlin_20261020/index.md), [platform_feasibility](../../tracks/platform_feasibility_20261020/index.md). Requirement references: R16, R24, R26 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
 
 ## Required outputs
 

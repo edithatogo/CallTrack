@@ -106,7 +106,7 @@ change. Reopen the recorded decision before adopting any prototype screen/versio
 
 ## M7 research disposition
 
-[Track8 KMP-D01](tracks/kmp_20261020/decisions.md) completes research with justified
+[Track8 KMP-D01](archive/kmp_20261020/decisions.md) completes research with justified
 deferral. The M7 exit gate is unchanged: shared fixtures on Android and a selected
 second target remain required before adoption. Reopen after stable source/delivery
 contracts, qualified Kotlin extraction boundaries and Track12's useful workflow.
