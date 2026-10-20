@@ -71,4 +71,65 @@ public class WorkStatusStoreTest {
             assertTrue(context().deleteSharedPreferences(name));
         }
     }
+
+    private static void expectUnavailable(Runnable read) {
+        try {
+            read.run();
+            fail("An uncertain status must not be presented as saved");
+        } catch (IllegalStateException expected) {
+        }
+    }
+
+    @Test
+    public void uncertainCommitIsHiddenAcrossStoreInstancesUntilSuccessfulPublication() {
+        String name = fixture();
+        SharedPreferences disk = context().getSharedPreferences(name, Context.MODE_PRIVATE);
+        java.util.concurrent.atomic.AtomicBoolean fail =
+                new java.util.concurrent.atomic.AtomicBoolean();
+        // Return an uncertain outcome after Android has updated its memory cache. Disk may
+        // actually have committed: callers must not infer durability from the cached value.
+        SharedPreferences preferences =
+                (SharedPreferences)
+                        java.lang.reflect.Proxy.newProxyInstance(
+                                SharedPreferences.class.getClassLoader(),
+                                new Class<?>[] {SharedPreferences.class},
+                                (proxy, method, args) -> {
+                                    Object value = method.invoke(disk, args);
+                                    if (!method.getName().equals("edit")) return value;
+                                    SharedPreferences.Editor editor =
+                                            (SharedPreferences.Editor) value;
+                                    return java.lang.reflect.Proxy.newProxyInstance(
+                                            SharedPreferences.Editor.class.getClassLoader(),
+                                            new Class<?>[] {SharedPreferences.Editor.class},
+                                            (editorProxy, editMethod, editArgs) -> {
+                                                Object result = editMethod.invoke(editor, editArgs);
+                                                if (editMethod.getName().equals("commit")
+                                                        && fail.get()) return false;
+                                                return result == editor ? editorProxy : result;
+                                            });
+                                });
+        try {
+            new ActivationControl(new AndroidActivationStore(preferences))
+                    .activate(7, "UTC", 1000, true, true, true);
+            AndroidWorkStatusStore store = new AndroidWorkStatusStore(preferences);
+            assertTrue(store.publish(1, 1001, "old", WorkStatus.Code.COMPLETE, 0, 0));
+            fail.set(true);
+            assertFalse(store.publish(1, 1002, "attempt", WorkStatus.Code.FAILED, 0, 0));
+            assertEquals("attempt", disk.getString("automaticStatusToken", null));
+            expectUnavailable(() -> store.read(1));
+            expectUnavailable(() -> new AndroidWorkStatusStore(preferences).read(1));
+            assertFalse(store.publish(1, 1003, "attempt", WorkStatus.Code.FAILED, 0, 0));
+            expectUnavailable(() -> store.read(1));
+            fail.set(false);
+            assertTrue(
+                    new AndroidWorkStatusStore(preferences)
+                            .publish(1, 1004, "attempt", WorkStatus.Code.FAILED, 0, 0));
+            WorkStatus saved = store.read(1);
+            assertEquals(1, saved.failures);
+            assertEquals(1004, saved.at);
+            assertEquals("attempt", saved.token);
+        } finally {
+            assertTrue(context().deleteSharedPreferences(name));
+        }
+    }
 }

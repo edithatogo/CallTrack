@@ -422,3 +422,17 @@ matching the current source signature and known facts, under its confirmed opera
 and cancellation guard. Suppression remains a separate explicit action and cannot
 be reapproved. No data downgrade or automatic calendar/source deletion is supplied.
 Retirement/replacement by a persistence library requires preserving these contracts.
+
+
+## Execution status after an uncertain preference commit
+
+Status publication does not authorize delivery. Android can expose new preference
+values in its process cache before commit reports failure. A process-local shared
+uncertainty set therefore makes reads fail closed across status-store instances
+until a subsequent complete synchronous publication commits successfully. Retrying
+may use cached attempt identity/counters to avoid counting the same attempt twice;
+those cached values cannot be presented as a saved status while uncertain. A thrown
+commit also leaves uncertainty in place. Process restart must reload disk state;
+actual process-death acceptance remains separate from creating another store object.
+No new runtime dependency or data-schema change is required. Retire this latch only
+with equivalent failure semantics in a replacement persistence adapter.
