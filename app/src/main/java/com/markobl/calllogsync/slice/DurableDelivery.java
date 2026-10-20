@@ -41,11 +41,39 @@ public final class DurableDelivery {
         void put(Intent intent);
     }
 
+    /** Persisted activation/import identity. Generations are never reused after cancellation. */
+    public static final class Operation {
+        public final String owner;
+        public final long generation;
+
+        public Operation(String owner, long generation) {
+            if (owner == null || owner.isEmpty() || generation < 0)
+                throw new IllegalArgumentException("Invalid operation identity");
+            this.owner = owner;
+            this.generation = generation;
+        }
+    }
+
+    private static boolean sameOperation(Operation left, Operation right) {
+        return left == null
+                ? right == null
+                : right != null
+                        && left.owner.equals(right.owner)
+                        && left.generation == right.generation;
+    }
+
+    private static boolean pending(Intent intent) {
+        return intent.state == State.READY
+                || intent.state == State.IN_FLIGHT
+                || intent.state == State.ATTEMPTED;
+    }
+
     public static final class Intent {
         public final State state;
         public final String key, sourceSignature, marker, fingerprint;
         public final long calendar, eventId;
         public final CallEvent payload;
+        public final Operation operation;
 
         public Intent(
                 State state,
@@ -56,6 +84,29 @@ public final class DurableDelivery {
                 String fingerprint,
                 long eventId,
                 CallEvent payload) {
+            this(
+                    state,
+                    key,
+                    calendar,
+                    sourceSignature,
+                    marker,
+                    fingerprint,
+                    eventId,
+                    payload,
+                    null);
+        }
+
+        public Intent(
+                State state,
+                String key,
+                long calendar,
+                String sourceSignature,
+                String marker,
+                String fingerprint,
+                long eventId,
+                CallEvent payload,
+                Operation operation) {
+            this.operation = operation;
             this.state = Objects.requireNonNull(state);
             this.key = Objects.requireNonNull(key);
             this.calendar = calendar;
@@ -73,12 +124,28 @@ public final class DurableDelivery {
                             ? null
                             : payload;
             return new Intent(
-                    next, key, calendar, sourceSignature, marker, fingerprint, id, retained);
+                    next,
+                    key,
+                    calendar,
+                    sourceSignature,
+                    marker,
+                    fingerprint,
+                    id,
+                    retained,
+                    operation);
         }
 
         Intent bind(String signature) {
             return new Intent(
-                    state, key, calendar, signature, marker, fingerprint, eventId, payload);
+                    state,
+                    key,
+                    calendar,
+                    signature,
+                    marker,
+                    fingerprint,
+                    eventId,
+                    payload,
+                    operation);
         }
     }
 
@@ -92,6 +159,15 @@ public final class DurableDelivery {
 
     public Result deliver(
             CallRecord call, long calendar, String timezone, BooleanSupplier allowed) {
+        return deliver(call, calendar, timezone, null, allowed);
+    }
+
+    public Result deliver(
+            CallRecord call,
+            long calendar,
+            String timezone,
+            Operation operation,
+            BooleanSupplier allowed) {
         synchronized (DELIVERY_LOCK) {
             try {
                 if (!allowed.getAsBoolean()) return Result.PAUSED;
@@ -109,8 +185,11 @@ public final class DurableDelivery {
                                     event.marker,
                                     event.fingerprint(),
                                     -1,
-                                    event);
+                                    event,
+                                    operation);
                     store.put(intent);
+                } else if (pending(intent) && !sameOperation(intent.operation, operation)) {
+                    return Result.PAUSED;
                 } else if (intent.sourceSignature == null) {
                     // A v1 receipt has no source signature: bind only if its original payload
                     // agrees.
@@ -134,12 +213,18 @@ public final class DurableDelivery {
 
     /** Resume a committed payload even when the original call-log row no longer exists. */
     public Result resume(String key, long calendar, BooleanSupplier allowed) {
+        return resume(key, calendar, null, allowed);
+    }
+
+    public Result resume(String key, long calendar, Operation operation, BooleanSupplier allowed) {
         synchronized (DELIVERY_LOCK) {
             try {
                 if (!allowed.getAsBoolean()) return Result.PAUSED;
                 if (calendar < 0 || !sink.writable(calendar)) return Result.DESTINATION_UNAVAILABLE;
                 Intent intent = store.get(key, calendar);
-                return intent == null ? Result.NOTHING_PENDING : attempt(intent, allowed);
+                if (intent == null) return Result.NOTHING_PENDING;
+                if (!sameOperation(intent.operation, operation)) return Result.PAUSED;
+                return attempt(intent, allowed);
             } catch (SecurityException e) {
                 return Result.PERMISSION_REQUIRED;
             } catch (RuntimeException e) {
@@ -161,6 +246,9 @@ public final class DurableDelivery {
         // exceptions.
         intent = intent.state(State.IN_FLIGHT, -1);
         store.put(intent);
+        // Settings/cancel publication may occur during the durable write. The shared lock
+        // must also protect final pause publication in the coordinator.
+        if (!allowed.getAsBoolean()) return Result.PAUSED;
         long id = sink.insert(intent.calendar, intent.payload);
         if (id < 0) return review(intent, Result.REVIEW_REQUIRED);
         intent = intent.state(State.ATTEMPTED, id);

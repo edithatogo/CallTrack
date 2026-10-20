@@ -76,7 +76,9 @@ def qualify(serial):
         for method in ('preservesV1ReceiptsAndCreatesLegacyBindings',
                        'outboxCommitsInflightAndPurgesConfirmedPayloadAcrossReopen',
                        'rejectsOutboxWriteInsideAnUncommittedTransaction',
-                       'kotlinMappingRecognisesPreservedJavaReceiptWithoutReinsert'):
+                       'kotlinMappingRecognisesPreservedJavaReceiptWithoutReinsert',
+                       'preservesV2PendingRowsWithoutInventingOperationOwnership',
+                       'operationIdentitySurvivesReopenAndPayloadPurge'):
             check('ParityStoreTest', method)
         receipt['result'] = 'passed'
     except Exception as error:

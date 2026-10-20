@@ -250,4 +250,84 @@ public class DurableDeliveryTest {
                 delivery(store, sink).resume(call().key(), 7, () -> true));
         assertEquals(1, sink.inserts);
     }
+
+    @Test
+    public void pendingIntentCannotBeResumedByAnotherOwnerOrGeneration() {
+        Store store = new Store();
+        store.crashAfter = DurableDelivery.State.READY;
+        SliceTest.Sink sink = sink();
+        DurableDelivery engine = delivery(store, sink);
+        DurableDelivery.Operation original = new DurableDelivery.Operation("import-1", 1);
+        assertThrows(Crash.class, () -> engine.deliver(call(), 7, "UTC", original, () -> true));
+        assertEquals(
+                DurableDelivery.Result.PAUSED,
+                engine.resume(
+                        call().key(),
+                        7,
+                        new DurableDelivery.Operation("automatic", 1),
+                        () -> true));
+        assertEquals(
+                DurableDelivery.Result.PAUSED,
+                engine.resume(
+                        call().key(), 7, new DurableDelivery.Operation("import-1", 2), () -> true));
+        assertEquals(DurableDelivery.Result.PAUSED, engine.resume(call().key(), 7, () -> true));
+        assertEquals(
+                DurableDelivery.Result.PAUSED,
+                engine.deliver(
+                        call(),
+                        7,
+                        "UTC",
+                        new DurableDelivery.Operation("automatic", 1),
+                        () -> true));
+        assertEquals(0, sink.inserts);
+        assertEquals(DurableDelivery.State.READY, store.get(call().key(), 7).state);
+        assertEquals(
+                DurableDelivery.Result.SAVED,
+                engine.resume(
+                        call().key(), 7, new DurableDelivery.Operation("import-1", 1), () -> true));
+        assertEquals(1, sink.inserts);
+        assertEquals(
+                DurableDelivery.Result.ALREADY_LOGGED,
+                engine.deliver(
+                        call(),
+                        7,
+                        "UTC",
+                        new DurableDelivery.Operation("automatic", 2),
+                        () -> true));
+        assertEquals(1, sink.inserts);
+    }
+
+    @Test
+    public void cancellationAtCommittedBoundaryDoesNotInsert() {
+        java.util.concurrent.atomic.AtomicBoolean enabled =
+                new java.util.concurrent.atomic.AtomicBoolean(true);
+        Store store =
+                new Store() {
+                    @Override
+                    public void put(DurableDelivery.Intent intent) {
+                        super.put(intent);
+                        if (intent.state == DurableDelivery.State.IN_FLIGHT) enabled.set(false);
+                    }
+                };
+        SliceTest.Sink sink = sink();
+        assertEquals(
+                DurableDelivery.Result.PAUSED,
+                delivery(store, sink)
+                        .deliver(
+                                call(),
+                                7,
+                                "UTC",
+                                new DurableDelivery.Operation("import-1", 1),
+                                enabled::get));
+        assertEquals(0, sink.inserts);
+        assertEquals(DurableDelivery.State.IN_FLIGHT, store.get(call().key(), 7).state);
+    }
+
+    @Test
+    public void operationIdentityMustBeExplicitAndGenerationNonnegative() {
+        assertThrows(IllegalArgumentException.class, () -> new DurableDelivery.Operation("", 0));
+        assertThrows(IllegalArgumentException.class, () -> new DurableDelivery.Operation(null, 0));
+        assertThrows(
+                IllegalArgumentException.class, () -> new DurableDelivery.Operation("import", -1));
+    }
 }

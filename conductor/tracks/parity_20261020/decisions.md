@@ -26,3 +26,20 @@ Native SQLite remains selected for the bounded outbox migration, subject to actu
 - Import preview freezes the selected range/filter/destination and candidate source signatures. Confirmation authorises that snapshot, not a changing query. Revalidate changed candidates, retain progress across interruption, cancel without deleting confirmed events and clear preview personal payload when cancelled/completed.
 - Source facts (exact source instant, actual seconds, raw type/presentation) must survive payload minimisation; logical clearing of names/numbers is not a claim of forensic erasure.
 - All app delivery currently assumes one Android process; UI pause/settings publication must coordinate with the same delivery lock so a displayed completed pause has no later writes from an old worker.
+
+## Operation scope implementation checkpoint
+
+Schema3 adds nullable opaque operation owner plus nonnegative generation. Existing
+schema1 receipts and schema2 pending rows are preserved without inventing ownership.
+The legacy unscoped API remains for compatibility/manual callers; new automatic/
+import coordination must supply a scoped operation and an allowed callback tied to
+its persisted activation/session. Pending work requires the exact owner/generation;
+resuming through an unrelated or legacy unscoped caller pauses without changing it.
+Confirmed receipts may be verified by another explicitly delivered source operation
+without recreating events. Ownership persists after payload purge.
+
+Recheck allowed after the committed IN_FLIGHT boundary as well as before it. A pause
+observed at that boundary leaves the ambiguous intent for conservative recovery;
+never roll it back to READY. Future coordinator pause publication must hold the same
+process delivery lock to serialize its completion with provider insertion. This
+engine change is not proof of a wired pause/import/scheduler UI.

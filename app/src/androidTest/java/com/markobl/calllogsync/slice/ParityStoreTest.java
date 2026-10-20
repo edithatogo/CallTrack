@@ -44,7 +44,7 @@ public class ParityStoreTest {
                 assertEquals(42, migrated.eventId);
                 assertEquals("old-fingerprint", migrated.fingerprint);
                 assertNull(migrated.sourceSignature);
-                assertEquals(2, ledger.getReadableDatabase().getVersion());
+                assertEquals(3, ledger.getReadableDatabase().getVersion());
             }
         } finally {
             context().deleteDatabase(name);
@@ -201,7 +201,82 @@ public class ParityStoreTest {
                         SliceEngine.Result.REVIEW_REQUIRED,
                         new SliceEngine(() -> call, sink, ledger, "UTC").run(7));
                 assertEquals(javaFingerprint, ledger.get(call.key(), 7).fingerprint);
-                assertEquals(2, ledger.getReadableDatabase().getVersion());
+                assertEquals(3, ledger.getReadableDatabase().getVersion());
+            }
+        } finally {
+            context().deleteDatabase(name);
+        }
+    }
+
+    @Test
+    public void preservesV2PendingRowsWithoutInventingOperationOwnership() {
+        String name = database();
+        context().deleteDatabase(name);
+        try {
+            try (SQLiteDatabase db =
+                    context().openOrCreateDatabase(name, Context.MODE_PRIVATE, null)) {
+                db.execSQL(
+                        "CREATE TABLE receipts (source TEXT NOT NULL, calendar INTEGER NOT NULL,"
+                                + " event INTEGER NOT NULL, fingerprint TEXT NOT NULL, PRIMARY"
+                                + " KEY(source,calendar))");
+                db.execSQL(
+                        "CREATE TABLE outbox (source TEXT NOT NULL, calendar INTEGER NOT NULL,"
+                            + " state TEXT NOT NULL, event INTEGER NOT NULL, signature TEXT, marker"
+                            + " TEXT, fingerprint TEXT NOT NULL, payload_title TEXT,"
+                            + " payload_description TEXT, payload_start INTEGER, payload_end"
+                            + " INTEGER, payload_timezone TEXT, PRIMARY KEY(source,calendar))");
+                db.execSQL("CREATE INDEX outbox_state ON outbox(calendar,state)");
+                db.execSQL(
+                        "INSERT INTO outbox VALUES"
+                                + " ('source',7,'READY',-1,'sig','marker','fp','Synthetic"
+                                + " title','Synthetic description',1,2,'UTC')");
+                db.setVersion(2);
+            }
+            try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+                DurableDelivery.Intent intent = ledger.outbox().get("source", 7);
+                assertEquals(3, ledger.getReadableDatabase().getVersion());
+                assertNull(intent.operation);
+                assertEquals(DurableDelivery.State.READY, intent.state);
+                assertEquals("Synthetic title", intent.payload.title);
+                assertEquals("sig", intent.sourceSignature);
+                assertEquals("fp", intent.fingerprint);
+            }
+        } finally {
+            context().deleteDatabase(name);
+        }
+    }
+
+    @Test
+    public void operationIdentitySurvivesReopenAndPayloadPurge() {
+        String name = database();
+        context().deleteDatabase(name);
+        try {
+            try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+                ledger.outbox()
+                        .put(
+                                new DurableDelivery.Intent(
+                                        DurableDelivery.State.READY,
+                                        "source",
+                                        7,
+                                        "sig",
+                                        "marker",
+                                        "fp",
+                                        -1,
+                                        new CallEvent("Synthetic", "", 1, 2, "UTC", "marker"),
+                                        new DurableDelivery.Operation("import-1", 42)));
+            }
+            try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+                DurableDelivery.Intent intent = ledger.outbox().get("source", 7);
+                assertEquals("import-1", intent.operation.owner);
+                assertEquals(42, intent.operation.generation);
+                ledger.outbox().put(intent.state(DurableDelivery.State.CONFIRMED, 123));
+            }
+            try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+                DurableDelivery.Intent intent = ledger.outbox().get("source", 7);
+                assertEquals("import-1", intent.operation.owner);
+                assertEquals(42, intent.operation.generation);
+                assertNull(intent.payload);
+                assertEquals(123, intent.eventId);
             }
         } finally {
             context().deleteDatabase(name);
