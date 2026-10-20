@@ -1,31 +1,37 @@
 # Plan: Rust and reusable component evaluation
 
-All tasks pending. Discovery is real track work. Implementation is conditional; do not mark it complete when only research/prototypes exist.
+Research and bounded host experiment complete; production Rust adoption is deferred under RUST-D01. Full contracts/target packaging/material product benefit remain open.
 
 ## Phase 1: Discovery and mapping
 
-- [ ] Task: Identify concrete cross-application consumers and current custom/native components potentially replaceable by libraries
-- [ ] Task: Research maintained Rust libraries, UniFFI target support, licences and packaging versus Kotlin/KMP alternatives
-- [ ] Task: Benchmark one bounded component when justified; document temporary versus production role, exit criteria and costs
-- [ ] Task: Write findings and refine track requirements/acceptance with source provenance
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- [x] Task: Identify concrete cross-application consumers and current custom/native components potentially replaceable by libraries
+- [x] Task: Research maintained Rust libraries, UniFFI target support, licences and packaging versus Kotlin/KMP alternatives
+- [x] Task: Benchmark one bounded component when justified; document temporary versus production role, exit criteria and costs
+- [x] Task: Write findings and refine track requirements/acceptance with source provenance
+- [x] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
 
 ## Phase 2: Options and dependency decision
 
-- [ ] Task: Compare retained/native/custom implementation with dependencies and deferral
-- [ ] Task: Run a bounded prototype only where it resolves uncertainty; identify temporary dependencies and expiry criteria
-- [ ] Task: Record decision, update spec and implementation tasks; propagate any changed prerequisite assumptions
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- [x] Task: Compare retained/native/custom implementation with dependencies and deferral
+- [x] Task: Run a bounded prototype only where it resolves uncertainty; identify temporary dependencies and expiry criteria
+- [x] Task: Record decision, update spec and implementation tasks; propagate any changed prerequisite assumptions
+- [x] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
 
 ## Phase 3: Conditional implementation and verification
 
-- [ ] Task: If adopted, write meaningful failing contract/regression tests before changing behaviour
-- [ ] Task: Implement the selected bounded change and any data/config migration; remove superseded code only after parity
-- [ ] Task: Verify tests plus applicable device/provider readback and rollback; otherwise document justified deferral
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- [x] Task: Prototype golden/invalid-input tests fail before implementation; production integration contracts remain deferred.
+- [x] Task: Implement isolated host signature subset and JVM-source baseline only; no app/data migration or retirement.
+- [x] Task: Verify tests plus applicable device/provider readback and rollback; otherwise document justified deferral
+- [x] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
 
 ## Phase 4: Handoff
 
-- [ ] Task: Update consolidated requirements, stack and dependency decisions with actual outcomes
-- [ ] Task: Document residual gaps, next-track inputs and checkpoint evidence
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- [x] Task: Update consolidated requirements, stack and dependency decisions with actual outcomes
+- [x] Task: Document residual gaps, next-track inputs and checkpoint evidence
+- [x] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+
+## History and final checkpoint
+
+- `a0da851`: activate research track.
+- Rust3 tests and JVM4 golden assertions pass; sequential raw benchmark receipt recorded.
+- [~] Host/link/format validation, formal review/fixes and archive.
