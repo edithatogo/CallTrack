@@ -133,3 +133,21 @@ artifacts/native outputs in pending-evidence.json. No full native calendar recov
 scheduler or UI acceptance inferred. Next implement frozen historical preview/
 confirmation/progress/cancel/resume and read-only legacy matching, then scheduling,
 user controls and complete emulator acceptance. Full review/fixes/archive remain open.
+
+
+## Historical import foundation checkpoint
+
+HistoricalImport implements bounded observed candidate preview/count, explicit
+confirmation, cancellation, resumable per-candidate delivery and crash replay via
+existing receipts. SqliteImportStore schema1 commits session/candidates atomically,
+rejects stale revisions and keeps delivery outside its transaction. Three test-first
+JVM regressions cover read-only/frozen/range preview, changed-source review and
+crash-before-progress/cancellation. Two native SQLite/port tests cover partial
+reopen, repeat import without duplicate, injected append rollback and stale update
+rejection. Full source-bound build65 JVM tests/APKs/lint and25 host tests pass;
+19 API36 native checks pass, with fixture databases and packages removed. Exact
+inputs/artifacts/native outputs in import-evidence.json. Native calendar is a fake
+port here; no real CalendarContract/import UI/process-kill acceptance inferred.
+Next: per-candidate review details and permission/recovery tests, read-only legacy
+matcher, qualified scheduling and user settings/import/status controls, then full
+emulator acceptance and final review/fixes/archive. P07 is not closed by this core.
