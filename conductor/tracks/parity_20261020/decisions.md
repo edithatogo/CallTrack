@@ -436,3 +436,53 @@ commit also leaves uncertainty in place. Process restart must reload disk state;
 actual process-death acceptance remains separate from creating another store object.
 No new runtime dependency or data-schema change is required. Retire this latch only
 with equivalent failure semantics in a replacement persistence adapter.
+
+
+## Launcher and lifecycle recovery
+
+P08 requires recovery on ordinary launcher resume as well as platform broadcasts.
+API35+ sends BOOT_COMPLETED when a user takes a package out of the stopped state
+([Android platform contract](https://developer.android.com/about/versions/15/behavior-changes-all#enhanced-stop-states));
+a force-stop/reopen result alone therefore cannot isolate the Activity recovery path.
+A native test temporarily disables only the app's wake receiver, restores its exact
+component setting in finally, and demonstrates the independent resume requirement.
+CalendarSliceActivity now invokes AutomaticScheduling.reconcile on its executor.
+Reconcile reads only committed policy and schedules only a previously enabled
+activation; resume never activates a policy, resets its boundary or grants access.
+Worker generation/permission/receipt checks remain the authority at effect time.
+
+Lifecycle acceptance separates actual provider/receipt persistence from worker-status
+publication. Starting instrumentation can terminate an existing app process, so the
+host must observe both scoped calendar effects and committed status before restarting
+verification. For interrupted insertion it instead deliberately observes the real
+provider effect, terminates the still-live app before the returned ID is committed,
+and verifies recovery after explicit reopening. No expectation of running while the
+user keeps the app force-stopped is introduced.
+
+The dedicated-emulator controller snapshots qualified power/network settings before
+mutation, refuses pre-existing battery overrides or unqualified idle baselines, and
+checks exact restoration in finally. Radio enable commands are asynchronous: bounded
+readback polling qualifies settled state rather than treating an accepted command or
+one immediate stale read as proof. Doze acceptance keeps verification instrumentation
+out of the app until deferred background delivery is observed. Synthetic fixtures,
+actual guest reboot identity, private ledger state and remote calendar sync remain
+distinct evidence; no dependency or cloud/physical-device capability is added.
+
+
+The wake receiver now waits for both WorkManager enqueue-operation acknowledgements
+before finishing its goAsync lifetime. One monotonic eight-second budget starts at
+receiver dispatch; enqueue completion means scheduler persistence, not worker execution
+or provider delivery. Failed/timed-out/interrupt acknowledgements remain unconfirmed;
+interrupt status is restored and only a constant nonpersonal warning is logged. UI
+reconcile stays asynchronous. No new dependency or persisted schema is introduced.
+Three test-first JVM contracts cover both acknowledgements, failure and bounded wait.
+The platform requires short broadcast handling; see [broadcast guidance](https://developer.android.com/develop/background-work/background-tasks/broadcasts).
+
+A boot observation can outlive90 seconds: actual broadcast history in this emulator
+showed the app receiver scheduled approximately85 seconds after broadcast enqueue.
+The lifecycle harness therefore observes boot effects/status for up to180 seconds
+and records command timing. This changes an observation budget, not the product's
+latency guarantee or its data assertions. Earlier no-effect windows and enqueue
+acknowledgement limits must remain explicit rather than attributed to one cause
+without evidence. Physical/OEM dispatch policy and running while force-stopped are
+not qualified by these emulator cases.

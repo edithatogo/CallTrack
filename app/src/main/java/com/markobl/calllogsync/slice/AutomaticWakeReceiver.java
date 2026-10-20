@@ -19,14 +19,19 @@ public final class AutomaticWakeReceiver extends BroadcastReceiver {
                 && !Intent.ACTION_BOOT_COMPLETED.equals(action)
                 && !Intent.ACTION_MY_PACKAGE_REPLACED.equals(action)) return;
         PendingResult pending = goAsync();
+        long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(8);
         java.util.concurrent.ExecutorService executor =
                 java.util.concurrent.Executors.newSingleThreadExecutor();
         executor.execute(
                 () -> {
                     try {
-                        AutomaticScheduling.reconcile(context);
-                    } catch (RuntimeException unavailable) {
-                        /* A later periodic/reopen wake can retry persisted settings. */
+                        AutomaticScheduling.reconcileCommitted(context, deadline);
+                    } catch (InterruptedException interrupted) {
+                        Thread.currentThread().interrupt();
+                        android.util.Log.w("CallTrackScheduling", "WAKE_ENQUEUE_UNCONFIRMED");
+                    } catch (Exception unavailable) {
+                        // No caller fields, account names, exception text or stack traces.
+                        android.util.Log.w("CallTrackScheduling", "WAKE_ENQUEUE_UNCONFIRMED");
                     } finally {
                         pending.finish();
                         executor.shutdown();

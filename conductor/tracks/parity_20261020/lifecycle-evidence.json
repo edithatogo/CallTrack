@@ -1,0 +1,1144 @@
+{
+  "exit_code": 0,
+  "inputs_unchanged": true,
+  "inputs": {
+    "build.gradle": "e12c8bd92c32b307f2aec4044aad6fc5e9c378329a3dab52b7e29fb7b176250f",
+    "settings.gradle": "b725061d2a76a06441d3481de0f6eed52b5f7c7d54279864ecf6b3b04a42bd4d",
+    "gradle.properties": "1ef6157a4970eef09cf79edfea9bdf29496116711e9588f02f5218aa4014bdc2",
+    "gradlew": "63135287117a1e6d12c84580f1f49c61d1ba02218ecd28660605e97f976e7d65",
+    "gradle/wrapper/gradle-wrapper.jar": "e996d452d2645e70c01c11143ca2d3742734a28da2bf61f25c82bdc288c9e637",
+    "gradle/wrapper/gradle-wrapper.properties": "91c1ed951e7e61e66acf8f08b181df8d9af06bac43d5b4a3a9c6b3ff353ad6d5",
+    "app/build.gradle": "3ecb16872af5a18d525e734c5a08d22b9e6a20ffad7f8a394e3598cd3c30a4f6",
+    "app/proguard-rules.pro": "56fd960cf225f6ca40f982b13a5dbb0d8bc3dfde13ff76422825c6070d0a1890",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/ActivationStoreTest.java": "5df381546c553e1479e153f6e616a1cbe3cf5f7ec94daee572690e6a58d8b989",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/AutomaticSettingsTest.java": "592375d8dcc54d640238fe63e59ae3c70bf03a2266a9c52c79c7c530e8184b69",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/AutomaticWorkTest.java": "7a78386a80ee6445cf8feebdffcaee2196ab6071df08fe9ccf05361cd1cb4e56",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/CalendarSliceTest.java": "37307686c2a3bf2cea8ab5e1633be713f9bb8d23a780dab649fb2adbdc8333be",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/HistoricalImportStoreTest.java": "661a3e2e84f932f311d22cd17403d9770fa7c7388cc787269e2a5b1562252df0",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/LifecycleProviderTest.java": "699d24137ef44a82194d2c079bfec67b61b819d484e020d94885f1da11365620",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/ParityProviderTest.java": "ec46b944030b1592bc54955b0bd2360f5a639cfa8be88adc637c3b4cda3e1678",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/ParityStoreTest.java": "a50ffdb47ec9ea7c03af11c627e99784f31bab3f15b33850572bfc6e0321ca48",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/WorkStatusStoreTest.java": "2b55b8d81d9568314168123d1ec128b166bff646f2d853243cc0ae4662a32547",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/WorkerProviderTest.java": "1b54d0ab5ee5ca6fe118d9c2a880dddbfc533f933f905ac978ac8764a504660b",
+    "app/src/main/AndroidManifest.xml": "0e29b8c22ea4ec01fb766e358c9c2b353ef3b2079de015d180b7c169451bc424",
+    "app/src/main/ic_launcher-playstore.png": "6c2a7ea9feb47526705c68f30c1d27cc56d767c3e060c77ad4570cd1b3020c4b",
+    "app/src/main/java/com/markobl/calllogsync/AutostartReceiver.java": "dcde4455f71c3ab517669f5509b312c7a16cd13f764db316775728ba1a3e0b68",
+    "app/src/main/java/com/markobl/calllogsync/Config.java": "23b4ae821c36f0d2ad7337632fd6114b87dbc06aa3ecc15a30518b28dccc8b5d",
+    "app/src/main/java/com/markobl/calllogsync/LogFragment.java": "da8f4dd5c34e8c1b9d9d49cd59c9b34ed2b6ca03ffa5a705a3456e9e0047843e",
+    "app/src/main/java/com/markobl/calllogsync/LogItem.java": "68643c3bed8b66762670818d6fb5109b79beb7889dd4590b35d2799c5dcaaf69",
+    "app/src/main/java/com/markobl/calllogsync/LogItemRecyclerViewAdapter.java": "05bac90526e208fc934a584f5dd789e8f3e05790f0fcf2d1073fb07f421f966a",
+    "app/src/main/java/com/markobl/calllogsync/MainActivity.java": "19cc6dac6aad7aee47808cad2fc111b637fb211d75ced388331945e9fe88a417",
+    "app/src/main/java/com/markobl/calllogsync/MainFragment.java": "d732616ea2addd65cd827a32c0b22da7994cc3dbb2b8576a1c7618679115d58c",
+    "app/src/main/java/com/markobl/calllogsync/RandomString.java": "0c0c55e069467e4e1cd992d59fe5c53a9f79772e8170b7e84d6579358a540e82",
+    "app/src/main/java/com/markobl/calllogsync/SettingsFragment.java": "b8b32207904584b98b81cdbd9a4a883229c27a751a2ff29c20b8d1adbb98c873",
+    "app/src/main/java/com/markobl/calllogsync/Sync.java": "a2f73bd10b399c05d5cf917d58315b3cecd63e681fd3b9158e180e7ea8df8ff8",
+    "app/src/main/java/com/markobl/calllogsync/SyncResult.java": "2b6b0b55afad7ba0d87f1aa84b3220628f286a61c546efbe90b1d3a55d6201d0",
+    "app/src/main/java/com/markobl/calllogsync/SyncResultRunner.java": "137928ce06ce2c665ec0a77318ef064a73a8860ce1d45669e142b34e47e7bd20",
+    "app/src/main/java/com/markobl/calllogsync/SyncResultType.java": "391f8230adfac1f720c6d900f9b2a7929171a8b99bbb9d17f3aa35b89f7ec88b",
+    "app/src/main/java/com/markobl/calllogsync/SyncWorker.java": "4aa71769dc3120b5cc9b5cf5fdeafe934464ff29e857e71ec4c35b38f9224e72",
+    "app/src/main/java/com/markobl/calllogsync/slice/ActivationControl.java": "1b88fdfdf8b59964ee6bc791b5f284f635f2bc5bfa4f0867761fb1d974a4d64b",
+    "app/src/main/java/com/markobl/calllogsync/slice/AndroidActivationStore.java": "f690b0ff7cd998903cfce31a25c35420b4ad0d7e19b4201f77bba9082898ad7c",
+    "app/src/main/java/com/markobl/calllogsync/slice/AndroidCalendarSink.java": "59bd06509ed00f65b580e15607453f454d14fda4a5f2e0a54411661ac29eaf24",
+    "app/src/main/java/com/markobl/calllogsync/slice/AndroidCallLogSource.java": "9f7f6bedbf41f2a32f311f0d98107b40d63028b89716b2e972acbfa090d06b90",
+    "app/src/main/java/com/markobl/calllogsync/slice/AndroidWorkStatusStore.java": "ecf229e75e5602e2e72d40d4a003f2dd7d83f7445e72e2533cc0bc3bc28c24f0",
+    "app/src/main/java/com/markobl/calllogsync/slice/AutomaticDelivery.java": "ab2d6ed7dee168f9fef4192688778c9f6c04d61fcdf928dceeaf3c9014200ddc",
+    "app/src/main/java/com/markobl/calllogsync/slice/AutomaticLogWorker.java": "7b8447430dceb77b3f79834701247e57655b9285da317770b882e894342f250a",
+    "app/src/main/java/com/markobl/calllogsync/slice/AutomaticScheduling.java": "b9be1944b8b0b85e64e2de7109f6e12626d10ce21521baa59447ca4d91baa4ff",
+    "app/src/main/java/com/markobl/calllogsync/slice/AutomaticSettingsActivity.java": "0bbc2e6f3cbb18f4c6f02f8edeb10bb555e5d56d19e1189c0793589387d0dacc",
+    "app/src/main/java/com/markobl/calllogsync/slice/AutomaticWakeReceiver.java": "36670fac3b122325adebe561ce29fba677e0e703bf368e56aaf4e2762d0bba05",
+    "app/src/main/java/com/markobl/calllogsync/slice/AutomaticWorkPolicy.java": "f51edb214ccd392bbf4ad8ceeaf139e072bba77bfb96445d8e20069a69742c61",
+    "app/src/main/java/com/markobl/calllogsync/slice/CalendarSliceActivity.java": "3fe867fba004c9cb5d4199d0b15b3b72078444b25e45baf879ad516e784a297b",
+    "app/src/main/java/com/markobl/calllogsync/slice/CallRecord.java": "9fa00d598596b3ea81490dc03c75149712e050c933b7f12dbd6e1421251878b4",
+    "app/src/main/java/com/markobl/calllogsync/slice/DeliveryCounts.java": "90641d773d7963a1dacba9784bf5cae8a27feca696b1b62c696c6ac75f24e75d",
+    "app/src/main/java/com/markobl/calllogsync/slice/DurableDelivery.java": "af245824289d63ae8642952338004c7211f8dee0f87dbfab68b286ac1842847b",
+    "app/src/main/java/com/markobl/calllogsync/slice/HistoricalImport.java": "f70c4aab28536c2ff8c7faed0e57c1ff195ea188c910b8af4fdc9c3025a1f74e",
+    "app/src/main/java/com/markobl/calllogsync/slice/HistoricalImportActivity.java": "ca3f593a39f09cd8c6955691557add585144e1ca540517e916fa85901f77efa0",
+    "app/src/main/java/com/markobl/calllogsync/slice/ImportRange.java": "a3e3500bbb7799164681906451bdc774f422d29f222a5e48a24f19e157c82f21",
+    "app/src/main/java/com/markobl/calllogsync/slice/LegacyEventMatcher.java": "6c224071a91e7769e925a1234fc36ef2e6ffed67bb8271e6b100f9dcbda3854f",
+    "app/src/main/java/com/markobl/calllogsync/slice/ManualDelivery.java": "ceca9ec8cc837b8861c26018b4774642d4cf80e49ac627cc459eef0a3aa6ff8b",
+    "app/src/main/java/com/markobl/calllogsync/slice/PagedCalls.java": "f3b8c443aafe6f0c6c710454d1f5aacde4948ef0f8b4b44d877b7bcd43fa95ae",
+    "app/src/main/java/com/markobl/calllogsync/slice/PayloadRetention.java": "0a4c98678d22ad67821720553e6f951ae19637146323611eabe8bc0c9a6a6b38",
+    "app/src/main/java/com/markobl/calllogsync/slice/ReadyReapproval.java": "9d5ae79f78945425ac018b94bffa7d70ece5356b4be418ff1369cfcae64db829",
+    "app/src/main/java/com/markobl/calllogsync/slice/ReceiptRecovery.java": "255c7ffc130e1122716dd6b326b63ead888a9d2f19b5b0711f758a766ccf59bb",
+    "app/src/main/java/com/markobl/calllogsync/slice/ReceiptRecoveryActivity.java": "a065be32f4bb317d159f570c09f09fb7b427414008f9dd4e27e693374d1d9638",
+    "app/src/main/java/com/markobl/calllogsync/slice/ScanDelivery.java": "93a5f4777a84673b8b4f0afc9d8cb38837bcb9f4b877abe65a526bf319bbfdc7",
+    "app/src/main/java/com/markobl/calllogsync/slice/SliceEngine.java": "483e0a862c7f265257d20f44fcd34f663a138c30c2338d7dd4e9e039ce72d5c7",
+    "app/src/main/java/com/markobl/calllogsync/slice/SqliteImportStore.java": "93ceff5477413312470c0d3fbd2f783d8b9083c38dc71c592bbb0ffc4a447010",
+    "app/src/main/java/com/markobl/calllogsync/slice/SqliteLedger.java": "5a4771cdd11c66cf6fd7a62cd3eb1390864652a629ea06c3f5156601d68f80e7",
+    "app/src/main/java/com/markobl/calllogsync/slice/WorkStatus.java": "10b5c777f796ccd0466adb99480f39021b1513c0ba0124195bfacbf266486ba0",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/CallEvent.kt": "3b4f035275c687211f420a84665054971934451a3d7d90f4ca5caec0046ffd6c",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/CallIdentity.kt": "6f9920a760af20368262f7d6e64ee36092a4ce4987b28fdddc0fd005165e941f",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/CallSelection.kt": "0edee562b3efa945c933245beebb2a2affb1c65821653c685c27ef6289ca8fcd",
+    "app/src/main/res/drawable/ic_launcher_background.xml": "f6be98e2584ff88e9fbeb38e0552ccf1f7f6f068be06ce63b55d3450c83100c4",
+    "app/src/main/res/drawable/ic_launcher_foreground.xml": "df028a62eb821dd967adcbf035c2603789668ccb5a12afba1e83f875147caa34",
+    "app/src/main/res/layout/activity_main.xml": "0454d85b72af882024079b0b75dd9e6ea0710c7376219ed1046809268172842c",
+    "app/src/main/res/layout/content_main.xml": "b596321376c0b85d0c20d8884e3b2909637fa1099657a69e5d2acb6b21ff20dc",
+    "app/src/main/res/layout/fragment_log.xml": "b722ecda3fac88300a6c359f4dbeada398c4ebe95ea05cbd02409fc8d461eaca",
+    "app/src/main/res/layout/fragment_log_list.xml": "27a258eb62759be1cf49b9873e6c4da0d9c5cba27cfd682e05fd9d4acc501fad",
+    "app/src/main/res/layout/fragment_main.xml": "3e3679f42d62dcfc024f4aa88f03675fc9614afacbb6500311197373082eb277",
+    "app/src/main/res/menu/menu_main.xml": "75f9b9aa83e69b60177476890e9fc41975041964f82068ba9a70fb5e14fce590",
+    "app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml": "46aef39e5993c8278c744bb9e8f58eb06ba663416fbaf0b954ae189c63b065a7",
+    "app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml": "46aef39e5993c8278c744bb9e8f58eb06ba663416fbaf0b954ae189c63b065a7",
+    "app/src/main/res/mipmap-hdpi/ic_launcher.png": "b16071bcb0a76bb7bfdc1e8e46e98ca29f62da76ff72c3a29d0116197daa3f00",
+    "app/src/main/res/mipmap-hdpi/ic_launcher_round.png": "60223cff074b54fd5ab20028d4599751ebb0711bd1ddc34758eb88b53fe5c34e",
+    "app/src/main/res/mipmap-mdpi/ic_launcher.png": "6952a9674eb946026ad97d08670d69a830cdbb38933cd892b66e08ff097c21f0",
+    "app/src/main/res/mipmap-mdpi/ic_launcher_round.png": "700517327eb6f68fd38b80fe717c9d20abe9f3a7892fd08301ec0cf1442aa352",
+    "app/src/main/res/mipmap-xhdpi/ic_launcher.png": "970858b1ef2339a64e42544dc59b4afc4663798a4d19c9644bce699dbed359d8",
+    "app/src/main/res/mipmap-xhdpi/ic_launcher_round.png": "14fe841513ec15e1d169f0ec3ccf1d340100445fe6c0fef0a0b2bd39367e1f3c",
+    "app/src/main/res/mipmap-xxhdpi/ic_launcher.png": "964c0447021d2af0829905286a6374825eb19a4cdba1f1f153b0d98ec934e49e",
+    "app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png": "d8335f3bc152e97dee312e767f06b7092da3aae41af45f3d285134d9017fd797",
+    "app/src/main/res/mipmap-xxxhdpi/ic_launcher.png": "998527c39e08e23e29d4ef276347578c2a2a10c1a416eb78b07c12ddc924c97f",
+    "app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png": "1faa0725c0f93a19fd12a4ef4a6a51f359947ba3bfeea7bfbbdd4802cd6b33b4",
+    "app/src/main/res/navigation/nav_graph.xml": "520ad7c2979f3d433de3992d888305cae5ec5ff38f7b01cec86d1d17844246fd",
+    "app/src/main/res/values/colors.xml": "b5626527d503417f0d8e5b1e08f338de7b31173bf0e122815f03e64932adbd88",
+    "app/src/main/res/values/dimens.xml": "e54b8f556d2d62ef5fc86d5b8cae1acc1be53e43fa70ece6300d60a84cf0b6c6",
+    "app/src/main/res/values/ids.xml": "76ae646e01454331bf3b431b846fee5da3811f1cc5f0693935e75e3423cff742",
+    "app/src/main/res/values/strings.xml": "a79849e154412a63fe862877034d6adba082e6df162c5c67049c746ccb9d3dd5",
+    "app/src/main/res/values/themes.xml": "980b1c1f279d4011fedcf3caaa92a9660a27fd3da8bc5f8d7ed476086fd7ee08",
+    "app/src/main/res/values-de/strings.xml": "f529873bfcedb6a83f8048efca801774586195c11c8883519ec57c748d0a1e23",
+    "app/src/main/res/values-land/dimens.xml": "3efd84816b428a7af7ee473c70d6be22017b2358c33bb7a91fdf04f518cc7573",
+    "app/src/main/res/values-night/themes.xml": "4f9605a8df95f285e11ca91ad885737d40aa686a595e32a08b28d16035175e13",
+    "app/src/main/res/values-w1240dp/dimens.xml": "d6887b19bf9d21f1cbd6b05226bc25079c1cfa455ab30e9cf66f46cc1837db70",
+    "app/src/main/res/values-w600dp/dimens.xml": "3efd84816b428a7af7ee473c70d6be22017b2358c33bb7a91fdf04f518cc7573",
+    "app/src/main/res/xml/root_preferences.xml": "320bb6b10712cad231fd6bdf70fca957da148329c8221c5c24b7069c5e1c12f7",
+    "app/src/main/res/xml/slice_backup_rules.xml": "80be325e44eb49bec54794399e7de6b4d274513a3ebce30584889d06372f1a0a",
+    "app/src/main/res/xml/slice_extraction_rules.xml": "cb029b35db0e976c087100424e16e14a6256b46962398887520e51508c3b5842",
+    "app/src/test/java/com/markobl/calllogsync/slice/ActivationControlTest.java": "06546f8fd5217d2e7a76597b2a657f854d6276a8fa5c061c0354eb318f6cf5c9",
+    "app/src/test/java/com/markobl/calllogsync/slice/AutomaticDeliveryTest.java": "f06166dec6c29189e00aa4d6fd5aa9d9be6df055eab51fef08b8a64ab48c0c25",
+    "app/src/test/java/com/markobl/calllogsync/slice/AutomaticWorkPolicyTest.java": "65e89314cff2a25d8ab6e81adbc49548472b4f9216bdf7b949bcb3956288754c",
+    "app/src/test/java/com/markobl/calllogsync/slice/CallSelectionTest.java": "9c9cdb6442b2c0ac0cb75a47628231516af03b243f11ae86c3d16f25a332e10f",
+    "app/src/test/java/com/markobl/calllogsync/slice/DurableDeliveryTest.java": "1842b4e5ac1064aab7ed7a09491a121a5a4b388e45890265003625c2ef401a2e",
+    "app/src/test/java/com/markobl/calllogsync/slice/HistoricalImportTest.java": "3e33bdbb4383412d217965d66dfe09e7b7d7550a5bf76a950c95897ba8fedd7b",
+    "app/src/test/java/com/markobl/calllogsync/slice/ImportRangeTest.java": "a5609da16dac4f3d14dffcdd8761ea7333d211dfadd5588c80ccaeb037d1f81c",
+    "app/src/test/java/com/markobl/calllogsync/slice/KotlinMigrationContractTest.java": "915a4cb3d30f5c50962d0c4c0bafddc0d56842b3487c8588ce1ca3760e880eca",
+    "app/src/test/java/com/markobl/calllogsync/slice/LegacyEventMatcherTest.java": "4f5c03bbdf354d860f74dd495bb0a987008a880ec05c5118837141bd5590d1d9",
+    "app/src/test/java/com/markobl/calllogsync/slice/ManualDeliveryTest.java": "d3f1e53a88b93402d98673bbf535d4a7a7559528962b5c6ac84eb58e48d405a4",
+    "app/src/test/java/com/markobl/calllogsync/slice/PagedCallsTest.java": "0155a60ec91f0dfcd3d5c91121eccf34d10f336be58086309c685f0e4995d1d4",
+    "app/src/test/java/com/markobl/calllogsync/slice/PayloadRetentionTest.java": "d7112a8128f1913c467d5ec80c3eaf2d185584a8d6443795e53ac1eaa00bb4aa",
+    "app/src/test/java/com/markobl/calllogsync/slice/ReadyReapprovalTest.java": "cb8c298867370506cd18255e5e18f9494f0be725c2b957cb78a159a41233cbcc",
+    "app/src/test/java/com/markobl/calllogsync/slice/ReceiptRecoveryTest.java": "ab823fc1e8c24fec397e986d890c76b77492889ab007ef65bbc30adc01c82bc9",
+    "app/src/test/java/com/markobl/calllogsync/slice/ScanDeliveryTest.java": "3da478450e2e42908cf466eae9ff76c9ed8ce06ab6ce515ad6c4f8d4fa8bf328",
+    "app/src/test/java/com/markobl/calllogsync/slice/SchedulingCommitTest.java": "91d2ceef38bdf018ac4796f22f7434ffdc3142a69583e826bd04bf19d960dc55",
+    "app/src/test/java/com/markobl/calllogsync/slice/SliceTest.java": "a4257456086608fc09f5c857f6853a18738284919bb10983d993f0d391c19efa",
+    "app/src/test/java/com/markobl/calllogsync/slice/WorkStatusTest.java": "1e344ea8d495eca1e322e8cb70c9b8c15a26f30e98e357b839a3bd884c9e898e"
+  },
+  "artifacts": {
+    "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk": "66d9e437db3d69ae7f5ab6b8d1f1e618f19e0a9fd54e64ee536280d643c0930b",
+    "app/build/outputs/apk/debug/app-debug.apk": "0d7134c8e250dba8c20885ffd32e7b883067f5b6862229cc5487682793c6c3e1"
+  },
+  "command": [
+    "sh",
+    "gradlew",
+    "--no-daemon",
+    "--console=plain",
+    ":app:testDebugUnitTest",
+    ":app:assembleDebug",
+    ":app:assembleDebugAndroidTest",
+    ":app:lintDebug"
+  ],
+  "jdk": "/opt/homebrew/Cellar/openjdk@17/17.0.20.1/libexec/openjdk.jdk/Contents/Home",
+  "sdk": "/Volumes/PortableSSD/cache/calltrack-sdk-20261020",
+  "elapsed_seconds": 56.7,
+  "scope": "Dedicated API36 guest lifecycle, actual provider-boundary process termination, offline and Doze acceptance",
+  "jvm_tests": 97,
+  "host_tests": 50,
+  "native_checks": [
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "0986a1ab24ef41b2800bababe33faaf2",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.LifecycleProviderTest#prepareReopenFixtureWithoutScheduledWork",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.LifecycleProviderTest:\nINSTRUMENTATION_STATUS: test=prepareReopenFixtureWithoutScheduledWork\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: expectedEvents=1\nINSTRUMENTATION_STATUS: fixtureCalendar=1\nINSTRUMENTATION_STATUS: fixtureSourceAt=1792521978195\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=prepareReopenFixtureWithoutScheduledWork\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 1.351\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n",
+      "host_monotonic_started": 883444.423815166,
+      "elapsed_seconds": 6.596105084056035
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "0986a1ab24ef41b2800bababe33faaf2",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.LifecycleProviderTest#verifyExpectedDeliveryAndReceipt",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.LifecycleProviderTest:\nINSTRUMENTATION_STATUS: test=verifyExpectedDeliveryAndReceipt\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: sourceToVerifiedObservationMillis=18275\nINSTRUMENTATION_STATUS: verifiedEvents=1\nINSTRUMENTATION_STATUS: workerPublishedAt=1792521991159\nINSTRUMENTATION_STATUS: workerReportedDelivered=0\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=verifyExpectedDeliveryAndReceipt\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.981\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n",
+      "host_monotonic_started": 883463.34911325,
+      "elapsed_seconds": 5.593992374953814
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "0986a1ab24ef41b2800bababe33faaf2",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.LifecycleProviderTest#launcherResumeWithoutSystemWakeRequestsRecovery",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.LifecycleProviderTest:\nINSTRUMENTATION_STATUS: test=launcherResumeWithoutSystemWakeRequestsRecovery\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: expectedEvents=2\nINSTRUMENTATION_STATUS: fixtureCalendar=1\nINSTRUMENTATION_STATUS: fixtureSourceAt=1792522000835\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_STATUS: sourceToVerifiedObservationMillis=8087\nINSTRUMENTATION_STATUS: verifiedEvents=2\nINSTRUMENTATION_STATUS: workerPublishedAt=1792522008697\nINSTRUMENTATION_STATUS: workerReportedDelivered=1\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=launcherResumeWithoutSystemWakeRequestsRecovery\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 11.078\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n",
+      "host_monotonic_started": 883468.943142833,
+      "elapsed_seconds": 15.621413125074469
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "0986a1ab24ef41b2800bababe33faaf2",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.LifecycleProviderTest#insertAndWaitBeforeReturningProviderId",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.LifecycleProviderTest:\nINSTRUMENTATION_STATUS: test=insertAndWaitBeforeReturningProviderId\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: expectedEvents=3\nINSTRUMENTATION_STATUS: fixtureCalendar=1\nINSTRUMENTATION_STATUS: fixtureSourceAt=1792522015361\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: shortMsg=Process crashed.\nINSTRUMENTATION_CODE: 0\n",
+      "expected_process_termination": true
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "0986a1ab24ef41b2800bababe33faaf2",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.LifecycleProviderTest#verifyExpectedDeliveryAndReceipt",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.LifecycleProviderTest:\nINSTRUMENTATION_STATUS: test=verifyExpectedDeliveryAndReceipt\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: sourceToVerifiedObservationMillis=18778\nINSTRUMENTATION_STATUS: verifiedEvents=3\nINSTRUMENTATION_STATUS: workerPublishedAt=1792522026706\nINSTRUMENTATION_STATUS: workerReportedDelivered=2\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=verifyExpectedDeliveryAndReceipt\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.552\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n",
+      "host_monotonic_started": 883500.839283666,
+      "elapsed_seconds": 5.845561417052522
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "0986a1ab24ef41b2800bababe33faaf2",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.LifecycleProviderTest#prepareNextCallWithoutWake",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.LifecycleProviderTest:\nINSTRUMENTATION_STATUS: test=prepareNextCallWithoutWake\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: expectedEvents=4\nINSTRUMENTATION_STATUS: fixtureCalendar=1\nINSTRUMENTATION_STATUS: fixtureSourceAt=1792522038166\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=prepareNextCallWithoutWake\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.883\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n",
+      "host_monotonic_started": 883506.684903041,
+      "elapsed_seconds": 4.648789959028363
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "0986a1ab24ef41b2800bababe33faaf2",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.LifecycleProviderTest#verifyExpectedDeliveryAndReceipt",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.LifecycleProviderTest:\nINSTRUMENTATION_STATUS: test=verifyExpectedDeliveryAndReceipt\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: sourceToVerifiedObservationMillis=180134\nINSTRUMENTATION_STATUS: verifiedEvents=4\nINSTRUMENTATION_STATUS: workerPublishedAt=1792522209367\nINSTRUMENTATION_STATUS: workerReportedDelivered=0\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=verifyExpectedDeliveryAndReceipt\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.556\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n",
+      "host_monotonic_started": 883686.846421708,
+      "elapsed_seconds": 4.013478833017871
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "0986a1ab24ef41b2800bababe33faaf2",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.LifecycleProviderTest#prepareNextCallWithoutWake",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.LifecycleProviderTest:\nINSTRUMENTATION_STATUS: test=prepareNextCallWithoutWake\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: expectedEvents=5\nINSTRUMENTATION_STATUS: fixtureCalendar=1\nINSTRUMENTATION_STATUS: fixtureSourceAt=1792522221797\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=prepareNextCallWithoutWake\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 1.453\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n",
+      "host_monotonic_started": 883690.859937583,
+      "elapsed_seconds": 5.223086375044659
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "0986a1ab24ef41b2800bababe33faaf2",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.LifecycleProviderTest#requestOfflineWakeAndVerifyDelivery",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.LifecycleProviderTest:\nINSTRUMENTATION_STATUS: test=requestOfflineWakeAndVerifyDelivery\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: sourceToVerifiedObservationMillis=9941\nINSTRUMENTATION_STATUS: verifiedEvents=5\nINSTRUMENTATION_STATUS: workerPublishedAt=1792522231684\nINSTRUMENTATION_STATUS: workerReportedDelivered=1\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=requestOfflineWakeAndVerifyDelivery\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 2.17\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n",
+      "host_monotonic_started": 883698.323535416,
+      "elapsed_seconds": 6.016537416959181
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "0986a1ab24ef41b2800bababe33faaf2",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.LifecycleProviderTest#prepareDelayedCallForDoze",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.LifecycleProviderTest:\nINSTRUMENTATION_STATUS: test=prepareDelayedCallForDoze\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: expectedEvents=6\nINSTRUMENTATION_STATUS: fixtureCalendar=1\nINSTRUMENTATION_STATUS: fixtureSourceAt=1792522240750\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=prepareDelayedCallForDoze\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 1.597\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n",
+      "host_monotonic_started": 883709.170346041,
+      "elapsed_seconds": 5.216513417079113
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "0986a1ab24ef41b2800bababe33faaf2",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.LifecycleProviderTest#verifyExpectedDeliveryAndReceipt",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.LifecycleProviderTest:\nINSTRUMENTATION_STATUS: test=verifyExpectedDeliveryAndReceipt\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: sourceToVerifiedObservationMillis=60867\nINSTRUMENTATION_STATUS: verifiedEvents=6\nINSTRUMENTATION_STATUS: workerPublishedAt=1792522296543\nINSTRUMENTATION_STATUS: workerReportedDelivered=1\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=verifyExpectedDeliveryAndReceipt\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.25\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n",
+      "host_monotonic_started": 883770.770134041,
+      "elapsed_seconds": 3.384580958983861
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "0986a1ab24ef41b2800bababe33faaf2",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.LifecycleProviderTest#cleanupFixture",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.LifecycleProviderTest:\nINSTRUMENTATION_STATUS: test=cleanupFixture\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.LifecycleProviderTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=cleanupFixture\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.896\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n",
+      "host_monotonic_started": 883774.154746875,
+      "elapsed_seconds": 2.8689901659963652
+    }
+  ],
+  "native_result": "passed",
+  "observations": [
+    {
+      "method": "verifyExpectedDeliveryAndReceipt",
+      "sourceToVerifiedObservationMillis": 18275,
+      "verifiedEvents": 1,
+      "workerPublishedAt": 1792521991159,
+      "workerReportedDelivered": 0
+    },
+    {
+      "method": "launcherResumeWithoutSystemWakeRequestsRecovery",
+      "sourceToVerifiedObservationMillis": 8087,
+      "verifiedEvents": 2,
+      "workerPublishedAt": 1792522008697,
+      "workerReportedDelivered": 1
+    },
+    {
+      "method": "verifyExpectedDeliveryAndReceipt",
+      "sourceToVerifiedObservationMillis": 18778,
+      "verifiedEvents": 3,
+      "workerPublishedAt": 1792522026706,
+      "workerReportedDelivered": 2
+    },
+    {
+      "method": "verifyExpectedDeliveryAndReceipt",
+      "sourceToVerifiedObservationMillis": 180134,
+      "verifiedEvents": 4,
+      "workerPublishedAt": 1792522209367,
+      "workerReportedDelivered": 0
+    },
+    {
+      "method": "requestOfflineWakeAndVerifyDelivery",
+      "sourceToVerifiedObservationMillis": 9941,
+      "verifiedEvents": 5,
+      "workerPublishedAt": 1792522231684,
+      "workerReportedDelivered": 1
+    },
+    {
+      "method": "verifyExpectedDeliveryAndReceipt",
+      "sourceToVerifiedObservationMillis": 60867,
+      "verifiedEvents": 6,
+      "workerPublishedAt": 1792522296543,
+      "workerReportedDelivered": 1
+    }
+  ],
+  "fixture_cleanup_verified": true,
+  "packages_removed": true,
+  "held_process_termination_verified": true,
+  "reboot_verified": true,
+  "doze_deferral_verified": true,
+  "emulator_original": {
+    "airplane": "disabled",
+    "wifi": "Wifi is enabled",
+    "mobile": "1",
+    "stay": "1",
+    "power_flags": {
+      "AC": "true",
+      "USB": "false",
+      "Wireless": "false",
+      "Dock": "false"
+    },
+    "awake": "Awake"
+  },
+  "emulator_restored": {
+    "verified": true,
+    "changed": false
+  },
+  "offline_restore": {
+    "verified": true,
+    "changed": true,
+    "errors": []
+  },
+  "doze_restore": {
+    "verified": true,
+    "changed": true,
+    "errors": []
+  },
+  "boot_observation_window_seconds": 180,
+  "raw_receipt_sha256": "f7e202e04f46e7cdaee0d95900d7688a185aa094f1f5d1c3e58ba1e49a99e5f4",
+  "tool_inputs": {
+    "scripts/qualify_parity_lifecycle.py": "a757992bc967e5d3536e12b8527ac77fbd9aacf130792380ae1163f95317df8b",
+    "scripts/parity_environment.py": "a9a697e4cf420ff5736725689896762e69d25c3064d50b2064a2253fb4cd6d99",
+    "tests/test_parity_lifecycle_safety.py": "cee11f5ad70df5266c86611a6820638d313152ba27039948c4af09bcf8deae57",
+    "tests/test_parity_environment.py": "9029438f889fcbef4465d5a4055819a9d93a93cdb9e73c3cf93eba21641a3cf4"
+  },
+  "red_evidence_sha256": {
+    "launcher-resume-red.json": "812eef1a9039d91a44ec7d6664778b7c3957bdbb8cbb71ee27f98b51457699a6",
+    "lifecycle-observer-race.json": "b9c9a7383a1dec3594aa1b7587ea094aa12a0e1fa711afff6bf094a37b8965fb",
+    "lifecycle-wifi-settle-red.json": "a6d25771f0e85a0f4d4edf1b9e1e5d7bdada674e7a701f1c4efffd408e00779f",
+    "lifecycle-boot-diagnostics-red.json": "76b93f8e3176e98720e63d04e2552c89f347124bdcac32b52709fc6f23292c6a",
+    "boot-receiver-delivery.txt": "56a766a93bd27d4d1ab166ab03832239f5d930e7c280793db00c438ece634418"
+  },
+  "scheduling_red_sha256": "3e5a8f78fc9166de390a99f839fed5808ff46dee24813d3e5070888f7755abbc",
+  "limitations": [
+    "One API36 emulator/LOCAL calendar; no physical/OEM/cloud or positive rendered-UI acceptance",
+    "Boot source-to-verification180134ms includes guest boot and delayed platform dispatch; not a deadline guarantee",
+    "Force-stop recovery requires explicit reopening; no promise to run while intentionally stopped",
+    "Receiver-isolated launcher case temporarily disables/restores only the app wake component to separate Android35+ unstopped broadcast behavior",
+    "One recovered item reported two verification actions after rescan; ledger counts/event IDs, not worker delivery-action counts, prove unique effects; counter semantics remain a follow-up",
+    "Protected PHONE_IDLE wake from an emulator GSM call is not exercised in this lifecycle suite"
+  ],
+  "regression_native_checks": [
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.WorkStatusStoreTest#uncertainCommitIsHiddenAcrossStoreInstancesUntilSuccessfulPublication",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.WorkStatusStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.WorkStatusStoreTest:\nINSTRUMENTATION_STATUS: test=uncertainCommitIsHiddenAcrossStoreInstancesUntilSuccessfulPublication\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.WorkStatusStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=uncertainCommitIsHiddenAcrossStoreInstancesUntilSuccessfulPublication\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.206\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.AutomaticSettingsTest#openingRecoveryDoesNotCreateReceiptsOrEnableLogging",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.AutomaticSettingsTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.AutomaticSettingsTest:\nINSTRUMENTATION_STATUS: test=openingRecoveryDoesNotCreateReceiptsOrEnableLogging\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.AutomaticSettingsTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=openingRecoveryDoesNotCreateReceiptsOrEnableLogging\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 8.773\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.HistoricalImportStoreTest#sessionHistoryPagesNewestFirstWithoutLosingOlderSessions",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.HistoricalImportStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.HistoricalImportStoreTest:\nINSTRUMENTATION_STATUS: test=sessionHistoryPagesNewestFirstWithoutLosingOlderSessions\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.HistoricalImportStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=sessionHistoryPagesNewestFirstWithoutLosingOlderSessions\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 3.313\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.AutomaticSettingsTest#openingImportsDoesNotCreatePreviewOrConfirmWithoutAccess",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.AutomaticSettingsTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.AutomaticSettingsTest:\nINSTRUMENTATION_STATUS: test=openingImportsDoesNotCreatePreviewOrConfirmWithoutAccess\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.AutomaticSettingsTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=openingImportsDoesNotCreatePreviewOrConfirmWithoutAccess\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 7.04\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.WorkStatusStoreTest#publicationPersistsFailureCountAndRejectsOldActivationAfterReopen",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.WorkStatusStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.WorkStatusStoreTest:\nINSTRUMENTATION_STATUS: test=publicationPersistsFailureCountAndRejectsOldActivationAfterReopen\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.WorkStatusStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=publicationPersistsFailureCountAndRejectsOldActivationAfterReopen\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.689\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.WorkStatusStoreTest#legacyStatusWithoutCounterRemainsReadableAndUnknownCodesAreSanitised",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.WorkStatusStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.WorkStatusStoreTest:\nINSTRUMENTATION_STATUS: test=legacyStatusWithoutCounterRemainsReadableAndUnknownCodesAreSanitised\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.WorkStatusStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=legacyStatusWithoutCounterRemainsReadableAndUnknownCodesAreSanitised\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.074\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.AutomaticSettingsTest#openingSettingsDoesNotEnableOrSelectDestinationWithoutAccess",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.AutomaticSettingsTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.AutomaticSettingsTest:\nINSTRUMENTATION_STATUS: test=openingSettingsDoesNotEnableOrSelectDestinationWithoutAccess\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.AutomaticSettingsTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=openingSettingsDoesNotEnableOrSelectDestinationWithoutAccess\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 7.388\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.AutomaticWorkTest#absentActivationExecutesWithoutCallCalendarPermission",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.AutomaticWorkTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.AutomaticWorkTest:\nINSTRUMENTATION_STATUS: test=absentActivationExecutesWithoutCallCalendarPermission\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.AutomaticWorkTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=absentActivationExecutesWithoutCallCalendarPermission\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.4\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.AutomaticWorkTest#staleGenerationExecutesWithoutOpeningProviders",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.AutomaticWorkTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.AutomaticWorkTest:\nINSTRUMENTATION_STATUS: test=staleGenerationExecutesWithoutOpeningProviders\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.AutomaticWorkTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=staleGenerationExecutesWithoutOpeningProviders\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.621\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.AutomaticWorkTest#promptAndPeriodicRequestsPersistWithoutNetworkConstraint",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.AutomaticWorkTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.AutomaticWorkTest:\nINSTRUMENTATION_STATUS: test=promptAndPeriodicRequestsPersistWithoutNetworkConstraint\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.AutomaticWorkTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=promptAndPeriodicRequestsPersistWithoutNetworkConstraint\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.37\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.HistoricalImportStoreTest#schemaOneMigrationPreservesAggregateProgressWithoutInventingOutcomes",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.HistoricalImportStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.HistoricalImportStoreTest:\nINSTRUMENTATION_STATUS: test=schemaOneMigrationPreservesAggregateProgressWithoutInventingOutcomes\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.HistoricalImportStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=schemaOneMigrationPreservesAggregateProgressWithoutInventingOutcomes\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 2.765\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.HistoricalImportStoreTest#failedOutcomeProgressCommitRollsBackBothRecords",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.HistoricalImportStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.HistoricalImportStoreTest:\nINSTRUMENTATION_STATUS: test=failedOutcomeProgressCommitRollsBackBothRecords\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.HistoricalImportStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=failedOutcomeProgressCommitRollsBackBothRecords\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 1.761\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.HistoricalImportStoreTest#frozenPreviewAndPartialDeliverySurviveReopenAndRepeatWithoutDuplicate",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.HistoricalImportStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.HistoricalImportStoreTest:\nINSTRUMENTATION_STATUS: test=frozenPreviewAndPartialDeliverySurviveReopenAndRepeatWithoutDuplicate\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.HistoricalImportStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=frozenPreviewAndPartialDeliverySurviveReopenAndRepeatWithoutDuplicate\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 7.544\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.HistoricalImportStoreTest#failedCandidateAppendRollsBackPreviewAndStaleRevisionIsRejected",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.HistoricalImportStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.HistoricalImportStoreTest:\nINSTRUMENTATION_STATUS: test=failedCandidateAppendRollsBackPreviewAndStaleRevisionIsRejected\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.HistoricalImportStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=failedCandidateAppendRollsBackPreviewAndStaleRevisionIsRejected\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 1.216\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ActivationStoreTest#activationAndPauseCommitToDiskAndRejectOldGeneration",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ActivationStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ActivationStoreTest:\nINSTRUMENTATION_STATUS: test=activationAndPauseCommitToDiskAndRejectOldGeneration\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ActivationStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=activationAndPauseCommitToDiskAndRejectOldGeneration\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.573\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ActivationStoreTest#malformedOrFutureSettingsCannotBecomeEnabled",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ActivationStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ActivationStoreTest:\nINSTRUMENTATION_STATUS: test=malformedOrFutureSettingsCannotBecomeEnabled\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ActivationStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=malformedOrFutureSettingsCannotBecomeEnabled\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.317\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.CalendarSliceTest#syntheticCursorMapsPresentationWithoutPersonalQuery",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.CalendarSliceTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.CalendarSliceTest:\nINSTRUMENTATION_STATUS: test=syntheticCursorMapsPresentationWithoutPersonalQuery\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.CalendarSliceTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=syntheticCursorMapsPresentationWithoutPersonalQuery\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.138\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.CalendarSliceTest#syntheticCursorRetainsNullAndExtendedPresentation",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.CalendarSliceTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.CalendarSliceTest:\nINSTRUMENTATION_STATUS: test=syntheticCursorRetainsNullAndExtendedPresentation\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.CalendarSliceTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=syntheticCursorRetainsNullAndExtendedPresentation\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.243\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.CalendarSliceTest#syntheticPagingUsesBoundedQueriesAndPreservesEveryRow",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.CalendarSliceTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.CalendarSliceTest:\nINSTRUMENTATION_STATUS: test=syntheticPagingUsesBoundedQueriesAndPreservesEveryRow\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.CalendarSliceTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=syntheticPagingUsesBoundedQueriesAndPreservesEveryRow\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.126\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ParityStoreTest#preservesV1ReceiptsAndCreatesLegacyBindings",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ParityStoreTest:\nINSTRUMENTATION_STATUS: test=preservesV1ReceiptsAndCreatesLegacyBindings\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=preservesV1ReceiptsAndCreatesLegacyBindings\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.708\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ParityStoreTest#outboxCommitsInflightAndPurgesConfirmedPayloadAcrossReopen",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ParityStoreTest:\nINSTRUMENTATION_STATUS: test=outboxCommitsInflightAndPurgesConfirmedPayloadAcrossReopen\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=outboxCommitsInflightAndPurgesConfirmedPayloadAcrossReopen\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.775\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ParityStoreTest#rejectsOutboxWriteInsideAnUncommittedTransaction",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ParityStoreTest:\nINSTRUMENTATION_STATUS: test=rejectsOutboxWriteInsideAnUncommittedTransaction\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=rejectsOutboxWriteInsideAnUncommittedTransaction\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.6\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ParityStoreTest#kotlinMappingRecognisesPreservedJavaReceiptWithoutReinsert",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ParityStoreTest:\nINSTRUMENTATION_STATUS: test=kotlinMappingRecognisesPreservedJavaReceiptWithoutReinsert\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=kotlinMappingRecognisesPreservedJavaReceiptWithoutReinsert\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 1.236\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ParityStoreTest#preservesV2PendingRowsWithoutInventingOperationOwnership",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ParityStoreTest:\nINSTRUMENTATION_STATUS: test=preservesV2PendingRowsWithoutInventingOperationOwnership\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=preservesV2PendingRowsWithoutInventingOperationOwnership\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 1.036\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ParityStoreTest#operationIdentitySurvivesReopenAndPayloadPurge",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ParityStoreTest:\nINSTRUMENTATION_STATUS: test=operationIdentitySurvivesReopenAndPayloadPurge\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=operationIdentitySurvivesReopenAndPayloadPurge\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 1.314\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ParityStoreTest#preservesV3OwnershipWithoutInferringSourceFactsFromPayload",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ParityStoreTest:\nINSTRUMENTATION_STATUS: test=preservesV3OwnershipWithoutInferringSourceFactsFromPayload\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=preservesV3OwnershipWithoutInferringSourceFactsFromPayload\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 2.073\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ParityStoreTest#sourceFactsSurviveReopenAndPayloadPurgeWithNullPresentation",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ParityStoreTest:\nINSTRUMENTATION_STATUS: test=sourceFactsSurviveReopenAndPayloadPurgeWithNullPresentation\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=sourceFactsSurviveReopenAndPayloadPurgeWithNullPresentation\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 1.041\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ParityStoreTest#frozenCheckpointPersistsAndRejectsRegressionOrRebinding",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ParityStoreTest:\nINSTRUMENTATION_STATUS: test=frozenCheckpointPersistsAndRejectsRegressionOrRebinding\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=frozenCheckpointPersistsAndRejectsRegressionOrRebinding\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.665\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ParityStoreTest#preservesV4FactsAndCreatesEmptyCheckpointStore",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ParityStoreTest:\nINSTRUMENTATION_STATUS: test=preservesV4FactsAndCreatesEmptyCheckpointStore\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=preservesV4FactsAndCreatesEmptyCheckpointStore\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 1.458\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ParityStoreTest#rolloverPreservesProcessedAnchorAndRejectsStalePublication",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ParityStoreTest:\nINSTRUMENTATION_STATUS: test=rolloverPreservesProcessedAnchorAndRejectsStalePublication\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=rolloverPreservesProcessedAnchorAndRejectsStalePublication\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.809\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ParityStoreTest#pendingRecoveryQueryIsBoundedAndOwnerDestinationScoped",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ParityStoreTest:\nINSTRUMENTATION_STATUS: test=pendingRecoveryQueryIsBoundedAndOwnerDestinationScoped\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=pendingRecoveryQueryIsBoundedAndOwnerDestinationScoped\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 2.033\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ParityStoreTest#deliveryCountsIncludeLateLegacyWithoutDoubleCountingBoundReceipt",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ParityStoreTest:\nINSTRUMENTATION_STATUS: test=deliveryCountsIncludeLateLegacyWithoutDoubleCountingBoundReceipt\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=deliveryCountsIncludeLateLegacyWithoutDoubleCountingBoundReceipt\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 1.89\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ParityStoreTest#recoveryPagingIncludesLegacyAndRemainsStableWhenStatesChange",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ParityStoreTest:\nINSTRUMENTATION_STATUS: test=recoveryPagingIncludesLegacyAndRemainsStableWhenStatesChange\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=recoveryPagingIncludesLegacyAndRemainsStableWhenStatesChange\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 6.412\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ParityStoreTest#explicitReapprovalPersistsFreshOwnerAndSuppressionClearsReadyPayload",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ParityStoreTest:\nINSTRUMENTATION_STATUS: test=explicitReapprovalPersistsFreshOwnerAndSuppressionClearsReadyPayload\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=explicitReapprovalPersistsFreshOwnerAndSuppressionClearsReadyPayload\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 2.074\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ParityStoreTest#payloadStorageAgeSurvivesTransitionsAndExpiryPreservesRecoveryMetadata",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ParityStoreTest:\nINSTRUMENTATION_STATUS: test=payloadStorageAgeSurvivesTransitionsAndExpiryPreservesRecoveryMetadata\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=payloadStorageAgeSurvivesTransitionsAndExpiryPreservesRecoveryMetadata\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 1.844\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "am",
+        "instrument",
+        "-w",
+        "-r",
+        "-e",
+        "fixtureToken",
+        "661240c7130947d1a4d205b31bb854c6",
+        "-e",
+        "class",
+        "com.markobl.calllogsync.slice.ParityStoreTest#preservesV5PendingPayloadAndCheckpointWithExplicitMigrationGrace",
+        "org.calltrack.community.dev.test/androidx.test.runner.AndroidJUnitRunner"
+      ],
+      "exit_code": 0,
+      "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.slice.ParityStoreTest:\nINSTRUMENTATION_STATUS: test=preservesV5PendingPayloadAndCheckpointWithExplicitMigrationGrace\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.slice.ParityStoreTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=preservesV5PendingPayloadAndCheckpointWithExplicitMigrationGrace\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 1.502\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+    }
+  ],
+  "regression_packages_removed": true,
+  "regression_raw_receipt_sha256": "c3edea68c91fcae4cdc9fd0d7126c74ebc74e70ac0c79cad6917ef8ca01f09a5",
+  "lint": {
+    "errors": 0,
+    "warnings": 32,
+    "hints": 5
+  }
+}

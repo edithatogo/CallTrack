@@ -401,3 +401,54 @@ in worker-provider-evidence.json. Provider-only prior checkpoint is1c9fffe; curr
 helper changes only expose its test fixture utilities at package scope. No production
 runtime code/dependency changed. Reboot/force-stop/reopen, offline/Doze, rendered UI,
 remaining persistence faults and full-track review/fixes/archive are still open.
+
+
+## Lifecycle recovery acceptance checkpoint
+
+The native receiver-isolated launcher regression failed with expected2 events but1
+before CalendarSliceActivity resume requested recovery. The fix schedules only a
+previously enabled committed policy, without changing generation/boundary. API35+
+force-stop/reopen separately passed via its unstopped-package boot signal; that was
+not mistaken for an independent Activity wake. An initial verifier killed the app
+between confirmed receipt and status publication; the host now observes both before
+starting instrumentation. A stale immediate Wi-Fi restore read also failed; a
+regression demonstrates asynchronous readback and bounded polling fixes it.
+
+Broadcast acknowledgement now covers both WorkManager operation futures within one
+monotonic8-second budget before finishing goAsync. Three JVM regressions were red
+before implementation and pass. Two earlier90-second boot observation windows had
+no fourth effect; diagnostics retained granted READ_CALL_LOG, an unstopped package
+and no scheduled job, with broadcast history showing receiver dispatch about85s
+late. The final observation budget is180s; this is neither a product deadline nor
+proof that only one of those changes explains earlier outcomes.
+
+The final source-bound lifecycle run passes11 instrumentation checks plus one
+explicitly terminated held insertion: launcher resume, force-stop/reopen, actual
+process death after CalendarContract insert/before ID persistence, preserved unique
+marker/receipt recovery, actual guest boot-ID change and background recovery before
+verification startup, no-active-network local delivery,40s forced deep-IDLE deferral
+past a30s staged eligibility delay, and background recovery after unforce without
+starting the app first. Six expected real events/receipts are verified and preserved
+until scoped cleanup. Native source→verified observations:18275ms first reopen,
+8087ms isolated resume,18778ms terminated-insertion recovery,180134ms reboot including
+guest boot/platform dispatch,9941ms offline and60867ms Doze including deferral. These
+are observations, not insertion timestamps or physical-device guarantees.
+
+All97 JVM/50 host tests and full debug build/lint pass. Airplane/Wi-Fi/mobile-data,
+stay-awake, battery override and idle/screen settings match their original snapshot;
+all tagged calls/calendar events and both packages are removed. lifecycle-evidence.json
+binds exact sources/debug artifacts, native outputs, tools and failed-check digests.
+Native regression of the earlier store/control suite follows separately. Protected
+emulator call-end wake and positive rendered UI, remaining activation/status fault
+contracts, diagnostic delivery-count semantics and final full-track review/archive
+remain open. In the held recovery, a worker reported2 verification actions for one
+recovered+rescanned event; ledger count3 and exact event ID prove unique effects,
+so no unique/new-event claim is inferred from that action counter.
+
+
+Final lifecycle regression: all36 earlier API36 store/settings/disabled-stale worker
+checks pass on the same source-bound build, with packages removed. Exact outputs
+are included in lifecycle-evidence.json alongside the11 lifecycle checks and the
+expected process termination. All97 JVM/50 host tests pass; lint0 errors/32 warnings/
+5 hints. No fixture packages or changed emulator settings remain. Full Track4 review
+and archive are not complete while the explicit remaining gates above are open.
