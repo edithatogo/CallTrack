@@ -1,7 +1,7 @@
 {
   "track_id": "kotlin_20261020",
   "type": "research-led-development",
-  "status": "new",
+  "status": "in_progress",
   "milestone": "M5",
   "created_at": "2026-10-20",
   "updated_at": "2026-10-20",
@@ -9,5 +9,5 @@
     "release_20261020"
   ],
   "requirements": "R14, R26",
-  "implementation_status": "conditional-not-started"
+  "implementation_status": "mapping-and-bounded-migration"
 }
