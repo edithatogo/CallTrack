@@ -349,3 +349,20 @@ Exact sources/debug artifacts/native output in retention-evidence.json. Clearing
 logical/opportunistic, not forensic or deadline-guaranteed. Positive rendered UI,
 real-provider delivery/background lifecycle and persistence-fault gates remain open.
 Full-track review/fixes/archive is still pending.
+
+
+## Uncertain execution-status commit checkpoint
+
+An injected false commit outcome after Android cache update reproduced a saved-status
+read despite uncertain durability. The native regression failed on that exact assertion,
+with packages removed; red receipt digest retained in status-commit-evidence.json.
+An initial test compile used unavailable assertThrows in the older Android JUnit
+runtime; existing try/catch assertion style corrected the fixture before the red run.
+A shared process uncertainty set now blocks status reads across store instances until
+complete publication commits successfully. Repeated attempts retain their token and
+do not inflate failure counts. Thrown commit leaves the same fail-closed state.
+All36 API36 checks,94 JVM tests,25 host tests and source-bound debug build/lint pass;
+packages removed. Lint0 errors/32 warnings/5 hints. This injects an uncertain outcome
+using real Android preferences; it does not prove physical disk exhaustion, restart,
+or process-death recovery. Those faults and real-provider/worker/UI/reboot/reopen/
+offline/Doze/latency gates remain open before final full-track review and archive.

@@ -6,6 +6,10 @@ import android.content.SharedPreferences;
 /** Atomic generation-checked publication. Status never grants authority to deliver a call. */
 public final class AndroidWorkStatusStore {
     private final SharedPreferences preferences;
+    // Android updates its cache before disk commit. Share uncertainty across store instances.
+    // Access is protected by DELIVERY_LOCK; process restart reloads the disk-backed state.
+    private static final java.util.Set<SharedPreferences> uncertain =
+            java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
 
     public AndroidWorkStatusStore(Context context) {
         this(context.getApplicationContext().getSharedPreferences("slice", Context.MODE_PRIVATE));
@@ -17,6 +21,8 @@ public final class AndroidWorkStatusStore {
 
     public WorkStatus read(long generation) {
         synchronized (DurableDelivery.DELIVERY_LOCK) {
+            if (uncertain.contains(preferences))
+                throw new IllegalStateException("Execution status commit uncertain");
             WorkStatus stored = stored();
             return stored != null && stored.generation == generation ? stored : null;
         }
@@ -36,16 +42,21 @@ public final class AndroidWorkStatusStore {
             WorkStatus next =
                     WorkStatus.next(prior, generation, at, token, code, delivered, review);
             if (next == prior) return true;
-            return preferences
-                    .edit()
-                    .putLong("automaticStatusGeneration", next.generation)
-                    .putLong("automaticStatusAt", next.at)
-                    .putString("automaticStatusToken", next.token)
-                    .putString("automaticStatusCode", next.code.name())
-                    .putInt("automaticStatusDelivered", next.delivered)
-                    .putInt("automaticStatusReview", next.review)
-                    .putLong("automaticStatusFailures", next.failures)
-                    .commit();
+            // Cached values may inform retry accounting but are not readable as saved status.
+            uncertain.add(preferences);
+            boolean committed =
+                    preferences
+                            .edit()
+                            .putLong("automaticStatusGeneration", next.generation)
+                            .putLong("automaticStatusAt", next.at)
+                            .putString("automaticStatusToken", next.token)
+                            .putString("automaticStatusCode", next.code.name())
+                            .putInt("automaticStatusDelivered", next.delivered)
+                            .putInt("automaticStatusReview", next.review)
+                            .putLong("automaticStatusFailures", next.failures)
+                            .commit();
+            if (committed) uncertain.remove(preferences);
+            return committed;
         }
     }
 
