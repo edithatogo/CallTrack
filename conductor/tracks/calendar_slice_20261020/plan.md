@@ -4,7 +4,7 @@ All tasks pending. Discovery is real track work. Implementation is conditional; 
 
 ## Phase 1: Discovery and mapping
 
-- [ ] Task: Map call source and writable-calendar contracts, including Outlook-backed device calendars
+- [~] Task: Map call source and writable-calendar contracts, including Outlook-backed device calendars
 - [ ] Task: Compare direct provider APIs with maintained wrappers; prototype one synthetic/controlled event
 - [ ] Task: Define source identity, ledger boundary and persistence/readback acceptance
 - [ ] Task: Write findings and refine track requirements/acceptance with source provenance
