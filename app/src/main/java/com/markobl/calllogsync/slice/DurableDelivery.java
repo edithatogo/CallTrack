@@ -68,12 +68,53 @@ public final class DurableDelivery {
                 || intent.state == State.ATTEMPTED;
     }
 
+    /** Non-rendered source facts, retained when personal event payload is cleared. */
+    public static final class SourceFacts {
+        public final long start, seconds;
+        public final int type;
+        public final Integer presentation;
+        public final boolean presentationSupplied;
+
+        public SourceFacts(
+                long start,
+                long seconds,
+                int type,
+                Integer presentation,
+                boolean presentationSupplied) {
+            if (start < 0 || seconds < 0) throw new IllegalArgumentException("Invalid source time");
+            this.start = start;
+            this.seconds = seconds;
+            this.type = type;
+            this.presentation = presentation;
+            this.presentationSupplied = presentationSupplied;
+        }
+
+        static SourceFacts from(CallRecord call) {
+            return new SourceFacts(
+                    call.start,
+                    call.seconds,
+                    call.type,
+                    call.numberPresentation,
+                    call.presentationSupplied);
+        }
+
+        boolean agrees(CallRecord call) {
+            return start == call.start
+                    && seconds == call.seconds
+                    && type == call.type
+                    && (!presentationSupplied
+                            || !call.presentationSupplied
+                            || Objects.equals(presentation, call.numberPresentation));
+        }
+    }
+
     public static final class Intent {
         public final State state;
         public final String key, sourceSignature, marker, fingerprint;
         public final long calendar, eventId;
         public final CallEvent payload;
         public final Operation operation;
+        public final SourceFacts facts;
 
         public Intent(
                 State state,
@@ -106,6 +147,31 @@ public final class DurableDelivery {
                 long eventId,
                 CallEvent payload,
                 Operation operation) {
+            this(
+                    state,
+                    key,
+                    calendar,
+                    sourceSignature,
+                    marker,
+                    fingerprint,
+                    eventId,
+                    payload,
+                    operation,
+                    null);
+        }
+
+        public Intent(
+                State state,
+                String key,
+                long calendar,
+                String sourceSignature,
+                String marker,
+                String fingerprint,
+                long eventId,
+                CallEvent payload,
+                Operation operation,
+                SourceFacts facts) {
+            this.facts = facts;
             this.operation = operation;
             this.state = Objects.requireNonNull(state);
             this.key = Objects.requireNonNull(key);
@@ -132,7 +198,8 @@ public final class DurableDelivery {
                     fingerprint,
                     id,
                     retained,
-                    operation);
+                    operation,
+                    facts);
         }
 
         Intent bind(String signature) {
@@ -145,7 +212,8 @@ public final class DurableDelivery {
                     fingerprint,
                     eventId,
                     payload,
-                    operation);
+                    operation,
+                    facts);
         }
     }
 
@@ -186,7 +254,8 @@ public final class DurableDelivery {
                                     event.fingerprint(),
                                     -1,
                                     event,
-                                    operation);
+                                    operation,
+                                    SourceFacts.from(call));
                     store.put(intent);
                 } else if (pending(intent) && !sameOperation(intent.operation, operation)) {
                     return Result.PAUSED;
@@ -197,7 +266,8 @@ public final class DurableDelivery {
                         return review(intent, Result.REVIEW_REQUIRED);
                     intent = intent.bind(signature);
                     store.put(intent);
-                } else if (!intent.sourceSignature.equals(signature)) {
+                } else if (!intent.sourceSignature.equals(signature)
+                        || intent.facts != null && !intent.facts.agrees(call)) {
                     return review(intent, Result.SOURCE_CHANGED);
                 }
                 return attempt(intent, allowed);

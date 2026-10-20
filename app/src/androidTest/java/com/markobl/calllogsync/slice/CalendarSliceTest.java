@@ -309,8 +309,42 @@ public class CalendarSliceTest {
         assertNotNull(call);
         assertEquals("77", call.id);
         assertFalse(call.identityAllowed);
+        assertTrue(call.presentationSupplied);
+        assertEquals(
+                Integer.valueOf(android.provider.CallLog.Calls.PRESENTATION_RESTRICTED),
+                call.numberPresentation);
         assertFalse(CallEvent.from(call, "UTC").title.contains("Secret"));
         cursor.close();
+    }
+
+    @Test
+    public void syntheticCursorRetainsNullAndExtendedPresentation() {
+        assertNotEquals(
+                android.content.pm.PackageManager.PERMISSION_GRANTED,
+                context().checkSelfPermission(Manifest.permission.READ_CALL_LOG));
+        for (Integer presentation : new Integer[] {null, 3, 4, 5, 99}) {
+            try (MatrixCursor cursor = new MatrixCursor(AndroidCallLogSource.PROJECTION)) {
+                cursor.addRow(
+                        new Object[] {
+                            "78",
+                            "555",
+                            1,
+                            1700000000123L,
+                            2147483652L,
+                            "Cached Secret",
+                            presentation,
+                            "fixture-SIM"
+                        });
+                CallRecord call = AndroidCallLogSource.first(cursor, "fixture");
+                assertTrue(call.presentationSupplied);
+                assertEquals(presentation, call.numberPresentation);
+                assertEquals(2147483652L, call.seconds);
+                assertEquals("fixture-SIM", call.phoneAccountId);
+                assertFalse(call.identityAllowed);
+                assertFalse(CallEvent.from(call, "UTC").title.contains("Secret"));
+                assertFalse(CallEvent.from(call, "UTC").description.contains("555"));
+            }
+        }
     }
 
     private static class MemoryLedger implements SliceEngine.Ledger {

@@ -15,13 +15,16 @@ members. Private/free event flags do not encrypt content or revoke calendar acce
 |---|---|---|
 | Android call-log provider | Source call metadata | Owned by the system; this app does not delete source rows |
 | Private `slice` preferences | Random source namespace and selected calendar ID | Retained across restart; no in-app reset workflow |
-| Private `calltrack-ledger.db`, schema2 | Source/destination keys, event IDs, fingerprints and outbox state | Retained for duplicate prevention and recovery; no age-based expiry |
+| Private `calltrack-ledger.db`, schema4 | Source/destination keys, event IDs, fingerprints, outbox state, operation owner/generation and source instant/actual duration/raw type/presentation | Retained for duplicate prevention and recovery; no age-based expiry |
 | Outbox personal payload | Frozen event title/description/time data for interrupted delivery | DurableDelivery clears payload on confirmed/review/suppressed transitions; pending payload has no time-based expiry |
 | Selected calendar provider | Title, description, start/end, timezone and app marker; name/number may be included | Remains after uninstall; calendar/provider controls cloud retention and deletion |
 | Local developer evidence | Toolchain paths, hashes, synthetic fixture receipts and test output | `.local` excluded from Git; no automated expiry implemented |
 
 The current launcher uses SliceEngine receipts, not the new DurableDelivery path.
-Schema1 receipts survive migration to schema2. Clearing an outbox payload is logical
+Schema1–3 receipts and pending rows survive migration to schema4. Older source facts
+remain unknown; they are never inferred from event marker length. New source facts
+survive payload clearing and remain potentially sensitive; no age-based expiry is
+implemented for them or operation metadata. Clearing an outbox payload is logical
 removal from that row; it is not forensic erasure of SQLite pages/backups. Hashes and
 source/event identifiers remain potentially linkable metadata, not anonymized data.
 Legacy preferences/code remain packaged and need a release audit even though the

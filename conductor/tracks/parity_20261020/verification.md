@@ -37,3 +37,21 @@ remain under .local/parity-owner-* and .local/parity-evidence.
 
 No source-fact/raw-presentation retention, automatic/import/scheduler/controller
 integration or full P01–P10 acceptance follows. Track4 remains active and unarchived.
+
+## Schema4 source facts and presentation checkpoint
+
+Tests first fail on missing raw-presentation constructor/fields and SourceFacts.
+Green source-bound build passes42 JVM tests, app/test APK packaging and lint
+(0 errors/30 warnings), with unchanged inputs. Legacy Java source/event goldens
+remain intact. Tests distinguish seven presentation inputs, retain zero actual
+duration independently from the one-minute marker, and review a presentation
+change without changing the legacy signature or inserting again.
+
+Dedicated API36 emulator harness passes10 native invocations, including synthetic
+Cursor null/extended presentation and duration beyond32-bit range, schema1/2/3→4
+preservation, source-fact retention after reopen/payload purge, and prior owner/
+receipt contracts. No call/calendar permission granted or personal provider query.
+Both test packages removed and read back absent. Exact hashes/methods are in
+source-facts-evidence.json; detailed snapshots remain excluded in .local/parity-evidence.
+25 host safety tests and Java/Kotlin formatting checks pass; privacy map updated.
+This does not qualify paging/import/scheduling/UI or complete P01–P10.

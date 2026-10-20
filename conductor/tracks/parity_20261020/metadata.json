@@ -4,11 +4,12 @@
   "status": "in_progress",
   "milestone": "M3",
   "created_at": "2026-10-20",
-  "updated_at": "2026-10-20",
+  "updated_at": "2026-10-21",
   "depends_on": [
     "calendar_slice_20261020"
   ],
   "requirements": "R01\u2013R11, R23, R27",
-  "implementation_status": "native-qualified-durable-foundation-full-parity-in-progress",
-  "implementation_commit": "9fc2466"
+  "implementation_status": "native-qualified-owned-source-facts-foundation-full-parity-in-progress",
+  "implementation_commit": "9fc2466",
+  "ledger_schema": 4
 }

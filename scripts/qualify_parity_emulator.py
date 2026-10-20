@@ -73,12 +73,15 @@ def qualify(serial):
             if 'Success' not in command('install', str(apk)):
                 raise RuntimeError('Install not confirmed')
         check('CalendarSliceTest', 'syntheticCursorMapsPresentationWithoutPersonalQuery')
+        check('CalendarSliceTest', 'syntheticCursorRetainsNullAndExtendedPresentation')
         for method in ('preservesV1ReceiptsAndCreatesLegacyBindings',
                        'outboxCommitsInflightAndPurgesConfirmedPayloadAcrossReopen',
                        'rejectsOutboxWriteInsideAnUncommittedTransaction',
                        'kotlinMappingRecognisesPreservedJavaReceiptWithoutReinsert',
                        'preservesV2PendingRowsWithoutInventingOperationOwnership',
-                       'operationIdentitySurvivesReopenAndPayloadPurge'):
+                       'operationIdentitySurvivesReopenAndPayloadPurge',
+                       'preservesV3OwnershipWithoutInferringSourceFactsFromPayload',
+                       'sourceFactsSurviveReopenAndPayloadPurgeWithNullPresentation'):
             check('ParityStoreTest', method)
         receipt['result'] = 'passed'
     except Exception as error:

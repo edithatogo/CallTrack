@@ -278,4 +278,31 @@ public class SliceTest {
         assertEquals(1, ledger.rows.size());
         assertEquals(1, sink.inserts);
     }
+
+    @Test
+    public void rawPresentationLabelsNeverDiscloseNonAllowedIdentity() {
+        Integer[] presentations = {1, 2, 3, 4, 5, 99, null};
+        String[] people = {
+            "Cached Secret",
+            "Private number",
+            "Unknown number",
+            "Payphone",
+            "Unknown number",
+            "Unknown number",
+            "Unknown number"
+        };
+        for (int i = 0; i < presentations.length; i++) {
+            CallRecord call =
+                    new CallRecord(
+                            "facts", "1", 1, 0, 1, "Cached Secret", "123", presentations[i], null);
+            assertTrue(call.presentationSupplied);
+            assertEquals(presentations[i], call.numberPresentation);
+            CallEvent event = CallEvent.from(call, "UTC");
+            assertEquals("Incoming: " + people[i], event.title);
+            if (i > 0) {
+                assertFalse(event.description.contains("123"));
+                assertFalse(event.title.contains("Secret"));
+            }
+        }
+    }
 }

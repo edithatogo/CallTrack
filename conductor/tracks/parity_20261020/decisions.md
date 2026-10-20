@@ -43,3 +43,26 @@ observed at that boundary leaves the ambiguous intent for conservative recovery;
 never roll it back to READY. Future coordinator pause publication must hold the same
 process delivery lock to serialize its completion with provider insertion. This
 engine change is not proof of a wired pause/import/scheduler UI.
+
+## Source-fact/rendering policy and schema4
+
+Preserve nullable raw number presentation from Cursor instead of collapsing it to
+a Boolean. New raw-provider records disclose identity only for allowed(1):
+restricted(2) renders Private number, payphone(4) Payphone, and unknown(3),
+unavailable(5), null/unrecognized values Unknown number. Non-allowed presentation
+masks cached name and number in event output. Boolean legacy constructors retain
+the previous rendering and source-v1 signatures, so old golden contracts remain
+unchanged. Values follow [Android CallLog reference](https://developer.android.com/reference/android/provider/CallLog.Calls).
+
+New durable intents keep exact source milliseconds, actual seconds, raw type and
+nullable presentation separately from the event payload. Source facts survive
+confirmation/review/suppression and never infer actual talk time from a visual
+marker. Where both inputs have raw presentation, a changed presentation enters
+SOURCE_CHANGED review even if the compatibility signature remains equal. Older
+rows keep facts unknown; no new fact is guessed or old event rewritten.
+
+Schema4 preserves schema1/2/3 data and operation ownership. New facts are nullable
+for migrated rows; null presentation is distinct from absent historical facts.
+These retained metadata remain sensitive and lack an expiry policy; PRIVACY.md
+records that limit. No destructive downgrade/backup promise follows: older APK
+readers of schema4 and full recovery/restore policy remain unqualified.

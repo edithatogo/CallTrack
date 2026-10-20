@@ -1,6 +1,6 @@
 # Plan: Parity and durable synchronisation
 
-All tasks pending. Discovery is real track work. Implementation is conditional; do not mark it complete when only research/prototypes exist.
+Track active: schema4 durable foundations have bounded JVM/native evidence. Paging, historical import, scheduling, UI/recovery and full parity acceptance remain required.
 
 ## Phase 1: Discovery and mapping
 
@@ -28,7 +28,7 @@ All tasks pending. Discovery is real track work. Implementation is conditional; 
 
 - [x] Durable intent engine, source-independent resume, v1 preservation and native persistence tests (31 JVM/19 host tests; four API36 native invocations passed; packages removed)
 - [x] Operation owner/generation and preserving schema3 migration (39 JVM/25 host/7 API36 native checks; packages removed)
-- [ ] Retained source facts/raw presentation, with preserving migration/tests
+- [x] Retained source facts/raw presentation, preserving schema4 migration (42 JVM/25 host/10 API36 native checks; packages removed)
 - [ ] Bounded source paging, checkpoint/anchor validation, filter/settings policy and reset handling
 - [ ] Frozen historical preview, confirmed bounded import, cancel/resume and partial-progress handling
 - [ ] Read-only legacy confidence/ambiguity matcher
@@ -71,3 +71,11 @@ Schema3 ownership change verified in ownership-evidence.json. Next implement raw
 presentation/exact source metadata retention, then bounded source traversal, frozen
 import sessions, legacy matching, scheduling and UI. Final full-track review/archive
 remain required; do not treat this checkpoint as parity completion.
+
+## Current source-facts checkpoint
+
+Source facts/presentation verified in source-facts-evidence.json. Next implement
+bounded source traversal with stable snapshot/anchor reset handling, then frozen
+historical sessions and automatic scheduling/UI integration. Prior resume sections
+are historical; use this checkpoint and fresh device/process checks. Full review/
+fixes/archive remain outstanding.
