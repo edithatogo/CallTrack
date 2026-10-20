@@ -72,6 +72,8 @@ def qualify(serial):
             attempted.append(package)
             if 'Success' not in command('install', str(apk)):
                 raise RuntimeError('Install not confirmed')
+        check('ActivationStoreTest', 'activationAndPauseCommitToDiskAndRejectOldGeneration')
+        check('ActivationStoreTest', 'malformedOrFutureSettingsCannotBecomeEnabled')
         check('CalendarSliceTest', 'syntheticCursorMapsPresentationWithoutPersonalQuery')
         check('CalendarSliceTest', 'syntheticCursorRetainsNullAndExtendedPresentation')
         check('CalendarSliceTest', 'syntheticPagingUsesBoundedQueriesAndPreservesEveryRow')

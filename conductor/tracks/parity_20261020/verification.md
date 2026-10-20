@@ -91,3 +91,16 @@ compiles, with process fail-closed latch for failed commit. Source-bound build p
 activation-evidence.json. Native persistence/fault tests remain pending. Next qualify
 store readback and connect settings to scanner/scheduler/UI, then frozen imports,
 legacy matching and full acceptance. This is not completed automatic logging.
+
+
+## Native activation checkpoint
+
+Two isolated Android settings tests pass: committed document exists on disk,
+adapter recreation reads selected activation/pause/type settings, generation2
+rejects generation1 workers, and malformed/future documents fail closed. Fixture
+preferences deleted in finally. Full native regression matrix15/15 passes on API36;
+test packages removed. Source-bound build57 JVM tests/APKs/lint and25 host tests
+pass. Exact inputs/artifacts/native output in activation-native-evidence.json.
+Reopen remains within one instrumentation process; no process-death or disk-failure
+injection claim. Next implement verified automatic scan rollover and bounded
+source-independent recovery before scheduler/UI; full Track4 remains open.
