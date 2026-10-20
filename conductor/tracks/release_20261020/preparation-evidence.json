@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-20",
+  "code_checkpoint": "28b4180",
+  "track_start_commit": "4b31e39",
+  "build_receipt_sha256": "acb456b8590ccc6f5b00eba6021ac09e16d1af94b322cdc73494cc696b7e46e1",
+  "build_exit": 0,
+  "inputs_unchanged": true,
+  "elapsed_seconds": 101.7,
+  "artifacts": {
+    "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk": "1f3bdbeed79d271e16e8f427b5fbc537f383679ec6cf046fa7c64f16fdc0a322",
+    "app/build/outputs/apk/debug/app-debug.apk": "6f523cc3db74ef07426784613da29f49ba4155438687e7241207fddf5707386d"
+  },
+  "jvm_tests": 31,
+  "jvm_failures": 0,
+  "host_tests": 19,
+  "host_failures": 0,
+  "lint": {
+    "Error": 0,
+    "Fatal": 0,
+    "Warning": 30
+  },
+  "markdown_documents_checked": 85,
+  "native_tests_this_track": 0,
+  "release_candidate": false,
+  "operational_acceptance": false
+}

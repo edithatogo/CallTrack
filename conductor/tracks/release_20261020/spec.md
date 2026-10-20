@@ -1,6 +1,6 @@
 # Community distribution and release readiness
 
-Milestone: M4. Type: research-led development. Status: planned discovery; implementation scope provisional.
+Milestone: M4. Type: research-led development. Status: discovery and community preparation in progress; release candidate blocked on M3.
 
 ## Objective
 
@@ -27,3 +27,12 @@ Source-matched release candidate, contributor instructions and recorded operatio
 ## Out of scope
 
 No automatic adoption of shortlisted technology, wholesale rewrite, paid service, unqualified platform parity or public release. Cross-track responsibilities remain with their owning tracks. A negative feasibility result or justified deferral is an acceptable research outcome.
+
+## Refined execution scope (2026-10-20)
+
+Discovery selected native tooling and repository documentation/templates without
+new dependencies. Findings and D01–D09 define the candidate gates. Contributor and
+release preparation may proceed before M3. Candidate signing, reproduction, upgrade
+and operational acceptance are deferred until their prerequisites exist. This
+refinement does not waive the original objective or permit completion/archive on
+documents alone. See [verification](verification.md) for the current boundary.
