@@ -118,3 +118,11 @@ and a staged provider qualification protocol. INT-D01 retains native CalendarCon
 first and defers direct clients until a required route gap is measured and Track4
 contracts stabilize. Outlook/Google/CalDAV cloud readback remains unqualified; no
 new endpoint, multi-destination routing or auth library was implemented.
+
+## Track11 productivity research outcome
+
+R18/R21–R23/R27 have [J01–J12](tracks/productivity_20261020/requirements.md) covering
+independent annotations, search, recovery/export, callback, rules and time summaries.
+The proposed order remains subject to user workflow validation. PROD-D01 defers
+implementation and dependencies; no journal, restore, reminder, SMS or routing
+feature is delivered. Receipt payload clearing is not journal retention.
