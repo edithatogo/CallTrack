@@ -44,6 +44,7 @@ public final class SliceEngine {
         void put(String sourceKey, long calendar, Entry entry);
     }
 
+    /** Insert attempt receipt. Its presence alone never establishes verified success. */
     public static final class Entry {
         public final long id;
         public final String fingerprint;
@@ -114,8 +115,17 @@ public final class SliceEngine {
         boolean recovered = !found.isEmpty();
         if (recovered && !matches(found.get(0), calendar, event)) return Result.REVIEW_REQUIRED;
         long id = recovered ? found.get(0).id : sink.insert(calendar, event);
-        if (!matches(sink.read(id), calendar, event)) return Result.REVIEW_REQUIRED;
+        // Retain the returned insert ID even when readback is uncertain. This is an
+        // attempt receipt, not a success flag: every retry verifies the actual event.
         ledger.put(key, calendar, new Entry(id, event.fingerprint()));
-        return recovered ? Result.RECOVERED : Result.SAVED;
+        try {
+            if (!matches(sink.read(id), calendar, event)) return Result.REVIEW_REQUIRED;
+            return recovered ? Result.RECOVERED : Result.SAVED;
+        } catch (SecurityException e) {
+            return Result.PERMISSION_REQUIRED;
+        } catch (RuntimeException e) {
+            // Return inside the writer transaction so the known event ID is committed.
+            return Result.FAILED;
+        }
     }
 }

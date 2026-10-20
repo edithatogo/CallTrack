@@ -6,7 +6,8 @@ CallTrack successor. See [source provenance](NOTICE.md) and [Conductor roadmap](
 The current slice is manual: choose a visible writable device calendar, grant the
 requested permissions, then explicitly log the latest call. The event uses cached
 caller identity when available, exact timestamps, private/free defaults and no
-reminders. Restricted numbers remain private. A zero-duration call has a one-minute
+reminders. Restricted numbers remain private. Known insert IDs are retained even if readback fails; receipt presence alone is not
+success. A zero-duration call has a one-minute
 visual marker and describes its actual zero duration. Calendar providers may sync
 these events to their accounts. Launching or granting access never reads a call.
 
