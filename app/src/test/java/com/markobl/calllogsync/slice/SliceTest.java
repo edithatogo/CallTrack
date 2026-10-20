@@ -193,7 +193,7 @@ public class SliceTest {
     }
 
     @Test
-    public void readbackMismatchDoesNotCommitReceipt() {
+    public void readbackMismatchRetainsAttemptWithoutClaimingSuccess() {
         Sink sink =
                 new Sink() {
                     @Override
@@ -205,7 +205,7 @@ public class SliceTest {
         assertEquals(
                 SliceEngine.Result.REVIEW_REQUIRED,
                 new SliceEngine(this::call, sink, ledger, "UTC").run(7));
-        assertTrue(ledger.rows.isEmpty());
+        assertEquals(1, ledger.rows.size());
     }
 
     @Test
@@ -238,6 +238,44 @@ public class SliceTest {
         assertEquals(
                 SliceEngine.Result.REVIEW_REQUIRED,
                 new SliceEngine(() -> changed, sink, ledger, "UTC").run(7));
+        assertEquals(1, sink.inserts);
+    }
+
+    @Test
+    public void uncertainReadbackMustNotInsertAgain() {
+        Sink sink =
+                new Sink() {
+                    @Override
+                    public SliceEngine.StoredEvent read(long id) {
+                        return null;
+                    }
+
+                    @Override
+                    public List<SliceEngine.StoredEvent> find(long calendar, String marker) {
+                        return Collections.emptyList();
+                    }
+                };
+        Ledger ledger = new Ledger();
+        SliceEngine engine = new SliceEngine(this::call, sink, ledger, "UTC");
+        assertEquals(SliceEngine.Result.REVIEW_REQUIRED, engine.run(7));
+        assertEquals(SliceEngine.Result.REVIEW_REQUIRED, engine.run(7));
+        assertEquals(1, sink.inserts);
+    }
+
+    @Test
+    public void readbackExceptionRetainsAttemptForLaterVerification() {
+        Sink sink =
+                new Sink() {
+                    @Override
+                    public SliceEngine.StoredEvent read(long id) {
+                        throw new IllegalStateException("provider unavailable");
+                    }
+                };
+        Ledger ledger = new Ledger();
+        SliceEngine engine = new SliceEngine(this::call, sink, ledger, "UTC");
+        assertEquals(SliceEngine.Result.FAILED, engine.run(7));
+        assertEquals(SliceEngine.Result.FAILED, engine.run(7));
+        assertEquals(1, ledger.rows.size());
         assertEquals(1, sink.inserts);
     }
 }
