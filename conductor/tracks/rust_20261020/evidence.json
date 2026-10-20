@@ -69,5 +69,19 @@
     "clippy.log": "b868e759d05fee87ee1de2cb826089b9132a919579d7ed14f2d614038e39e966",
     "rust-final.log": "ab3c845884fa8f735fe22ba5904f926124cf3e56a649b7fbd5a15f3374a03fbb",
     "jvm-final.log": "bcd5f3115f84eb1840a70f6d1b839ede09b7afe45b71afc4b89582da6ce051ae"
+  },
+  "toolchain_details": {
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13) (Homebrew)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: aarch64-apple-darwin\nrelease: 1.99.1\nLLVM version: 23.1.3",
+    "cargo": "cargo 1.99.1 (5f94df478 2026-08-27) (Homebrew)",
+    "java": "openjdk 17.0.20.1 2026-08-18\nOpenJDK Runtime Environment Homebrew (build 17.0.20.1+0)\nOpenJDK 64-Bit Server VM Homebrew (build 17.0.20.1+0, mixed mode, sharing)",
+    "macos": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0.1\nBuildVersion:\t\t26A434",
+    "architecture": "arm64"
+  },
+  "artifact_sha256": {
+    "prototypes/rust-identity/build/release/calltrack-identity-experiment": "3865c3c664a5bd5d10aeadcd0cd9ce6f2d665e5dee2ddbfa4c1384e87306358e",
+    "prototypes/rust-jvm-baseline/build/classes/java/main/com/markobl/calllogsync/slice/CallRecord.class": "6b892e2d8d3ee97e6c329e8a76a357503bae02f84f800dfe1b95ed682f27c587",
+    "prototypes/rust-jvm-baseline/build/classes/kotlin/main/com/markobl/calllogsync/slice/CallIdentity$Companion.class": "83663acea9c98355256ee9e79a6433e6529afc2cfb7dfb16cf96ac4512e0b444",
+    "prototypes/rust-jvm-baseline/build/classes/kotlin/main/com/markobl/calllogsync/slice/CallIdentity.class": "98e0df84c641382bfdd94dc991d5d21dc16c65cd3266ae449db331e5a4ec2b55",
+    "prototypes/rust-jvm-baseline/build/classes/kotlin/main/org/calltrack/benchmark/MainKt.class": "bc82f36f20a9f96db11b9c55ffbbfd0a690555a5bde48cbc48315ee3ab7992fa"
   }
 }
