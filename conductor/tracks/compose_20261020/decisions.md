@@ -47,3 +47,37 @@ Primary sources: [migration](https://developer.android.com/develop/ui/compose/mi
 [BOM](https://developer.android.com/develop/ui/compose/bom),
 [compiler](https://developer.android.com/develop/ui/compose/compiler),
 [accessibility testing](https://developer.android.com/develop/ui/compose/accessibility/testing).
+
+## Final production decision — retain Views; defer adoption
+
+The experiment demonstrates a feasible Compose rendering/state boundary; it does
+not justify replacing the current screen yet. Retain the working Views UI. M3's
+operation ownership/import/status contract and full M5 remain unsettled, prototype
+access is simulated rather than OS truth, and manual TalkBack/Switch Access/task
+acceptance has not occurred. Adopting now would couple UI and controller changes
+without the required real-behaviour evidence. This is a justified production
+deferral under the original spec, not rejection of Compose or completion of M6.
+
+Production implementation in this research track is therefore **not applicable**.
+No adopted screen needs to be silently grandfathered into acceptance. Research
+closure requires the bounded results, reviewed fixes and explicit handoff below.
+The prototype stays isolated for reproducible research; its dependencies remain
+prototype-only. The optional CI job may be removed with the standalone directory
+and harness when superseded. No root app data, dependency or code rollback is needed.
+
+Reopen the production M6 decision when: (1) M3/M5 controller/state contracts are
+stable; (2) real permission/revocation, destination refresh/loss, busy/recovery and
+Activity/process restoration cases have an authoritative state model; (3) manual
+accessibility and localization criteria are scheduled against an actual screen;
+(4) a fresh compatible dependency graph and supported-API matrix are qualified.
+Then choose one screen/section with ComposeView coexistence and explicit disposal,
+keep effects in the controller, and prove parity before removing its Views. Compare
+native/owned/library takeover again; prototype versions are not a production lock.
+Compose Multiplatform work must not assume an Android Compose UI already exists.
+
+Final result:3 JVM/25 host passes, build/lint success, but5/5 foreground-guarded UI
+tests fail because Android system crash windows obstruct the emulator. Earlier
+semantics success is not accepted as visual proof. Both packages are removed.
+This strengthens the retain/defer decision; resolve the environment and rerun all
+strict native/manual gates before any production adoption. No successful full
+prototype qualification, screen migration or library performance claim is made.
