@@ -63,9 +63,18 @@ download recipe are in CI. The upstream build reproducer remains available throu
 [qualification instructions](qualification/README.md). CI definitions are local
 configuration until a hosted run is observed.
 
-Ledger schema1 is preserving: unsupported upgrades fail instead of dropping data.
+Ledger schema2 preserves schema1 receipts and adds a durable outbox foundation;
+unsupported upgrades fail instead of dropping data. The manual launcher still uses
+the original receipt path; automatic delivery/import integration is unfinished.
 The receipt key includes per-install source namespace, call row ID and destination.
 Do not clear app data as a retry strategy: losing receipts changes recovery and
 identity semantics. Cross-device restore, edited/deleted crash-gap tombstones and
 full background reconciliation are Track4 work. Keep working releases and source
 history until migration and recovery have passed.
+
+## Community preparation
+
+See [contribution guide](CONTRIBUTING.md), [data lifecycle](PRIVACY.md),
+[security status](SECURITY.md) and [release runbook](RELEASING.md). These prepare
+future community distribution; they do not establish a release candidate or public
+reporting channel. Track4 acceptance and signing/distribution gates remain open.
