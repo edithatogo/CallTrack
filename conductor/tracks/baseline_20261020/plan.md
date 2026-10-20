@@ -1,6 +1,6 @@
 # Plan: CallTrack and FOSS capability mapping
 
-Research execution complete; final verification and formal review pending. Application implementation phase is not applicable per decisions D04; checklist completion records disposition, not app delivery.
+Research execution and formal review complete; final archive verification follows. Application implementation phase is not applicable per decisions D04; checklist completion records disposition, not app delivery.
 
 ## Phase 1: Discovery and mapping
 
@@ -39,9 +39,11 @@ Research execution complete; final verification and formal review pending. Appli
 
 ## Phase: Review Fixes
 
-- [~] Task: Correct stale global status and misleading fixture cross-reference; verify archival links and validator failure detection
+- [x] Task: Correct stale global status and misleading fixture cross-reference; verify archival links and validator failure detection c7a0499
 
 ## Commit history
 
 - d3a68d7: track start.
 - f5fb750: static mapping, requirements, decisions, fixtures and evidence verification.
+
+Review-fix commit: c7a0499. All research phases reference implementation checkpoint f5fb750 and the verification report; no application phase checkpoint is claimed.
