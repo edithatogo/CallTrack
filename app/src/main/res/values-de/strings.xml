@@ -148,4 +148,9 @@
     <string name="reapproval_changed">Dieser Nachweis wurde geändert oder ein Einfügeversuch könnte bereits erfolgt sein. Aktualisiere und prüfe die bestehende Wirkung. Kein neues Einfügen wurde freigegeben.</string>
     <string name="reapproval_paused">Die Einfügefreigabe wurde vor Abschluss angehalten. Aktualisiere vor einem erneuten Versuch den Nachweis. Der ausstehende Vorgang bleibt erfasst.</string>
     <string name="reapproval_failed">Das neu bestätigte Einfügen konnte nicht geprüft werden. Prüfe vor einer weiteren Aktion die bestehende Wirkung. Ein Termin könnte bereits vorhanden sein.</string>
+
+    <string name="recovery_expired">Ausstehende Nutzdaten abgelaufen — kein Einfügeversuch</string>
+    <string name="retention_policy">Ausstehende persönliche Termindaten laufen sieben Tage nach der Speicherung ab. Die Prüfung erfolgt beim Zugriff und in begrenzten Wartungsläufen. Bestehende Daten unbekannten Alters erhalten sieben Tage ab der Migration. Das Datum des Anrufs bestimmt dieses Alter nicht. IDs, Hashwerte, Quelldaten und Termine bleiben erhalten. Noch nicht versuchte abgelaufene Vorgänge benötigen einen bestätigten Import zum erneuten Lesen der Quelle und werden nie automatisch eingefügt. Offline oder inaktive Apps können die Bereinigung bis zur nächsten Prüfung verzögern.</string>
+    <string name="retention_run">Abgelaufene ausstehende Nutzdaten jetzt entfernen</string>
+    <string name="retention_result">%1$d abgelaufene Nutzdatensätze in diesem Lauf entfernt. Weitere können verbleiben. Nachweismetadaten und Termine bleiben erhalten.</string>
 </resources>

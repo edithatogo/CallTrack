@@ -353,7 +353,10 @@ public final class HistoricalImport {
             final Session active = session;
             DurableDelivery.Result result;
             DurableDelivery.Intent intent = receipts.get(candidate.key, session.calendar);
-            if (owned(intent, session) && bindingMatches(candidate, intent)) {
+            if (intent != null
+                    && intent.state != DurableDelivery.State.EXPIRED_READY
+                    && owned(intent, session)
+                    && bindingMatches(candidate, intent)) {
                 result =
                         delivery.resume(
                                 candidate.key,
@@ -366,6 +369,14 @@ public final class HistoricalImport {
                         || !candidate.key.equals(call.key())
                         || !candidate.binding.equals(PagedCalls.binding(call)))
                     result = DurableDelivery.Result.SOURCE_CHANGED;
+                else if (intent != null && intent.state == DurableDelivery.State.EXPIRED_READY)
+                    result =
+                            delivery.reapproveExpired(
+                                    call,
+                                    session.calendar,
+                                    session.timezone,
+                                    session.operation(),
+                                    () -> running.getAsBoolean() && allowed(active));
                 else
                     result =
                             delivery.deliver(

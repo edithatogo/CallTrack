@@ -104,7 +104,9 @@ def qualify(serial):
                        'pendingRecoveryQueryIsBoundedAndOwnerDestinationScoped',
                        'deliveryCountsIncludeLateLegacyWithoutDoubleCountingBoundReceipt',
                        'recoveryPagingIncludesLegacyAndRemainsStableWhenStatesChange',
-                       'explicitReapprovalPersistsFreshOwnerAndSuppressionClearsReadyPayload'):
+                       'explicitReapprovalPersistsFreshOwnerAndSuppressionClearsReadyPayload',
+                       'payloadStorageAgeSurvivesTransitionsAndExpiryPreservesRecoveryMetadata',
+                       'preservesV5PendingPayloadAndCheckpointWithExplicitMigrationGrace'):
             check('ParityStoreTest', method)
         receipt['result'] = 'passed'
     except Exception as error:

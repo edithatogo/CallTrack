@@ -51,6 +51,11 @@ public final class ReceiptRecoveryActivity extends Activity {
                         load(null);
                     }
                 });
+        TextView retention = new TextView(this);
+        retention.setText(R.string.retention_policy);
+        layout.addView(retention);
+        Button expire = button(layout, R.string.retention_run);
+        expire.setOnClickListener(v -> expireOldPayloads());
         feedback = new TextView(this);
         feedback.setId(R.id.recovery_feedback);
         feedback.setAccessibilityLiveRegion(android.view.View.ACCESSIBILITY_LIVE_REGION_POLITE);
@@ -93,6 +98,7 @@ public final class ReceiptRecoveryActivity extends Activity {
         executor.execute(
                 () -> {
                     try (SqliteLedger ledger = new SqliteLedger(getApplicationContext())) {
+                        ledger.expirePayloads(50);
                         List<SqliteLedger.RecoveryItem> page = ledger.recoveryPage(cursor, 11);
                         Map<Long, String> labels = new HashMap<>();
                         AndroidCalendarSink sink = new AndroidCalendarSink(getApplicationContext());
@@ -221,6 +227,33 @@ public final class ReceiptRecoveryActivity extends Activity {
                     });
         }
         rows.addView(card);
+    }
+
+    private void expireOldPayloads() {
+        if (busy) return;
+        busy = true;
+        navigation();
+        executor.execute(
+                () -> {
+                    try (SqliteLedger ledger = new SqliteLedger(getApplicationContext())) {
+                        int count = ledger.expirePayloads(50);
+                        runOnUiThread(
+                                () -> {
+                                    if (isDestroyed()) return;
+                                    busy = false;
+                                    feedback.setText(getString(R.string.retention_result, count));
+                                    load(current);
+                                });
+                    } catch (RuntimeException failed) {
+                        runOnUiThread(
+                                () -> {
+                                    if (isDestroyed()) return;
+                                    busy = false;
+                                    feedback.setText(R.string.recovery_failed);
+                                    navigation();
+                                });
+                    }
+                });
     }
 
     private void confirmReapproval(DurableDelivery.Intent intent, String calendar) {
@@ -360,6 +393,8 @@ public final class ReceiptRecoveryActivity extends Activity {
         switch (state) {
             case READY:
                 return R.string.recovery_ready;
+            case EXPIRED_READY:
+                return R.string.recovery_expired;
             case IN_FLIGHT:
                 return R.string.recovery_inflight;
             case ATTEMPTED:

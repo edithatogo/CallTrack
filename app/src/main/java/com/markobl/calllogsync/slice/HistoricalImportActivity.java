@@ -376,6 +376,7 @@ public final class HistoricalImportActivity extends Activity {
                 () -> {
                     try (SqliteImportStore store = new SqliteImportStore(getApplicationContext());
                             SqliteLedger ledger = new SqliteLedger(getApplicationContext())) {
+                        ledger.expirePayloads(50);
                         HistoricalImport importer =
                                 new HistoricalImport(
                                         store,

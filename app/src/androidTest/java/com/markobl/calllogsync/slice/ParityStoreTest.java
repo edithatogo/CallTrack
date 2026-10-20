@@ -54,7 +54,7 @@ public class ParityStoreTest {
                 assertEquals(42, migrated.eventId);
                 assertEquals("old-fingerprint", migrated.fingerprint);
                 assertNull(migrated.sourceSignature);
-                assertEquals(5, ledger.getReadableDatabase().getVersion());
+                assertEquals(6, ledger.getReadableDatabase().getVersion());
             }
         } finally {
             context().deleteDatabase(name);
@@ -211,7 +211,7 @@ public class ParityStoreTest {
                         SliceEngine.Result.REVIEW_REQUIRED,
                         new SliceEngine(() -> call, sink, ledger, "UTC").run(7));
                 assertEquals(javaFingerprint, ledger.get(call.key(), 7).fingerprint);
-                assertEquals(5, ledger.getReadableDatabase().getVersion());
+                assertEquals(6, ledger.getReadableDatabase().getVersion());
             }
         } finally {
             context().deleteDatabase(name);
@@ -244,7 +244,7 @@ public class ParityStoreTest {
             }
             try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
                 DurableDelivery.Intent intent = ledger.outbox().get("source", 7);
-                assertEquals(5, ledger.getReadableDatabase().getVersion());
+                assertEquals(6, ledger.getReadableDatabase().getVersion());
                 assertNull(intent.operation);
                 assertEquals(DurableDelivery.State.READY, intent.state);
                 assertEquals("Synthetic title", intent.payload.title);
@@ -322,7 +322,7 @@ public class ParityStoreTest {
             }
             try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
                 DurableDelivery.Intent intent = ledger.outbox().get("source", 7);
-                assertEquals(5, ledger.getReadableDatabase().getVersion());
+                assertEquals(6, ledger.getReadableDatabase().getVersion());
                 assertNull(intent.facts);
                 assertEquals("import-1", intent.operation.owner);
                 assertEquals(42, intent.operation.generation);
@@ -444,10 +444,11 @@ public class ParityStoreTest {
                                         new DurableDelivery.SourceFacts(123, 0, 3, null, true)));
                 SQLiteDatabase db = ledger.getWritableDatabase();
                 db.execSQL("DROP TABLE scan_cursors");
+                db.execSQL("ALTER TABLE outbox DROP COLUMN payload_saved_at");
                 db.setVersion(4);
             }
             try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
-                assertEquals(5, ledger.getReadableDatabase().getVersion());
+                assertEquals(6, ledger.getReadableDatabase().getVersion());
                 DurableDelivery.Intent saved = ledger.outbox().get("source", 7);
                 assertEquals(123, saved.eventId);
                 assertEquals(123, saved.facts.start);
@@ -613,10 +614,10 @@ public class ParityStoreTest {
             DeliveryCounts counts = ledger.counts();
             assertEquals(3, counts.pending);
             assertEquals(1, counts.verified);
-            assertEquals(2, counts.review);
+            assertEquals(3, counts.review);
             assertEquals(1, counts.suppressed);
             ledger.put("late-manual", 7, new SliceEngine.Entry(123, "fingerprint"));
-            assertEquals(3, ledger.counts().review);
+            assertEquals(4, ledger.counts().review);
             assertEquals(DurableDelivery.State.LEGACY, ledger.outbox().get("late-manual", 7).state);
             ledger.outbox()
                     .put(
@@ -629,7 +630,7 @@ public class ParityStoreTest {
                                     "fingerprint",
                                     123,
                                     null));
-            assertEquals(2, ledger.counts().review);
+            assertEquals(3, ledger.counts().review);
             assertEquals(2, ledger.counts().verified);
         } finally {
             assertTrue(context().deleteDatabase(name));
@@ -775,6 +776,144 @@ public class ParityStoreTest {
                 assertEquals(-1, suppressed.eventId);
                 assertEquals(old.owner, suppressed.operation.owner);
                 assertEquals(other.start, suppressed.facts.start);
+            }
+        } finally {
+            assertTrue(context().deleteDatabase(name));
+        }
+    }
+
+    @Test
+    public void payloadStorageAgeSurvivesTransitionsAndExpiryPreservesRecoveryMetadata() {
+        String name = database();
+        context().deleteDatabase(name);
+        long base = 1000000000000L;
+        java.util.concurrent.atomic.AtomicLong time =
+                new java.util.concurrent.atomic.AtomicLong(base);
+        CallRecord call = HistoricalImportStoreTest.row(1),
+                attempted = HistoricalImportStoreTest.row(2);
+        CallEvent event = CallEvent.from(call, "UTC"), other = CallEvent.from(attempted, "UTC");
+        DurableDelivery.Operation operation = new DurableDelivery.Operation("automatic", 1);
+        try {
+            try (SqliteLedger ledger = new SqliteLedger(context(), name, time::get)) {
+                ledger.outbox()
+                        .put(
+                                new DurableDelivery.Intent(
+                                        DurableDelivery.State.READY,
+                                        call.key(),
+                                        7,
+                                        CallIdentity.signature(call),
+                                        event.marker,
+                                        event.fingerprint(),
+                                        -1,
+                                        event,
+                                        operation,
+                                        DurableDelivery.SourceFacts.from(call)));
+                ledger.outbox()
+                        .put(
+                                new DurableDelivery.Intent(
+                                        DurableDelivery.State.ATTEMPTED,
+                                        attempted.key(),
+                                        7,
+                                        CallIdentity.signature(attempted),
+                                        other.marker,
+                                        other.fingerprint(),
+                                        42,
+                                        other,
+                                        operation,
+                                        DurableDelivery.SourceFacts.from(attempted)));
+                time.set(base + PayloadRetention.WINDOW_MILLIS / 2);
+                DurableDelivery.Intent current = ledger.outbox().get(call.key(), 7);
+                assertNotNull(current.payload);
+                ledger.outbox().put(current);
+                try (Cursor cursor =
+                        ledger.getReadableDatabase()
+                                .rawQuery(
+                                        "SELECT payload_saved_at FROM outbox WHERE source=?",
+                                        new String[] {call.key()})) {
+                    assertTrue(cursor.moveToFirst());
+                    assertEquals(base, cursor.getLong(0));
+                }
+            }
+            time.set(base + PayloadRetention.WINDOW_MILLIS);
+            try (SqliteLedger ledger = new SqliteLedger(context(), name, time::get)) {
+                assertEquals(1, ledger.expirePayloads(1));
+                DurableDelivery.Intent expired = ledger.outbox().get(call.key(), 7);
+                assertEquals(DurableDelivery.State.EXPIRED_READY, expired.state);
+                assertNull(expired.payload);
+                assertEquals(event.fingerprint(), expired.fingerprint);
+                assertEquals(call.start, expired.facts.start);
+                assertEquals(operation.owner, expired.operation.owner);
+                assertEquals(-1, expired.eventId);
+                DurableDelivery.Intent known = ledger.outbox().get(attempted.key(), 7);
+                assertEquals(DurableDelivery.State.ATTEMPTED, known.state);
+                assertNull(known.payload);
+                assertEquals(42, known.eventId);
+                assertEquals(other.marker, known.marker);
+                try (Cursor cursor =
+                        ledger.getReadableDatabase()
+                                .rawQuery(
+                                        "SELECT COUNT(*) FROM outbox WHERE payload_title IS NOT"
+                                                + " NULL OR payload_description IS NOT NULL OR"
+                                                + " payload_start IS NOT NULL OR payload_end IS NOT"
+                                                + " NULL OR payload_timezone IS NOT NULL",
+                                        null)) {
+                    assertTrue(cursor.moveToFirst());
+                    assertEquals(0, cursor.getLong(0));
+                }
+                assertEquals(0, ledger.expirePayloads(50));
+            }
+        } finally {
+            assertTrue(context().deleteDatabase(name));
+        }
+    }
+
+    @Test
+    public void preservesV5PendingPayloadAndCheckpointWithExplicitMigrationGrace() {
+        String name = database();
+        context().deleteDatabase(name);
+        long base = 1000000000000L;
+        java.util.concurrent.atomic.AtomicLong time =
+                new java.util.concurrent.atomic.AtomicLong(base);
+        CallRecord call = HistoricalImportStoreTest.row(1);
+        CallEvent event = CallEvent.from(call, "UTC");
+        DurableDelivery.Operation operation = new DurableDelivery.Operation("import-old", 3);
+        try {
+            try (SqliteLedger ledger = new SqliteLedger(context(), name, time::get)) {
+                ledger.outbox()
+                        .put(
+                                new DurableDelivery.Intent(
+                                        DurableDelivery.State.READY,
+                                        call.key(),
+                                        7,
+                                        CallIdentity.signature(call),
+                                        event.marker,
+                                        event.fingerprint(),
+                                        -1,
+                                        event,
+                                        operation,
+                                        DurableDelivery.SourceFacts.from(call)));
+                ledger.put("legacy", 7, new SliceEngine.Entry(99, "old-fingerprint"));
+                ledger.checkpoint(
+                        operation, new PagedCalls.Checkpoint("fixture", 2, "upper", 1, "last"));
+                ledger.getWritableDatabase()
+                        .execSQL("ALTER TABLE outbox DROP COLUMN payload_saved_at");
+                ledger.getWritableDatabase().setVersion(5);
+            }
+            long migrated = base + 100 * PayloadRetention.WINDOW_MILLIS;
+            time.set(migrated);
+            try (SqliteLedger ledger = new SqliteLedger(context(), name, time::get)) {
+                assertEquals(6, ledger.getReadableDatabase().getVersion());
+                assertNotNull(ledger.outbox().get(call.key(), 7).payload);
+                assertEquals(1, ledger.checkpoint(operation).lastId);
+                assertEquals(99, ledger.get("legacy", 7).id);
+                time.set(migrated + PayloadRetention.WINDOW_MILLIS - 1);
+                assertNotNull(ledger.outbox().get(call.key(), 7).payload);
+                time.incrementAndGet();
+                assertEquals(
+                        DurableDelivery.State.EXPIRED_READY,
+                        ledger.outbox().get(call.key(), 7).state);
+                assertEquals(operation.owner, ledger.outbox().get(call.key(), 7).operation.owner);
+                assertEquals(call.start, ledger.outbox().get(call.key(), 7).facts.start);
             }
         } finally {
             assertTrue(context().deleteDatabase(name));

@@ -9,12 +9,25 @@ import android.database.sqlite.SQLiteOpenHelper;
 /** Durable receipt per source/destination. A writer transaction serializes concurrent instances. */
 public final class SqliteLedger extends SQLiteOpenHelper
         implements SliceEngine.Ledger, AutomaticDelivery.Progress {
+    private final java.util.function.LongSupplier clock;
+
     public SqliteLedger(Context context) {
         this(context, "calltrack-ledger.db");
     }
 
     public SqliteLedger(Context context, String name) {
-        super(context, name, null, 5);
+        this(context, name, System::currentTimeMillis);
+    }
+
+    public SqliteLedger(Context context, String name, java.util.function.LongSupplier clock) {
+        super(context, name, null, 6);
+        this.clock = clock;
+    }
+
+    private long now() {
+        long time = clock.getAsLong();
+        if (time < 0) throw new IllegalStateException("Invalid storage clock");
+        return time;
     }
 
     @Override
@@ -29,7 +42,7 @@ public final class SqliteLedger extends SQLiteOpenHelper
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (newVersion != 5 || oldVersion < 1 || oldVersion > 4)
+        if (newVersion != 6 || oldVersion < 1 || oldVersion > 5)
             throw new IllegalStateException("A preserving ledger migration is required");
         if (oldVersion == 1) {
             createOutbox(db);
@@ -52,7 +65,11 @@ public final class SqliteLedger extends SQLiteOpenHelper
                 db.execSQL("ALTER TABLE outbox ADD COLUMN source_presentation_supplied INTEGER");
             }
         }
-        createScans(db);
+        if (oldVersion < 5) createScans(db);
+        if (oldVersion != 1) db.execSQL("ALTER TABLE outbox ADD COLUMN payload_saved_at INTEGER");
+        ContentValues migrated = new ContentValues();
+        migrated.put("payload_saved_at", now());
+        db.update("outbox", migrated, "payload_title IS NOT NULL", null);
     }
 
     private static void createScans(SQLiteDatabase db) {
@@ -153,6 +170,7 @@ public final class SqliteLedger extends SQLiteOpenHelper
                         break;
                     case REVIEW:
                     case LEGACY:
+                    case EXPIRED_READY:
                         review = Math.addExact(review, count);
                         break;
                     case SUPPRESSED:
@@ -358,7 +376,8 @@ public final class SqliteLedger extends SQLiteOpenHelper
                     + " INTEGER, payload_end INTEGER, payload_timezone TEXT, operation_owner TEXT,"
                     + " operation_generation INTEGER NOT NULL DEFAULT 0, source_start INTEGER,"
                     + " source_seconds INTEGER, source_type INTEGER, source_presentation INTEGER,"
-                    + " source_presentation_supplied INTEGER, PRIMARY KEY(source,calendar))");
+                    + " source_presentation_supplied INTEGER, payload_saved_at INTEGER, PRIMARY"
+                    + " KEY(source,calendar))");
         db.execSQL("CREATE INDEX outbox_state ON outbox(calendar,state)");
     }
 
@@ -377,7 +396,37 @@ public final class SqliteLedger extends SQLiteOpenHelper
         };
     }
 
+    public int expirePayloads(int limit) {
+        if (limit < 1 || limit > 500) throw new IllegalArgumentException("Invalid retention batch");
+        synchronized (DurableDelivery.DELIVERY_LOCK) {
+            long time = now();
+            if (time < PayloadRetention.WINDOW_MILLIS) return 0;
+            try (android.database.sqlite.SQLiteStatement statement =
+                    getWritableDatabase()
+                            .compileStatement(
+                                    "UPDATE outbox SET state=CASE WHEN state='READY' AND event<0"
+                                        + " THEN 'EXPIRED_READY' ELSE state END,"
+                                        + " payload_title=NULL,payload_description=NULL,payload_start=NULL,payload_end=NULL,payload_timezone=NULL,payload_saved_at=NULL"
+                                        + " WHERE rowid IN (SELECT rowid FROM outbox WHERE"
+                                        + " payload_title IS NOT NULL AND payload_saved_at<=? ORDER"
+                                        + " BY payload_saved_at ASC,source ASC,calendar ASC LIMIT"
+                                        + " ?)")) {
+                statement.bindLong(1, time - PayloadRetention.WINDOW_MILLIS);
+                statement.bindLong(2, limit);
+                return statement.executeUpdateDelete();
+            }
+        }
+    }
+
     private DurableDelivery.Intent readIntent(String key, long calendar) {
+        synchronized (DurableDelivery.DELIVERY_LOCK) {
+            return readIntentLocked(key, calendar);
+        }
+    }
+
+    private DurableDelivery.Intent readIntentLocked(String key, long calendar) {
+        DurableDelivery.Intent found = null;
+        Long savedAt = null;
         try (Cursor c =
                 getReadableDatabase()
                         .query(
@@ -399,7 +448,8 @@ public final class SqliteLedger extends SQLiteOpenHelper
                                     "source_seconds",
                                     "source_type",
                                     "source_presentation",
-                                    "source_presentation_supplied"
+                                    "source_presentation_supplied",
+                                    "payload_saved_at"
                                 },
                                 "source=? AND calendar=?",
                                 new String[] {key, Long.toString(calendar)},
@@ -417,27 +467,40 @@ public final class SqliteLedger extends SQLiteOpenHelper
                                         c.getLong(8),
                                         c.getString(9),
                                         c.getString(3));
-                return new DurableDelivery.Intent(
-                        DurableDelivery.State.valueOf(c.getString(0)),
-                        key,
-                        calendar,
-                        c.getString(2),
-                        c.getString(3),
-                        c.getString(4),
-                        c.getLong(1),
-                        payload,
-                        c.isNull(10)
-                                ? null
-                                : new DurableDelivery.Operation(c.getString(10), c.getLong(11)),
-                        c.isNull(12)
-                                ? null
-                                : new DurableDelivery.SourceFacts(
-                                        c.getLong(12),
-                                        c.getLong(13),
-                                        c.getInt(14),
-                                        c.isNull(15) ? null : Integer.valueOf(c.getInt(15)),
-                                        c.getInt(16) != 0));
+                found =
+                        new DurableDelivery.Intent(
+                                DurableDelivery.State.valueOf(c.getString(0)),
+                                key,
+                                calendar,
+                                c.getString(2),
+                                c.getString(3),
+                                c.getString(4),
+                                c.getLong(1),
+                                payload,
+                                c.isNull(10)
+                                        ? null
+                                        : new DurableDelivery.Operation(
+                                                c.getString(10), c.getLong(11)),
+                                c.isNull(12)
+                                        ? null
+                                        : new DurableDelivery.SourceFacts(
+                                                c.getLong(12),
+                                                c.getLong(13),
+                                                c.getInt(14),
+                                                c.isNull(15) ? null : Integer.valueOf(c.getInt(15)),
+                                                c.getInt(16) != 0));
+                savedAt = c.isNull(17) ? null : c.getLong(17);
             }
+        }
+        if (found != null) {
+            if (found.payload != null && PayloadRetention.expired(savedAt, now())) {
+                synchronized (DurableDelivery.DELIVERY_LOCK) {
+                    DurableDelivery.Intent cleared = PayloadRetention.clear(found);
+                    writeIntent(cleared);
+                    return cleared;
+                }
+            }
+            return found;
         }
         // Preserve receipts even if an older retained entry point wrote after schema migration.
         SliceEngine.Entry prior = get(key, calendar);
@@ -458,52 +521,76 @@ public final class SqliteLedger extends SQLiteOpenHelper
         SQLiteDatabase db = getWritableDatabase();
         if (db.inTransaction())
             throw new IllegalStateException("Outbox intent must commit before provider access");
-        ContentValues values = new ContentValues();
-        values.put("source", intent.key);
-        values.put("calendar", intent.calendar);
-        values.put("state", intent.state.name());
-        values.put("event", intent.eventId);
-        values.put("signature", intent.sourceSignature);
-        values.put("marker", intent.marker);
-        values.put("fingerprint", intent.fingerprint);
-        values.put("operation_owner", intent.operation == null ? null : intent.operation.owner);
-        values.put(
-                "operation_generation", intent.operation == null ? 0 : intent.operation.generation);
-        DurableDelivery.SourceFacts facts = intent.facts;
-        if (facts != null) {
-            values.put("source_start", facts.start);
-            values.put("source_seconds", facts.seconds);
-            values.put("source_type", facts.type);
-            values.put("source_presentation", facts.presentation);
-            values.put("source_presentation_supplied", facts.presentationSupplied ? 1 : 0);
-        } else {
-            for (String column :
-                    new String[] {
-                        "source_start",
-                        "source_seconds",
-                        "source_type",
-                        "source_presentation",
-                        "source_presentation_supplied"
-                    }) values.putNull(column);
+        db.beginTransaction();
+        try {
+            Long savedAt = null;
+            if (intent.payload != null) {
+                try (Cursor prior =
+                        db.query(
+                                "outbox",
+                                new String[] {"payload_title", "payload_saved_at"},
+                                "source=? AND calendar=?",
+                                new String[] {intent.key, Long.toString(intent.calendar)},
+                                null,
+                                null,
+                                null)) {
+                    if (prior.moveToFirst() && !prior.isNull(0) && !prior.isNull(1))
+                        savedAt = prior.getLong(1);
+                }
+                if (savedAt == null) savedAt = now();
+            }
+            ContentValues values = new ContentValues();
+            values.put("payload_saved_at", savedAt);
+            values.put("source", intent.key);
+            values.put("calendar", intent.calendar);
+            values.put("state", intent.state.name());
+            values.put("event", intent.eventId);
+            values.put("signature", intent.sourceSignature);
+            values.put("marker", intent.marker);
+            values.put("fingerprint", intent.fingerprint);
+            values.put("operation_owner", intent.operation == null ? null : intent.operation.owner);
+            values.put(
+                    "operation_generation",
+                    intent.operation == null ? 0 : intent.operation.generation);
+            DurableDelivery.SourceFacts facts = intent.facts;
+            if (facts != null) {
+                values.put("source_start", facts.start);
+                values.put("source_seconds", facts.seconds);
+                values.put("source_type", facts.type);
+                values.put("source_presentation", facts.presentation);
+                values.put("source_presentation_supplied", facts.presentationSupplied ? 1 : 0);
+            } else {
+                for (String column :
+                        new String[] {
+                            "source_start",
+                            "source_seconds",
+                            "source_type",
+                            "source_presentation",
+                            "source_presentation_supplied"
+                        }) values.putNull(column);
+            }
+            CallEvent payload = intent.payload;
+            if (payload != null) {
+                values.put("payload_title", payload.title);
+                values.put("payload_description", payload.description);
+                values.put("payload_start", payload.start);
+                values.put("payload_end", payload.end);
+                values.put("payload_timezone", payload.timezone);
+            } else {
+                for (String column :
+                        new String[] {
+                            "payload_title",
+                            "payload_description",
+                            "payload_start",
+                            "payload_end",
+                            "payload_timezone"
+                        }) values.putNull(column);
+            }
+            if (db.insertWithOnConflict("outbox", null, values, SQLiteDatabase.CONFLICT_REPLACE)
+                    < 0) throw new IllegalStateException("Outbox write was not committed");
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
         }
-        CallEvent payload = intent.payload;
-        if (payload != null) {
-            values.put("payload_title", payload.title);
-            values.put("payload_description", payload.description);
-            values.put("payload_start", payload.start);
-            values.put("payload_end", payload.end);
-            values.put("payload_timezone", payload.timezone);
-        } else {
-            for (String column :
-                    new String[] {
-                        "payload_title",
-                        "payload_description",
-                        "payload_start",
-                        "payload_end",
-                        "payload_timezone"
-                    }) values.putNull(column);
-        }
-        if (db.insertWithOnConflict("outbox", null, values, SQLiteDatabase.CONFLICT_REPLACE) < 0)
-            throw new IllegalStateException("Outbox write was not committed");
     }
 }

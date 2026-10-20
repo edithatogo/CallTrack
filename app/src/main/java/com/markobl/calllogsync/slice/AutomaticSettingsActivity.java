@@ -251,6 +251,7 @@ public final class AutomaticSettingsActivity extends Activity {
                                         : Collections.emptyList();
                         DeliveryCounts summary;
                         try (SqliteLedger ledger = new SqliteLedger(getApplicationContext())) {
+                            ledger.expirePayloads(50);
                             summary = ledger.counts();
                         }
                         WorkStatus worker =

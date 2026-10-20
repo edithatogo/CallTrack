@@ -30,6 +30,7 @@ public final class AutomaticLogWorker extends Worker {
                     || isStopped()) return report(generation, "PAUSED", 0, 0, false);
             int delivered = 0, review = 0;
             try (SqliteLedger ledger = new SqliteLedger(getApplicationContext())) {
+                ledger.expirePayloads(50);
                 AutomaticDelivery runner =
                         new AutomaticDelivery(
                                 control,

@@ -36,7 +36,9 @@ public final class ReceiptRecovery {
                 if (intent == null) return Result.NOT_FOUND;
                 if (intent.state == DurableDelivery.State.SUPPRESSED) return Result.SUPPRESSED;
                 if (intent.eventId < 0) {
-                    if (intent.state == DurableDelivery.State.READY) return Result.NEVER_ATTEMPTED;
+                    if (intent.state == DurableDelivery.State.READY
+                            || intent.state == DurableDelivery.State.EXPIRED_READY)
+                        return Result.NEVER_ATTEMPTED;
                     if (intent.marker == null || intent.marker.isEmpty()) return review(intent);
                     List<SliceEngine.StoredEvent> found = events.find(calendar, intent.marker);
                     if (found == null || found.size() != 1 || !matches(found.get(0), intent))

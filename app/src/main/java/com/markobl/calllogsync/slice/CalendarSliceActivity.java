@@ -142,6 +142,14 @@ public final class CalendarSliceActivity extends Activity {
     @Override
     public void onResume() {
         super.onResume();
+        executor.execute(
+                () -> {
+                    try (SqliteLedger ledger = new SqliteLedger(getApplicationContext())) {
+                        ledger.expirePayloads(50);
+                    } catch (RuntimeException unavailable) {
+                        /* Status/recovery exposes any storage problem. */
+                    }
+                });
         if (calendarAccess()) refresh();
         else {
             selected = -1;

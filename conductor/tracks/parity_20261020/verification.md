@@ -305,3 +305,22 @@ Native insertion here uses a fake calendar port, not CalendarContract; positive
 rendered permission/confirmation/lifecycle remains pending. Next implement age-based
 payload retention and remaining storage faults, then full real-provider/worker/UI/
 reboot/reopen/offline/Doze/latency acceptance and final review/fixes/archive.
+
+
+## Storage-age retention checkpoint
+
+Schema6 commits payload storage timestamps and preserves original age across pending
+transitions. Existing schema1–5 payloads receive seven days from migration because
+their age is unknown. Access checks and bounded maintenance clear expired bodies;
+READY becomes EXPIRED_READY so automatic delivery cannot insert it. Confirmed import
+can collect a matching fresh source under its current operation. Attempted metadata,
+known IDs, hashes/facts and calendar effects remain available for reconciliation.
+Three test-first JVM contracts pass (94 total). Two new native checks verify bounded
+clearing/read expiry, preserved age and recovery metadata, and schema5 migration
+with preserved checkpoints/receipts and exact grace boundary. All35 API36 checks,
+25 host tests and source-bound build/APKs/lint pass; packages removed. Lint0 errors,
+32 warnings/5 hints includes a new plural-candidate copy warning for retention count.
+Exact sources/debug artifacts/native output in retention-evidence.json. Clearing is
+logical/opportunistic, not forensic or deadline-guaranteed. Positive rendered UI,
+real-provider delivery/background lifecycle and persistence-fault gates remain open.
+Full-track review/fixes/archive is still pending.
