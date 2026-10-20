@@ -483,3 +483,5 @@ are included in lifecycle-evidence.json alongside the11 lifecycle checks and the
 expected process termination. All97 JVM/50 host tests pass; lint0 errors/32 warnings/
 5 hints. No fixture packages or changed emulator settings remain. Full Track4 review
 and archive are not complete while the explicit remaining gates above are open.
+
+- `ca132a4`: launcher resume recovery, bounded scheduler acknowledgement, native process-death/reboot/offline/Doze acceptance and restored emulator state.
