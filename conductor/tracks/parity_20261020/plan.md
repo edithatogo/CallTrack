@@ -4,7 +4,7 @@ All tasks pending. Discovery is real track work. Implementation is conditional; 
 
 ## Phase 1: Discovery and mapping
 
-- [ ] Task: Refresh legacy parity matrix and missing/zero-duration/contact behaviour
+- [~] Task: Refresh legacy parity matrix and missing/zero-duration/contact behaviour
 - [ ] Task: Research durable outbox, deduplication and legacy-migration approaches including replacement libraries
 - [ ] Task: Specify edit/deletion, restart, offline, import and privacy semantics before implementing
 - [ ] Task: Write findings and refine track requirements/acceptance with source provenance
