@@ -77,3 +77,7 @@ inferred from build success. Only local cache downloads are needed for the trial
 No native Swift framework, iOS simulator, installed desktop distribution, physical
 phone or personal data is used. Startup/size/memory/battery/performance comparisons
 are not measured; prototype build effort cannot predict long-term maintenance cost.
+
+Resolved desktop trial readback: Kotlin stdlib2.3.21, Compose Material/UI1.10.3,
+AndroidX runtime-desktop1.10.5, coroutines-core-jvm1.9.0 and Skiko/AWT macOS-arm64
+0.9.37.4. These transitives are prototype-only, independent of the root app graph.

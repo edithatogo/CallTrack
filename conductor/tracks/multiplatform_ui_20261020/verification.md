@@ -21,3 +21,10 @@ shared Android/iOS UI execution, manual accessibility, native packaging, provide
 permissions, persistence, import parser or cloud sync was tested. No production
 runtime code or root build configuration changed. Existing Android evidence is
 historical and does not qualify shared UI. No phone/emulator installation occurred.
+
+Final review rerun:4 desktop UI tests passed including reselect-without-stale-preview;
+25 host tests passed. ktfmt0.59 non-mutating check and git diff whitespace check
+passed; Conductor97 documents/13 tracks/25 scenarios and private-source digests
+passed. Source/test-report hashes refreshed after review. No root runtime or
+production build selection changed; product identity/production stack/guidelines
+therefore need no adoption change. Research outcomes are in requirements/roadmap.

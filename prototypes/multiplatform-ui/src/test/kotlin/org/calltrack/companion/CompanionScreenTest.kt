@@ -38,6 +38,19 @@ class CompanionScreenTest {
     }
 
     @Test
+    fun reselectingDestinationDoesNotRestoreStalePreview() {
+        show()
+        compose.onNodeWithText("Use sample calendar").performClick()
+        compose.onNodeWithText("Preview sample").performClick()
+        compose.onNodeWithText("Clear selection").performClick()
+        compose.onNodeWithText("Use sample calendar").performClick()
+        compose.onNodeWithText("Preview sample").assertIsEnabled()
+        compose
+            .onNodeWithText("2 synthetic entries ready for review; nothing saved.")
+            .assertDoesNotExist()
+    }
+
+    @Test
     fun capabilitiesAndSyntheticBoundaryStayVisible() {
         show()
         compose

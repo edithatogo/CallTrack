@@ -42,3 +42,9 @@ production sharing after evidence; Track7/8 deferrals remain in force.
 - Desktop prototype:3 rendered interaction tests pass; source and graph receipt recorded.
 - Production shared UI deferred; native/iOS/manual/packaging gates remain open.
 - Final host, format and link checks plus formal review precede archive.
+
+## History and review fixes
+
+- `efc06b5`: implement synthetic desktop trial and record discovery/decision.
+- [~] Review improvement: reselecting destination must not restore old preview;
+  rerun tests and refresh source-bound receipt.
