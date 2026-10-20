@@ -41,3 +41,6 @@ Research and compile-only surface experiment complete; production implementation
 ## Phase: Review
 
 - [x] Formal scope/source review and final host/link checks; no code fix required.
+
+- `dc45cb7`: formal review/verification; no unresolved finding.
+- [x] Archive research and compile-only evidence; production/runtime gates remain open.

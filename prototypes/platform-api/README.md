@@ -17,7 +17,7 @@ No executable/installer is emitted. SDK surface compilation does not qualify TCC
 sandbox entitlements, user-facing permission strings, calendar eligibility or
 readback. No iOS SDK/build/device or cross-platform sharing is tested.
 
-See the [track](../../conductor/tracks/platform_feasibility_20261020/index.md) for
+See the [track](../../conductor/archive/platform_feasibility_20261020/index.md) for
 the conditional iOS default-dialer history route, capability matrix, evidence and
 production deferral. This project has no root Gradle integration or new dependency.
 Retire this isolated directory when its SDK question is no longer useful; do not
