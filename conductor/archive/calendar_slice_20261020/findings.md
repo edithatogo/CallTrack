@@ -29,4 +29,4 @@ No prototype dependency is installed. The prototype is the actual slice, exercis
 
 Exact millisecond starts and safe duration arithmetic replace legacy rounding/overflow behaviour. Zero-duration events provisionally occupy one minute while describing zero actual duration. Per-install namespace plus row ID and destination identify a receipt. Before success, compare actual provider fields. A provider marker closes the insert-before-ledger gap; conflicting, missing or edited records require review. This is single-device manual operation, not cross-device deduplication or full CallTrack parity.
 
-Native evidence, unit-test evidence, package cleanup and remaining gaps will be recorded in verification.md after execution.
+Native evidence, tests, package cleanup and remaining gaps are recorded in verification.md and evidence.json.

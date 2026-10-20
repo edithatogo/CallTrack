@@ -48,7 +48,7 @@ Review passed with all five findings fixed; final source-matched build/native ac
 
 Initial implementation commit: b2e105d (80 files, 4,111 inserted lines including adopted upstream). Review is iterative: verify inherited files by hash against the audited source, then examine each new adapter/domain/UI/test/harness file and manifest/build/CI changes. The reference comparison found only manifest and strings changed among pre-existing main-source files; seven slice classes are new. No original CallTrack implementation is incorporated.
 
-No subagent review, hosted CI, store approval, cloud sync, actual call reading or user-consent walkthrough is claimed. Final dispositions, tests and commit pointers will be added after verification.
+No subagent review, hosted CI, store approval, cloud sync, actual call reading or user-consent walkthrough is claimed. Final dispositions, tests and commit pointers are recorded below and in verification.md/evidence.json.
 
 ## Final dispositions
 

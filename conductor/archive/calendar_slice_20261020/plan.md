@@ -30,9 +30,9 @@ Discovery has selected a manual native-provider slice. Completion requires actua
 - [x] Task: Document residual gaps, next-track inputs and checkpoint evidence
 - [x] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
 
-## Execution evidence (in progress)
+## Historical execution checkpoints (superseded by final checkpoint)
 
-- Direct javac red check: missing CallRecord/CallEvent/SliceEngine symbols in `.local/slice-domain-red.log`, before implementation. Initial 10 pure Java JUnit contracts passed afterward. Expanded suite and Android/native checks pending.
+- Direct javac red check: missing CallRecord/CallEvent/SliceEngine symbols in `.local/slice-domain-red.log`, before implementation. Initial 10 pure Java JUnit contracts passed afterward. At that checkpoint the expanded suite and Android/native checks were pending; final results are below.
 - The first Gradle invocation completed after domain implementation; despite its historical log filename it is a green result, not the red evidence.
 - Research sources consulted 2026-10-20; native wrapper alternatives and deferral triggers documented in findings.
 
@@ -40,7 +40,7 @@ Discovery has selected a manual native-provider slice. Completion requires actua
 
 - [x] Task: Fix uncertain install cleanup, stale refresh selection and explicit transfer policy; verify final APK/native receipts
 
-Implementation checkpoint: b2e105d. Initial Android build passed with 14 JVM tests and zero lint errors (31 warnings). Final input-bound receipt, native provider readback and cleanup remain pending.
+Implementation checkpoint: b2e105d. Initial Android build passed with 14 JVM tests and zero lint errors (31 warnings). At that checkpoint the final input-bound receipt, native readback and cleanup were pending; all subsequently passed.
 
 First native evidence: `.local/slice-evidence/pre-review-device-receipt.json` passed on Android17/API37. Synthetic local event readback, reopened SQLite retry, crash-gap recovery, edited-event preservation, read-only destination, denied/revoked permissions and fixture/package removal passed. Final review fixes require another source-bound build/device verification.
 
