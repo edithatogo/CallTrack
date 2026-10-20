@@ -1,0 +1,253 @@
+package com.markobl.calllogsync.slice;
+
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+import java.util.*;
+import java.util.concurrent.*;
+
+public class DurableDeliveryTest {
+    private CallRecord call() {
+        return new CallRecord("fixture", "1", 1700000000123L, 65, "Incoming", "Ada", "123", true);
+    }
+
+    static class Crash extends Error {}
+
+    static class Store implements DurableDelivery.Store {
+        final Map<String, DurableDelivery.Intent> rows = new HashMap<>();
+        DurableDelivery.State crashAfter;
+
+        public DurableDelivery.Intent get(String key, long calendar) {
+            return rows.get(key + "/" + calendar);
+        }
+
+        public void put(DurableDelivery.Intent intent) {
+            rows.put(intent.key + "/" + intent.calendar, intent);
+            if (intent.state == crashAfter) {
+                crashAfter = null;
+                throw new Crash();
+            }
+        }
+    }
+
+    private SliceTest.Sink sink() {
+        return new SliceTest.Sink();
+    }
+
+    private DurableDelivery delivery(Store store, SliceTest.Sink sink) {
+        return new DurableDelivery(store, sink);
+    }
+
+    @Test
+    public void intentIsCommittedBeforeInsertAndPayloadPurgedAfterSuccess() {
+        Store store = new Store();
+        SliceTest.Sink sink =
+                new SliceTest.Sink() {
+                    @Override
+                    public long insert(long calendar, CallEvent event) {
+                        assertEquals(
+                                DurableDelivery.State.IN_FLIGHT,
+                                store.get(call().key(), calendar).state);
+                        return super.insert(calendar, event);
+                    }
+                };
+        assertEquals(
+                DurableDelivery.Result.SAVED,
+                delivery(store, sink).deliver(call(), 7, "UTC", () -> true));
+        DurableDelivery.Intent receipt = store.get(call().key(), 7);
+        assertEquals(DurableDelivery.State.CONFIRMED, receipt.state);
+        assertNull(receipt.payload);
+        assertEquals(
+                DurableDelivery.Result.ALREADY_LOGGED,
+                delivery(store, sink).deliver(call(), 7, "UTC", () -> true));
+        assertEquals(1, sink.inserts);
+    }
+
+    @Test
+    public void interruptedBeforeInsertDoesNotGuessThatRetryIsSafe() {
+        Store store = new Store();
+        store.crashAfter = DurableDelivery.State.IN_FLIGHT;
+        SliceTest.Sink sink = sink();
+        assertThrows(
+                Crash.class, () -> delivery(store, sink).deliver(call(), 7, "UTC", () -> true));
+        assertEquals(
+                DurableDelivery.Result.REVIEW_REQUIRED,
+                delivery(store, sink).deliver(call(), 7, "UTC", () -> true));
+        assertEquals(0, sink.inserts);
+    }
+
+    @Test
+    public void crashAfterInsertRecoversExactlyOneMarker() {
+        Store store = new Store();
+        SliceTest.Sink sink =
+                new SliceTest.Sink() {
+                    boolean crash = true;
+
+                    @Override
+                    public long insert(long calendar, CallEvent event) {
+                        long id = super.insert(calendar, event);
+                        if (crash) {
+                            crash = false;
+                            throw new Crash();
+                        }
+                        return id;
+                    }
+                };
+        assertThrows(
+                Crash.class, () -> delivery(store, sink).deliver(call(), 7, "UTC", () -> true));
+        assertEquals(
+                DurableDelivery.Result.RECOVERED,
+                delivery(store, sink).resume(call().key(), 7, () -> true));
+        assertEquals(1, sink.inserts);
+    }
+
+    @Test
+    public void lostMarkerAfterCrashNeverCreatesAnotherEvent() {
+        Store store = new Store();
+        SliceTest.Sink sink =
+                new SliceTest.Sink() {
+                    @Override
+                    public long insert(long calendar, CallEvent event) {
+                        super.insert(calendar, event);
+                        throw new Crash();
+                    }
+
+                    @Override
+                    public List<SliceEngine.StoredEvent> find(long calendar, String marker) {
+                        return Collections.emptyList();
+                    }
+                };
+        assertThrows(
+                Crash.class, () -> delivery(store, sink).deliver(call(), 7, "UTC", () -> true));
+        assertEquals(
+                DurableDelivery.Result.REVIEW_REQUIRED,
+                delivery(store, sink).deliver(call(), 7, "UTC", () -> true));
+        assertEquals(1, sink.inserts);
+    }
+
+    @Test
+    public void deletedConfirmedEventIsNeverRecreated() {
+        Store store = new Store();
+        SliceTest.Sink sink = sink();
+        DurableDelivery delivery = delivery(store, sink);
+        delivery.deliver(call(), 7, "UTC", () -> true);
+        sink.rows.clear();
+        assertEquals(
+                DurableDelivery.Result.REVIEW_REQUIRED,
+                delivery.deliver(call(), 7, "UTC", () -> true));
+        assertEquals(
+                DurableDelivery.Result.REVIEW_REQUIRED,
+                delivery.deliver(call(), 7, "UTC", () -> true));
+        assertEquals(1, sink.inserts);
+    }
+
+    @Test
+    public void cachedContactRenameOrTimezoneChangeDoesNotRewrite() {
+        Store store = new Store();
+        SliceTest.Sink sink = sink();
+        DurableDelivery delivery = delivery(store, sink);
+        delivery.deliver(call(), 7, "UTC", () -> true);
+        CallRecord renamed =
+                new CallRecord(
+                        "fixture", "1", 1700000000123L, 65, "Incoming", "Renamed", "123", true);
+        assertEquals(
+                DurableDelivery.Result.ALREADY_LOGGED,
+                delivery.deliver(renamed, 7, "Australia/Brisbane", () -> true));
+        assertEquals("Incoming: Ada", sink.rows.get(1L).title);
+        assertEquals(1, sink.inserts);
+    }
+
+    @Test
+    public void reusedSourceIdWithDifferentContentNeedsReview() {
+        Store store = new Store();
+        SliceTest.Sink sink = sink();
+        DurableDelivery delivery = delivery(store, sink);
+        delivery.deliver(call(), 7, "UTC", () -> true);
+        CallRecord changed =
+                new CallRecord("fixture", "1", 1700000001123L, 65, "Incoming", "Ada", "123", true);
+        assertEquals(
+                DurableDelivery.Result.SOURCE_CHANGED,
+                delivery.deliver(changed, 7, "UTC", () -> true));
+        assertEquals(1, sink.inserts);
+    }
+
+    @Test
+    public void pausedDeliveryDoesNotPrepareOrWrite() {
+        Store store = new Store();
+        SliceTest.Sink sink = sink();
+        assertEquals(
+                DurableDelivery.Result.PAUSED,
+                delivery(store, sink).deliver(call(), 7, "UTC", () -> false));
+        assertTrue(store.rows.isEmpty());
+        assertEquals(0, sink.inserts);
+    }
+
+    @Test
+    public void permissionDeniedBeforeAttemptLeavesNoIntent() {
+        Store store = new Store();
+        SliceTest.Sink sink =
+                new SliceTest.Sink() {
+                    @Override
+                    public boolean writable(long id) {
+                        throw new SecurityException();
+                    }
+                };
+        assertEquals(
+                DurableDelivery.Result.PERMISSION_REQUIRED,
+                delivery(store, sink).deliver(call(), 7, "UTC", () -> true));
+        assertTrue(store.rows.isEmpty());
+    }
+
+    @Test
+    public void readbackFailureRetainsKnownIdAcrossRetries() {
+        Store store = new Store();
+        SliceTest.Sink sink =
+                new SliceTest.Sink() {
+                    @Override
+                    public SliceEngine.StoredEvent read(long id) {
+                        throw new IllegalStateException();
+                    }
+                };
+        DurableDelivery delivery = delivery(store, sink);
+        assertEquals(DurableDelivery.Result.FAILED, delivery.deliver(call(), 7, "UTC", () -> true));
+        assertEquals(1, store.get(call().key(), 7).eventId);
+        assertEquals(DurableDelivery.Result.FAILED, delivery.deliver(call(), 7, "UTC", () -> true));
+        assertEquals(1, sink.inserts);
+    }
+
+    @Test
+    public void overlappingInstancesProduceOneEffect() throws Exception {
+        Store store = new Store();
+        SliceTest.Sink sink = sink();
+        ExecutorService pool = Executors.newFixedThreadPool(4);
+        try {
+            List<Callable<DurableDelivery.Result>> requests = new ArrayList<>();
+            for (int i = 0; i < 20; i++)
+                requests.add(() -> delivery(store, sink).deliver(call(), 7, "UTC", () -> true));
+            int saved = 0;
+            for (Future<DurableDelivery.Result> result : pool.invokeAll(requests)) {
+                DurableDelivery.Result value = result.get();
+                if (value == DurableDelivery.Result.SAVED) saved++;
+                else assertEquals(DurableDelivery.Result.ALREADY_LOGGED, value);
+            }
+            assertEquals(1, saved);
+            assertEquals(1, sink.inserts);
+        } finally {
+            pool.shutdownNow();
+        }
+    }
+
+    @Test
+    public void readyIntentResumesWithoutOriginalSourceRow() {
+        Store store = new Store();
+        store.crashAfter = DurableDelivery.State.READY;
+        SliceTest.Sink sink = sink();
+        assertThrows(
+                Crash.class, () -> delivery(store, sink).deliver(call(), 7, "UTC", () -> true));
+        assertEquals(
+                DurableDelivery.Result.SAVED,
+                delivery(store, sink).resume(call().key(), 7, () -> true));
+        assertEquals(1, sink.inserts);
+    }
+}
