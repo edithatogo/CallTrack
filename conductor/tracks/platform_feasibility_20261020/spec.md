@@ -34,3 +34,10 @@ No automatic adoption of shortlisted technology, wholesale rewrite, paid service
 workflows without selecting a platform. Qualify supported acquisition, calendar,
 background and packaging capabilities here before reopening KMP-D01. No native
 companion or target feasibility is established by that research closure.
+
+## Shared-UI experiment handoff
+
+[Track9 UI-D01](../multiplatform_ui_20261020/decisions.md) tests a synthetic desktop
+preview screen only. Choose a useful platform/workflow and qualify native import,
+calendar, background, accessibility and packaging capabilities here; no such native
+capability follows from the desktop renderer tests.
