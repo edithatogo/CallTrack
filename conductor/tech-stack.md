@@ -59,8 +59,10 @@ be retired independently; no application data/code rollback is needed.
 
 [WORK-D01](tracks/parity_20261020/decisions.md) upgrades the existing WorkManager
 runtime2.7.1 to2.12.0 for the bounded durable worker. Actual AAR metadata, debug
-build and disabled/stale native worker branches pass; full positive scheduling/
-reboot/Doze/provider/UI acceptance remains pending. Transitive Room2.7.0 and
+build and disabled/stale plus positive CallLog/calendar native worker branches pass.
+Bounded filters, duplicate requests, permission revocation and latency are recorded
+in Track4 worker-provider-evidence.json; reboot/reopen/Doze/offline/UI acceptance
+remains pending. Transitive Room2.7.0 and
 coroutines1.9.0 are framework internals; app-owned ledgers remain SQLiteOpenHelper
 and no new app coroutine/Room API adoption occurs. No experimental WorkManager
 analytics or test helper dependency is added. See graph/licence/artifact inventory

@@ -370,3 +370,34 @@ actual abrupt process death. Synthetic sources do not qualify actual CallLog/pos
 WorkManager delivery. Rendered UI, background restart/reboot/reopen, offline/Doze and
 latency acceptance, remaining storage faults and final full-track review/archive stay
 open. Physical calls and real cloud delivery remain pending as previously scoped.
+
+
+## Positive CallLog/provider/WorkManager checkpoint
+
+WorkerProviderTest uses only the dedicated emulator. Setup verifies an empty call
+provider, creates a token-owned LOCAL calendar and inserts explicitly tagged synthetic
+call rows using test-only shell READ/WRITE_CALL_LOG identity, withdrawn before worker
+execution. The app has READ_CALL_LOG only; contacts/SMS/audio/write-call permissions
+remain denied.125 mixed incoming/outgoing/missed/blocked rows plus one pre-activation
+row exercise multiple50-row pages. Incoming/missed-only policy creates exactly63
+verified events, with a complete durable checkpoint and no pending/review rows. Repeat
+work creates none. Paused work creates none; fresh outgoing-only activation excludes
+paused/older rows and adds exactly one. A single subsequent outgoing call adds one
+more (65 total), and two outstanding repeat work requests converge without another
+event. They do not independently prove simultaneous execution. Revoked READ_CALL_LOG
+in a subsequent instrumentation run produces PERMISSION_REQUIRED with65 unchanged.
+
+Observed on this API36 emulator: mixed backlog request→verified observation52159ms;
+source→verified68753ms including fixture preparation/grant/startup; single new-call
+request→verified3499ms and source→verified4341ms. These include scheduling, execution
+and final readback observation, not an insertion timestamp or delivery deadline.
+Native output records worker publication separately. No physical-device inference.
+
+All5 worker instrumentation checks,94 JVM tests,39 host tests, source-bound debug
+build and lint pass (0 errors/32 warnings/5 hints). Cleanup pauses/cancels fixture
+work, removes only exact tagged calls and verifies their absence, then verifies
+calendar/event removal and both package removals. Evidence is source/APK/tool bound
+in worker-provider-evidence.json. Provider-only prior checkpoint is1c9fffe; current
+helper changes only expose its test fixture utilities at package scope. No production
+runtime code/dependency changed. Reboot/force-stop/reopen, offline/Doze, rendered UI,
+remaining persistence faults and full-track review/fixes/archive are still open.

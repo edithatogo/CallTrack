@@ -19,11 +19,11 @@ import org.junit.Test;
 
 /** Actual LOCAL calendar and SQLite, synthetic source only; no device-call access. */
 public class ParityProviderTest {
-    private Context context() {
+    Context context() {
         return InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
 
-    private String account() {
+    String account() {
         String token = InstrumentationRegistry.getArguments().getString("fixtureToken", "");
         if (!token.matches("[a-f0-9]{32}")) throw new IllegalArgumentException("Fixture required");
         return "org.calltrack.community.dev.parity." + token;
@@ -86,7 +86,7 @@ public class ParityProviderTest {
         }
     }
 
-    private long createCalendar() {
+    long createCalendar() {
         cleanupFixture();
         assertEquals(
                 PackageManager.PERMISSION_DENIED,
@@ -130,7 +130,7 @@ public class ParityProviderTest {
                                 + "' BEGIN SELECT RAISE(ABORT,'fixture'); END");
     }
 
-    private long events(long calendar) {
+    long events(long calendar) {
         try (Cursor c =
                 context()
                         .getContentResolver()
