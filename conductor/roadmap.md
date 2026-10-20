@@ -121,7 +121,7 @@ are qualified. Desktop offscreen tests do not qualify iOS or native distribution
 
 ## Integration discovery decision
 
-[Track10 INT-D01](tracks/destinations_20261020/decisions.md) retains the native-provider
+[Track10 INT-D01](archive/destinations_20261020/decisions.md) retains the native-provider
 route and documents Graph/Google/CalDAV contract, identity and recovery gates.
 Reopen against a selected required destination after a native coverage gap or a
 qualified companion need is demonstrated. Research closure does not satisfy

@@ -59,7 +59,7 @@ Next: retain source facts/raw presentation and operation-owner generation in the
 
 ## Integration research handoff (nonblocking)
 
-[Track10 contracts](../destinations_20261020/requirements.md) identify future route
+[Track10 contracts](../../archive/destinations_20261020/requirements.md) identify future route
 identity, epoch/rebinding and opaque remote-ID migration requirements. Retain current
 receipt compatibility; no direct connector/schema expansion is adopted here.
 Provider-cloud qualification and native marker survival remain unverified.

@@ -33,10 +33,13 @@ Research completed with justified deferral under INT-D01; provider/runtime accep
 ## History
 
 - `90445b7`: activate research track.
-- [~] Formal review, host/source/link verification and final archive still to run.
+- [x] Formal review and host/source/link verification; archive follows.
 
 - `8379003`: provider research, contracts and justified connector deferral.
 
 ## Phase: Review Fixes
 
-- [~] Apply R12 receiving-side endpoint contract/traceability fix; run final checks.
+- [x] Apply R12 receiving-side endpoint contract/traceability fix; final checks pass.
+
+- `ef644f3`: endpoint traceability fix, formal review and final checks.
+- [x] Archive completed research; provider/live connector acceptance remains pending.
