@@ -103,3 +103,10 @@ for equivalent fixture, transaction, packaging and compatibility acceptance. KMP
 retains existing code and defers extraction pending stable Track4/6 boundaries and
 Track12 workflow feasibility. No common module or second-target tests exist; R16/M7
 production acceptance remains pending.
+
+## Track9 shared-UI research outcome
+
+R17/R24 have [U01–U08](tracks/multiplatform_ui_20261020/requirements.md) for capability-aware
+shared UI. A standalone desktop experiment tests synthetic destination choice and
+preview only. Production adoption is deferred under UI-D01; no iOS or shared
+Android/iOS UI, native packaging or manual accessibility acceptance is established.

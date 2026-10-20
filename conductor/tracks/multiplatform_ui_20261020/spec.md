@@ -41,3 +41,13 @@ and qualify the UI/state adoption requirements afresh before proposing shared UI
 defers extraction. No common module or qualified second target exists. Reopen its
 contract/packaging gates before shared UI depends on a shared runtime; archived
 research completion is not implemented prerequisite acceptance.
+
+## Bounded experiment selected 2026-10-21
+
+Trial desktop JVM rendering with Compose Multiplatform1.10.3 and existing
+Kotlin/compiler2.3.21/JDK17/Gradle8.13, in a standalone project outside root settings.
+Material2 avoids the preview Material3 line in this release; no production design
+system is selected. Test destination gating, synthetic preview, invalidation and
+capability disclosure. No provider, file import, credentials, persistence or shared
+core is implemented. Native iOS/desktop packaging and manual accessibility remain
+separate gates. A successful offscreen UI test is not human workflow acceptance.
