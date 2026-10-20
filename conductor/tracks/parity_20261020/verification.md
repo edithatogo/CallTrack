@@ -341,3 +341,32 @@ packages removed. Lint0 errors/32 warnings/5 hints. This injects an uncertain ou
 using real Android preferences; it does not prove physical disk exhaustion, restart,
 or process-death recovery. Those faults and real-provider/worker/UI/reboot/reopen/
 offline/Doze/latency gates remain open before final full-track review and archive.
+
+
+## Real calendar-provider durable acceptance checkpoint
+
+New ParityProviderTest runs only against a token-scoped LOCAL calendar with synthetic
+call objects and READ_CALL_LOG denied. SQL trigger faults prove READY failure has no
+provider effect, ATTEMPTED failure leaves recoverable IN_FLIGHT plus exactly one real
+event, and CONFIRMED failure retains a committed known ID. A separate SQLite connection
+observes committed IN_FLIGHT before provider insertion. Reopen recovers marker/known
+ID without another event. Actual edited/deleted events become review without overwrite
+or recreation; read-only destination blocks a new intent. Zero-talk-time metadata and
+visual marker, withheld identity and absent reminders/attendees pass actual readback.
+
+Historical preview writes no events, partial saved count matches effects, reopen
+finishes12 events, repeat import keeps12 and cancellation after one new event keeps13
+with the remaining candidate unattempted. An actual interrupted effect is then kept
+across instrumentation runs; the harness revokes WRITE_CALENDAR and read-only recovery
+verifies the unique existing marker/ID and purges the body without insertion.
+
+All8 provider instrumentation checks,94 JVM tests,32 host tests and the source-bound
+build pass. Calendar cleanup checks both account rows and their event rows; both APKs
+are removed. Host fault tests cover target refusal, cleanup failure, uncertain install,
+failed build and restoring write access before recovery after read-only phase failure.
+Exact input/APK/native output and tool hashes in provider-evidence.json. No production
+code changed in this checkpoint. Trigger faults are not physical disk exhaustion or
+actual abrupt process death. Synthetic sources do not qualify actual CallLog/positive
+WorkManager delivery. Rendered UI, background restart/reboot/reopen, offline/Doze and
+latency acceptance, remaining storage faults and final full-track review/archive stay
+open. Physical calls and real cloud delivery remain pending as previously scoped.
