@@ -29,3 +29,11 @@ All tasks pending. Discovery is real track work. Implementation is conditional; 
 - [ ] Task: Update consolidated requirements, stack and dependency decisions with actual outcomes
 - [ ] Task: Document residual gaps, next-track inputs and checkpoint evidence
 - [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+
+## Execution checkpoints
+
+Start: c4c8c02. User selected emulator tests initially (physical-call acceptance pending), prompt logging when possible with recovery after delays. Concrete P01–P10 requirements and pre-insert intent design are recorded before implementation.
+
+First foundation: 11 new pure Java durable-delivery contracts passed with 16 prior slice contracts. Native store contracts first failed to compile on missing outbox() before schema2 implementation. Android build and emulator migration tests remain pending. Automatic scheduling, paging/import, UI/status and full parity matrix are still required; this foundation is not track completion.
+
+Foundation build passed (27 JVM tests; app/test APKs and lint, unchanged inputs), followed by a twelfth durable-core contract for source-independent resume (28 pure Java tests passing). Three native store tests are compiled: v1 preservation/migration, committed state and payload clearing across reopen, and nested-transaction rejection. Emulator image installation is running after explicit user approval of android-sdk-arm-dbt-license.

@@ -1,6 +1,6 @@
 # Parity and durable synchronisation
 
-Milestone: M3. Type: research-led development. Status: planned discovery; implementation scope provisional.
+Milestone: M3. Type: research-led development. Status: discovery in progress; concrete acceptance and outbox design being refined.
 
 ## Objective
 
@@ -27,3 +27,7 @@ Parity suite, crash/retry and background-recovery evidence; preserved edits and 
 ## Out of scope
 
 No automatic adoption of shortlisted technology, wholesale rewrite, paid service, unqualified platform parity or public release. Cross-track responsibilities remain with their owning tracks. A negative feasibility result or justified deferral is an acceptable research outcome.
+
+## Execution steering
+
+Use [concrete acceptance](requirements.md) and [decisions](decisions.md). The user selected emulator acceptance initially and explicitly left physical-call acceptance pending. Prompt logging when possible with eventual recovery is the latency direction; measure actual results. Implementation still includes automatic logging, historical preview/import and durable recovery rather than treating documentation alone as parity.
