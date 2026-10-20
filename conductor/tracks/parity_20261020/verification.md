@@ -79,3 +79,15 @@ app/test APK compilation and lint;25 host tests pass. Exact inputs/artifacts in
 scan-evidence.json. No new native coordinator runtime proof is claimed. Persisted
 activation settings/generation publication, source-independent pending recovery,
 frozen historical sessions, scheduler/UI and full acceptance remain required.
+
+
+## Activation control checkpoint
+
+Four test-first controller regressions pass: absent/disabled default, pause across
+controller recreation, new generation/boundary invalidating old workers, publication
+failure/overflow and full policy match. Versioned Android SharedPreferences adapter
+compiles, with process fail-closed latch for failed commit. Source-bound build passes
+57 JVM tests, APK assembly and lint;25 host tests pass. Exact inputs/artifacts in
+activation-evidence.json. Native persistence/fault tests remain pending. Next qualify
+store readback and connect settings to scanner/scheduler/UI, then frozen imports,
+legacy matching and full acceptance. This is not completed automatic logging.

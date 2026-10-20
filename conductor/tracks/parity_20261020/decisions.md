@@ -93,3 +93,21 @@ user status total. Activation policy/route must be immutable within an operation
 its persisted publication and generation lifecycle remain the next integration task.
 The new coordinator is not yet invoked from launcher/background work. No automatic
 activation, historical preview or scheduling completion is claimed.
+
+
+## Activation publication
+
+Use an immutable versioned settings document with generation, enabled state,
+destination ID, timezone, future start boundary and incoming/outgoing/missed flags.
+Default is absent/disabled; no migration enables logging. Every explicit activation
+increments generation and starts at its recorded time; calls during a pause need
+explicit historical import. Pause retains the disabled generation, leaving old
+pending receipts for explicit recovery rather than assigning them to new work.
+Publication and final effect authorization share DELIVERY_LOCK. Workers must match
+the full settings document. Generation overflow fails before publication. The
+Android adapter uses one synchronous SharedPreferences commit, with a process-wide
+fail-closed latch if commit reports failure because SharedPreferences can change
+memory before disk success. Restart requires fresh stored readback; no claim of
+rollback on disk failure. Existing backup/transfer exclusions cover these settings.
+Native persistence and fault injection remain unqualified until runtime tests;
+launcher/background invocation and explicit pending-recovery UI remain required.
