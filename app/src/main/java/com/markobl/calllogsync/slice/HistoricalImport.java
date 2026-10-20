@@ -29,13 +29,29 @@ public final class HistoricalImport {
         void save(Session expected, Session next, List<Candidate> added);
 
         List<Candidate> candidates(String id, long afterExclusive, int limit);
+
+        /**
+         * Commit candidate outcome and session progress atomically; failed attempts stay pending.
+         */
+        void finish(
+                Session expected,
+                Session next,
+                Candidate candidate,
+                DurableDelivery.Result outcome);
     }
 
     public static final class Candidate {
         public final long sourceId;
         public final String key, binding;
+        public final DurableDelivery.Result outcome;
 
         public Candidate(long sourceId, String key, String binding) {
+            this(sourceId, key, binding, null);
+        }
+
+        public Candidate(
+                long sourceId, String key, String binding, DurableDelivery.Result outcome) {
+            this.outcome = outcome;
             if (sourceId < 0
                     || key == null
                     || key.isEmpty()
@@ -284,31 +300,7 @@ public final class HistoricalImport {
                 if (candidate.sourceId <= session.processedId
                         || candidate.sourceId > session.checkpoint.upperId)
                     throw new IllegalStateException("Invalid candidate order");
-                final Session active = session;
-                DurableDelivery.Result result;
-                DurableDelivery.Intent intent = receipts.get(candidate.key, session.calendar);
-                if (owned(intent, session) && bindingMatches(candidate, intent)) {
-                    result =
-                            delivery.resume(
-                                    candidate.key,
-                                    session.calendar,
-                                    session.operation(),
-                                    () -> allowed(active));
-                } else {
-                    CallRecord call = source.at(candidate.sourceId);
-                    if (call == null
-                            || !candidate.key.equals(call.key())
-                            || !candidate.binding.equals(PagedCalls.binding(call)))
-                        result = DurableDelivery.Result.SOURCE_CHANGED;
-                    else
-                        result =
-                                delivery.deliver(
-                                        call,
-                                        session.calendar,
-                                        session.timezone,
-                                        session.operation(),
-                                        () -> allowed(active));
-                }
+                DurableDelivery.Result result = attempt(session, candidate);
                 long saved = session.saved, review = session.review;
                 switch (result) {
                     case SAVED:
@@ -321,7 +313,7 @@ public final class HistoricalImport {
                         review = Math.addExact(review, 1);
                         break;
                     default:
-                        return save(
+                        return finish(
                                 session,
                                 session.next(
                                         session.phase,
@@ -330,7 +322,9 @@ public final class HistoricalImport {
                                         session.processedId,
                                         saved,
                                         review,
-                                        result));
+                                        result),
+                                candidate,
+                                result);
                 }
                 Session next =
                         session.next(
@@ -341,11 +335,52 @@ public final class HistoricalImport {
                                 saved,
                                 review,
                                 null);
-                session = save(session, next);
+                session = finish(session, next, candidate, result);
                 if (session.phase == Phase.COMPLETE) break;
             }
             return session;
         }
+    }
+
+    private DurableDelivery.Result attempt(Session session, Candidate candidate) {
+        try {
+            final Session active = session;
+            DurableDelivery.Result result;
+            DurableDelivery.Intent intent = receipts.get(candidate.key, session.calendar);
+            if (owned(intent, session) && bindingMatches(candidate, intent)) {
+                result =
+                        delivery.resume(
+                                candidate.key,
+                                session.calendar,
+                                session.operation(),
+                                () -> allowed(active));
+            } else {
+                CallRecord call = source.at(candidate.sourceId);
+                if (call == null
+                        || !candidate.key.equals(call.key())
+                        || !candidate.binding.equals(PagedCalls.binding(call)))
+                    result = DurableDelivery.Result.SOURCE_CHANGED;
+                else
+                    result =
+                            delivery.deliver(
+                                    call,
+                                    session.calendar,
+                                    session.timezone,
+                                    session.operation(),
+                                    () -> allowed(active));
+            }
+            return result;
+        } catch (SecurityException denied) {
+            return DurableDelivery.Result.PERMISSION_REQUIRED;
+        } catch (RuntimeException failed) {
+            return DurableDelivery.Result.FAILED;
+        }
+    }
+
+    private Session finish(
+            Session expected, Session next, Candidate candidate, DurableDelivery.Result outcome) {
+        store.finish(expected, next, candidate, outcome);
+        return next;
     }
 
     private boolean allowed(Session worker) {

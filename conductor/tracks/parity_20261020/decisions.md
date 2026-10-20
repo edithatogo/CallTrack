@@ -180,3 +180,19 @@ are outside this transaction. Pending payload remains governed by the existing
 outbox. Native storage/transaction proof and fake calendar-port outcomes are distinct
 from real CalendarContract/user UI acceptance. User controls, per-row review detail,
 retention/deletion workflow, full native recovery and scheduling remain required.
+
+
+## Persisted candidate outcomes and denied-source recovery
+
+Import schema2 adds nullable outcome codes. New result codes commit in the same
+transaction as session counts/progress; failures leave the candidate unprocessed
+and record a retryable outcome. Successful/review results advance one candidate.
+The store rejects a progress advance without a candidate outcome and validates the
+first unprocessed candidate and counter classification. Failed outcome/progress
+transactions roll back both records. Schema1 migration preserves session/candidate
+metadata and aggregate progress, leaving prior individual outcomes unknown rather
+than fabricating them from totals. Source permission errors during confirmed
+delivery become PERMISSION_REQUIRED with unchanged progress; source/provider runtime
+errors become FAILED. Existing source-independent receipt recovery remains first.
+This creates status data for the later UI; it does not implement the UI or prove
+permission revocation behavior of real CallLog/CalendarContract providers.
