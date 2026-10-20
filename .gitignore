@@ -1,3 +1,9 @@
 .local/
 __pycache__/
 *.py[cod]
+
+# Local Android state and signing material
+.gradle/
+local.properties
+*.jks
+*.keystore

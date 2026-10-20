@@ -30,6 +30,6 @@ Planning authorisation does not itself install phone apps, grant permissions, cr
 
 ## Commands and style
 
-No successor build command is qualified yet; the build track must record exact prerequisites and commands after verification. Use the supplied [general style guide](code_styleguides/general.md). The setup assets contain no Java/Kotlin guide; select authoritative language formatting/linting in the build/Kotlin tracks rather than inventing a guide here.
+Build qualification commands and prerequisites are maintained in [qualification README](../qualification/README.md); use the exact toolchain for each variant. Native test harness execution requires a selected authorised device and remains separate from build-only CI. Use the supplied [general style guide](code_styleguides/general.md). The setup assets contain no Java/Kotlin guide; select authoritative language formatting/linting in the build/Kotlin tracks rather than inventing a guide here.
 
 Research outputs: source-pinned findings, mapped requirements, option comparison, decision and handoff. Implementation outputs: tests, code, migration/recovery evidence and updated documentation. Distribution is a separate release track.

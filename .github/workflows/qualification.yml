@@ -1,0 +1,51 @@
+name: Build qualification
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  qualification:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: upstream
+            jdk: '11'
+            platform: '32'
+            build_tools: '30.0.3'
+          - variant: modern
+            jdk: '17'
+            platform: '36'
+            build_tools: '35.0.0'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Check qualification Java formatting
+        run: |
+          mkdir -p .local/toolchain
+          curl --fail --location --silent --show-error https://repo.maven.apache.org/maven2/com/google/googlejavaformat/google-java-format/1.24.0/google-java-format-1.24.0-all-deps.jar -o .local/toolchain/google-java-format-1.24.0.jar
+          echo "812f805f58112460edf01bf202a8e61d0fd1f35c0d4fabd54220640776ec57a1  .local/toolchain/google-java-format-1.24.0.jar" | sha256sum --check
+          java -jar .local/toolchain/google-java-format-1.24.0.jar --aosp --dry-run --set-exit-if-changed qualification/src/androidTest/java/com/markobl/calllogsync/PermissionQualificationTest.java
+      - name: Install SDK packages with Java 17
+        run: sdkmanager "platforms;android-${{ matrix.platform }}" "build-tools;${{ matrix.build_tools }}"
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.jdk }}
+      - name: Verify tooling and Conductor
+        run: |
+          python3 -m unittest discover -s tests -v
+          python3 scripts/verify_conductor.py
+      - name: Fetch audited upstream
+        run: python3 scripts/bootstrap_qualification.py
+      - name: Prepare modern qualification
+        if: matrix.variant == 'modern'
+        run: python3 scripts/prepare_qualification.py --modern
+      - name: Build and lint
+        run: python3 scripts/run_qualification.py --variant "${{ matrix.variant }}" --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME" --clean

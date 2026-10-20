@@ -1,0 +1,280 @@
+{
+  "status": "in_progress",
+  "upstream_clean": {
+    "variant": "upstream",
+    "clean": true,
+    "exit_code": 0,
+    "elapsed_seconds": 160.5,
+    "command": [
+      "sh",
+      "/Users/doughnut/Documents/calltrack/.local/AndroidCallLogSync/gradlew",
+      "-p",
+      "/Users/doughnut/Documents/calltrack/.local/AndroidCallLogSync",
+      "--no-daemon",
+      "--console=plain",
+      "clean",
+      ":app:assembleDebug",
+      ":app:testDebugUnitTest",
+      ":app:lintDebug"
+    ],
+    "jdk": "/opt/homebrew/Cellar/openjdk@11/11.0.32.1/libexec/openjdk.jdk/Contents/Home",
+    "sdk": "/Volumes/PortableSSD/cache/calltrack-sdk-20261020",
+    "log": ".local/build-evidence/upstream-clean-verification.log",
+    "artifacts": [
+      {
+        "path": ".local/AndroidCallLogSync/app/build/outputs/apk/debug/app-debug.apk",
+        "sha256": "5ff724ca00e22f4b694f4d28b4dcc41ea3d8e42abde71f4d9aa2f1d6a6896ea4"
+      }
+    ]
+  },
+  "device_before_fragment_repair": {
+    "device": {
+      "android": "17",
+      "sdk": "37"
+    },
+    "apks": [
+      {
+        "name": "app-debug.apk",
+        "sha256": "629ddfeebcd57de63732c2ccc4a5a868b87a453b2863c469b2856f50ad2d510a"
+      },
+      {
+        "name": "app-debug-androidTest.apk",
+        "sha256": "26b8b230cf7beb25290d607ef8abdad92cc86e6e1ec3871a5ec0c1fb043588a9"
+      }
+    ],
+    "steps": [
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "pm",
+          "path",
+          "org.calltrack.qualification"
+        ],
+        "exit_code": 1,
+        "output": ""
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "pm",
+          "path",
+          "org.calltrack.qualification.test"
+        ],
+        "exit_code": 1,
+        "output": ""
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "getprop",
+          "ro.build.version.release"
+        ],
+        "exit_code": 0,
+        "output": "17\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "getprop",
+          "ro.build.version.sdk"
+        ],
+        "exit_code": 0,
+        "output": "37\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "install",
+          "/Users/doughnut/Documents/calltrack/.local/modern-qualification/app/build/outputs/apk/debug/app-debug.apk"
+        ],
+        "exit_code": 0,
+        "output": "Performing Streamed Install\nSuccess\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "install",
+          "/Users/doughnut/Documents/calltrack/.local/modern-qualification/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk"
+        ],
+        "exit_code": 0,
+        "output": "Performing Streamed Install\nSuccess\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "am",
+          "start",
+          "-W",
+          "-n",
+          "org.calltrack.qualification/com.markobl.calllogsync.MainActivity"
+        ],
+        "exit_code": 0,
+        "output": "Starting: Intent { cmp=org.calltrack.qualification/com.markobl.calllogsync.MainActivity }\nStatus: ok\nLaunchState: COLD\nActivity: org.calltrack.qualification/com.markobl.calllogsync.MainActivity\nTotalTime: 456\nWaitTime: 459\nComplete\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "pidof",
+          "org.calltrack.qualification"
+        ],
+        "exit_code": 0,
+        "output": "19191\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "am",
+          "instrument",
+          "-w",
+          "-r",
+          "-e",
+          "class",
+          "com.markobl.calllogsync.PermissionQualificationTest#testDenied",
+          "org.calltrack.qualification.test/androidx.test.runner.AndroidJUnitRunner"
+        ],
+        "exit_code": 0,
+        "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.PermissionQualificationTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.PermissionQualificationTest:\nINSTRUMENTATION_STATUS: test=testDenied\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.PermissionQualificationTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=testDenied\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.004\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "pm",
+          "grant",
+          "org.calltrack.qualification",
+          "android.permission.READ_CALL_LOG"
+        ],
+        "exit_code": 0,
+        "output": ""
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "am",
+          "instrument",
+          "-w",
+          "-r",
+          "-e",
+          "class",
+          "com.markobl.calllogsync.PermissionQualificationTest#testGranted",
+          "org.calltrack.qualification.test/androidx.test.runner.AndroidJUnitRunner"
+        ],
+        "exit_code": 0,
+        "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.PermissionQualificationTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.PermissionQualificationTest:\nINSTRUMENTATION_STATUS: test=testGranted\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.PermissionQualificationTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=testGranted\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.028\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "pm",
+          "revoke",
+          "org.calltrack.qualification",
+          "android.permission.READ_CALL_LOG"
+        ],
+        "exit_code": 0,
+        "output": ""
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "am",
+          "instrument",
+          "-w",
+          "-r",
+          "-e",
+          "class",
+          "com.markobl.calllogsync.PermissionQualificationTest#testDenied",
+          "org.calltrack.qualification.test/androidx.test.runner.AndroidJUnitRunner"
+        ],
+        "exit_code": 0,
+        "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.PermissionQualificationTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.PermissionQualificationTest:\nINSTRUMENTATION_STATUS: test=testDenied\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.PermissionQualificationTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=testDenied\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.007\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "uninstall",
+          "org.calltrack.qualification.test"
+        ],
+        "exit_code": 0,
+        "output": "Success\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "uninstall",
+          "org.calltrack.qualification"
+        ],
+        "exit_code": 0,
+        "output": "Success\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "pm",
+          "path",
+          "org.calltrack.qualification"
+        ],
+        "exit_code": 1,
+        "output": ""
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "pm",
+          "path",
+          "org.calltrack.qualification.test"
+        ],
+        "exit_code": 1,
+        "output": ""
+      }
+    ],
+    "result": "passed",
+    "cleanup_complete": true
+  },
+  "final_fragment_repair": "pending build and device revalidation"
+}

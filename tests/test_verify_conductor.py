@@ -21,6 +21,8 @@ class VerificationFailures(unittest.TestCase):
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
         shutil.copytree(MODULE.parent.parent / 'conductor', self.root / 'conductor')
+        if (MODULE.parent.parent / 'qualification').exists():
+            shutil.copytree(MODULE.parent.parent / 'qualification', self.root / 'qualification')
         self.baseline = next((self.root / 'conductor').glob('*/baseline_20261020'))
 
     def run_verifier(self):
