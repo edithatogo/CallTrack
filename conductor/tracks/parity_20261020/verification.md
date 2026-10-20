@@ -166,3 +166,17 @@ outputs in import-outcome-evidence.json. Actual CallLog permission revocation,
 CalendarContract delivery and outcome UI remain unqualified. Next implement read-only
 legacy matching, qualified scheduling, user controls/status/import/review flows and
 complete native acceptance. Final full-track review/fixes/archive remain required.
+
+
+## Legacy matcher checkpoint
+
+Five test-first matcher regressions verify nearest-second/zero-duration tuples,
+strong/possible/ambiguous outcomes, duplicate event IDs, rounded source collisions,
+incomplete/malformed inputs, unknown presentation, edited text, old overflow rejection
+and modern-marker exclusion. Results retain only IDs/confidence and expose no write
+port. Full source-bound debug build71 JVM tests/APKs/lint and25 host tests pass;
+formatting and Conductor/private-digest checks pass. Exact inputs/debug artifacts and
+pinned APK inspection digest in legacy-evidence.json. No live calendar/provider or
+receipt adoption is inferred. Next qualify WorkManager and connect scheduling plus
+settings/import/status/recovery UI, then full native failure/background acceptance.
+Final full-track review/fixes/archive remain required.

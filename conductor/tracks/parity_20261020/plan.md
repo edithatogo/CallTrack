@@ -31,7 +31,7 @@ Track active: schema4 durable foundations have bounded JVM/native evidence. Pagi
 - [x] Retained source facts/raw presentation, preserving schema4 migration (42 JVM/25 host/10 API36 native checks; packages removed)
 - [ ] Bounded source paging, checkpoint/anchor validation, filter/settings policy and reset handling
 - [ ] Frozen historical preview, confirmed bounded import, cancel/resume and partial-progress handling
-- [ ] Read-only legacy confidence/ambiguity matcher
+- [x] Read-only legacy confidence/ambiguity prototype (71 JVM/25 host tests and source-bound debug build; no live query or adoption)
 - [ ] Prompt scheduling plus periodic/reboot/reopen catch-up using a qualified WorkManager version
 - [ ] User settings, destination/permission flows, pending/review/error status and explicit recovery policy
 - [ ] Full emulator parity/background/failure matrix with exact artifact and cleanup evidence
@@ -191,3 +191,17 @@ outputs in import-outcome-evidence.json. Actual CallLog permission revocation,
 CalendarContract delivery and outcome UI remain unqualified. Next implement read-only
 legacy matching, qualified scheduling, user controls/status/import/review flows and
 complete native acceptance. Final full-track review/fixes/archive remain required.
+
+
+## Legacy matcher checkpoint
+
+Five test-first matcher regressions verify nearest-second/zero-duration tuples,
+strong/possible/ambiguous outcomes, duplicate event IDs, rounded source collisions,
+incomplete/malformed inputs, unknown presentation, edited text, old overflow rejection
+and modern-marker exclusion. Results retain only IDs/confidence and expose no write
+port. Full source-bound debug build71 JVM tests/APKs/lint and25 host tests pass;
+formatting and Conductor/private-digest checks pass. Exact inputs/debug artifacts and
+pinned APK inspection digest in legacy-evidence.json. No live calendar/provider or
+receipt adoption is inferred. Next qualify WorkManager and connect scheduling plus
+settings/import/status/recovery UI, then full native failure/background acceptance.
+Final full-track review/fixes/archive remain required.

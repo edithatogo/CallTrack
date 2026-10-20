@@ -196,3 +196,31 @@ delivery become PERMISSION_REQUIRED with unchanged progress; source/provider run
 errors become FAILED. Existing source-independent receipt recovery remains first.
 This creates status data for the later UI; it does not implement the UI or prove
 permission revocation behavior of real CallLog/CalendarContract providers.
+
+
+## Read-only legacy confidence prototype
+
+LegacyEventMatcher accepts at most500 observed events and500 source rows, with
+explicit completeness flags and caller-supplied text from a historical rendering
+profile. It has no provider/receipt mutation port. Results retain IDs/confidence
+only. Nearest-second rounding is based on pinned APK inspection CT-R/CT-E in the
+baseline archive; old int-overflow durations and unsupported call types are rejected,
+not emulated. Zero-duration legacy tuples have equal endpoints, distinct from the
+new one-minute visual marker. Modern marked events are excluded. Matching title/
+description can support a candidate; edited text, unavailable identity or missing
+evidence lowers confidence. Duplicate events or rounded source collisions are
+ambiguous; malformed, duplicate-ID or incomplete observations never become strong.
+Even STRONG_CANDIDATE is not proof of ownership, adoption permission or safe dedup.
+NONE never authorizes insertion or proves absence of edited legacy records. No
+calendar query adapter, automatic adoption, suppression or receipt binding is added.
+
+## Scheduling research refresh (no dependency adoption yet)
+
+Direct official release read2026-10-21 supersedes stale search snippets: WorkManager
+[2.12.0 stable](https://developer.android.com/jetpack/androidx/releases/work#2.12.0)
+was released2026-09-23, minSdk24. The app still uses2.7.1;2.12.0 is a qualification
+candidate, not yet selected. Current minSdk26 meets that stated minimum; actual
+artifact/AAR compatibility and transitive graph must be checked with builds/native
+work tests. Experimental analytics/listener APIs are unnecessary for initial delivery.
+Compare stability/recovery fixes, graph cost and existing WorkManager integration;
+retain existing working app until replacement scheduling and recovery are proven.
