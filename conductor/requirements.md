@@ -56,7 +56,7 @@ The following are proposed extensions, not changes to the minimum parity release
 
 ## Conductor execution policy (2026-10-20)
 
-The [track registry](tracks.md) now owns execution. These inventories are planning hypotheses and dated evidence, not fully specified future implementations. Each later track must map, understand, research and document its requirements and dependency options when activated. Dependencies can be temporary prototype aids, enduring replacements for existing libraries, or replacements for app-owned/native code. Decisions require explicit purpose, evidence, promotion/removal criteria and recovery. See [workflow](workflow.md). Tracks 1–3 are complete; Tracks4/5 are active and eight tracks remain unstarted.
+The [track registry](tracks.md) now owns execution. These inventories are planning hypotheses and dated evidence, not fully specified future implementations. Each later track must map, understand, research and document its requirements and dependency options when activated. Dependencies can be temporary prototype aids, enduring replacements for existing libraries, or replacements for app-owned/native code. Decisions require explicit purpose, evidence, promotion/removal criteria and recovery. See [workflow](workflow.md). Tracks 1–3 are complete; Tracks4–6 are active and seven tracks remain unstarted.
 
 ## Track 1 mapping outcome
 
@@ -77,3 +77,12 @@ channel research, resolved dependency inventory and a release/upgrade/observatio
 protocol. [D01–D09](tracks/release_20261020/requirements.md) retain the unmet gates.
 This does not establish a source-matched release candidate, store eligibility,
 production signing, retention controls or operational acceptance.
+
+## Track 6 bounded migration outcome
+
+R14/R26 now have a Java/Kotlin responsibility map and conditional pure-component
+conversion, with Java golden contracts for persisted signatures, JVM interop and
+legacy null/whitespace/overflow semantics. [K01–K07](tracks/kotlin_20261020/requirements.md)
+separate this bounded qualification from the remaining21 Java files, prerequisite
+release acceptance and whole-app migration/upgrade requirements. No Compose/KMP
+or coroutine architecture adoption follows from adding Kotlin source.

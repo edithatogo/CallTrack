@@ -86,3 +86,11 @@ exit criteria remain unmet while M3 is incomplete. Source-matched signed candida
 upgrade/recovery execution, distribution outcomes and actual observation remain
 open; physical-call acceptance stays pending by user direction. No public release
 or production identity has been created.
+
+## M5 bounded Kotlin checkpoint
+
+[Track6](tracks/kotlin_20261020/index.md) maps Java ownership and compares direct
+translation with library takeover. Three pure components migrate behind Java
+contracts with pinned Kotlin2.3.21, without data-schema or UI changes. Remaining21
+Java files, stabilized M3/M4 contracts and full preserving update/recovery acceptance
+remain open before M5 completion; a pilot does not authorize Compose/KMP rewrites.

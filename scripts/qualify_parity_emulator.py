@@ -75,7 +75,8 @@ def qualify(serial):
         check('CalendarSliceTest', 'syntheticCursorMapsPresentationWithoutPersonalQuery')
         for method in ('preservesV1ReceiptsAndCreatesLegacyBindings',
                        'outboxCommitsInflightAndPurgesConfirmedPayloadAcrossReopen',
-                       'rejectsOutboxWriteInsideAnUncommittedTransaction'):
+                       'rejectsOutboxWriteInsideAnUncommittedTransaction',
+                       'kotlinMappingRecognisesPreservedJavaReceiptWithoutReinsert'):
             check('ParityStoreTest', method)
         receipt['result'] = 'passed'
     except Exception as error:

@@ -31,3 +31,14 @@ This does not adopt all old runtime dependencies for the long term. Kotlin/Compo
 Native Android CalendarContract/CallLog provider adapters and a small SQLiteOpenHelper ledger are selected for the initial manual vertical slice. Pure Java mapping/ports stay independent of Android for later Kotlin migration. No new runtime framework is added; provider wrappers and richer persistence libraries are reassessed when they address a demonstrated need. New development app ID is org.calltrack.community.dev.
 
 Track 3 native CalendarContract/CallLog and SQLite selection is now implemented and [verified](archive/calendar_slice_20261020/verification.md) for the bounded manual slice. The app omits network permission, disables legacy boot entry, uses explicit backup/transfer exclusions and retains insert-attempt receipts across uncertain readback. No new runtime framework was added. The modern build passed with 16 JVM tests and zero lint errors; Android17/API37 synthetic provider/SQLite/UI acceptance passed and disposable state was removed. Live source acquisition, remote sync, full parity and production upgrade/restore remain unqualified.
+
+## Track 6 bounded Kotlin development migration
+
+[Track6 decisions](tracks/kotlin_20261020/decisions.md) select Kotlin/KGP2.3.21 for
+CallEvent, CallIdentity and CallSelection only, retaining AGP8.13.2/Gradle8.13/JDK17
+and Java/Kotlin bytecode1.8. ktfmt0.59 is a checksum-pinned build-only formatter.
+Existing Kotlin/coroutines transitives predated this migration; adding the compiler
+changes runtime resolution and requires recorded graph readback. No app-owned
+coroutine, Room, DataStore, Compose, KMP or Rust adoption occurs. Twenty-one Java
+production files remain, with explicit ownership and conversion/removal gates in
+the track. Mixed-language qualification and full M5 completion remain distinct.

@@ -9,6 +9,7 @@ The current package is disposable; there is no supported public release yet.
 Use a fresh checkout of the exact commit being reviewed. Install an OpenJDK17
 runtime, Python3 standard library and Android SDK platform36/build-tools35.0.0.
 The wrapper pins Gradle8.13 and its distribution checksum; AGP is 8.13.2.
+The mixed-language slice pins Kotlin/KGP2.3.21 and targets Java8 bytecode.
 Set JAVA_HOME and ANDROID_HOME to those installations. SDK licences must be accepted
 by the person operating the build environment. Run from the repository root:
 
@@ -28,12 +29,15 @@ See [qualification](qualification/README.md) for the separate upstream reproduce
 Use google-java-format1.24.0 with `--aosp` for app-owned Java. CI includes the pinned
 formatter URL/checksum and exact command. Preserve the upstream notices; contribute
 only code and assets you have the right to distribute under compatible terms.
+For Kotlin use ktfmt0.59 with `--kotlinlang-style --dry-run --set-exit-if-changed`;
+CI pins its Maven URL and SHA256. Follow [Kotlin style](conductor/code_styleguides/kotlin.md).
 Describe behaviour changes and their regression evidence in the pull request.
 Keep language/UI migrations separate from synchronization behaviour changes.
 
 ## Testing and evidence
 
-Prefer pure Java tests and synthetic inputs. Meaningful behaviour changes need a
+Prefer pure JVM tests and synthetic inputs; retained Java tests deliberately
+exercise public Kotlin fields/static entry points. Meaningful behaviour changes need a
 failing contract/regression test before implementation. Documentation needs link,
 source and consistency checks. Test the failure path as well as success: lost
 provider readback, interrupted writes, changed events, permissions and migrations.
