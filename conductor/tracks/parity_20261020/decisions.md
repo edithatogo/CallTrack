@@ -294,3 +294,24 @@ old jobs, failed-attempt counts, permission text when a prior automatic policy e
 draft-state recreation/accessibility, import/recovery controls and full positive
 permission/provider/background acceptance. Programmatic Activity state tests are
 not a substitute for guarded rendered/manual UI acceptance.
+
+
+## Generation-checked status publication
+
+AndroidWorkStatusStore shares DELIVERY_LOCK with activation publication, checks the
+current activation generation and rejects stale publishers. WorkStatus also refuses
+a lower generation over a newer record. Latest result, timestamp, per-attempt random
+token and recorded failure counter commit together. Repeated FAILED publication
+from one attempt token does not increment twice; a new activation starts a new
+counter. Successful attempts preserve the count for their generation. The counter
+counts recorded background attempts, not failed source calls, and legacy counters
+may be incomplete. Unknown stored codes become UNKNOWN rather than exposing raw
+text. No status grants delivery authority; receipts remain the effect evidence.
+
+Status-storage exceptions/failed commits request bounded retries, then return an
+explicit UNKNOWN/statusStored=false failure rather than claiming a successful
+status save. Process-death/disk-failure injection remains part of full acceptance;
+SharedPreferences in-memory readback is not proof of disk persistence after a failed
+commit. Permission wording now distinguishes an explicit manual action from a
+previously enabled automatic policy resuming when access returns. Remove duplicate
+reload callback; import/recovery user flows and rendered accessibility remain next.

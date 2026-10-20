@@ -61,7 +61,7 @@
     <string name="slice_no_calendars" translatable="false">No visible writable calendars are available. Configure one in your calendar app, then refresh.</string>
     <string name="slice_ready" translatable="false">Choose a calendar before logging a call.</string>
     <string name="slice_calendar_unavailable" translatable="false">The calendar is unavailable. Refresh and choose a destination; no fallback calendar is used.</string>
-    <string name="slice_tap_again" translatable="false">If access was granted, tap Log latest call again when ready. No call has been read automatically.</string>
+    <string name="slice_tap_again" translatable="false">If access was granted, tap Log latest call again for this manual action. Any previously enabled automatic policy can resume when access returns.</string>
     <string name="slice_saved" translatable="false">Event saved and read back successfully.</string>
     <string name="slice_already" translatable="false">This call is already logged in this calendar.</string>
     <string name="slice_recovered" translatable="false">Recovered an existing event without creating a duplicate.</string>
@@ -91,4 +91,6 @@
     <string name="auto_paused">Last background attempt stopped because it was paused or no longer current.</string>
     <string name="auto_backlog">More pending work remains; recovery has been requested.</string>
     <string name="auto_run_failed">Last background attempt failed. Pending receipts remain available for recovery.</string>
+    <string name="auto_failure_count">Recorded failed background attempts in this logging period: %1$d. Earlier attempts may be unavailable. This is not a count of failed calls.</string>
+    <string name="auto_unknown">The latest attempt status is unavailable. Refresh or request recovery.</string>
 </resources>

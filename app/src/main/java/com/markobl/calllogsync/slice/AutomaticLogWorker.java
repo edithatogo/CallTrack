@@ -10,6 +10,7 @@ import androidx.work.WorkerParameters;
 /** Local provider work only; no network constraint or personal caller data in work input/output. */
 public final class AutomaticLogWorker extends Worker {
     public static final String GENERATION = "activationGeneration";
+    private final String statusToken = java.util.UUID.randomUUID().toString();
 
     public AutomaticLogWorker(@NonNull Context context, @NonNull WorkerParameters parameters) {
         super(context, parameters);
@@ -63,17 +64,29 @@ public final class AutomaticLogWorker extends Worker {
     private Result report(long generation, String code, int delivered, int review, boolean retry) {
         // Status is nonpersonal and generation-scoped; receipt data is the authority for delivered
         // events.
-        boolean committed =
-                getApplicationContext()
-                        .getSharedPreferences("slice", Context.MODE_PRIVATE)
-                        .edit()
-                        .putLong("automaticStatusGeneration", generation)
-                        .putLong("automaticStatusAt", System.currentTimeMillis())
-                        .putString("automaticStatusCode", code)
-                        .putInt("automaticStatusDelivered", delivered)
-                        .putInt("automaticStatusReview", review)
-                        .commit();
-        if (retry || !committed) return Result.retry();
+        boolean committed;
+        try {
+            committed =
+                    new AndroidWorkStatusStore(getApplicationContext())
+                            .publish(
+                                    generation,
+                                    System.currentTimeMillis(),
+                                    statusToken,
+                                    WorkStatus.Code.parse(code),
+                                    delivered,
+                                    review);
+        } catch (RuntimeException unavailable) {
+            committed = false;
+        }
+        if (!committed) {
+            if (getRunAttemptCount() < 5) return Result.retry();
+            return Result.failure(
+                    new Data.Builder()
+                            .putString("status", "UNKNOWN")
+                            .putBoolean("statusStored", false)
+                            .build());
+        }
+        if (retry) return Result.retry();
         return Result.success(
                 new Data.Builder()
                         .putString("status", code)
