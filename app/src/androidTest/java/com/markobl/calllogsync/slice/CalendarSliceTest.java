@@ -78,6 +78,55 @@ public class CalendarSliceTest {
                         .run(1));
     }
 
+    private void verifyPicker(long savedCalendar, boolean expectChoice) {
+        context()
+                .getSharedPreferences("slice", Context.MODE_PRIVATE)
+                .edit()
+                .putLong("calendar", savedCalendar)
+                .commit();
+        android.app.Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        android.app.Activity activity =
+                instrumentation.startActivitySync(
+                        new Intent(context(), CalendarSliceActivity.class)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        try {
+            long deadline = android.os.SystemClock.elapsedRealtime() + 10000;
+            java.util.concurrent.atomic.AtomicBoolean ready =
+                    new java.util.concurrent.atomic.AtomicBoolean();
+            do {
+                instrumentation.runOnMainSync(
+                        () -> {
+                            android.widget.Spinner picker =
+                                    activity.findViewById(
+                                            com.markobl.calllogsync.R.id.slice_calendar_picker);
+                            ready.set(
+                                    picker != null
+                                            && picker.isEnabled()
+                                            && picker.getAdapter() != null
+                                            && picker.getAdapter().getCount() > 1
+                                            && (expectChoice
+                                                    ? picker.getSelectedItemPosition() > 0
+                                                    : picker.getSelectedItemPosition() == 0));
+                        });
+                if (ready.get()) break;
+                android.os.SystemClock.sleep(50);
+            } while (android.os.SystemClock.elapsedRealtime() < deadline);
+            assertTrue(
+                    "Picker did not restore explicit choice / missing-destination placeholder",
+                    ready.get());
+            instrumentation.runOnMainSync(
+                    () -> {
+                        long actual =
+                                context()
+                                        .getSharedPreferences("slice", Context.MODE_PRIVATE)
+                                        .getLong("calendar", -1);
+                        assertEquals(expectChoice ? savedCalendar : -1, actual);
+                    });
+        } finally {
+            instrumentation.runOnMainSync(activity::finish);
+        }
+    }
+
     @Test
     public void nativeRoundtripAndReopenedLedger() {
         cleanup();
@@ -99,6 +148,33 @@ public class CalendarSliceTest {
             long calendar = ContentUris.parseId(uri);
             AndroidCalendarSink sink = new AndroidCalendarSink(context());
             assertTrue(sink.writable(calendar));
+            android.os.Bundle categories = new android.os.Bundle();
+            int local = 0, google = 0, microsoft = 0, other = 0;
+            for (AndroidCalendarSink.Choice choice : sink.choices()) {
+                String type =
+                        choice.accountType == null
+                                ? ""
+                                : choice.accountType.toLowerCase(java.util.Locale.ROOT);
+                if (CalendarContract.ACCOUNT_TYPE_LOCAL.equals(choice.accountType)) local++;
+                else if (type.equals("com.google")) google++;
+                else if (type.contains("outlook")
+                        || type.contains("exchange")
+                        || type.contains("microsoft")) microsoft++;
+                else other++;
+            }
+            categories.putString(
+                    "calendarCategories",
+                    "local="
+                            + local
+                            + ", google="
+                            + google
+                            + ", microsoft-like="
+                            + microsoft
+                            + ", other="
+                            + other);
+            InstrumentationRegistry.getInstrumentation().sendStatus(0, categories);
+            verifyPicker(calendar, true);
+            verifyPicker(Long.MAX_VALUE, false);
             CallRecord call =
                     new CallRecord(
                             "synthetic-" + account(),

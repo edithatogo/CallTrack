@@ -52,7 +52,15 @@ public final class AndroidCallLogSource implements SliceEngine.CallSource {
                 ContentResolver.QUERY_SORT_DIRECTION_DESCENDING);
         query.putInt(ContentResolver.QUERY_ARG_LIMIT, 1);
         try (Cursor c =
-                context.getContentResolver().query(Calls.CONTENT_URI, PROJECTION, query, null)) {
+                context.getContentResolver()
+                        .query(
+                                Calls.CONTENT_URI
+                                        .buildUpon()
+                                        .appendQueryParameter(Calls.LIMIT_PARAM_KEY, "1")
+                                        .build(),
+                                PROJECTION,
+                                query,
+                                null)) {
             if (c == null) throw new IllegalStateException("Call provider unavailable");
             return first(c, namespace(context));
         }

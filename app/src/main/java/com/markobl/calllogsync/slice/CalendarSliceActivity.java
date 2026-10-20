@@ -22,6 +22,8 @@ public final class CalendarSliceActivity extends Activity {
     private List<AndroidCalendarSink.Choice> choices = new ArrayList<>();
     private long selected = -1;
     private boolean busy;
+    private boolean refreshing;
+    private int refreshGeneration;
 
     @Override
     public void onCreate(Bundle state) {
@@ -48,6 +50,7 @@ public final class CalendarSliceActivity extends Activity {
                                 1);
                 });
         picker = new Spinner(this);
+        picker.setId(R.id.slice_calendar_picker);
         picker.setContentDescription(getString(R.string.slice_choose));
         layout.addView(picker);
         picker.setOnItemSelectedListener(
@@ -123,7 +126,9 @@ public final class CalendarSliceActivity extends Activity {
                                         });
                             });
                 });
-        setContentView(layout);
+        ScrollView scroll = new ScrollView(this);
+        scroll.addView(layout);
+        setContentView(scroll);
     }
 
     @Override
@@ -145,13 +150,17 @@ public final class CalendarSliceActivity extends Activity {
     }
 
     private void updateButton() {
-        if (log != null) log.setEnabled(!busy && selected >= 0 && calendarAccess());
+        if (log != null) log.setEnabled(!busy && !refreshing && selected >= 0 && calendarAccess());
+        if (picker != null) picker.setEnabled(!busy && !refreshing && calendarAccess());
     }
 
     private void refresh() {
         // Save before asynchronous adapter replacement; spinner callbacks must not select a
         // fallback.
         final long saved = getSharedPreferences("slice", MODE_PRIVATE).getLong("calendar", -1);
+        final int generation = ++refreshGeneration;
+        refreshing = true;
+        updateButton();
         executor.execute(
                 () -> {
                     try {
@@ -159,7 +168,8 @@ public final class CalendarSliceActivity extends Activity {
                                 new AndroidCalendarSink(getApplicationContext()).choices();
                         runOnUiThread(
                                 () -> {
-                                    if (isDestroyed()) return;
+                                    if (isDestroyed() || generation != refreshGeneration) return;
+                                    refreshing = false;
                                     choices = loaded;
                                     List<String> labels = new ArrayList<>();
                                     labels.add(getString(R.string.slice_choose));
@@ -184,7 +194,8 @@ public final class CalendarSliceActivity extends Activity {
                     } catch (RuntimeException e) {
                         runOnUiThread(
                                 () -> {
-                                    if (!isDestroyed()) {
+                                    if (!isDestroyed() && generation == refreshGeneration) {
+                                        refreshing = false;
                                         selected = -1;
                                         status.setText(R.string.slice_calendar_unavailable);
                                         updateButton();
@@ -227,6 +238,7 @@ public final class CalendarSliceActivity extends Activity {
 
     @Override
     public void onDestroy() {
+        ++refreshGeneration;
         executor.shutdown();
         super.onDestroy();
     }
