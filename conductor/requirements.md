@@ -113,7 +113,7 @@ Android/iOS UI, native packaging or manual accessibility acceptance is establish
 
 ## Track10 integration research outcome
 
-R12/R19/R20/R25 have [destination contracts](tracks/destinations_20261020/requirements.md)
+R12/R19/R20/R25 have [destination contracts](archive/destinations_20261020/requirements.md)
 and a staged provider qualification protocol. INT-D01 retains native CalendarContract
 first and defers direct clients until a required route gap is measured and Track4
 contracts stabilize. Outlook/Google/CalDAV cloud readback remains unqualified; no

@@ -14,7 +14,7 @@ Provider-specific evidence and contracts; implement only justified connectors wi
 
 ## Inputs and dependencies
 
-Prerequisites: [parity](../parity_20261020/index.md). Requirement references: R12, R19, R20, R25 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
+Prerequisites: [parity](../../tracks/parity_20261020/index.md). Requirement references: R12, R19, R20, R25 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
 
 ## Required outputs
 
