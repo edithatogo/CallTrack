@@ -115,3 +115,26 @@ It never uses a physical phone. Receipts are in .local/parity-evidence and
 .local/slice-evidence; committed Track4 checkpoint evidence records the exact scope.
 These commands do not qualify cloud sync, physical calls, rendered UI, reboot or
 Doze/offline acceptance. Host fault fixtures validate cleanup control flow separately.
+
+
+The lifecycle harness adds ordinary launcher resume, explicit force-stop/reopen,
+actual process termination between provider insertion and ID persistence, a guest
+reboot, local offline delivery and deferred Doze recovery:
+
+```sh
+python3 scripts/qualify_parity_lifecycle.py --serial emulator-5580
+```
+
+It requires a qualified initial emulator power/network snapshot and refuses existing
+battery overrides. It changes only the dedicated emulator's airplane/Wi-Fi/mobile-data,
+stay-awake, simulated battery and idle/screen state. It checks restoration against
+the snapshot in finally, allowing bounded asynchronous radio readback to settle.
+A boot observation may take180 seconds after boot completion; this is a test budget,
+not a delivery guarantee. Never restart the emulator or another harness because an
+observation call yielded: poll the live process first. On failure, inspect
+.local/slice-evidence/parity-lifecycle-receipt.json for separate fixture, package and
+emulator-restoration results. If cleanup is unverified the test APK is deliberately
+retained; do not replace it or clear app data before using its saved fixture token
+for scoped recovery. The receipt records the original emulator settings and exact
+failed command/state. These cases do not qualify physical calls, cloud delivery,
+rendered UI acceptance, every OEM/version or automatic execution while force-stopped.

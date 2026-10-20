@@ -61,8 +61,9 @@ be retired independently; no application data/code rollback is needed.
 runtime2.7.1 to2.12.0 for the bounded durable worker. Actual AAR metadata, debug
 build and disabled/stale plus positive CallLog/calendar native worker branches pass.
 Bounded filters, duplicate requests, permission revocation and latency are recorded
-in Track4 worker-provider-evidence.json; reboot/reopen/Doze/offline/UI acceptance
-remains pending. Transitive Room2.7.0 and
+in Track4 worker-provider-evidence.json. lifecycle-evidence.json adds bounded
+resume/process-death/reboot/offline/Doze proof and enqueue acknowledgement. Protected
+emulator call-end wake, rendered UI and full acceptance/review remain pending. Transitive Room2.7.0 and
 coroutines1.9.0 are framework internals; app-owned ledgers remain SQLiteOpenHelper
 and no new app coroutine/Room API adoption occurs. No experimental WorkManager
 analytics or test helper dependency is added. See graph/licence/artifact inventory

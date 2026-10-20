@@ -39,9 +39,34 @@ public final class AutomaticScheduling {
     }
 
     public static void reconcile(Context context) {
+        requests(context);
+    }
+
+    private static java.util.concurrent.Future<?>[] requests(Context context) {
         ActivationControl.Settings settings =
                 new ActivationControl(new AndroidActivationStore(context)).current();
-        if (settings != null && settings.enabled) schedule(context, settings);
+        return settings != null && settings.enabled
+                ? schedule(context, settings)
+                : new java.util.concurrent.Future<?>[0];
+    }
+
+    static void reconcileCommitted(Context context, long deadlineNanos)
+            throws java.util.concurrent.ExecutionException,
+                    InterruptedException,
+                    java.util.concurrent.TimeoutException {
+        awaitCommitted(requests(context), deadlineNanos);
+    }
+
+    static void awaitCommitted(java.util.concurrent.Future<?>[] operations, long deadlineNanos)
+            throws java.util.concurrent.ExecutionException,
+                    InterruptedException,
+                    java.util.concurrent.TimeoutException {
+        for (java.util.concurrent.Future<?> operation : operations) {
+            long remaining = deadlineNanos - System.nanoTime();
+            if (remaining <= 0)
+                throw new java.util.concurrent.TimeoutException("Wake enqueue unconfirmed");
+            operation.get(remaining, TimeUnit.NANOSECONDS);
+        }
     }
 
     private static Data input(ActivationControl.Settings settings) {
@@ -70,13 +95,19 @@ public final class AutomaticScheduling {
                 .build();
     }
 
-    private static void schedule(Context context, ActivationControl.Settings settings) {
+    private static java.util.concurrent.Future<?>[] schedule(
+            Context context, ActivationControl.Settings settings) {
         WorkManager manager = WorkManager.getInstance(context);
-        manager.enqueueUniquePeriodicWork(
-                PERIODIC, ExistingPeriodicWorkPolicy.UPDATE, periodic(settings));
-        manager.enqueueUniqueWork(
-                "calltrack.automatic.prompt." + settings.generation,
-                ExistingWorkPolicy.APPEND_OR_REPLACE,
-                prompt(settings));
+        java.util.concurrent.Future<?> periodic =
+                manager.enqueueUniquePeriodicWork(
+                                PERIODIC, ExistingPeriodicWorkPolicy.UPDATE, periodic(settings))
+                        .getResult();
+        java.util.concurrent.Future<?> prompt =
+                manager.enqueueUniqueWork(
+                                "calltrack.automatic.prompt." + settings.generation,
+                                ExistingWorkPolicy.APPEND_OR_REPLACE,
+                                prompt(settings))
+                        .getResult();
+        return new java.util.concurrent.Future<?>[] {periodic, prompt};
     }
 }

@@ -144,6 +144,11 @@ public final class CalendarSliceActivity extends Activity {
         super.onResume();
         executor.execute(
                 () -> {
+                    try {
+                        AutomaticScheduling.reconcile(getApplicationContext());
+                    } catch (RuntimeException unavailable) {
+                        /* Settings/status exposes unavailable persisted policy; opening cannot enable it. */
+                    }
                     try (SqliteLedger ledger = new SqliteLedger(getApplicationContext())) {
                         ledger.expirePayloads(50);
                     } catch (RuntimeException unavailable) {
