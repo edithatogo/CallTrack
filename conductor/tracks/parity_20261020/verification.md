@@ -282,3 +282,26 @@ rendered positive UI are not qualified here. Next: separate explicit reapproval 
 inactive never-attempted work, payload-retention policy/controls and persistence
 faults, then full positive provider/worker/UI/reboot/reopen/offline/Doze/latency matrix.
 Final full-track review/fixes/archive remain outstanding.
+
+
+## Explicit READY reapproval checkpoint
+
+ReadyReapproval validates the exact user-reviewed frozen READY snapshot, calendar
+permissions/availability and current confirmation under the delivery lock. Fresh
+manual ownership preserves source facts/payload identity; old operations cannot
+resume it. Attempted, suppressed, changed or incomplete intents are rejected. The
+recovery Activity separates original-event insertion preview/confirmation from
+existing-effect checks. Permission grants do not approve insertion, and leaving
+withdraws pending authorization. Four test-first core contracts cover fresh owner,
+refusal, crash-after-insert/no second approval and denied/withdrawn confirmation.
+Native SQLite/port verification covers owner/facts across reopen and suppression
+clearing a non-null READY payload while retaining metadata and duplicate protection.
+
+Full source-bound build91 JVM tests/APKs/lint and25 host tests pass;33 API36 native
+checks pass and packages are removed. Exact inputs/debug artifacts/native outputs
+in reapproval-evidence.json. A broad German copy replacement was corrected before
+the final build so suppression does not imply it can be undone by reapproval.
+Native insertion here uses a fake calendar port, not CalendarContract; positive
+rendered permission/confirmation/lifecycle remains pending. Next implement age-based
+payload retention and remaining storage faults, then full real-provider/worker/UI/
+reboot/reopen/offline/Doze/latency acceptance and final review/fixes/archive.

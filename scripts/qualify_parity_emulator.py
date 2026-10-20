@@ -103,7 +103,8 @@ def qualify(serial):
                        'rolloverPreservesProcessedAnchorAndRejectsStalePublication',
                        'pendingRecoveryQueryIsBoundedAndOwnerDestinationScoped',
                        'deliveryCountsIncludeLateLegacyWithoutDoubleCountingBoundReceipt',
-                       'recoveryPagingIncludesLegacyAndRemainsStableWhenStatesChange'):
+                       'recoveryPagingIncludesLegacyAndRemainsStableWhenStatesChange',
+                       'explicitReapprovalPersistsFreshOwnerAndSuppressionClearsReadyPayload'):
             check('ParityStoreTest', method)
         receipt['result'] = 'passed'
     except Exception as error:

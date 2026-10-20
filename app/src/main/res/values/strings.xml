@@ -126,7 +126,7 @@
     <string name="auto_status_summary">%1$s\n%2$s</string>
     <string name="import_history_item">%1$s — %2$s</string>
     <string name="recovery_open">Delivery review and recovery</string>
-    <string name="recovery_intro">Review saved delivery records across all calendars. Times use the current device timezone. Checking only reads existing calendar events; it never creates or changes one. Suppression stops app retries and clears the pending personal payload while retaining duplicate protection. Calendar events remain untouched.</string>
+    <string name="recovery_intro">Review saved delivery records across all calendars. Times use the current device timezone. Checking only reads existing calendar events; it never creates or changes one. Suppression stops app retries and clears the pending personal payload while retaining duplicate protection. Calendar events remain untouched. Reapproval is a separate, explicitly confirmed action for never-attempted work.</string>
     <string name="recovery_access">Allow calendar read access</string>
     <string name="recovery_refresh">Refresh recent records</string>
     <string name="recovery_previous">Previous records</string>
@@ -151,10 +151,19 @@
     <string name="recovery_suppressed">Retries suppressed</string>
     <string name="recovery_legacy">Earlier receipt — source identity not yet bound</string>
     <string name="recovery_verified">Existing calendar content verified; no event was created.</string>
-    <string name="recovery_never_attempted">This intent was never attempted. Checking did not create an event. Resume its original active operation or suppress it.</string>
+    <string name="recovery_never_attempted">This intent was never attempted. Checking did not create an event. Resume its original active operation, use separate reapproval if offered, or suppress it.</string>
     <string name="recovery_suppressed_result">Retries suppressed and pending personal payload cleared. Calendar events remain unchanged.</string>
     <string name="recovery_permission">Calendar read access is required to check existing effects. No event was changed.</string>
     <string name="recovery_review_result">The event is missing, changed or ambiguous. Review remains required; no event was recreated or overwritten.</string>
     <string name="recovery_not_found">The selected record is no longer available. Refresh the list.</string>
     <string name="recovery_failed">This check could not be verified. Existing receipts remain available; refresh before retrying.</string>
+
+    <string name="reapproval_open">Reapprove never-attempted insertion</string>
+    <string name="reapproval_preview">Create the original pending event in %1$s? This is a new, explicit insertion approval, separate from checking existing effects.\n\nTitle: %2$s\nDetails: %3$s\nStart: %4$s\nEnd: %5$s\n\nThe original pending operation stays inactive. If the record changes or an insertion has already been attempted, no new event will be created.</string>
+    <string name="reapproval_confirm">Approve this insertion</string>
+    <string name="reapproval_tap_again">Calendar read/write access is required. Permission changes do not confirm this insertion. Tap reapprove again to review the original event.</string>
+    <string name="reapproval_verified">The explicitly reapproved event was saved and verified. Its receipt prevents another automatic insertion.</string>
+    <string name="reapproval_changed">This record changed or an insertion may already have been attempted. Refresh and check the existing effect; no new insertion was approved.</string>
+    <string name="reapproval_paused">Insertion approval stopped before completion. Refresh the record before retrying; the pending intent remains tracked.</string>
+    <string name="reapproval_failed">The reapproved insertion could not be verified. Check its existing effect before another action; a calendar event may already exist.</string>
 </resources>
