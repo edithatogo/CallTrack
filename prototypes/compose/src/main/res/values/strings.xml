@@ -1,0 +1,16 @@
+<resources>
+    <string name="title">CallTrack UI preview</string>
+    <string name="intro">Synthetic preview. No calls or calendars are accessed.</string>
+    <string name="access">Simulate calendar access</string>
+    <string name="choose">Choose a calendar</string>
+    <string name="log">Log latest call</string>
+    <string name="permission">Calendar access is required</string>
+    <string name="ready">Ready for an explicit action</string>
+    <string name="no_calendars">No writable calendars available</string>
+    <string name="working">Working</string>
+    <string name="refreshing">Refreshing calendars</string>
+    <string name="count">Synthetic requests: %1$d</string>
+    <string name="fixture_personal">Personal fixture</string>
+    <string name="fixture_work">Work fixture</string>
+    <string name="fixture_other">Synthetic calendar %1$d</string>
+</resources>

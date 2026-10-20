@@ -26,6 +26,9 @@ class VerificationFailures(unittest.TestCase):
         for source in [*MODULE.parent.parent.glob('*.md'), MODULE.parent.parent / 'LICENSE']:
             if source.exists():
                 shutil.copy2(source, self.root / source.name)
+        if (MODULE.parent.parent / 'prototypes').exists():
+            shutil.copytree(MODULE.parent.parent / 'prototypes', self.root / 'prototypes',
+                            ignore=shutil.ignore_patterns('build', '.gradle', '.kotlin'))
         self.baseline = next((self.root / 'conductor').glob('*/baseline_20261020'))
 
     def run_verifier(self):
