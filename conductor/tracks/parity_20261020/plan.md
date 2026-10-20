@@ -281,3 +281,29 @@ stop/cancel/recreate interaction and accessibility remain unqualified. Next add
 recovery/retention controls and UI hardening, then persistence faults and complete
 positive worker/provider/reboot/reopen/offline/Doze/latency acceptance. Final full-track
 review/fixes/archive remain outstanding; P07 is not closed by default-state tests.
+
+
+## Existing-effect recovery controls checkpoint
+
+ReceiptRecovery has no insert port; known-ID/unique-marker checks can reconcile an
+existing effect even when its original operation is inactive. READY without event ID
+is not inserted. Suppression is explicitly confirmed, clears pending payload and
+retains source/event identity without calendar deletion. Five core regressions cover
+never-attempted, inactive ownership, missing/ambiguous effects, denied readback and
+preserved discovered ID. Recovery Activity exposes bounded metadata pages, read-only
+calendar access and optional recorded-event viewing. Native tests verify empty
+screen opening and25 mixed current/legacy receipts across state changes.
+
+The Android pager regression initially failed on repeated rows. A host SQL probe and
+native red receipt identified lost affinity on COALESCE-derived time with string
+cursor binding; verified INTEGER casts correct all numeric cursor comparisons.
+One attempted wrapped-string replacement was detected as a no-op; that build was
+intentionally interrupted before retrying the verified correction. Marker result
+materialisation now caps at two; formatted locale resources replace concatenation.
+Full source-bound build87 JVM tests/APKs/lint and25 host tests pass;32 API36 native
+checks pass and packages are removed. Exact inputs/debug artifacts/native outputs
+and red receipt digest are in recovery-evidence.json. Real read-only provider and
+rendered positive UI are not qualified here. Next: separate explicit reapproval for
+inactive never-attempted work, payload-retention policy/controls and persistence
+faults, then full positive provider/worker/UI/reboot/reopen/offline/Doze/latency matrix.
+Final full-track review/fixes/archive remain outstanding.

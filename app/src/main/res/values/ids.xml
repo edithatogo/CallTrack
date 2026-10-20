@@ -25,4 +25,9 @@
     <item name="import_cancel" type="id" />
     <item name="import_feedback" type="id" />
     <item name="import_history" type="id" />
+    <item name="open_recovery" type="id" />
+    <item name="recovery_refresh" type="id" />
+    <item name="recovery_feedback" type="id" />
+    <item name="recovery_rows" type="id" />
+    <item name="recovery_empty" type="id" />
 </resources>

@@ -98,4 +98,37 @@ public class AutomaticSettingsTest {
             instrumentation.runOnMainSync(activity::finish);
         }
     }
+
+    @Test
+    public void openingRecoveryDoesNotCreateReceiptsOrEnableLogging() {
+        android.app.Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        Context context = instrumentation.getTargetContext();
+        try (SqliteLedger ledger = new SqliteLedger(context)) {
+            assertTrue(ledger.recoveryPage(null, 10).isEmpty());
+        }
+        Activity activity =
+                instrumentation.startActivitySync(
+                        new Intent(context, ReceiptRecoveryActivity.class)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        try {
+            java.util.concurrent.atomic.AtomicBoolean ready =
+                    new java.util.concurrent.atomic.AtomicBoolean();
+            long deadline = SystemClock.elapsedRealtime() + 10000;
+            do {
+                instrumentation.runOnMainSync(
+                        () -> ready.set(activity.findViewById(R.id.recovery_empty) != null));
+                if (ready.get()) break;
+                SystemClock.sleep(50);
+            } while (SystemClock.elapsedRealtime() < deadline);
+            assertTrue("Recovery list did not load", ready.get());
+            try (SqliteLedger ledger = new SqliteLedger(context)) {
+                assertTrue(ledger.recoveryPage(null, 10).isEmpty());
+            }
+            assertFalse(
+                    context.getSharedPreferences("slice", Context.MODE_PRIVATE)
+                            .contains("automaticActivation"));
+        } finally {
+            instrumentation.runOnMainSync(activity::finish);
+        }
+    }
 }
