@@ -40,3 +40,7 @@
 - Follow-up: reopen for chosen first slice after user workflow/retention decision
   and Track4/5 gates; Track10 routes, Track12 companion, Track13 parser/crypto reuse
   evidence inform later design without becoming mandatory dependencies.
+
+Review refinement: restored receipt metadata remains inactive historical evidence
+until destination/ownership reconciliation; imported hashes do not grant remote
+write authority or establish current delivery. No restore engine is implemented.
