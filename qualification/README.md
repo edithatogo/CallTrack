@@ -89,3 +89,29 @@ establish a bounded development baseline, not target37/API37 compilation support
 actual call logging, background reliability or calendar parity. Before wider
 release, test the chosen minimum supported OS and real workflows as later tracks
 specify.
+
+
+## Track4 dedicated emulator acceptance
+
+Build exact root debug inputs first, then run one harness at a time. These require
+absent development/test packages and never replace an existing installation. The
+provider and worker harnesses verify the dedicated CallTrack AVD, source/APK hashes,
+fixture cleanup and package absence. They preserve cleanup code if external fixture
+removal cannot be verified. Inspect the saved receipt before retrying a failure.
+
+```sh
+python3 scripts/run_slice_build.py --jdk /opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home --sdk .local/android-sdk
+python3 scripts/qualify_parity_emulator.py --serial emulator-5580
+python3 scripts/qualify_parity_provider.py --serial emulator-5580
+python3 scripts/qualify_parity_worker.py --serial emulator-5580
+```
+
+Use the currently verified dedicated emulator serial if it changes. The store suite
+grants no provider permissions. The provider suite uses synthetic source objects
+and real LOCAL calendar effects. The worker suite additionally requires an initially
+empty emulator call provider, seeds exact tagged synthetic rows through test-only
+shell identity and grants/revokes app READ_CALL_LOG for positive/revoked branches.
+It never uses a physical phone. Receipts are in .local/parity-evidence and
+.local/slice-evidence; committed Track4 checkpoint evidence records the exact scope.
+These commands do not qualify cloud sync, physical calls, rendered UI, reboot or
+Doze/offline acceptance. Host fault fixtures validate cleanup control flow separately.
