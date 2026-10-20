@@ -32,7 +32,7 @@ No automatic adoption of shortlisted technology, wholesale rewrite, paid service
 
 [INT-D01](decisions.md) retains existing CalendarContract coverage and defers direct
 connectors until a measured native-route gap and stable Track4 contracts justify one.
-[I01–I12](requirements.md) and the [qualification protocol](qualification.md) define
+[I01–I13](requirements.md) and the [qualification protocol](qualification.md) define
 provider-specific contracts and future end-to-end evidence. Research may close on
 this justified deferral. Provider/cloud acceptance remains unmet; no connector or
 mock prototype is selected. No app permissions or dependency changes are needed.

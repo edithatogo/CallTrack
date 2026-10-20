@@ -115,7 +115,7 @@ retaining delivery bindings. [RFC6578](https://www.rfc-editor.org/rfc/rfc6578.ht
 
 Graph SDK is MIT; Google Java client is Apache-2.0 at inspected upstream licences.
 Resolved transitive/native notices, exact auth/client compatibility, footprint and
-security advisories must be audited before adoption. dav4jvm licence must be checked
+security advisories must be audited before adoption. dav4jvm inspected main licence text is MPL-2.0; licence obligations must be checked
 at its selected revision before distribution. These are uninstalled candidates,
 not a compatible dependency lockfile. No performance or development-time gain is
 measured. No temporary dependency exists to silently become production.
@@ -131,3 +131,12 @@ Release activity indicates maintained candidate projects, not proven suitability
 this build. MSAL documentation URL initially failed; the official Android overview
 was used instead. AppAuth's latest-release URL gave no selected release; no AppAuth
 version/support assertion or dependency decision relies on it.
+
+## Original optional endpoint distinction
+
+The [baseline audit](../../research/baseline-audit.md) maps AndroidCallLogSync's
+configurable HTTP POST and Device-Name/Token/Number headers, with cleartext allowed
+in that reference. The current successor manual slice does not expose that route.
+R12 needs a selected receiver and versioned acknowledgment/idempotency contract;
+I13 defines its gates. Do not conflate endpoint success with calendar persistence,
+or preserve the old cleartext/header policy merely for feature parity.
