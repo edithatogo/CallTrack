@@ -99,3 +99,5 @@ jobs:
           rg --files app/src -g '*.kt' -0 | xargs -0 java -jar .local/toolchain/ktfmt-0.59.jar --kotlinlang-style --dry-run --set-exit-if-changed
       - name: Build and verify development slice
         run: .venv/bin/python scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"
+      - name: Compile and package unsigned release variant
+        run: sh gradlew --no-daemon --console=plain :app:assembleRelease

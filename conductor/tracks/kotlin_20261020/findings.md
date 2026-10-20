@@ -74,3 +74,12 @@ that changes persisted identity.
 Golden fixtures are captured from pre-migration Java and exercised from Java tests.
 The existing31 JVM contracts and native preserving-store tests are regression inputs,
 not proof of whole-app Kotlin migration, real calls or cloud synchronization.
+
+## Qualification refinements
+
+Release is built unsigned with minification disabled, as before. Successful release
+packaging verifies the Kotlin/D8 variant, not a shrinking/obfuscation configuration;
+qualify R8 separately if minification is enabled. Runtime graph selection is recorded
+separately from compiler/build tooling so build-only coroutines are not reported as
+new application dependencies. Primary direct tool/runtime POM declarations are in
+[tool provenance](tool-provenance.json); this does not close M4's full licence audit.

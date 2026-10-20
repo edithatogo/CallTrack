@@ -1,6 +1,6 @@
 # Kotlin pilot verification
 
-Date: 2026-10-20. Track is active, not complete. Full M5 and M4 acceptance are not
+Started2026-10-20; final qualification recorded2026-10-21. Track is active, not complete. Full M5 and M4 acceptance are not
 inferred from this pilot.
 
 ## Baseline and scope
@@ -27,5 +27,43 @@ creating a build receipt and verifies native acceptance is refused before any to
 or device access. Existing `run_slice_build.inputs()` already covers all app/src
 files, so no hash-scope weakening or new alternate native path was necessary.
 
-Full mixed-language build, graph readback and emulator regression results will be
-recorded after completion. No personal call data or calendar access is required.
+## Final bounded qualification
+
+[Source-bound evidence](pilot-evidence.json) records the exact input hashes,
+debug/test APK hashes, unsigned release hash, native methods, SDK and cleanup.
+Implementation commit7cdd8d4; app input hashes still match after commit and review.
+
+- `python3 scripts/run_slice_build.py --jdk <JDK17> --sdk .local/android-sdk`:
+  first mixed build passed in307.5s; added native regression passed packaging/lint
+  in54.4s; a Java formatter idempotence correction required the final source-bound
+  build, which passed in43.4s. Final36 JVM tests pass; debug/app-test APKs build;
+  lint has zero errors/fatal issues and30 existing warnings.
+- `sh gradlew --no-daemon --console=plain :app:assembleRelease :app:dependencies
+  --configuration releaseRuntimeClasspath buildEnvironment`: passed. Release APK
+  is unsigned and minification remains disabled; its embedded Git revision matches
+  7cdd8d4. No production-signing or R8
+  shrinking acceptance is claimed.
+- `python3 scripts/qualify_parity_emulator.py --serial emulator-5580`: five native
+  methods passed on verified dedicated API36 emulator. Tests cover synthetic source
+  cursor, schema1 preserving upgrade, committed outbox/payload clearing, transaction
+  guard and Java-era golden receipt recognition after upgrade/reopen. The last
+  scenario refuses reinsertion and preserves a human edit as REVIEW_REQUIRED.
+  Both disposable packages were uninstalled and absence read back successfully.
+- [Dependency graph](dependency-report.json):84 runtime graph modules, including
+  stdlib/common2.3.21, jdk7/jdk8 alignment modules1.8.0 and existing app coroutines1.6.1.
+  Build-tool coroutines1.9.0 belongs to the compiler graph, not the app. No SBOM or
+  transitive licence audit is inferred from the report.
+- `javap -public` confirmed original constructors, primitive/public final fields
+  and Java static entry points; Java reflection/golden tests cover that contract.
+- Final20 host tests pass, including refusal of Kotlin-stale receipts before any
+  device operation. Source/graph/link, private-source and formatter checks pass.
+  CI now includes unsigned release packaging and scans all Kotlin roots; no hosted
+  CI execution is claimed.
+
+No call/calendar permission was granted and no personal source or actual calendar
+was read/written in this native run. The calendar sink in the upgrade test is a
+synthetic port; SQLite is native. This is not a real app-package version update,
+provider/calendar persistence test, physical call or remote account acceptance.
+Remaining21 Java files and M4/full-M5 upgrade/recovery gates stay open. Restoring
+Java code/build settings is a development code rollback only; no installed-user
+app downgrade or data reset was performed.
