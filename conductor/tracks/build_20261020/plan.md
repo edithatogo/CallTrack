@@ -1,6 +1,6 @@
 # Plan: Fork feasibility and build qualification
 
-Build qualification, exact-artifact native checks and review fixes verified; archive/checkpoint finalisation follows. Application parity is outside this track.
+Build qualification, exact-artifact native checks and review fixes verified; completed track is ready for archival. Application parity is outside this track.
 
 ## Phase 1: Discovery and mapping
 
@@ -39,9 +39,11 @@ Build qualification, exact-artifact native checks and review fixes verified; arc
 
 ## Phase: Review Fixes
 
-- [~] Task: Resolve skipped Fragment lint/transitive mismatch, checksum/artifact identity and cleanup reporting; validate final source/artifact and archive continuity
+- [x] Task: Resolve skipped Fragment lint/transitive mismatch, checksum/artifact identity and cleanup reporting; validate final source/artifact and archive continuity bae7121
 
 ## Commit history
 
 - 2c3964a: track start.
 - eec3a32: qualification implementation, tests, prepared CI and research decisions.
+
+Review/verification checkpoint: bae7121. All four phase outputs and final source/device receipts verified; archive links receive a final post-move check.

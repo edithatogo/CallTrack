@@ -3,7 +3,7 @@
 Remaining active tracks are planned, not implemented. Track 1 is complete and archived. Discovery deliverables are required work within each track; earlier research is input to refresh. Later implementation phases are conditional on track findings. See [workflow](workflow.md).
 
 ---
-- [~] **Track: Fork feasibility and build qualification** (M1)
+- [x] **Track: Fork feasibility and build qualification** (M1)
   *Link: [Track](tracks/build_20261020/index.md)*
 
 ---
