@@ -29,7 +29,7 @@ data survives closing it; retained preview state is deliberately ephemeral.
 
 Pinned trial: Kotlin/JVM and Compose compiler2.3.21, Compose plugin/Material2 1.10.3,
 JDK17, existing Gradle8.13 wrapper, JUnit4.13.2. Newer framework releases are research
-inputs in the [track](../../conductor/tracks/multiplatform_ui_20261020/index.md),
+inputs in the [track](../../conductor/archive/multiplatform_ui_20261020/index.md),
 not automatically selected. Use the project's ktfmt0.59 Kotlin style check.
 The root app and prototype have separate dependency graphs.
 
