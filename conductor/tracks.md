@@ -3,7 +3,7 @@
 Remaining active tracks are planned, not implemented. Tracks 1–3 are complete and archived. Discovery deliverables are required work within each track; earlier research is input to refresh. Later implementation phases are conditional on track findings. See [workflow](workflow.md).
 
 ---
-- [ ] **Track: Parity and durable synchronisation** (M3)
+- [~] **Track: Parity and durable synchronisation** (M3)
   *Link: [Track](tracks/parity_20261020/index.md)*
 
 ---
