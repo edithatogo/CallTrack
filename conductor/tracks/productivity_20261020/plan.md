@@ -35,3 +35,9 @@ Research completed with justified implementation deferral. Candidate ordering is
 - `1f3b07c`: activate research track.
 - [~] Formal review, host/link/source verification and archive.
 - User priorities remain optional input; no answer is taken as validation.
+
+- `caf5fb4`: feature mapping, research and justified implementation deferral.
+
+## Phase: Review Fixes
+
+- [~] Add restore receipt trust/reconciliation contracts and final validation.

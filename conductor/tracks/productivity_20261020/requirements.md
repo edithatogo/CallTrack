@@ -50,3 +50,18 @@ Structured time reports, if later selected, should first evaluate maintained Wor
 templates and the user's preferred SharePoint structured-document route. Record
 selection and calculations stay in authoritative data layers. This research creates
 repository requirements, not a new report generator or tenant workflow.
+
+## Restore trust and receipt reconciliation
+
+Imported records are untrusted input even when syntactically valid. Validate schema,
+size, provenance and record identity before a transactional staged merge. Exported
+receipt IDs/hashes are historical evidence, not authority to mark remote delivery
+confirmed, suppress a new source call, overwrite an event or adopt foreign content.
+Keep imported delivery bindings inactive until the selected destination/account is
+explicitly rebound and ownership/readback reconciles; ambiguity remains review.
+
+Tests must include forged/conflicting receipt IDs, another installation's namespace,
+reused local calendar IDs, deleted/edited remote events and a second import of the
+same archive with divergent annotations. Preserve both authored versions for review
+and roll back interrupted local merge without auto-replay, notifications or remote
+cleanup. Authentication/encryption of an archive does not prove current remote state.
