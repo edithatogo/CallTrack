@@ -2,7 +2,7 @@
 
 ## Observed baseline
 
-Reference only: AndroidCallLogSync is Java/XML, AndroidX/View Binding/WorkManager, target SDK 32, AGP 7.2.2 at the pinned revision in the [audit](research/baseline-audit.md). No application source has been adopted into this root. These versions are not endorsed for the successor.
+Reference only: AndroidCallLogSync is Java/XML, AndroidX/View Binding/WorkManager, target SDK 32, AGP 7.2.2 at the pinned revision in the [audit](research/baseline-audit.md). Track 3 adopts the audited fork into the root app workspace with the qualified modern build configuration. These versions are not endorsed for the successor.
 
 ## Direction
 
@@ -25,3 +25,7 @@ Update this file when a dependency is actually selected, including track/decisio
 Proceed with a local fork of the audited AndroidCallLogSync revision. Preserve the reference and prepare an isolated modern candidate using [build scripts](../qualification/README.md). AGP8.13.2/Gradle8.13/JDK17/compile-target36/build-tools35.0.0 is the selected development baseline; Fragment1.5.1 and ViewModel KTX2.5.1 are interim compatibility overrides subject to the build-track verification record. Original AGP7.2.2/JDK11/SDK32 is a reference reproducer only.
 
 This does not adopt all old runtime dependencies for the long term. Kotlin/Compose/KMP/Rust research remains owned by the later tracks. Local debug signing and disposable test IDs are qualified; public identity, release signing and distribution remain unqualified. See [build findings](archive/build_20261020/findings.md) and [decisions](archive/build_20261020/decisions.md).
+
+## Track 3 implementation decision
+
+Native Android CalendarContract/CallLog provider adapters and a small SQLiteOpenHelper ledger are selected for the initial manual vertical slice. Pure Java mapping/ports stay independent of Android for later Kotlin migration. No new runtime framework is added; provider wrappers and richer persistence libraries are reassessed when they address a demonstrated need. New development app ID is org.calltrack.community.dev.

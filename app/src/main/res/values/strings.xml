@@ -1,0 +1,72 @@
+<resources>
+    <string name="app_name">Call Log Sync</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_log">Sync Log</string>
+    <string name="action_about">About</string>
+    <string name="sync_active">Sync Active</string>
+    <string name="last_sync">Last sync: %1$s at %2$s</string>
+    <string name="sync_info">Go to settings, setup an remote endpoint for the call log and enable sync.</string>
+    <string name="sync_button">Sync NOW</string>
+
+    <string name="main_fragment_label">Call Log Sync</string>
+    <string name="settings_fragment_label">Settings</string>
+    <string name="log_fragment_label">Sync Log</string>
+
+    <string name="call_log_required">Access to call log required</string>
+    <string name="sync_success">Synced %1$d entries from the call log.</string>
+    <string name="sync_nothing">Sync: no new entries in the call log.</string>
+    <string name="sync_failure">Sync failed: %1$s (%2$d).</string>
+    <string name="sync_exception">Sync exception: %1$s</string>
+
+    <string name="sync_header">Sync</string>
+    <string name="sync_alert_failed">Sync failure</string>
+    <string name="sync_alert_success">Sync success</string>
+    <string name="ok">OK</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <string name="setup_title">Setup remote endpoint</string>
+    <string name="setup_info">Learn to setup a remote endpoint</string>
+    <string name="endpoint_title">Remote endpoint</string>
+    <string name="sync_title">Enable Sync</string>
+    <string name="invalid_endpoint">Invalid remote endpoint. Must start with http(s)://</string>
+    <string name="no_endpoint">No remote endpoint set</string>
+    <string name="testing_endpoint">Sending random call log to remote endpoint</string>
+    <string name="test_title">Test remote endpoint</string>
+    <string name="test_info">Send random call log to remote endpoint</string>
+
+    <string name="device_header">Phone</string>
+    <string name="name_title">Phone Name</string>
+    <string name="token_title">Phone Token</string>
+    <string name="number_title">Phone Number</string>
+    <string name="token_copied">Phone Token copied to clipboard</string>
+    <string name="last_id_title">Last transmitted call log id</string>
+
+    <string name="reset_header">Settings</string>
+    <string name="device_lock">Lock Settings</string>
+    <string name="device_lock_info">All settings are locked and can no longer be changed. Only a reset is still possible.</string>
+    <string name="device_reset">Reset Settings</string>
+    <string name="reset_info">This will reset all sync settings to their initial values. New device token will be generated.</string>
+    <string name="reset_info2">Are you sure you want to reset all sync settings?</string>
+
+    <string name="batteryopt">Please disable battery optimization.</string>
+    <string name="restrictopt">Please disable "Pause app activity if unused".</string>
+
+    <string name="slice_intro" translatable="false">CallTrack development slice. Choose a calendar, then explicitly log the latest call. Automatic logging is not enabled. Calendar providers may sync saved events to their accounts.</string>
+    <string name="slice_calendar_access" translatable="false">Allow calendar access / refresh calendars</string>
+    <string name="slice_choose" translatable="false">Choose a destination calendar</string>
+    <string name="slice_log_latest" translatable="false">Log latest call</string>
+    <string name="slice_permission_needed" translatable="false">Calendar and call-log access are required for this action.</string>
+    <string name="slice_working" translatable="false">Saving and checking the event…</string>
+    <string name="slice_no_calendars" translatable="false">No visible writable calendars are available. Configure one in your calendar app, then refresh.</string>
+    <string name="slice_ready" translatable="false">Choose a calendar before logging a call.</string>
+    <string name="slice_calendar_unavailable" translatable="false">The calendar is unavailable. Refresh and choose a destination; no fallback calendar is used.</string>
+    <string name="slice_tap_again" translatable="false">If access was granted, tap Log latest call again when ready. No call has been read automatically.</string>
+    <string name="slice_saved" translatable="false">Event saved and read back successfully.</string>
+    <string name="slice_already" translatable="false">This call is already logged in this calendar.</string>
+    <string name="slice_recovered" translatable="false">Recovered an existing event without creating a duplicate.</string>
+    <string name="slice_no_call" translatable="false">No call is available.</string>
+    <string name="slice_review" translatable="false">An existing event or source has changed. Review is required; no existing event was overwritten.</string>
+    <string name="slice_invalid" translatable="false">The call contains invalid time or duration data.</string>
+    <string name="slice_failed" translatable="false">The operation could not be verified. Retry can reconcile an existing event; check the calendar before further action.</string>
+</resources>
