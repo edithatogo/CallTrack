@@ -184,4 +184,101 @@ public class HistoricalImportStoreTest {
             assertTrue(context().deleteDatabase(name));
         }
     }
+
+    @Test
+    public void schemaOneMigrationPreservesAggregateProgressWithoutInventingOutcomes() {
+        String name = fixture() + ".db";
+        String ledgerName = fixture() + "-ledger.db";
+        Source source = new Source();
+        source.rows.put(0L, row(0));
+        source.rows.put(1L, row(1));
+        Sink sink = new Sink();
+        String id;
+        try {
+            try (SqliteImportStore imports = new SqliteImportStore(context(), name);
+                    SqliteLedger ledger = new SqliteLedger(context(), ledgerName)) {
+                HistoricalImport importer =
+                        new HistoricalImport(
+                                imports,
+                                source,
+                                ledger.outbox(),
+                                new DurableDelivery(ledger.outbox(), sink));
+                id = importer.start(7, "UTC", 0, 2000, true, true, true).id;
+                importer.preview(id, 4);
+                importer.confirm(id);
+                importer.deliver(id, 1);
+                assertEquals(
+                        DurableDelivery.Result.SAVED, imports.candidates(id, -1, 4).get(0).outcome);
+                imports.getWritableDatabase().execSQL("ALTER TABLE candidates DROP COLUMN outcome");
+                imports.getWritableDatabase().setVersion(1);
+            }
+            try (SqliteImportStore imports = new SqliteImportStore(context(), name);
+                    SqliteLedger ledger = new SqliteLedger(context(), ledgerName)) {
+                assertEquals(2, imports.getReadableDatabase().getVersion());
+                assertEquals(1, imports.get(id).saved);
+                assertNull(imports.candidates(id, -1, 4).get(0).outcome);
+                assertNull(imports.candidates(id, -1, 4).get(1).outcome);
+                source.rows.remove(1L);
+                HistoricalImport importer =
+                        new HistoricalImport(
+                                imports,
+                                source,
+                                ledger.outbox(),
+                                new DurableDelivery(ledger.outbox(), sink));
+                importer.deliver(id, 4);
+                assertEquals(1, imports.get(id).saved);
+                assertEquals(1, imports.get(id).review);
+                assertEquals(
+                        DurableDelivery.Result.SOURCE_CHANGED,
+                        imports.candidates(id, -1, 4).get(1).outcome);
+                assertEquals(1, sink.inserts);
+            }
+        } finally {
+            assertTrue(context().deleteDatabase(name));
+            assertTrue(context().deleteDatabase(ledgerName));
+        }
+    }
+
+    @Test
+    public void failedOutcomeProgressCommitRollsBackBothRecords() {
+        String name = fixture() + ".db";
+        Source source = new Source();
+        source.rows.put(0L, row(0));
+        try (SqliteImportStore imports = new SqliteImportStore(context(), name)) {
+            HistoricalImport importer = new HistoricalImport(imports, source, null, null);
+            String id = importer.start(7, "UTC", 0, 2000, true, true, true).id;
+            importer.preview(id, 4);
+            importer.confirm(id);
+            HistoricalImport.Session before = imports.get(id);
+            HistoricalImport.Session next =
+                    before.next(
+                            HistoricalImport.Phase.COMPLETE,
+                            before.checkpoint,
+                            before.count,
+                            0,
+                            1,
+                            0,
+                            null);
+            HistoricalImport.Candidate candidate = imports.candidates(id, -1, 1).get(0);
+            imports.getWritableDatabase()
+                    .execSQL(
+                            "CREATE TRIGGER fail_outcome_fixture BEFORE UPDATE ON sessions BEGIN"
+                                    + " SELECT RAISE(ABORT,'fixture'); END");
+            try {
+                imports.finish(before, next, candidate, DurableDelivery.Result.SAVED);
+                fail("Progress must fail");
+            } catch (android.database.SQLException expected) {
+            }
+            assertNull(imports.candidates(id, -1, 1).get(0).outcome);
+            assertEquals(-1, imports.get(id).processedId);
+            assertEquals(before.revision, imports.get(id).revision);
+            imports.getWritableDatabase().execSQL("DROP TRIGGER fail_outcome_fixture");
+            imports.finish(before, next, candidate, DurableDelivery.Result.SAVED);
+            assertEquals(1, imports.get(id).saved);
+            assertEquals(
+                    DurableDelivery.Result.SAVED, imports.candidates(id, -1, 1).get(0).outcome);
+        } finally {
+            assertTrue(context().deleteDatabase(name));
+        }
+    }
 }

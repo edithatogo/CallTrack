@@ -151,3 +151,18 @@ port here; no real CalendarContract/import UI/process-kill acceptance inferred.
 Next: per-candidate review details and permission/recovery tests, read-only legacy
 matcher, qualified scheduling and user settings/import/status controls, then full
 emulator acceptance and final review/fixes/archive. P07 is not closed by this core.
+
+
+## Candidate outcome checkpoint
+
+Import schema2 persists per-candidate result codes atomically with session progress.
+Schema1 migration preserves totals/progress and leaves individual legacy outcomes
+unknown. A new test-first denied-source regression verifies permission outcome,
+unchanged progress and successful retry. Two native tests verify preserving schema1
+migration and rollback of both outcome/progress after injected session-update failure.
+Full source-bound debug build66 JVM tests/APKs/lint and25 host tests pass;21 API36
+native checks pass and packages are removed. Exact inputs/debug artifacts/native
+outputs in import-outcome-evidence.json. Actual CallLog permission revocation,
+CalendarContract delivery and outcome UI remain unqualified. Next implement read-only
+legacy matching, qualified scheduling, user controls/status/import/review flows and
+complete native acceptance. Final full-track review/fixes/archive remain required.

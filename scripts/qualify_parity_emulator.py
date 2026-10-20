@@ -72,6 +72,8 @@ def qualify(serial):
             attempted.append(package)
             if 'Success' not in command('install', str(apk)):
                 raise RuntimeError('Install not confirmed')
+        check('HistoricalImportStoreTest', 'schemaOneMigrationPreservesAggregateProgressWithoutInventingOutcomes')
+        check('HistoricalImportStoreTest', 'failedOutcomeProgressCommitRollsBackBothRecords')
         check('HistoricalImportStoreTest', 'frozenPreviewAndPartialDeliverySurviveReopenAndRepeatWithoutDuplicate')
         check('HistoricalImportStoreTest', 'failedCandidateAppendRollsBackPreviewAndStaleRevisionIsRejected')
         check('ActivationStoreTest', 'activationAndPauseCommitToDiskAndRejectOldGeneration')

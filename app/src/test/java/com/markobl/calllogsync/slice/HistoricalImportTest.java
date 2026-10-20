@@ -34,6 +34,23 @@ public class HistoricalImportTest {
             value = next;
         }
 
+        public void finish(
+                HistoricalImport.Session expected,
+                HistoricalImport.Session next,
+                HistoricalImport.Candidate candidate,
+                DurableDelivery.Result outcome) {
+            save(expected, next, java.util.Collections.emptyList());
+            for (int i = 0; i < rows.size(); i++)
+                if (rows.get(i).sourceId == candidate.sourceId) {
+                    rows.set(
+                            i,
+                            new HistoricalImport.Candidate(
+                                    candidate.sourceId, candidate.key, candidate.binding, outcome));
+                    return;
+                }
+            throw new IllegalStateException("Missing candidate");
+        }
+
         public List<HistoricalImport.Candidate> candidates(String id, long after, int limit) {
             List<HistoricalImport.Candidate> page = new ArrayList<>();
             for (HistoricalImport.Candidate row : rows)
@@ -108,5 +125,56 @@ public class HistoricalImportTest {
         importer.deliver(id, 4);
         assertEquals(1, sink.inserts);
         assertEquals(HistoricalImport.Phase.CANCELLED, store.value.phase);
+    }
+
+    @Test
+    public void sourcePermissionFailureRemainsPendingAndRecordedOutcomeCanRecover() {
+        Store store = new Store();
+        PagedCallsTest.Source source =
+                new PagedCallsTest.Source() {
+                    boolean denied;
+
+                    @Override
+                    public CallRecord at(long id) {
+                        if (denied) throw new SecurityException("fixture");
+                        return super.at(id);
+                    }
+                };
+        source.rows.put(1L, PagedCallsTest.row(1, 1));
+        SliceTest.Sink sink = new SliceTest.Sink();
+        DurableDeliveryTest.Store receipts = new DurableDeliveryTest.Store();
+        HistoricalImport importer =
+                new HistoricalImport(store, source, receipts, new DurableDelivery(receipts, sink));
+        String id = importer.start(7, "UTC", 0, 2000, true, true, true).id;
+        importer.preview(id, 4);
+        importer.confirm(id);
+        // A denied source port must leave the candidate available to retry.
+        PagedCalls.Source denied =
+                new PagedCalls.Source() {
+                    public String namespace() {
+                        return "fixture";
+                    }
+
+                    public CallRecord upper() {
+                        return source.upper();
+                    }
+
+                    public CallRecord at(long key) {
+                        throw new SecurityException("fixture");
+                    }
+
+                    public java.util.List<CallRecord> page(long a, long b, int c) {
+                        return source.page(a, b, c);
+                    }
+                };
+        HistoricalImport blocked =
+                new HistoricalImport(store, denied, receipts, new DurableDelivery(receipts, sink));
+        assertEquals(DurableDelivery.Result.PERMISSION_REQUIRED, blocked.deliver(id, 4).stopped);
+        assertEquals(-1, store.value.processedId);
+        assertEquals(0, sink.inserts);
+        assertEquals(DurableDelivery.Result.PERMISSION_REQUIRED, store.rows.get(0).outcome);
+        importer.deliver(id, 4);
+        assertEquals(1, sink.inserts);
+        assertEquals(DurableDelivery.Result.SAVED, store.rows.get(0).outcome);
     }
 }

@@ -20,7 +20,7 @@ public final class SqliteImportStore extends SQLiteOpenHelper implements Histori
     }
 
     public SqliteImportStore(Context context, String name) {
-        super(context, name, null, 1);
+        super(context, name, null, 2);
     }
 
     @Override
@@ -35,13 +35,16 @@ public final class SqliteImportStore extends SQLiteOpenHelper implements Histori
                         + " body TEXT NOT NULL)");
         db.execSQL(
                 "CREATE TABLE candidates (session TEXT NOT NULL REFERENCES sessions(id), source_id"
-                    + " INTEGER NOT NULL, source_key TEXT NOT NULL, binding TEXT NOT NULL, PRIMARY"
-                    + " KEY(session,source_id))");
+                    + " INTEGER NOT NULL, source_key TEXT NOT NULL, binding TEXT NOT NULL, outcome"
+                    + " TEXT, PRIMARY KEY(session,source_id))");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        throw new IllegalStateException("Preserving import migration required");
+        if (oldVersion != 1 || newVersion != 2)
+            throw new IllegalStateException("Preserving import migration required");
+        // Existing aggregated progress cannot prove individual outcomes. Preserve null as unknown.
+        db.execSQL("ALTER TABLE candidates ADD COLUMN outcome TEXT");
     }
 
     @Override
@@ -85,7 +88,31 @@ public final class SqliteImportStore extends SQLiteOpenHelper implements Histori
             HistoricalImport.Session expected,
             HistoricalImport.Session next,
             List<HistoricalImport.Candidate> added) {
+        update(expected, next, added, null, null);
+    }
+
+    @Override
+    public void finish(
+            HistoricalImport.Session expected,
+            HistoricalImport.Session next,
+            HistoricalImport.Candidate candidate,
+            DurableDelivery.Result outcome) {
+        if (candidate == null
+                || outcome == null
+                || expected.phase != HistoricalImport.Phase.CONFIRMED)
+            throw new IllegalArgumentException("Invalid candidate result");
+        update(expected, next, java.util.Collections.emptyList(), candidate, outcome);
+    }
+
+    private void update(
+            HistoricalImport.Session expected,
+            HistoricalImport.Session next,
+            List<HistoricalImport.Candidate> added,
+            HistoricalImport.Candidate handled,
+            DurableDelivery.Result outcome) {
         validate(expected, next, added);
+        if (handled == null && next.processedId != expected.processedId)
+            throw new IllegalArgumentException("Candidate outcome required for progress");
         SQLiteDatabase db = getWritableDatabase();
         if (db.inTransaction())
             throw new IllegalStateException("Import progress must commit independently");
@@ -101,6 +128,40 @@ public final class SqliteImportStore extends SQLiteOpenHelper implements Histori
                 row.put("source_key", candidate.key);
                 row.put("binding", candidate.binding);
                 db.insertOrThrow("candidates", null, row);
+            }
+            if (handled != null) {
+                List<HistoricalImport.Candidate> pending =
+                        candidates(expected.id, expected.processedId, 1);
+                if (pending.isEmpty()
+                        || pending.get(0).sourceId != handled.sourceId
+                        || !pending.get(0).key.equals(handled.key)
+                        || !pending.get(0).binding.equals(handled.binding))
+                    throw new IllegalStateException("Candidate changed before result");
+                boolean terminal =
+                        outcome == DurableDelivery.Result.SAVED
+                                || outcome == DurableDelivery.Result.RECOVERED
+                                || outcome == DurableDelivery.Result.ALREADY_LOGGED
+                                || outcome == DurableDelivery.Result.REVIEW_REQUIRED
+                                || outcome == DurableDelivery.Result.SOURCE_CHANGED;
+                if (terminal
+                        ? next.processedId != handled.sourceId
+                        : next.processedId != expected.processedId)
+                    throw new IllegalArgumentException("Outcome disagrees with progress");
+                boolean verified =
+                        outcome == DurableDelivery.Result.SAVED
+                                || outcome == DurableDelivery.Result.RECOVERED
+                                || outcome == DurableDelivery.Result.ALREADY_LOGGED;
+                if (next.saved != expected.saved + (verified ? 1 : 0)
+                        || next.review != expected.review + (terminal && !verified ? 1 : 0))
+                    throw new IllegalArgumentException("Outcome disagrees with counts");
+                ContentValues result = new ContentValues();
+                result.put("outcome", outcome.name());
+                if (db.update(
+                                "candidates",
+                                result,
+                                "session=? AND source_id=?",
+                                new String[] {expected.id, Long.toString(handled.sourceId)})
+                        != 1) throw new IllegalStateException("Candidate outcome not stored");
             }
             ContentValues values = new ContentValues();
             values.put("revision", next.revision);
@@ -126,7 +187,7 @@ public final class SqliteImportStore extends SQLiteOpenHelper implements Histori
                 getReadableDatabase()
                         .query(
                                 "candidates",
-                                new String[] {"source_id", "source_key", "binding"},
+                                new String[] {"source_id", "source_key", "binding", "outcome"},
                                 "session=? AND source_id>?",
                                 new String[] {id, Long.toString(after)},
                                 null,
@@ -136,7 +197,12 @@ public final class SqliteImportStore extends SQLiteOpenHelper implements Histori
             while (c.moveToNext())
                 rows.add(
                         new HistoricalImport.Candidate(
-                                c.getLong(0), c.getString(1), c.getString(2)));
+                                c.getLong(0),
+                                c.getString(1),
+                                c.getString(2),
+                                c.isNull(3)
+                                        ? null
+                                        : DurableDelivery.Result.valueOf(c.getString(3))));
         }
         return java.util.Collections.unmodifiableList(rows);
     }
@@ -215,7 +281,9 @@ public final class SqliteImportStore extends SQLiteOpenHelper implements Histori
         }
         long previous = old.checkpoint.lastId;
         for (HistoricalImport.Candidate candidate : added) {
-            if (candidate.sourceId <= previous || candidate.sourceId > next.checkpoint.lastId)
+            if (candidate.outcome != null
+                    || candidate.sourceId <= previous
+                    || candidate.sourceId > next.checkpoint.lastId)
                 throw new IllegalArgumentException("Invalid candidate order");
             previous = candidate.sourceId;
         }
