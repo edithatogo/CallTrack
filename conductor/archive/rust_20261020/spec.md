@@ -14,7 +14,7 @@ Adopt/retain/reject/defer decision based on contracts, packaging and material be
 
 ## Inputs and dependencies
 
-Prerequisites: [build](../../archive/build_20261020/index.md). Requirement references: R26 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
+Prerequisites: [build](../build_20261020/index.md). Requirement references: R26 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
 
 ## Required outputs
 

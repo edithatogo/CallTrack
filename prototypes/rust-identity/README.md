@@ -31,7 +31,7 @@ sha2 declares minimum1.88, which was not independently tested here. Release/MSRV
 licence/notice/security and native ABI support must be rechecked before any adoption.
 The project itself follows the root GPLv3 licence; dependency terms remain separate.
 
-[Track decision](../../conductor/tracks/rust_20261020/decisions.md) retains Kotlin and
+[Track decision](../../conductor/archive/rust_20261020/decisions.md) retains Kotlin and
 defers production Rust. Revisit on a demonstrated consumer/performance need; retire
 both isolated experiments/build outputs if no longer useful. No global cache or
 Android app cleanup/migration is needed.
