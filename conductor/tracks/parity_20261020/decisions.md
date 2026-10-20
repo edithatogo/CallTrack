@@ -224,3 +224,47 @@ artifact/AAR compatibility and transitive graph must be checked with builds/nati
 work tests. Experimental analytics/listener APIs are unnecessary for initial delivery.
 Compare stability/recovery fixes, graph cost and existing WorkManager integration;
 retain existing working app until replacement scheduling and recovery are proven.
+
+
+## WORK-D01 — WorkManager development upgrade and durable worker
+
+- Owner/date: Track4,2026-10-21; requirements P01/P02/P04/P08/P09.
+- Existing: WorkManager2.7.1 plus legacy SyncWorker tied to network connectivity,
+  old configuration/source checkpoint and unqualified recovery. Legacy UI/worker
+  remain isolated; the new durable path uses distinct work names and activation.
+- Options: retain2.7.1, implement JobScheduler directly, upgrade existing WorkManager,
+  or defer. Direct JobScheduler would duplicate persistence/retry/reboot plumbing;
+  keeping the old dependency leaves current-platform behavior unqualified.
+- Candidate: work-runtime2.12.0, Apache2.0, official release2026-09-23. Actual AAR
+  metadata requires compileSdk35/AGP8.6/minSdk24; current36/8.13.2/26 passes. No
+  work-analytics/experimental hooks, KTX, multiprocess or testing helper added.
+- Role/decision: upgrade the development dependency and qualify new AutomaticLogWorker;
+  retain full production scheduling/reboot/Doze/native-delivery gates. This is not a
+  public release or proof of operational latency. Official source:
+  [release notes](https://developer.android.com/jetpack/androidx/releases/work#2.12.0).
+- Graph cost:91 observed runtime coordinates/47 graph changes vs baseline, including
+  WorkManager-internal Room2.7.0, SQLite and coroutines1.9.0; this does not migrate
+  app-owned ledgers to Room or adopt coroutine APIs in app code. POM/parent licences,
+  exact artifact hashes, graph delta and manifest permissions are in
+  work-dependency-report.json. Dependency reports are not a vulnerability audit.
+- Implementation: one worker reads the current persisted activation and requires
+  matching input generation, recovers pending intents, processes at most8 pages of50,
+  and respects system stop through final delivery authorization. Transient failure
+  has bounded retries; permission/review stops await another wake. Nonpersonal
+  generation/timestamp/result/count status distinguishes execution from receipts.
+- Scheduling: ordinary one-shot work with2-second settling delay, unique append-or-
+  replace chain per generation, plus15-minute periodic recovery using UPDATE. No
+  network constraint. Pause persists before cancelling the app's tagged work.
+  Protected phone-IDLE/boot/package-replaced signals only enqueue enabled settings;
+  number extras are never read. READ_PHONE_STATE is declared but not granted by code.
+  UI activation/reopen hooks remain the next integration; no settings are implicitly enabled.
+- Security/privacy: no INTERNET permission in merged manifest. WorkManager contributes
+  wake-lock/network-state/boot/foreground-service declarations; no foreground work is
+  requested. The app's signature-only dynamic-receiver permission is transitive.
+- Migration/rollback: settings and receipt formats remain unchanged; WorkManager owns
+  its upgraded database. Do not downgrade that database in place. Development fixture
+  uninstall removes scheduler state; any production downgrade requires separate
+  qualification while preserving outbox/import data. No clearing app data to roll back.
+- Promotion/expiry: retain this candidate only if real worker-to-provider delivery,
+  paused/stale generations, process/reboot/reopen/offline/Doze, fixture cleanup and
+  package upgrade preserve progress. Reassess graph size/failures at full acceptance.

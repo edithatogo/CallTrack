@@ -31,10 +31,17 @@ public final class AutomaticDelivery {
     }
 
     public ScanDelivery.Batch run(ActivationControl.Settings worker, int limit) {
+        return run(worker, limit, () -> true);
+    }
+
+    public ScanDelivery.Batch run(
+            ActivationControl.Settings worker,
+            int limit,
+            java.util.function.BooleanSupplier running) {
         if (limit < 1 || limit > 500) throw new IllegalArgumentException("Invalid page limit");
         synchronized (DurableDelivery.DELIVERY_LOCK) {
             try {
-                if (!activation.allowed(worker)) return stopped(DurableDelivery.Result.PAUSED);
+                if (!permitted(worker, running)) return stopped(DurableDelivery.Result.PAUSED);
                 java.util.List<String> pending =
                         progress.pending(worker.operation(), worker.calendar, limit);
                 if (pending == null
@@ -51,7 +58,7 @@ public final class AutomaticDelivery {
                                         key,
                                         worker.calendar,
                                         worker.operation(),
-                                        () -> activation.allowed(worker));
+                                        () -> permitted(worker, running));
                         switch (result) {
                             case SAVED:
                             case RECOVERED:
@@ -75,7 +82,7 @@ public final class AutomaticDelivery {
                 PagedCalls.Checkpoint checkpoint = progress.get(worker.operation());
                 if (checkpoint != null && checkpoint.lastId == checkpoint.upperId) {
                     PagedCalls.Checkpoint next = PagedCalls.extend(source, checkpoint);
-                    if (!activation.allowed(worker)) return stopped(DurableDelivery.Result.PAUSED);
+                    if (!permitted(worker, running)) return stopped(DurableDelivery.Result.PAUSED);
                     progress.rollover(worker.operation(), checkpoint, next);
                 }
                 return scan.run(
@@ -84,7 +91,7 @@ public final class AutomaticDelivery {
                         worker.calendar,
                         worker.timezone,
                         limit,
-                        () -> activation.allowed(worker));
+                        () -> permitted(worker, running));
             } catch (PagedCalls.SourceChanged changed) {
                 return stopped(DurableDelivery.Result.SOURCE_CHANGED);
             } catch (SecurityException denied) {
@@ -93,6 +100,11 @@ public final class AutomaticDelivery {
                 return stopped(DurableDelivery.Result.FAILED);
             }
         }
+    }
+
+    private boolean permitted(
+            ActivationControl.Settings worker, java.util.function.BooleanSupplier running) {
+        return running.getAsBoolean() && activation.allowed(worker);
     }
 
     private static ScanDelivery.Batch stopped(DurableDelivery.Result result) {

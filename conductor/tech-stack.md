@@ -53,3 +53,15 @@ Retain Views in the working app; no Compose runtime adoption or legacy UI remova
 is approved by this experiment. Revisit after stable M3/M5 state contracts, refreshed
 compatibility and real screen/manual accessibility acceptance. Prototype tools can
 be retired independently; no application data/code rollback is needed.
+
+
+## Track4 development scheduling checkpoint
+
+[WORK-D01](tracks/parity_20261020/decisions.md) upgrades the existing WorkManager
+runtime2.7.1 to2.12.0 for the bounded durable worker. Actual AAR metadata, debug
+build and disabled/stale native worker branches pass; full positive scheduling/
+reboot/Doze/provider/UI acceptance remains pending. Transitive Room2.7.0 and
+coroutines1.9.0 are framework internals; app-owned ledgers remain SQLiteOpenHelper
+and no new app coroutine/Room API adoption occurs. No experimental WorkManager
+analytics or test helper dependency is added. See graph/licence/artifact inventory
+in work-dependency-report.json under Track4; no public release claim follows.

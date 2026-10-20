@@ -117,4 +117,31 @@ public class AutomaticDeliveryTest {
         assertEquals(1, sink.inserts);
         assertEquals(DurableDelivery.State.CONFIRMED, store.get(call.key(), 7).state);
     }
+
+    @Test
+    public void workerStopAfterIntentCommitPreventsProviderInsertion() {
+        ActivationControl control = new ActivationControl(new ActivationControlTest.Store());
+        ActivationControl.Settings settings = control.activate(7, "UTC", 1000, true, true, true);
+        java.util.concurrent.atomic.AtomicBoolean running =
+                new java.util.concurrent.atomic.AtomicBoolean(true);
+        DurableDeliveryTest.Store receipts =
+                new DurableDeliveryTest.Store() {
+                    @Override
+                    public void put(DurableDelivery.Intent intent) {
+                        super.put(intent);
+                        if (intent.state == DurableDelivery.State.READY) running.set(false);
+                    }
+                };
+        PagedCallsTest.Source source = new PagedCallsTest.Source();
+        source.rows.put(1L, PagedCallsTest.row(1, 1));
+        SliceTest.Sink sink = new SliceTest.Sink();
+        Progress progress = new Progress();
+        AutomaticDelivery runner =
+                new AutomaticDelivery(
+                        control, source, progress, new DurableDelivery(receipts, sink));
+        assertEquals(DurableDelivery.Result.PAUSED, runner.run(settings, 4, running::get).stopped);
+        assertEquals(0, sink.inserts);
+        assertEquals(-1, progress.value.lastId);
+        assertEquals(DurableDelivery.State.READY, receipts.get(source.rows.get(1L).key(), 7).state);
+    }
 }
