@@ -1,7 +1,7 @@
 {
   "track_id": "calendar_slice_20261020",
   "type": "research-led-development",
-  "status": "in_progress",
+  "status": "completed",
   "milestone": "M2",
   "created_at": "2026-10-20",
   "updated_at": "2026-10-20",
@@ -9,5 +9,12 @@
     "build_20261020"
   ],
   "requirements": "R02\u2013R04, R08, R10, R19",
-  "implementation_status": "conditional-not-started"
+  "implementation_status": "qualified-manual-local-provider-slice",
+  "implementation_commit": "b2e105d",
+  "review_status": "passed-with-fixes",
+  "review_fix_commits": [
+    "66ca1e7",
+    "a7e54a5"
+  ],
+  "completed_at": "2026-10-20"
 }

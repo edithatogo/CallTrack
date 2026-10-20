@@ -1,6 +1,6 @@
 # Call-to-calendar vertical slice
 
-Milestone: M2. Type: research-led development. Status: implementation in progress; bounded manual slice selected.
+Milestone: M2. Type: research-led development. Status: completed, reviewed with fixes and natively verified; bounded manual slice.
 
 ## Objective
 
