@@ -366,3 +366,6 @@ packages removed. Lint0 errors/32 warnings/5 hints. This injects an uncertain ou
 using real Android preferences; it does not prove physical disk exhaustion, restart,
 or process-death recovery. Those faults and real-provider/worker/UI/reboot/reopen/
 offline/Doze/latency gates remain open before final full-track review and archive.
+
+- `5c2b849`: storage-age retention, schema6 preserving migration and expiry evidence.
+- `68a9ecf`: fail-closed uncertain status publication with native red/green evidence.
