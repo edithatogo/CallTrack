@@ -9,7 +9,8 @@
     "release_20261020"
   ],
   "requirements": "R14, R26",
-  "implementation_status": "qualified-three-component-Kotlin-pilot-full-migration-open",
+  "implementation_status": "reviewed-qualified-Kotlin-pilot-full-migration-open",
   "implementation_commit": "7cdd8d4",
-  "full_migration_accepted": false
+  "full_migration_accepted": false,
+  "review_commit": "491f936"
 }
