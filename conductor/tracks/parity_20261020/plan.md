@@ -56,3 +56,10 @@ Native foundation receipt: foundation-evidence.json. Current source has a whites
 Dedicated emulator is live: emulator-5580 / calltrack-parity-api36-20261020; host process 60763 (unified exec session 88739 at creation). Always inspect current process/device state before reuse; do not restart from a stale session or timeout alone. Store tests removed both development packages. The physical phone is not used for Track 4. SDK/image licences and user timing/emulator choices are recorded in findings/decisions.
 
 Next: retain source facts/raw presentation and operation-owner generation in the durable model, with a preserving schema evolution and tests; then implement bounded source traversal/reset guards, import snapshots/cancel/resume, legacy matching, scheduler and user UI. Full emulator recovery matrix, final review/fixes/archive remain required.
+
+## Integration research handoff (nonblocking)
+
+[Track10 contracts](../destinations_20261020/requirements.md) identify future route
+identity, epoch/rebinding and opaque remote-ID migration requirements. Retain current
+receipt compatibility; no direct connector/schema expansion is adopted here.
+Provider-cloud qualification and native marker survival remain unverified.

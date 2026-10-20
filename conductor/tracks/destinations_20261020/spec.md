@@ -27,3 +27,12 @@ Provider-specific evidence and contracts; implement only justified connectors wi
 ## Out of scope
 
 No automatic adoption of shortlisted technology, wholesale rewrite, paid service, unqualified platform parity or public release. Cross-track responsibilities remain with their owning tracks. A negative feasibility result or justified deferral is an acceptable research outcome.
+
+## Research disposition,2026-10-21
+
+[INT-D01](decisions.md) retains existing CalendarContract coverage and defers direct
+connectors until a measured native-route gap and stable Track4 contracts justify one.
+[I01–I12](requirements.md) and the [qualification protocol](qualification.md) define
+provider-specific contracts and future end-to-end evidence. Research may close on
+this justified deferral. Provider/cloud acceptance remains unmet; no connector or
+mock prototype is selected. No app permissions or dependency changes are needed.
