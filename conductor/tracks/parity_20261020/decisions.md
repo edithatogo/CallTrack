@@ -152,3 +152,31 @@ future pending selection; permission, pause or provider failure stops the batch.
 No source checkpoint advances during recovery. Existing receipt marker/known-ID
 verification decides recovery; absence never licenses blind reinsertion. Pending
 rows belonging to paused/old operations still need explicit user recovery controls.
+
+
+## Frozen historical import protocol
+
+Use [from,to) source instants and incoming/outgoing/missed flags, explicit BUILDING,
+PREVIEW, CONFIRMED, COMPLETE, CANCELLED and REVIEW phases. Capture an upper source
+ID, then append bounded candidate IDs/keys/bindings and scan progress atomically.
+This is an observed candidate snapshot, not an atomic provider-wide read. New IDs
+above the bound are excluded. Source changes during preview can require review;
+every candidate is revalidated before its first effect. Contact labels are not part
+of source identity and can refresh at delivery. Preview stores no personal payload.
+Only completed preview can be confirmed. Delivery has its own operation identity,
+commits the durable receipt before per-candidate progress, and reconciles matching
+owned receipts without requiring the source row after a crash. Repeated import uses
+existing confirmed receipt verification; no blind recreation of deleted/edited events.
+Changed/missing candidates count as review while other candidates can continue.
+Cancellation preserves prior effects/receipts, disables future effects and never
+implicitly deletes calendar data. A cancelled session cannot be resumed; a new
+confirmed preview is required. Interrupted confirmed sessions remain resumable.
+
+Use dedicated SQLite import schema1 for sessions/candidate sets, with existing
+SqliteLedger remaining the authoritative delivery outbox. This isolates import
+metadata/retention evolution and avoids modifying legacy receipt formats. Sessions
+and candidate appends use one transaction with revision comparison; provider effects
+are outside this transaction. Pending payload remains governed by the existing
+outbox. Native storage/transaction proof and fake calendar-port outcomes are distinct
+from real CalendarContract/user UI acceptance. User controls, per-row review detail,
+retention/deletion workflow, full native recovery and scheduling remain required.
