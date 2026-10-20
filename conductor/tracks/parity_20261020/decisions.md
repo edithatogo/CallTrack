@@ -342,3 +342,34 @@ manual interaction or positive permission/provider flow. Pending: actual confirm
 stop/cancel/reopen UI interaction, review/recovery controls, storage faults and full
 worker/provider/background acceptance. No native import success is inferred from a
 read-only screen opening.
+
+
+## Existing-effect recovery and explicit suppression
+
+ReceiptRecovery deliberately exposes only read/find operations on existing events,
+with no insertion port. It can verify a known ID or recover one exact marker match
+without changing operation ownership. A discovered ID is committed before a second
+read; permission/readback failure therefore cannot lose it. Missing/changed/ambiguous
+effects remain review. READY without an event ID is never inserted by reconciliation.
+Suppression is explicit, retains source/event identity and duplicate protection,
+clears the pending personal payload and does not touch calendar data. Suppressed
+records are not automatically reactivated. No generic resume of inactive/cancelled
+operations is exposed.
+
+The nonexported recovery Activity lists bounded pages, displays retained source
+instant/type/duration and saved destination when readable, and links known IDs to
+the calendar app. Its permission request is calendar READ only. Calendar read/find/
+label methods no longer require WRITE; insertion and writable-destination operations
+still do. Marker materialisation stops at two rows, enough to reject ambiguity.
+Source calls and personal payload fields are not queried for inspection. Individual
+suppression is a user-controlled payload-retention action; age-based policy and
+broader recovery/deletion lifecycle remain pending.
+
+Recovery pagination includes unbound late legacy receipts and uses a stable source
+instant/key/calendar cursor rather than mutable row IDs. Native testing initially
+found repeated rows: COALESCE-derived time lacks SQLite column affinity and Android
+rawQuery binds cursor values as strings. Explicit INTEGER casts on numeric cursor
+comparisons fix the issue. The red device receipt is retained locally; final green
+proof must be source-bound. Status/history text concatenation is replaced by English/
+German formatted resources. Native UI default state, fake-port core behavior and
+real-provider/manual acceptance remain separate gates.

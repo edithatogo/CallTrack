@@ -26,8 +26,11 @@ members. Private/free event flags do not encrypt content or revoke calendar acce
 The manual latest-call action and automatic worker now share DurableDelivery receipts.
 Automatic settings require explicit activation; opening that settings screen can
 request recovery only for a previously enabled policy. Historical import controls now expose bounded preview/confirmation, saved sessions
-and stop/resume/cancel. Recovery controls and full positive native/provider/UI
-acceptance remain incomplete.
+and stop/resume/cancel. Recovery controls can now check existing effects or suppress a receipt without
+calendar writes. Suppression clears the pending personal payload but retains source
+facts/keys/hashes and any event ID; it is not deletion of all personal metadata or
+of calendar data. Age-based retention and full positive native/provider/UI acceptance
+remain incomplete.
 Schema1–4 receipts and pending rows survive migration to schema5. Older source facts
 remain unknown; they are never inferred from event marker length. New source facts
 survive payload clearing and remain potentially sensitive; no age-based expiry is

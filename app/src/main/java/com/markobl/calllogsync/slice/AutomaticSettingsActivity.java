@@ -114,6 +114,12 @@ public final class AutomaticSettingsActivity extends Activity {
         imports.setOnClickListener(
                 v -> startActivity(new Intent(this, HistoricalImportActivity.class)));
         layout.addView(imports);
+        Button recovery = new Button(this);
+        recovery.setId(R.id.open_recovery);
+        recovery.setText(R.string.recovery_open);
+        recovery.setOnClickListener(
+                v -> startActivity(new Intent(this, ReceiptRecoveryActivity.class)));
+        layout.addView(recovery);
         ScrollView scroll = new ScrollView(this);
         scroll.addView(layout);
         setContentView(scroll);
@@ -276,11 +282,12 @@ public final class AutomaticSettingsActivity extends Activity {
                                                     summary.review,
                                                     summary.suppressed));
                                     last.setText(
-                                            getString(workerMessage(code))
-                                                    + "\n"
-                                                    + getString(
+                                            getString(
+                                                    R.string.auto_status_summary,
+                                                    getString(workerMessage(code)),
+                                                    getString(
                                                             R.string.auto_failure_count,
-                                                            worker == null ? 0 : worker.failures));
+                                                            worker == null ? 0 : worker.failures)));
                                     {
                                         choices = loaded;
                                         List<String> labels = new ArrayList<>();

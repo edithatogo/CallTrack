@@ -510,9 +510,10 @@ public final class HistoricalImportActivity extends Activity {
                                         HistoricalImport.Session item = rows.get(i).session;
                                         Button open = new Button(this);
                                         open.setText(
-                                                dates(item)
-                                                        + " — "
-                                                        + getString(phaseLabel(item.phase)));
+                                                getString(
+                                                        R.string.import_history_item,
+                                                        dates(item),
+                                                        getString(phaseLabel(item.phase))));
                                         open.setOnClickListener(v -> loadSession(item.id));
                                         history.addView(open);
                                     }

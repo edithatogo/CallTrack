@@ -72,6 +72,7 @@ def qualify(serial):
             attempted.append(package)
             if 'Success' not in command('install', str(apk)):
                 raise RuntimeError('Install not confirmed')
+        check('AutomaticSettingsTest', 'openingRecoveryDoesNotCreateReceiptsOrEnableLogging')
         check('HistoricalImportStoreTest', 'sessionHistoryPagesNewestFirstWithoutLosingOlderSessions')
         check('AutomaticSettingsTest', 'openingImportsDoesNotCreatePreviewOrConfirmWithoutAccess')
         check('WorkStatusStoreTest', 'publicationPersistsFailureCountAndRejectsOldActivationAfterReopen')
@@ -101,7 +102,8 @@ def qualify(serial):
                        'preservesV4FactsAndCreatesEmptyCheckpointStore',
                        'rolloverPreservesProcessedAnchorAndRejectsStalePublication',
                        'pendingRecoveryQueryIsBoundedAndOwnerDestinationScoped',
-                       'deliveryCountsIncludeLateLegacyWithoutDoubleCountingBoundReceipt'):
+                       'deliveryCountsIncludeLateLegacyWithoutDoubleCountingBoundReceipt',
+                       'recoveryPagingIncludesLegacyAndRemainsStableWhenStatesChange'):
             check('ParityStoreTest', method)
         receipt['result'] = 'passed'
     except Exception as error:

@@ -63,6 +63,73 @@ public final class SqliteLedger extends SQLiteOpenHelper
                         + " KEY(owner,generation))");
     }
 
+    public static final class RecoveryCursor {
+        public final long started, calendar;
+        public final String key;
+
+        public RecoveryCursor(long started, String key, long calendar) {
+            if (started < -1 || key == null || key.isEmpty() || calendar < 0)
+                throw new IllegalArgumentException("Invalid receipt cursor");
+            this.started = started;
+            this.key = key;
+            this.calendar = calendar;
+        }
+    }
+
+    public static final class RecoveryItem {
+        public final RecoveryCursor cursor;
+        public final DurableDelivery.Intent intent;
+
+        RecoveryItem(RecoveryCursor cursor, DurableDelivery.Intent intent) {
+            this.cursor = cursor;
+            this.intent = intent;
+        }
+    }
+
+    /** Read-only bounded listing, including late legacy receipts not yet materialised in outbox. */
+    public java.util.List<RecoveryItem> recoveryPage(RecoveryCursor after, int limit) {
+        if (limit < 1 || limit > 50) throw new IllegalArgumentException("Invalid receipt page");
+        String rows =
+                "SELECT source,calendar,COALESCE(source_start,-1) AS started FROM outbox UNION ALL"
+                    + " SELECT r.source,r.calendar,-1 AS started FROM receipts r WHERE NOT EXISTS"
+                    + " (SELECT 1 FROM outbox o WHERE o.source=r.source AND o.calendar=r.calendar)";
+        String predicate =
+                after == null
+                        ? ""
+                        : " WHERE started<CAST(? AS INTEGER) OR (started=CAST(? AS INTEGER) AND"
+                                + " (source>? OR (source=? AND calendar>CAST(? AS INTEGER))))";
+        String[] args =
+                after == null
+                        ? new String[] {Integer.toString(limit)}
+                        : new String[] {
+                            Long.toString(after.started),
+                            Long.toString(after.started),
+                            after.key,
+                            after.key,
+                            Long.toString(after.calendar),
+                            Integer.toString(limit)
+                        };
+        java.util.List<RecoveryItem> items = new java.util.ArrayList<>();
+        try (Cursor cursor =
+                getReadableDatabase()
+                        .rawQuery(
+                                "SELECT source,calendar,started FROM ("
+                                        + rows
+                                        + ")"
+                                        + predicate
+                                        + " ORDER BY started DESC,source ASC,calendar ASC LIMIT ?",
+                                args)) {
+            while (cursor.moveToNext()) {
+                RecoveryCursor point =
+                        new RecoveryCursor(
+                                cursor.getLong(2), cursor.getString(0), cursor.getLong(1));
+                DurableDelivery.Intent intent = readIntent(point.key, point.calendar);
+                if (intent != null) items.add(new RecoveryItem(point, intent));
+            }
+        }
+        return java.util.Collections.unmodifiableList(items);
+    }
+
     public DeliveryCounts counts() {
         long pending = 0, verified = 0, review = 0, suppressed = 0;
         try (Cursor cursor =

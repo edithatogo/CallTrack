@@ -635,4 +635,66 @@ public class ParityStoreTest {
             assertTrue(context().deleteDatabase(name));
         }
     }
+
+    @Test
+    public void recoveryPagingIncludesLegacyAndRemainsStableWhenStatesChange() {
+        String name = database();
+        context().deleteDatabase(name);
+        try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+            for (int i = 0; i < 22; i++)
+                ledger.outbox()
+                        .put(
+                                new DurableDelivery.Intent(
+                                        DurableDelivery.State.READY,
+                                        "key-" + (i / 2),
+                                        7 + i % 2,
+                                        "s",
+                                        "m",
+                                        "f",
+                                        -1,
+                                        null,
+                                        null,
+                                        new DurableDelivery.SourceFacts(
+                                                1000 + (i / 2) % 3,
+                                                1,
+                                                1,
+                                                Integer.valueOf(1),
+                                                true)));
+            for (int i = 0; i < 3; i++)
+                ledger.put("legacy-" + i, 7, new SliceEngine.Entry(100 + i, "f"));
+            java.util.Set<String> seen = new java.util.HashSet<>();
+            SqliteLedger.RecoveryCursor after = null;
+            ReceiptRecovery recovery =
+                    new ReceiptRecovery(
+                            ledger.outbox(),
+                            new ReceiptRecovery.ExistingEvents() {
+                                public SliceEngine.StoredEvent read(long id) {
+                                    throw new AssertionError("Suppression cannot read calendar");
+                                }
+
+                                public java.util.List<SliceEngine.StoredEvent> find(
+                                        long c, String m) {
+                                    throw new AssertionError("Suppression cannot read calendar");
+                                }
+                            });
+            while (true) {
+                java.util.List<SqliteLedger.RecoveryItem> page = ledger.recoveryPage(after, 4);
+                if (page.isEmpty()) break;
+                assertTrue(page.size() <= 4);
+                for (SqliteLedger.RecoveryItem item : page) {
+                    assertTrue(seen.add(item.intent.key + "/" + item.intent.calendar));
+                    assertEquals(
+                            ReceiptRecovery.Result.SUPPRESSED,
+                            recovery.suppress(item.intent.key, item.intent.calendar));
+                }
+                after = page.get(page.size() - 1).cursor;
+            }
+            assertEquals(25, seen.size());
+            assertEquals(25, ledger.counts().suppressed);
+            assertEquals(0, ledger.counts().review);
+            expectFailure(IllegalArgumentException.class, () -> ledger.recoveryPage(null, 51));
+        } finally {
+            assertTrue(context().deleteDatabase(name));
+        }
+    }
 }
