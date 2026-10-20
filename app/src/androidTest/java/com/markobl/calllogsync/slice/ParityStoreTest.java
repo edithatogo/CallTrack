@@ -461,4 +461,46 @@ public class ParityStoreTest {
             context().deleteDatabase(name);
         }
     }
+
+    @Test
+    public void rolloverPreservesProcessedAnchorAndRejectsStalePublication() {
+        String name = database();
+        context().deleteDatabase(name);
+        DurableDelivery.Operation operation = new DurableDelivery.Operation("automatic", 5);
+        PagedCalls.Checkpoint done = new PagedCalls.Checkpoint("fixture", 1, "one", 1, "one");
+        PagedCalls.Checkpoint next = new PagedCalls.Checkpoint("fixture", 2, "two", 1, "one");
+        try {
+            try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+                ledger.checkpoint(operation, done);
+                ledger.rollover(operation, done, next);
+                expectFailure(
+                        IllegalStateException.class, () -> ledger.rollover(operation, done, next));
+                expectFailure(
+                        IllegalStateException.class, () -> ledger.checkpoint(operation, done));
+                assertTrue(PagedCalls.equal(next, ledger.checkpoint(operation)));
+            }
+            try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+                assertTrue(PagedCalls.equal(next, ledger.checkpoint(operation)));
+                expectFailure(
+                        IllegalArgumentException.class,
+                        () ->
+                                ledger.rollover(
+                                        operation,
+                                        next,
+                                        new PagedCalls.Checkpoint(
+                                                "fixture", 3, "three", 1, "one")));
+                PagedCalls.Checkpoint complete =
+                        new PagedCalls.Checkpoint("fixture", 2, "two", 2, "two");
+                ledger.checkpoint(operation, complete);
+                ledger.rollover(
+                        operation,
+                        complete,
+                        new PagedCalls.Checkpoint("fixture", 3, "three", 2, "two"));
+                assertEquals(3, ledger.checkpoint(operation).upperId);
+                assertEquals(2, ledger.checkpoint(operation).lastId);
+            }
+        } finally {
+            assertTrue(context().deleteDatabase(name));
+        }
+    }
 }

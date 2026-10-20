@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 /** Durable receipt per source/destination. A writer transaction serializes concurrent instances. */
 public final class SqliteLedger extends SQLiteOpenHelper
-        implements SliceEngine.Ledger, ScanDelivery.Progress {
+        implements SliceEngine.Ledger, AutomaticDelivery.Progress {
     public SqliteLedger(Context context) {
         this(context, "calltrack-ledger.db");
     }
@@ -134,6 +134,45 @@ public final class SqliteLedger extends SQLiteOpenHelper
             if (db.insertWithOnConflict(
                             "scan_cursors", null, values, SQLiteDatabase.CONFLICT_REPLACE)
                     < 0) throw new IllegalStateException("Checkpoint not stored");
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    /** Compare and extend a completed snapshot without weakening normal progress writes. */
+    @Override
+    public void rollover(
+            DurableDelivery.Operation operation,
+            PagedCalls.Checkpoint expected,
+            PagedCalls.Checkpoint next) {
+        if (operation == null
+                || expected == null
+                || next == null
+                || expected.lastId != expected.upperId
+                || !expected.namespace.equals(next.namespace)
+                || next.upperId < expected.upperId
+                || next.lastId != expected.lastId
+                || !java.util.Objects.equals(next.lastBinding, expected.lastBinding)
+                || next.upperId == expected.upperId
+                        && !java.util.Objects.equals(next.upperBinding, expected.upperBinding))
+            throw new IllegalArgumentException("Invalid scan rollover");
+        SQLiteDatabase db = getWritableDatabase();
+        if (db.inTransaction())
+            throw new IllegalStateException("Rollover must commit independently");
+        db.beginTransaction();
+        try {
+            if (!PagedCalls.equal(checkpoint(operation), expected))
+                throw new IllegalStateException("Scan changed before rollover");
+            ContentValues values = new ContentValues();
+            values.put("upper_id", next.upperId);
+            values.put("upper_binding", next.upperBinding);
+            if (db.update(
+                            "scan_cursors",
+                            values,
+                            "owner=? AND generation=?",
+                            new String[] {operation.owner, Long.toString(operation.generation)})
+                    != 1) throw new IllegalStateException("Rollover not stored");
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();

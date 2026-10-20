@@ -86,7 +86,8 @@ def qualify(serial):
                        'preservesV3OwnershipWithoutInferringSourceFactsFromPayload',
                        'sourceFactsSurviveReopenAndPayloadPurgeWithNullPresentation',
                        'frozenCheckpointPersistsAndRejectsRegressionOrRebinding',
-                       'preservesV4FactsAndCreatesEmptyCheckpointStore'):
+                       'preservesV4FactsAndCreatesEmptyCheckpointStore',
+                       'rolloverPreservesProcessedAnchorAndRejectsStalePublication'):
             check('ParityStoreTest', method)
         receipt['result'] = 'passed'
     except Exception as error:
