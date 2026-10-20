@@ -66,6 +66,36 @@ public final class PagedCalls {
         return new Checkpoint(namespace, id(upper), binding(upper), -1, null);
     }
 
+    /** Extend only a completed snapshot, retaining its processed anchor. */
+    public static Checkpoint extend(Source source, Checkpoint completed) {
+        if (completed.lastId != completed.upperId)
+            throw new IllegalArgumentException("Scan is incomplete");
+        validate(source, completed);
+        Checkpoint captured = capture(source);
+        validate(source, completed);
+        if (!completed.namespace.equals(captured.namespace) || captured.upperId < completed.upperId)
+            throw new SourceChanged();
+        if (captured.upperId == completed.upperId
+                && !Objects.equals(captured.upperBinding, completed.upperBinding))
+            throw new SourceChanged();
+        return new Checkpoint(
+                completed.namespace,
+                captured.upperId,
+                captured.upperBinding,
+                completed.lastId,
+                completed.lastBinding);
+    }
+
+    public static boolean equal(Checkpoint left, Checkpoint right) {
+        return left != null
+                && right != null
+                && left.namespace.equals(right.namespace)
+                && left.upperId == right.upperId
+                && left.lastId == right.lastId
+                && Objects.equals(left.upperBinding, right.upperBinding)
+                && Objects.equals(left.lastBinding, right.lastBinding);
+    }
+
     public static List<CallRecord> read(Source source, Checkpoint checkpoint, int limit) {
         if (limit < 1 || limit > 500) throw new IllegalArgumentException("Invalid page limit");
         validate(source, checkpoint);

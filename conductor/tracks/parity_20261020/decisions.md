@@ -123,3 +123,17 @@ checkpoint setter to permit arbitrary rebinding. Source-independent recovery of
 pending intents must precede source traversal so deleted source anchors do not hide
 an uncertain provider insertion. Rollover and recovery remain unimplemented at this
 checkpoint; they are prerequisites to scheduler/UI integration, not a scope deferral.
+
+
+## Verified automatic snapshot rollover
+
+Add an explicit completed-snapshot extension operation, leaving the ordinary frozen
+checkpoint setter strict. Validate old anchors before and after capturing the new
+upper bound; require same namespace and nondecreasing upper ID. Preserve last ID/
+binding. SQLite commits only if the stored checkpoint exactly matches the expected
+completed state, so stale overlapping publication fails. No schema change is needed.
+AutomaticDelivery binds one bounded scan to the full persisted activation document
+and rechecks authorization under the shared delivery lock. Empty-to-first-call and
+later-call scans use this same path. Deleted/changed processed anchors require review.
+Source-independent pending recovery, scheduler/UI wiring and historical snapshots
+remain required; the new runner is not yet launched automatically by Android.

@@ -129,3 +129,18 @@ pass. Exact inputs/artifacts/native output in activation-native-evidence.json.
 Reopen remains within one instrumentation process; no process-death or disk-failure
 injection claim. Next implement verified automatic scan rollover and bounded
 source-independent recovery before scheduler/UI; full Track4 remains open.
+
+
+## Automatic rollover checkpoint
+
+Completed scans can now extend to newer upper bounds while preserving processed
+anchors. Activation-bound AutomaticDelivery calls the bounded scanner only for the
+current full policy; stale/paused workers stop. Two test-first PagedCalls extension
+regressions plus two runner regressions pass (empty/first/later calls, no replay,
+changed/deleted anchors and pause). SQLite native test verifies compare-and-update,
+stale publication rejection and reopen preservation. Full source-bound build61 JVM
+tests/APKs/lint and25 host tests pass;16 API36 native checks pass and packages are
+removed. Exact inputs/artifacts/native outputs in rollover-evidence.json. No Android
+scheduler/UI/full-runner native acceptance inferred. Next integrate bounded pending
+recovery before source traversal, then frozen historical import and scheduling/UI.
+Full-track review/fixes/archive remain outstanding.

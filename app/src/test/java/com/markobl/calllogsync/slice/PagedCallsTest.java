@@ -143,4 +143,31 @@ public class PagedCallsTest {
         assertThrows(IllegalArgumentException.class, () -> PagedCalls.read(source, progress, 0));
         assertThrows(IllegalArgumentException.class, () -> PagedCalls.read(source, progress, 501));
     }
+
+    @Test
+    public void completedSnapshotExtendsWithoutReplayingProcessedIds() {
+        Source source = new Source();
+        source.rows.put(1L, row(1, 1));
+        PagedCalls.Checkpoint done = PagedCalls.capture(source).advance(source.rows.get(1L));
+        source.rows.put(2L, row(2, 1));
+        PagedCalls.Checkpoint next = PagedCalls.extend(source, done);
+        assertEquals(1, next.lastId);
+        assertEquals(2, next.upperId);
+        assertEquals("2", PagedCalls.read(source, next, 7).get(0).id);
+        assertThrows(IllegalArgumentException.class, () -> PagedCalls.extend(source, next));
+        source.rows.remove(1L);
+        assertThrows(PagedCalls.SourceChanged.class, () -> PagedCalls.extend(source, done));
+    }
+
+    @Test
+    public void emptySnapshotExtendsButNamespaceResetCannotBeAdopted() {
+        Source source = new Source();
+        PagedCalls.Checkpoint empty = PagedCalls.capture(source);
+        source.rows.put(0L, row(0, 1));
+        PagedCalls.Checkpoint next = PagedCalls.extend(source, empty);
+        assertEquals(-1, next.lastId);
+        assertEquals(0, next.upperId);
+        source.namespace = "reset";
+        assertThrows(PagedCalls.SourceChanged.class, () -> PagedCalls.extend(source, empty));
+    }
 }
