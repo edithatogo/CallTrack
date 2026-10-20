@@ -15,7 +15,7 @@ Tracks 4, 5 and 6 are in progress. Track5 community preparation does not establi
   *Link: [Track](tracks/kotlin_20261020/index.md)*
 
 ---
-- [ ] **Track: Call journal and productivity requirements** (Post-M4)
+- [~] **Track: Call journal and productivity requirements** (Post-M4)
   *Link: [Track](tracks/productivity_20261020/index.md)*
 
 ---
