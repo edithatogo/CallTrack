@@ -27,3 +27,12 @@ Evidence-backed UI decision; adopted screens match behavioural and accessibility
 ## Out of scope
 
 No automatic adoption of shortlisted technology, wholesale rewrite, paid service, unqualified platform parity or public release. Cross-track responsibilities remain with their owning tracks. A negative feasibility result or justified deferral is an acceptable research outcome.
+
+## Refined experiment scope (2026-10-21)
+
+Use a standalone synthetic Compose project to resolve UI/state/semantics and
+dependency questions. No production screen is adopted by building a prototype.
+Make a final evidence-backed retain/adopt/defer decision after tests; adopted
+screens still require behavioural/accessibility parity. A justified deferral can
+close the research track under its existing out-of-scope policy, with production
+work and reopening triggers explicitly retained. See [decision](decisions.md).
