@@ -9,7 +9,7 @@
     "prototypes/multiplatform-ui/gradle.properties": "526e7d3f92e04315ac105c8e309c5204c286254fb2df9b3bd28147a831e12d66",
     "prototypes/multiplatform-ui/settings.gradle": "65a9beacee18c3e05ad06a740cadbe0bac7c042a78ba6d85827501dbc430709a",
     "prototypes/multiplatform-ui/src/main/kotlin/org/calltrack/companion/Main.kt": "6f6c70f6040c4661a28c27fa61a3103b4cc88761b25d316043c95d5402041488",
-    "prototypes/multiplatform-ui/src/test/kotlin/org/calltrack/companion/CompanionScreenTest.kt": "0009aa3af5f5c6b4905a2f73f7de7f6a217949a9e8c62d1f27d5e4d1321c469f"
+    "prototypes/multiplatform-ui/src/test/kotlin/org/calltrack/companion/CompanionScreenTest.kt": "08f7af15e30e4fe94f60ae1d1ebe4cf027a75d491dea242346e434882081592f"
   },
   "versions": {
     "kotlin": "2.3.21",
@@ -19,12 +19,12 @@
     "jdk": "17"
   },
   "tests": {
-    "tests": "3",
+    "tests": "4",
     "failures": "0",
     "errors": "0",
     "skipped": "0"
   },
-  "report_sha256": "c09b3b492debfffc8b04a2aef2b085d2c8bfdc8fab04bc3707b991700e95953b",
+  "report_sha256": "d60b345ae814984b0d082148cc805253f2ad2f2cd1e0437273b38ef308a19193",
   "runtime_graph_sha256": "281614d325967eb02aae028ff58f4c0f634784aa941e0387d2279472775bd0b6",
   "jars": {
     "prototypes/multiplatform-ui/build/libs/calltrack-companion-ui-experiment.jar": "71d546830642306072870fb0fb3896a30cf33995d505779e6c6cf36af10a46c7"

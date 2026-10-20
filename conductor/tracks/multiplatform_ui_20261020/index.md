@@ -8,3 +8,5 @@
 - [Requirements](requirements.md)
 - [Decision](decisions.md)
 - [Verification](verification.md)
+- [Review](review.md)
+- [Evidence receipt](evidence.json)
