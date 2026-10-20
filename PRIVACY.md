@@ -19,6 +19,7 @@ members. Private/free event flags do not encrypt content or revoke calendar acce
 | Outbox personal payload | Frozen event title/description/time data for interrupted delivery | DurableDelivery clears payload on confirmed/review/suppressed transitions; pending payload has no time-based expiry |
 | Private scan checkpoints | Operation owner/generation, source namespace, frozen upper and last processed IDs and hashed source bindings | Retained for recovery; no expiry or automatic cleanup yet; no caller names/numbers stored |
 | Private `calltrack-imports.db`, schema2 | Import ID, destination/timezone/range/type policy, phase/revision, counts, source checkpoints and candidate IDs/keys/hash bindings and per-candidate result codes | Retained across cancellation/completion for progress/review; no expiry or deletion UI yet. No names/numbers or rendered event payload stored in preview rows |
+| WorkManager private database and execution status | Work IDs/class names, activation generation, scheduling/retry metadata and nonpersonal result/timestamp/counts | Framework-managed work retention; latest status preferences retained until replaced/uninstall. No caller names/numbers in inputs/outputs |
 | Selected calendar provider | Title, description, start/end, timezone and app marker; name/number may be included | Remains after uninstall; calendar/provider controls cloud retention and deletion |
 | Local developer evidence | Toolchain paths, hashes, synthetic fixture receipts and test output | `.local` excluded from Git; no automated expiry implemented |
 

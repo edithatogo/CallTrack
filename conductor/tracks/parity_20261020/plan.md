@@ -205,3 +205,24 @@ pinned APK inspection digest in legacy-evidence.json. No live calendar/provider 
 receipt adoption is inferred. Next qualify WorkManager and connect scheduling plus
 settings/import/status/recovery UI, then full native failure/background acceptance.
 Final full-track review/fixes/archive remain required.
+
+
+## WorkManager development checkpoint
+
+WorkManager2.12.0 resolves and passes actual AAR metadata checks against the retained
+SDK/toolchain. WORK-D01 records option comparison, graph/licence/artifact review and
+rollback limits in work-dependency-report.json. AutomaticLogWorker connects persisted
+activation to the durable runner, bounded8x50 pages, system-stop authorization and
+bounded retry; prompt2-second settling requests plus15-minute periodic recovery use
+no network constraint. Phone-IDLE/boot/package-replaced receiver only schedules an
+enabled activation and never reads number extras. READ_PHONE_STATE is declared but
+not granted. Launcher UI/reopen integration remains pending.
+
+Two test-first retry-policy regressions and final-intent worker-stop regression pass.
+Three actual WorkManager native tests verify disabled/stale jobs finish PAUSED without
+permissions and prompt/periodic requests persist with NOT_REQUIRED network constraint.
+Full source-bound build74 JVM tests/APKs/lint and25 host tests pass;24 API36 native
+checks pass and packages are removed. Exact inputs/debug artifacts/native outputs
+in work-evidence.json. Positive worker/provider, reboot/Doze/offline/reopen/latency and
+UI acceptance remain open. Next wire user settings/status/import/recovery controls,
+then full native acceptance and final review/fixes/archive.
