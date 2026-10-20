@@ -4,7 +4,7 @@ All tasks pending. Discovery is real track work. Implementation is conditional; 
 
 ## Phase 1: Discovery and mapping
 
-- [ ] Task: Complete APK preference, API, event-format and scan-limit mapping; distinguish static inference from runtime proof
+- [~] Task: Complete APK preference, API, event-format and scan-limit mapping; distinguish static inference from runtime proof
 - [ ] Task: Map both pinned FOSS sources including dependencies and custom code responsibilities
 - [ ] Task: Define synthetic parity fixtures, user outcomes and unresolved requirement decisions
 - [ ] Task: Write findings and refine track requirements/acceptance with source provenance
