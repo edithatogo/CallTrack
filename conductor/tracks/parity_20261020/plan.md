@@ -92,3 +92,15 @@ validation, cursor limits and preserving v4 migration are implemented. Filter/
 activation settings and coordinator advancement are still required before P02 can
 close. Next integrate scan delivery and frozen import sessions, then scheduler/UI.
 Full-track review/fixes/archive remain outstanding.
+
+
+## Scan coordinator checkpoint
+
+Bounded source scans now connect to DurableDelivery and SqliteLedger checkpoint
+ports. Five test-first coordinator regressions pass: multi-page activation/type
+policy, crash after receipt before progress, pause/destination stops, extended type
+exclusion and changed candidate rejection. Source-bound build passes53 JVM tests,
+app/test APK compilation and lint;25 host tests pass. Exact inputs/artifacts in
+scan-evidence.json. No new native coordinator runtime proof is claimed. Persisted
+activation settings/generation publication, source-independent pending recovery,
+frozen historical sessions, scheduler/UI and full acceptance remain required.
