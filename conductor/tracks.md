@@ -7,7 +7,7 @@ Track 4 is in progress; the other active tracks are planned, not implemented. Tr
   *Link: [Track](tracks/parity_20261020/index.md)*
 
 ---
-- [ ] **Track: Community distribution and release readiness** (M4)
+- [~] **Track: Community distribution and release readiness** (M4)
   *Link: [Track](tracks/release_20261020/index.md)*
 
 ---
