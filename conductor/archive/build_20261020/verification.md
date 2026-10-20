@@ -25,3 +25,7 @@ Proceed with calendar_slice using the selected fork/toolchain. Use the denied/gr
 Both final modern build receipts returned0; the fresh-preparation repeat produced the identical app and test APK hashes as the repaired clean build. The final device transcript tests exactly those hashes. All three permission cases passed and both test packages were removed with successful package-list absence checks. The final source-input digests still match current files. Modern lint:0 errors/30 warnings, no ObsoleteLintCustomCheck registry skip. Original lint:0 errors/25 warnings. Same-host repeatability was verified for both variants.
 
 `python3 -m unittest discover -s tests -v`:12 tests passed. Formatter, YAML matrix parse, Conductor/source-digest validation and `git diff --check` passed. Inherited Android app unit task remains NO-SOURCE; instrumentation runs are the bounded runtime evidence. Exact commands/artifact hashes/source fingerprints/log digests are preserved in evidence.json.
+
+## Archive completion audit
+
+All B01–B08 requirements have concrete build, decision, tooling or device evidence. Track is removed from active registry and retained in archive with stable prerequisite identity. Post-move document/metadata/graph checks and12 tooling tests pass; source digests, final APK hashes and device cleanup remain verified. No original phone call records or calendar data were accessed.

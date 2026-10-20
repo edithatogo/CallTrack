@@ -68,4 +68,8 @@ See [future features and architecture](research/future-architecture.md) and R19â
 
 ## Conductor execution policy (2026-10-20)
 
-The [track registry](tracks.md) now owns execution. These inventories are planning hypotheses and dated evidence, not fully specified future implementations. Each later track must map, understand, research and document its requirements and dependency options when activated. Dependencies can be temporary prototype aids, enduring replacements for existing libraries, or replacements for app-owned/native code. Decisions require explicit purpose, evidence, promotion/removal criteria and recovery. See [workflow](workflow.md). Track 1 static mapping is complete; other tracks remain pending.
+The [track registry](tracks.md) now owns execution. These inventories are planning hypotheses and dated evidence, not fully specified future implementations. Each later track must map, understand, research and document its requirements and dependency options when activated. Dependencies can be temporary prototype aids, enduring replacements for existing libraries, or replacements for app-owned/native code. Decisions require explicit purpose, evidence, promotion/removal criteria and recovery. See [workflow](workflow.md). Tracks 1 and 2 are complete; the remaining tracks are pending.
+
+## Qualified M1 outcome
+
+[Track 2 archive](archive/build_20261020/index.md): proceed with the audited fork and modern development configuration. Original and repaired target36 APKs repeated byte-for-byte on this host. Android17 launch and zero-row denied/granted/revoked permission checks passed, and disposable packages were removed. The next milestone must implement and verify an actual calendar event; this build evidence does not establish that result.

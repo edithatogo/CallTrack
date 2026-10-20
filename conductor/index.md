@@ -27,4 +27,4 @@
 
 ## Current checkpoint
 
-Track 1 static capability mapping is complete and reviewed; its evidence is retained in the [archive](archive/baseline_20261020/index.md). Next: build feasibility; platform feasibility may also consume the baseline. Twelve remaining tracks have not started. No library shortlist is a production adoption decision.
+Tracks 1 and 2 are complete, reviewed and archived. The [qualified fork build](archive/build_20261020/index.md) provides original/modern repeatability and bounded Android17 permission evidence. Next: [call-to-calendar vertical slice](tracks/calendar_slice_20261020/index.md). Eleven tracks remain unstarted. Runtime logging/calendar parity and production release approval are still later outcomes.

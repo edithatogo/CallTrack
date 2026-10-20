@@ -13,5 +13,7 @@
   "review_status": "passed-with-fixes",
   "completed_at": "2026-10-20",
   "implementation_commit": "eec3a32",
-  "review_fix_commit": "bae7121"
+  "review_fix_commit": "bae7121",
+  "archived": true,
+  "archived_at": "2026-10-20"
 }

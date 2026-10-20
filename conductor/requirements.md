@@ -56,7 +56,7 @@ The following are proposed extensions, not changes to the minimum parity release
 
 ## Conductor execution policy (2026-10-20)
 
-The [track registry](tracks.md) now owns execution. These inventories are planning hypotheses and dated evidence, not fully specified future implementations. Each later track must map, understand, research and document its requirements and dependency options when activated. Dependencies can be temporary prototype aids, enduring replacements for existing libraries, or replacements for app-owned/native code. Decisions require explicit purpose, evidence, promotion/removal criteria and recovery. See [workflow](workflow.md). Track 1 static mapping is complete; other tracks remain pending.
+The [track registry](tracks.md) now owns execution. These inventories are planning hypotheses and dated evidence, not fully specified future implementations. Each later track must map, understand, research and document its requirements and dependency options when activated. Dependencies can be temporary prototype aids, enduring replacements for existing libraries, or replacements for app-owned/native code. Decisions require explicit purpose, evidence, promotion/removal criteria and recovery. See [workflow](workflow.md). Tracks 1 and 2 are complete; the remaining tracks are pending.
 
 ## Track 1 mapping outcome
 
@@ -64,4 +64,4 @@ Static mapping completed; see [findings](archive/baseline_20261020/findings.md),
 
 ## Track 2 build outcome
 
-R08/R13/R26 now have a bounded reproducible development build and call-log permission qualification path. Consult [build requirements and limits](tracks/build_20261020/requirements.md) and actual [verification](tracks/build_20261020/verification.md). No production signing, store acceptance, minimum-OS qualification, real call capture or calendar sync follows from this baseline.
+R08/R13/R26 now have a bounded reproducible development build and call-log permission qualification path. Consult [build requirements and limits](archive/build_20261020/requirements.md) and actual [verification](archive/build_20261020/verification.md). No production signing, store acceptance, minimum-OS qualification, real call capture or calendar sync follows from this baseline.
