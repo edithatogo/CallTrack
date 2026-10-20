@@ -55,3 +55,15 @@ Both test packages removed and read back absent. Exact hashes/methods are in
 source-facts-evidence.json; detailed snapshots remain excluded in .local/parity-evidence.
 25 host safety tests and Java/Kotlin formatting checks pass; privacy map updated.
 This does not qualify paging/import/scheduling/UI or complete P01–P10.
+
+
+### Schema5 paging foundation
+
+Six new JVM regressions exercise51 rows over bounded pages, frozen upper bound,
+deleted/reused/reset anchors, raw presentation, malformed pages, empty snapshots
+and maximum IDs. Native synthetic query/cursor and private SQLite contracts pass,
+including monotonic immutable checkpoints across reopen and v4 migration. Total:
+48 JVM/25 host/13 native checks; exact inputs/APKs/methods in paging-evidence.json.
+Fresh source-bound build and lint pass; fixture packages removed. No live source
+query or user UI/background scheduling acceptance is inferred. Frozen candidate
+preview and effect-time revalidation remain unimplemented integration requirements.

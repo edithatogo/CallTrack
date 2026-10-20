@@ -16,6 +16,16 @@ import org.junit.Test;
 
 /** Synthetic source only. Never queries or changes the device's call history. */
 public class CalendarSliceTest {
+    private static void expectFailure(Class<? extends Throwable> type, Runnable action) {
+        try {
+            action.run();
+        } catch (Throwable failure) {
+            if (type.isInstance(failure)) return;
+            throw new AssertionError("Unexpected failure type", failure);
+        }
+        throw new AssertionError("Expected " + type.getSimpleName());
+    }
+
     private Context context() {
         return InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
@@ -345,6 +355,44 @@ public class CalendarSliceTest {
                 assertFalse(CallEvent.from(call, "UTC").description.contains("555"));
             }
         }
+    }
+
+    @Test
+    public void syntheticPagingUsesBoundedQueriesAndPreservesEveryRow() {
+        android.os.Bundle query =
+                AndroidCallLogSource.pageQuery(
+                        "_id>? AND _id<=?", new String[] {"-1", "7"}, true, 3);
+        assertArrayEquals(
+                new String[] {android.provider.CallLog.Calls._ID},
+                query.getStringArray(android.content.ContentResolver.QUERY_ARG_SORT_COLUMNS));
+        assertEquals(3, query.getInt(android.content.ContentResolver.QUERY_ARG_LIMIT));
+        assertEquals(
+                android.content.ContentResolver.QUERY_SORT_DIRECTION_ASCENDING,
+                query.getInt(android.content.ContentResolver.QUERY_ARG_SORT_DIRECTION));
+        assertArrayEquals(
+                new String[] {"-1", "7"},
+                query.getStringArray(android.content.ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS));
+        try (MatrixCursor cursor = new MatrixCursor(AndroidCallLogSource.PROJECTION)) {
+            for (int i = 1; i <= 3; i++)
+                cursor.addRow(
+                        new Object[] {Integer.toString(i), "000", 1, 1000L + i, 0L, null, 3, null});
+            java.util.List<CallRecord> rows = AndroidCallLogSource.pageRows(cursor, "fixture", 3);
+            assertEquals(3, rows.size());
+            assertEquals("1", rows.get(0).id);
+            assertEquals("3", rows.get(2).id);
+            assertEquals(Integer.valueOf(3), rows.get(2).numberPresentation);
+        }
+        try (MatrixCursor cursor = new MatrixCursor(AndroidCallLogSource.PROJECTION)) {
+            for (int i = 1; i <= 4; i++)
+                cursor.addRow(
+                        new Object[] {Integer.toString(i), "000", 1, 1000L + i, 0L, null, 3, null});
+            expectFailure(
+                    PagedCalls.SourceChanged.class,
+                    () -> AndroidCallLogSource.pageRows(cursor, "fixture", 3));
+        }
+        assertNotEquals(
+                android.content.pm.PackageManager.PERMISSION_GRANTED,
+                context().checkSelfPermission(Manifest.permission.READ_CALL_LOG));
     }
 
     private static class MemoryLedger implements SliceEngine.Ledger {

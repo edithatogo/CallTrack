@@ -66,3 +66,16 @@ for migrated rows; null presentation is distinct from absent historical facts.
 These retained metadata remain sensitive and lack an expiry policy; PRIVACY.md
 records that limit. No destructive downgrade/backup promise follows: older APK
 readers of schema4 and full recovery/restore policy remain unqualified.
+
+
+## Bounded source traversal checkpoint
+
+Use canonical nonnegative CallLog IDs with a frozen upper ID and ascending bounded
+pages (1–500 rows). Persist each operation's upper/last anchor bindings separately
+from delivery receipts in schema5. The coordinator must advance only after handling
+a row; a returned page is not completed work. Namespace, upper or processed anchor
+changes require review, rather than silently resetting progress. New rows above the
+upper bound belong to a later scan. This freezes ID bounds, not provider contents;
+historical confirmation still requires persisted candidates and revalidation before
+effects. Synthetic cursor/query contracts do not prove every vendor provider honors
+limits. No scheduler, import confirmation or automatic UI is enabled by this change.

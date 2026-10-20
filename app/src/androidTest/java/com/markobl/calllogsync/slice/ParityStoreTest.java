@@ -12,6 +12,16 @@ import org.junit.Test;
 
 /** Own private fixture database only; no calls, calendars or device settings are changed. */
 public class ParityStoreTest {
+    private static void expectFailure(Class<? extends Throwable> type, Runnable action) {
+        try {
+            action.run();
+        } catch (Throwable failure) {
+            if (type.isInstance(failure)) return;
+            throw new AssertionError("Unexpected failure type", failure);
+        }
+        throw new AssertionError("Expected " + type.getSimpleName());
+    }
+
     private Context context() {
         return InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
@@ -44,7 +54,7 @@ public class ParityStoreTest {
                 assertEquals(42, migrated.eventId);
                 assertEquals("old-fingerprint", migrated.fingerprint);
                 assertNull(migrated.sourceSignature);
-                assertEquals(4, ledger.getReadableDatabase().getVersion());
+                assertEquals(5, ledger.getReadableDatabase().getVersion());
             }
         } finally {
             context().deleteDatabase(name);
@@ -201,7 +211,7 @@ public class ParityStoreTest {
                         SliceEngine.Result.REVIEW_REQUIRED,
                         new SliceEngine(() -> call, sink, ledger, "UTC").run(7));
                 assertEquals(javaFingerprint, ledger.get(call.key(), 7).fingerprint);
-                assertEquals(4, ledger.getReadableDatabase().getVersion());
+                assertEquals(5, ledger.getReadableDatabase().getVersion());
             }
         } finally {
             context().deleteDatabase(name);
@@ -234,7 +244,7 @@ public class ParityStoreTest {
             }
             try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
                 DurableDelivery.Intent intent = ledger.outbox().get("source", 7);
-                assertEquals(4, ledger.getReadableDatabase().getVersion());
+                assertEquals(5, ledger.getReadableDatabase().getVersion());
                 assertNull(intent.operation);
                 assertEquals(DurableDelivery.State.READY, intent.state);
                 assertEquals("Synthetic title", intent.payload.title);
@@ -312,7 +322,7 @@ public class ParityStoreTest {
             }
             try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
                 DurableDelivery.Intent intent = ledger.outbox().get("source", 7);
-                assertEquals(4, ledger.getReadableDatabase().getVersion());
+                assertEquals(5, ledger.getReadableDatabase().getVersion());
                 assertNull(intent.facts);
                 assertEquals("import-1", intent.operation.owner);
                 assertEquals(42, intent.operation.generation);
@@ -360,6 +370,92 @@ public class ParityStoreTest {
                 assertEquals(0, intent.facts.seconds);
                 assertNull(intent.facts.presentation);
                 assertTrue(intent.facts.presentationSupplied);
+            }
+        } finally {
+            context().deleteDatabase(name);
+        }
+    }
+
+    @Test
+    public void frozenCheckpointPersistsAndRejectsRegressionOrRebinding() {
+        String name = database();
+        context().deleteDatabase(name);
+        DurableDelivery.Operation op = new DurableDelivery.Operation("import-1", 42);
+        PagedCalls.Checkpoint frozen =
+                new PagedCalls.Checkpoint("fixture", 7, "upper-binding", -1, null);
+        CallRecord row =
+                new CallRecord("fixture", "1", 123, 0, 1, null, null, Integer.valueOf(3), null);
+        try {
+            try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+                ledger.checkpoint(op, frozen);
+            }
+            try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+                PagedCalls.Checkpoint loaded = ledger.checkpoint(op);
+                assertEquals(-1, loaded.lastId);
+                assertEquals(7, loaded.upperId);
+                ledger.checkpoint(op, loaded.advance(row));
+            }
+            try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+                PagedCalls.Checkpoint loaded = ledger.checkpoint(op);
+                assertEquals(1, loaded.lastId);
+                assertEquals(PagedCalls.binding(row), loaded.lastBinding);
+                assertNull(ledger.checkpoint(new DurableDelivery.Operation("import-1", 43)));
+                expectFailure(IllegalStateException.class, () -> ledger.checkpoint(op, frozen));
+                expectFailure(
+                        IllegalStateException.class,
+                        () ->
+                                ledger.checkpoint(
+                                        op,
+                                        new PagedCalls.Checkpoint(
+                                                "fixture", 8, "changed", 1, loaded.lastBinding)));
+                expectFailure(
+                        IllegalStateException.class,
+                        () ->
+                                ledger.checkpoint(
+                                        op,
+                                        new PagedCalls.Checkpoint(
+                                                "fixture", 7, "upper-binding", 1, "changed")));
+                assertEquals(1, ledger.checkpoint(op).lastId);
+                assertEquals(7, ledger.checkpoint(op).upperId);
+            }
+        } finally {
+            context().deleteDatabase(name);
+        }
+    }
+
+    @Test
+    public void preservesV4FactsAndCreatesEmptyCheckpointStore() {
+        String name = database();
+        context().deleteDatabase(name);
+        try {
+            try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+                ledger.outbox()
+                        .put(
+                                new DurableDelivery.Intent(
+                                        DurableDelivery.State.CONFIRMED,
+                                        "source",
+                                        7,
+                                        "sig",
+                                        "marker",
+                                        "fp",
+                                        123,
+                                        null,
+                                        new DurableDelivery.Operation("automatic", 42),
+                                        new DurableDelivery.SourceFacts(123, 0, 3, null, true)));
+                SQLiteDatabase db = ledger.getWritableDatabase();
+                db.execSQL("DROP TABLE scan_cursors");
+                db.setVersion(4);
+            }
+            try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+                assertEquals(5, ledger.getReadableDatabase().getVersion());
+                DurableDelivery.Intent saved = ledger.outbox().get("source", 7);
+                assertEquals(123, saved.eventId);
+                assertEquals(123, saved.facts.start);
+                assertEquals(0, saved.facts.seconds);
+                assertNull(saved.facts.presentation);
+                assertEquals("automatic", saved.operation.owner);
+                assertEquals(42, saved.operation.generation);
+                assertNull(ledger.checkpoint(new DurableDelivery.Operation("automatic", 42)));
             }
         } finally {
             context().deleteDatabase(name);

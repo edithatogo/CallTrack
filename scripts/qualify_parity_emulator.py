@@ -74,6 +74,7 @@ def qualify(serial):
                 raise RuntimeError('Install not confirmed')
         check('CalendarSliceTest', 'syntheticCursorMapsPresentationWithoutPersonalQuery')
         check('CalendarSliceTest', 'syntheticCursorRetainsNullAndExtendedPresentation')
+        check('CalendarSliceTest', 'syntheticPagingUsesBoundedQueriesAndPreservesEveryRow')
         for method in ('preservesV1ReceiptsAndCreatesLegacyBindings',
                        'outboxCommitsInflightAndPurgesConfirmedPayloadAcrossReopen',
                        'rejectsOutboxWriteInsideAnUncommittedTransaction',
@@ -81,7 +82,9 @@ def qualify(serial):
                        'preservesV2PendingRowsWithoutInventingOperationOwnership',
                        'operationIdentitySurvivesReopenAndPayloadPurge',
                        'preservesV3OwnershipWithoutInferringSourceFactsFromPayload',
-                       'sourceFactsSurviveReopenAndPayloadPurgeWithNullPresentation'):
+                       'sourceFactsSurviveReopenAndPayloadPurgeWithNullPresentation',
+                       'frozenCheckpointPersistsAndRejectsRegressionOrRebinding',
+                       'preservesV4FactsAndCreatesEmptyCheckpointStore'):
             check('ParityStoreTest', method)
         receipt['result'] = 'passed'
     except Exception as error:
