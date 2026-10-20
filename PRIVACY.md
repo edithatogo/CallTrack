@@ -14,7 +14,7 @@ members. Private/free event flags do not encrypt content or revoke calendar acce
 | Location | Data and purpose | Retention/deletion behaviour now |
 |---|---|---|
 | Android call-log provider | Source call metadata | Owned by the system; this app does not delete source rows |
-| Private `slice` preferences | Random source namespace and selected calendar ID | Retained across restart; no in-app reset workflow |
+| Private `slice` preferences | Random source namespace, selected calendar ID and versioned automatic activation settings (generation, enabled state, destination ID, timezone, start and type flags) | Retained across restart; no in-app reset workflow |
 | Private `calltrack-ledger.db`, schema5 | Source/destination keys, event IDs, fingerprints, outbox state, operation owner/generation and source instant/actual duration/raw type/presentation | Retained for duplicate prevention and recovery; no age-based expiry |
 | Outbox personal payload | Frozen event title/description/time data for interrupted delivery | DurableDelivery clears payload on confirmed/review/suppressed transitions; pending payload has no time-based expiry |
 | Private scan checkpoints | Operation owner/generation, source namespace, frozen upper and last processed IDs and hashed source bindings | Retained for recovery; no expiry or automatic cleanup yet; no caller names/numbers stored |
