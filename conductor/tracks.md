@@ -15,7 +15,7 @@ Tracks 4, 5 and 6 are in progress. Track5 community preparation does not establi
   *Link: [Track](tracks/kotlin_20261020/index.md)*
 
 ---
-- [ ] **Track: Android Compose discovery and migration** (M6)
+- [~] **Track: Android Compose discovery and migration** (M6)
   *Link: [Track](tracks/compose_20261020/index.md)*
 
 ---
