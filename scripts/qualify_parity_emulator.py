@@ -72,6 +72,7 @@ def qualify(serial):
             attempted.append(package)
             if 'Success' not in command('install', str(apk)):
                 raise RuntimeError('Install not confirmed')
+        check('AutomaticSettingsTest', 'openingSettingsDoesNotEnableOrSelectDestinationWithoutAccess')
         check('AutomaticWorkTest', 'absentActivationExecutesWithoutCallCalendarPermission')
         check('AutomaticWorkTest', 'staleGenerationExecutesWithoutOpeningProviders')
         check('AutomaticWorkTest', 'promptAndPeriodicRequestsPersistWithoutNetworkConstraint')
@@ -95,7 +96,8 @@ def qualify(serial):
                        'frozenCheckpointPersistsAndRejectsRegressionOrRebinding',
                        'preservesV4FactsAndCreatesEmptyCheckpointStore',
                        'rolloverPreservesProcessedAnchorAndRejectsStalePublication',
-                       'pendingRecoveryQueryIsBoundedAndOwnerDestinationScoped'):
+                       'pendingRecoveryQueryIsBoundedAndOwnerDestinationScoped',
+                       'deliveryCountsIncludeLateLegacyWithoutDoubleCountingBoundReceipt'):
             check('ParityStoreTest', method)
         receipt['result'] = 'passed'
     except Exception as error:

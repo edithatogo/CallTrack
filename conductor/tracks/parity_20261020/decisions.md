@@ -268,3 +268,29 @@ retain existing working app until replacement scheduling and recovery are proven
 - Promotion/expiry: retain this candidate only if real worker-to-provider delivery,
   paused/stale generations, process/reboot/reopen/offline/Doze, fixture cleanup and
   package upgrade preserve progress. Reassess graph size/failures at full acceptance.
+
+
+## Automatic controls and manual-path integration
+
+Expose a separate nonexported automatic settings Activity from the manual launcher.
+Enable/apply requires calendar/call-log access, a visible writable destination, at
+least one call type and an explicit from-now confirmation. Draft controls do not
+change an active policy. Phone-state access is requested for prompt wakes but is
+not a prerequisite for periodic recovery. Permission callbacks refresh controls;
+they do not enable a policy. Reopening may request recovery for an already-enabled
+policy. Pause stays available even if status cannot load. No fallback destination
+is selected; unavailable active destinations are labelled explicitly.
+
+ManualDelivery replaces the launcher action's old SliceEngine execution, sharing
+DurableDelivery/outbox identity with automatic work. Existing late manual receipts
+are already recognised by SqliteLedger's legacy fallback; no new identity is guessed.
+All-route counts are read in one SQL snapshot, including unbound older receipts in
+review without double counting bound rows. Previously verified counts do not claim
+current event existence. UI labels are resource-based in English/German; missing
+German strings first failed lint and were supplied before the final passing build.
+
+Remaining review/integration work: monotonic worker status publication across late
+old jobs, failed-attempt counts, permission text when a prior automatic policy exists,
+draft-state recreation/accessibility, import/recovery controls and full positive
+permission/provider/background acceptance. Programmatic Activity state tests are
+not a substitute for guarded rendered/manual UI acceptance.

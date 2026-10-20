@@ -598,4 +598,41 @@ public class ParityStoreTest {
             assertTrue(context().deleteDatabase(name));
         }
     }
+
+    @Test
+    public void deliveryCountsIncludeLateLegacyWithoutDoubleCountingBoundReceipt() {
+        String name = database();
+        context().deleteDatabase(name);
+        try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+            int index = 0;
+            for (DurableDelivery.State state : DurableDelivery.State.values())
+                ledger.outbox()
+                        .put(
+                                new DurableDelivery.Intent(
+                                        state, "count-" + (index++), 7, "s", "m", "f", -1, null));
+            DeliveryCounts counts = ledger.counts();
+            assertEquals(3, counts.pending);
+            assertEquals(1, counts.verified);
+            assertEquals(2, counts.review);
+            assertEquals(1, counts.suppressed);
+            ledger.put("late-manual", 7, new SliceEngine.Entry(123, "fingerprint"));
+            assertEquals(3, ledger.counts().review);
+            assertEquals(DurableDelivery.State.LEGACY, ledger.outbox().get("late-manual", 7).state);
+            ledger.outbox()
+                    .put(
+                            new DurableDelivery.Intent(
+                                    DurableDelivery.State.CONFIRMED,
+                                    "late-manual",
+                                    7,
+                                    "s",
+                                    "m",
+                                    "fingerprint",
+                                    123,
+                                    null));
+            assertEquals(2, ledger.counts().review);
+            assertEquals(2, ledger.counts().verified);
+        } finally {
+            assertTrue(context().deleteDatabase(name));
+        }
+    }
 }
