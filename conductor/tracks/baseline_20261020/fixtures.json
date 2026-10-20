@@ -65,7 +65,7 @@
         "outgoing": false,
         "missed": true
       },
-      "expected": "No auto writes; manual import pause policy explicitly resolved under U06/R01"
+      "expected": "No auto writes; manual import pause policy explicitly resolved under R01; final import/pause policy remains to be specified"
     },
     {
       "id": "F07",

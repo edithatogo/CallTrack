@@ -36,3 +36,12 @@ Research execution complete; final verification and formal review pending. Appli
 - Phase 2: decisions D01–D05. Androguard used as isolated analysis tool; no runtime dependency promoted. A network/device prototype would not resolve a mapping uncertainty and is deferred.
 - Phase 3: **N/A application changes/tests/migration**; scope clarification and D04 document the allowed deferral. Documentation/source verification applies instead.
 - Phase 4: consolidated findings and downstream handoff updated; see verification.md.
+
+## Phase: Review Fixes
+
+- [~] Task: Correct stale global status and misleading fixture cross-reference; verify archival links and validator failure detection
+
+## Commit history
+
+- d3a68d7: track start.
+- f5fb750: static mapping, requirements, decisions, fixtures and evidence verification.
