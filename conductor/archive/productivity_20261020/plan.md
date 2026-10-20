@@ -33,11 +33,14 @@ Research completed with justified implementation deferral. Candidate ordering is
 ## History and remaining checkpoint
 
 - `1f3b07c`: activate research track.
-- [~] Formal review, host/link/source verification and archive.
+- [x] Formal review and host/link/source verification; archive follows.
 - User priorities remain optional input; no answer is taken as validation.
 
 - `caf5fb4`: feature mapping, research and justified implementation deferral.
 
 ## Phase: Review Fixes
 
-- [~] Add restore receipt trust/reconciliation contracts and final validation.
+- [x] Add restore receipt trust/reconciliation contracts; final checks pass.
+
+- `0347da7`: restore-trust review fix and final checks.
+- [x] Archive research/deferral record; workflow priority and feature acceptance remain open.
