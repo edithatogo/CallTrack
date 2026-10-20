@@ -9,5 +9,6 @@
     "parity_20261020"
   ],
   "requirements": "R13, R27",
-  "implementation_status": "discovery"
+  "implementation_status": "community-preparation-reviewing-release-acceptance-deferred",
+  "release_ready": false
 }

@@ -77,3 +77,12 @@ The [track registry](tracks.md) now owns execution. These inventories are planni
 ## Qualified M2 outcome
 
 [Track 3 archive](archive/calendar_slice_20261020/index.md): manual source/mapper/provider/ledger/UI implemented. Final 16 JVM contracts, 16 host tests, five Android17/API37 instrumentation invocations and fixture/package cleanup passed. Native persistence and retry/edit protection are qualified for synthetic inputs in a LOCAL calendar; saved-choice/missing-destination UI passed. No writable Microsoft-like calendar was exposed by the bounded metadata query, so remote Outlook qualification remains pending. M3 must cover automatic operation, live calls, history, durable pre-insert intent/lost-marker/tombstone recovery and restore identity.
+
+## M4 preparation checkpoint
+
+[Track5](tracks/release_20261020/index.md) has prepared contributor/lifecycle/security
+guidance, templates and a release protocol, with dependency/channel research. M4
+exit criteria remain unmet while M3 is incomplete. Source-matched signed candidate,
+upgrade/recovery execution, distribution outcomes and actual observation remain
+open; physical-call acceptance stays pending by user direction. No public release
+or production identity has been created.
