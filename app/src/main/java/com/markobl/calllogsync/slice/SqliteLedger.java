@@ -63,6 +63,37 @@ public final class SqliteLedger extends SQLiteOpenHelper
                         + " KEY(owner,generation))");
     }
 
+    /** Bounded source-independent recovery, restricted to this owner/generation/destination. */
+    @Override
+    public java.util.List<String> pending(
+            DurableDelivery.Operation operation, long calendar, int limit) {
+        if (operation == null || calendar < 0 || limit < 1 || limit > 500)
+            throw new IllegalArgumentException("Invalid pending query");
+        java.util.List<String> keys = new java.util.ArrayList<>();
+        try (Cursor cursor =
+                getReadableDatabase()
+                        .query(
+                                "outbox",
+                                new String[] {"source"},
+                                "calendar=? AND operation_owner=? AND operation_generation=? AND"
+                                        + " state IN (?,?,?)",
+                                new String[] {
+                                    Long.toString(calendar),
+                                    operation.owner,
+                                    Long.toString(operation.generation),
+                                    "READY",
+                                    "IN_FLIGHT",
+                                    "ATTEMPTED"
+                                },
+                                null,
+                                null,
+                                "source ASC",
+                                Integer.toString(limit))) {
+            while (cursor.moveToNext()) keys.add(cursor.getString(0));
+        }
+        return java.util.Collections.unmodifiableList(keys);
+    }
+
     @Override
     public PagedCalls.Checkpoint get(DurableDelivery.Operation operation) {
         return checkpoint(operation);

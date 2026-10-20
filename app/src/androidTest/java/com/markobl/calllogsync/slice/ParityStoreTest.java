@@ -503,4 +503,99 @@ public class ParityStoreTest {
             assertTrue(context().deleteDatabase(name));
         }
     }
+
+    @Test
+    public void pendingRecoveryQueryIsBoundedAndOwnerDestinationScoped() {
+        String name = database();
+        context().deleteDatabase(name);
+        DurableDelivery.Operation active = new DurableDelivery.Operation("automatic", 1);
+        try {
+            try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+                DurableDelivery.Store outbox = ledger.outbox();
+                int index = 0;
+                for (DurableDelivery.State state : DurableDelivery.State.values()) {
+                    outbox.put(
+                            new DurableDelivery.Intent(
+                                    state,
+                                    "key-" + (index++),
+                                    7,
+                                    "signature",
+                                    "marker",
+                                    "fingerprint",
+                                    -1,
+                                    null,
+                                    active));
+                }
+                outbox.put(
+                        new DurableDelivery.Intent(
+                                DurableDelivery.State.READY,
+                                "other-generation",
+                                7,
+                                "s",
+                                "m",
+                                "f",
+                                -1,
+                                null,
+                                new DurableDelivery.Operation("automatic", 2)));
+                outbox.put(
+                        new DurableDelivery.Intent(
+                                DurableDelivery.State.READY,
+                                "other-owner",
+                                7,
+                                "s",
+                                "m",
+                                "f",
+                                -1,
+                                null,
+                                new DurableDelivery.Operation("import", 1)));
+                outbox.put(
+                        new DurableDelivery.Intent(
+                                DurableDelivery.State.READY,
+                                "other-calendar",
+                                8,
+                                "s",
+                                "m",
+                                "f",
+                                -1,
+                                null,
+                                active));
+                outbox.put(
+                        new DurableDelivery.Intent(
+                                DurableDelivery.State.READY,
+                                "unowned",
+                                7,
+                                "s",
+                                "m",
+                                "f",
+                                -1,
+                                null));
+                assertEquals(
+                        java.util.Arrays.asList("key-0", "key-1"), ledger.pending(active, 7, 2));
+                assertEquals(
+                        java.util.Arrays.asList("key-0", "key-1", "key-2"),
+                        ledger.pending(active, 7, 500));
+                expectFailure(IllegalArgumentException.class, () -> ledger.pending(active, 7, 0));
+                expectFailure(IllegalArgumentException.class, () -> ledger.pending(active, 7, 501));
+            }
+            try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+                assertEquals(3, ledger.pending(active, 7, 4).size());
+                ledger.outbox()
+                        .put(
+                                new DurableDelivery.Intent(
+                                        DurableDelivery.State.REVIEW,
+                                        "key-0",
+                                        7,
+                                        "s",
+                                        "m",
+                                        "f",
+                                        -1,
+                                        null,
+                                        active));
+                assertEquals(
+                        java.util.Arrays.asList("key-1", "key-2"), ledger.pending(active, 7, 4));
+            }
+        } finally {
+            assertTrue(context().deleteDatabase(name));
+        }
+    }
 }
