@@ -12,8 +12,11 @@ public final class AndroidActivationStore implements ActivationControl.Store {
     private static volatile boolean commitUncertain;
 
     public AndroidActivationStore(Context context) {
-        preferences =
-                context.getApplicationContext().getSharedPreferences("slice", Context.MODE_PRIVATE);
+        this(context.getApplicationContext().getSharedPreferences("slice", Context.MODE_PRIVATE));
+    }
+
+    AndroidActivationStore(SharedPreferences preferences) {
+        this.preferences = preferences;
     }
 
     @Override

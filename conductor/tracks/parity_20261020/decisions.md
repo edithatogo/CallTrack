@@ -111,3 +111,15 @@ memory before disk success. Restart requires fresh stored readback; no claim of
 rollback on disk failure. Existing backup/transfer exclusions cover these settings.
 Native persistence and fault injection remain unqualified until runtime tests;
 launcher/background invocation and explicit pending-recovery UI remain required.
+
+
+## Automatic scan rollover integration requirement
+
+A completed frozen checkpoint must not leave automatic work permanently complete.
+The next scan must validate the previous source anchor, capture a new upper bound,
+and preserve prior delivery receipts and activation ownership. Publication must be
+atomic against overlapping workers and pause. Do not relax the existing immutable
+checkpoint setter to permit arbitrary rebinding. Source-independent recovery of
+pending intents must precede source traversal so deleted source anchors do not hide
+an uncertain provider insertion. Rollover and recovery remain unimplemented at this
+checkpoint; they are prerequisites to scheduler/UI integration, not a scope deferral.
