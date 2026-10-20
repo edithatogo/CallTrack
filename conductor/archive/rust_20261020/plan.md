@@ -40,4 +40,7 @@ Research and bounded host experiment complete; production Rust adoption is defer
 
 ## Phase: Review Fixes
 
-- [~] Expand benchmark provenance with exact tool/artifact hashes and validate.
+- [x] Expand benchmark provenance with exact tool/artifact hashes; final checks pass.
+
+- `2e1bcba`: review provenance fix and final verification.
+- [x] Archive research and host experiment; production Rust and complete contract/target gates remain open.

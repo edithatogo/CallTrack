@@ -148,7 +148,7 @@ not fulfill those implementation prerequisites.
 
 ## Rust evaluation decision
 
-[Track13 RUST-D01](tracks/rust_20261020/decisions.md) retains Kotlin/JVM/native code
+[Track13 RUST-D01](archive/rust_20261020/decisions.md) retains Kotlin/JVM/native code
 after a bounded signature experiment. Reopen for a named independent consumer or
 profiled deficiency; require full contracts and actual target/FFI packaging plus
 end-to-end measurements. No Rust rewrite or prerequisite is created by this research.

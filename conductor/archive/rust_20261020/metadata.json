@@ -1,0 +1,21 @@
+{
+  "track_id": "rust_20261020",
+  "type": "research-led-development",
+  "status": "completed",
+  "milestone": "Before M5/M7 decisions",
+  "created_at": "2026-10-20",
+  "updated_at": "2026-10-21",
+  "depends_on": [
+    "build_20261020"
+  ],
+  "requirements": "R26",
+  "implementation_status": "isolated signature-subset experiment only",
+  "archived": true,
+  "archived_at": "2026-10-21",
+  "research_outcome": "retain-kotlin-native; defer-production-rust",
+  "prototype_tests_passed": 3,
+  "java_golden_cases_matched": 4,
+  "full_java_contract_qualified": false,
+  "native_packaging_qualified": false,
+  "production_adopted": false
+}

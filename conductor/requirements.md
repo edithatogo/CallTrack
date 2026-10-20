@@ -137,7 +137,7 @@ and defers implementation; no iOS/device/calendar runtime qualification is estab
 
 ## Track13 Rust evaluation outcome
 
-R26 has [X01–X10](tracks/rust_20261020/requirements.md) and an isolated Rust/JVM
+R26 has [X01–X10](archive/rust_20261020/requirements.md) and an isolated Rust/JVM
 source-signature experiment. Four golden cases match, but full Java/UTF-16/legacy
 contracts, FFI and native packaging remain unqualified. RUST-D01 retains Kotlin/
 native ownership and defers adoption; host micro-timings alone do not justify Rust.
