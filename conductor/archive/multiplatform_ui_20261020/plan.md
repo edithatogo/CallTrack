@@ -46,5 +46,10 @@ production sharing after evidence; Track7/8 deferrals remain in force.
 ## History and review fixes
 
 - `efc06b5`: implement synthetic desktop trial and record discovery/decision.
-- [~] Review improvement: reselecting destination must not restore old preview;
+- [x] Review improvement: reselecting destination must not restore old preview;
   rerun tests and refresh source-bound receipt.
+
+- Review fix and verification committed; final receipt records4 passing UI tests.
+
+- `7198b24`: review regression fix and final qualification; no unresolved finding.
+- [x] Archive research outcome; M8 production/shared target acceptance remains deferred.

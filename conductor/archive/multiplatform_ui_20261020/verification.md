@@ -28,3 +28,8 @@ passed; Conductor97 documents/13 tracks/25 scenarios and private-source digests
 passed. Source/test-report hashes refreshed after review. No root runtime or
 production build selection changed; product identity/production stack/guidelines
 therefore need no adoption change. Research outcomes are in requirements/roadmap.
+
+Post-archive:97 document/13 track/25 scenario checks and25 host tests pass;
+prototype executable-input hashes match the4-test receipt. Root app/build/tooling
+and previous Android prototype are unchanged from baseline. Archive and prototype
+README links were rebased. Working Android app remains Views.

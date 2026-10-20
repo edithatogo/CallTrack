@@ -9,3 +9,5 @@
 - [Android Compose discovery](compose_20261020/index.md) — research completed, reviewed with fixes and archived2026-10-21 with justified production deferral. Prototype builds/3 policy/25 host tests pass; final guarded native UI5/5 fails on Android system dialogs. Working app remains Views; M6 production and manual/native acceptance are not complete.
 
 - [KMP shared core and second-platform requirements](kmp_20261020/index.md) — research completed, reviewed with fixes and archived2026-10-21. Retain current implementation; extraction deferred. No common module or equivalent second-target tests; M7 production gate remains open.
+
+- [Compose Multiplatform product and UI discovery](multiplatform_ui_20261020/index.md) — research completed, reviewed with fixes and archived2026-10-21. Isolated desktop JVM prototype builds;4 offscreen UI tests pass. Production shared UI remains deferred; no iOS/native packaging/manual accessibility acceptance.

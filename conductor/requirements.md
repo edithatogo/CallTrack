@@ -106,7 +106,7 @@ production acceptance remains pending.
 
 ## Track9 shared-UI research outcome
 
-R17/R24 have [U01–U08](tracks/multiplatform_ui_20261020/requirements.md) for capability-aware
+R17/R24 have [U01–U08](archive/multiplatform_ui_20261020/requirements.md) for capability-aware
 shared UI. A standalone desktop experiment tests synthetic destination choice and
 preview only. Production adoption is deferred under UI-D01; no iOS or shared
 Android/iOS UI, native packaging or manual accessibility acceptance is established.

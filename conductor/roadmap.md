@@ -114,7 +114,7 @@ No shared-core or second-platform application was implemented in this phase.
 
 ## M8 research disposition
 
-[Track9 UI-D01](tracks/multiplatform_ui_20261020/decisions.md) records a bounded desktop
+[Track9 UI-D01](archive/multiplatform_ui_20261020/decisions.md) records a bounded desktop
 UI experiment and defers production sharing. The M8 gate remains unchanged; reopen
 when a feasible companion workflow, common contracts and Android UI/state ownership
 are qualified. Desktop offscreen tests do not qualify iOS or native distribution.
