@@ -12,11 +12,14 @@ public final class CallIdentity {
     public static String signature(CallRecord call) {
         String number = call.number == null ? "-1:" : call.number.length() + ":" + call.number;
         String material =
-                call.key()
+                "source-v1|"
+                        + call.key()
                         + "|"
                         + call.start
                         + "|"
                         + call.seconds
+                        + "|"
+                        + call.type
                         + "|"
                         + call.direction.length()
                         + ":"

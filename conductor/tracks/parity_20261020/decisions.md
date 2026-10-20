@@ -17,3 +17,12 @@ Use emulator call/provider/background tests now. Physical-call acceptance remain
 ## Dependencies — initial disposition
 
 Native SQLite remains selected for the bounded outbox migration, subject to actual native tests. Room is a takeover candidate for schema/DAO/migration tooling, not an automatic addition during this behavioural change. WorkManager is already present at 2.7.1; refresh compatibility and fix constraints before selecting the scheduling version. No experimental analytics API or preview library is needed just to observe local test timestamps. Final dependency decisions/versions remain required before scheduling implementation.
+
+## Coordinator/import boundaries to implement
+
+- Use bounded source-ID paging with a stable upper snapshot, persisted per-row progress and anchor signature/reset checks. An unexpected missing/changed anchor pauses for source review rather than trusting a stale numeric checkpoint. Successful/reviewed/filtered rows advance deliberately; permission/provider/invalid-data failures must not silently skip the rest of history.
+- Automatic enable/resume defines an explicit future-call boundary. Delays/process death/reboot retain the current activation and catch up; an explicit pause/re-enable starts a new activation rather than silently importing paused history. Manual historical import is separate.
+- Every pending intent needs an operation owner/activation or import-session generation before generic background draining is wired. Cancelled imports and old paused activations are not globally resumable. Explicit manual retry may authorise the selected call separately.
+- Import preview freezes the selected range/filter/destination and candidate source signatures. Confirmation authorises that snapshot, not a changing query. Revalidate changed candidates, retain progress across interruption, cancel without deleting confirmed events and clear preview personal payload when cancelled/completed.
+- Source facts (exact source instant, actual seconds, raw type/presentation) must survive payload minimisation; logical clearing of names/numbers is not a claim of forensic erasure.
+- All app delivery currently assumes one Android process; UI pause/settings publication must coordinate with the same delivery lock so a displayed completed pause has no later writes from an old worker.
