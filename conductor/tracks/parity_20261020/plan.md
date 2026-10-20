@@ -429,3 +429,6 @@ in worker-provider-evidence.json. Provider-only prior checkpoint is1c9fffe; curr
 helper changes only expose its test fixture utilities at package scope. No production
 runtime code/dependency changed. Reboot/force-stop/reopen, offline/Doze, rendered UI,
 remaining persistence faults and full-track review/fixes/archive are still open.
+
+- `1c9fffe`: actual calendar-provider persistence boundaries, edits/deletion, import and read-only recovery acceptance.
+- `ea86831`: actual tagged CallLog/WorkManager delivery, filters, activation boundaries, revocation and observed latency.
