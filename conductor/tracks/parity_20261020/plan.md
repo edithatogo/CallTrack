@@ -27,7 +27,8 @@ All tasks pending. Discovery is real track work. Implementation is conditional; 
 ### Implementation slices still required
 
 - [x] Durable intent engine, source-independent resume, v1 preservation and native persistence tests (31 JVM/19 host tests; four API36 native invocations passed; packages removed)
-- [ ] Retained source facts and operation ownership/generation, with migration tests
+- [x] Operation owner/generation and preserving schema3 migration (39 JVM/25 host/7 API36 native checks; packages removed)
+- [ ] Retained source facts/raw presentation, with preserving migration/tests
 - [ ] Bounded source paging, checkpoint/anchor validation, filter/settings policy and reset handling
 - [ ] Frozen historical preview, confirmed bounded import, cancel/resume and partial-progress handling
 - [ ] Read-only legacy confidence/ambiguity matcher
@@ -63,3 +64,10 @@ Next: retain source facts/raw presentation and operation-owner generation in the
 identity, epoch/rebinding and opaque remote-ID migration requirements. Retain current
 receipt compatibility; no direct connector/schema expansion is adopted here.
 Provider-cloud qualification and native marker survival remain unverified.
+
+## Current ownership checkpoint
+
+Schema3 ownership change verified in ownership-evidence.json. Next implement raw
+presentation/exact source metadata retention, then bounded source traversal, frozen
+import sessions, legacy matching, scheduling and UI. Final full-track review/archive
+remain required; do not treat this checkpoint as parity completion.

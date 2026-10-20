@@ -13,7 +13,7 @@ public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.
     }
 
     public SqliteLedger(Context context, String name) {
-        super(context, name, null, 2);
+        super(context, name, null, 3);
     }
 
     @Override
@@ -27,12 +27,20 @@ public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion != 1 || newVersion != 2)
+        if (newVersion != 3 || oldVersion < 1 || oldVersion > 2)
             throw new IllegalStateException("A preserving ledger migration is required");
-        createOutbox(db);
-        db.execSQL(
-                "INSERT INTO outbox (source,calendar,state,event,fingerprint) SELECT"
-                        + " source,calendar,'LEGACY',event,fingerprint FROM receipts");
+        if (oldVersion == 1) {
+            createOutbox(db);
+            db.execSQL(
+                    "INSERT INTO outbox (source,calendar,state,event,fingerprint) SELECT"
+                            + " source,calendar,'LEGACY',event,fingerprint FROM receipts");
+        } else {
+            // Existing pending rows remain unowned, never assigned to a new activation.
+            db.execSQL("ALTER TABLE outbox ADD COLUMN operation_owner TEXT");
+            db.execSQL(
+                    "ALTER TABLE outbox ADD COLUMN operation_generation INTEGER NOT NULL DEFAULT"
+                            + " 0");
+        }
     }
 
     @Override
@@ -79,7 +87,8 @@ public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.
                 "CREATE TABLE outbox (source TEXT NOT NULL, calendar INTEGER NOT NULL, state TEXT"
                     + " NOT NULL, event INTEGER NOT NULL, signature TEXT, marker TEXT, fingerprint"
                     + " TEXT NOT NULL, payload_title TEXT, payload_description TEXT, payload_start"
-                    + " INTEGER, payload_end INTEGER, payload_timezone TEXT, PRIMARY"
+                    + " INTEGER, payload_end INTEGER, payload_timezone TEXT, operation_owner TEXT,"
+                    + " operation_generation INTEGER NOT NULL DEFAULT 0, PRIMARY"
                     + " KEY(source,calendar))");
         db.execSQL("CREATE INDEX outbox_state ON outbox(calendar,state)");
     }
@@ -114,7 +123,9 @@ public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.
                                     "payload_description",
                                     "payload_start",
                                     "payload_end",
-                                    "payload_timezone"
+                                    "payload_timezone",
+                                    "operation_owner",
+                                    "operation_generation"
                                 },
                                 "source=? AND calendar=?",
                                 new String[] {key, Long.toString(calendar)},
@@ -140,7 +151,10 @@ public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.
                         c.getString(3),
                         c.getString(4),
                         c.getLong(1),
-                        payload);
+                        payload,
+                        c.isNull(10)
+                                ? null
+                                : new DurableDelivery.Operation(c.getString(10), c.getLong(11)));
             }
         }
         // Preserve receipts even if an older retained entry point wrote after schema migration.
@@ -170,6 +184,9 @@ public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.
         values.put("signature", intent.sourceSignature);
         values.put("marker", intent.marker);
         values.put("fingerprint", intent.fingerprint);
+        values.put("operation_owner", intent.operation == null ? null : intent.operation.owner);
+        values.put(
+                "operation_generation", intent.operation == null ? 0 : intent.operation.generation);
         CallEvent payload = intent.payload;
         if (payload != null) {
             values.put("payload_title", payload.title);
