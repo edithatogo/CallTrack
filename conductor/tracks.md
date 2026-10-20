@@ -11,7 +11,7 @@ Tracks 4 and 5 are in progress. Track5 community preparation does not establish 
   *Link: [Track](tracks/release_20261020/index.md)*
 
 ---
-- [ ] **Track: Kotlin migration and dependency reassessment** (M5)
+- [~] **Track: Kotlin migration and dependency reassessment** (M5)
   *Link: [Track](tracks/kotlin_20261020/index.md)*
 
 ---
