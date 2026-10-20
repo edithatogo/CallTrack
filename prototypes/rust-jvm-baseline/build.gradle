@@ -1,0 +1,16 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '2.3.21'
+    id 'application'
+}
+kotlin {
+    jvmToolchain(17)
+    sourceSets.main.kotlin {
+        srcDirs '../../app/src/main/kotlin', 'src/main/kotlin'
+        include 'com/markobl/calllogsync/slice/CallIdentity.kt', 'org/calltrack/benchmark/Main.kt'
+    }
+}
+sourceSets.main.java {
+    srcDirs = ['../../app/src/main/java']
+    include 'com/markobl/calllogsync/slice/CallRecord.java'
+}
+application { mainClass = 'org.calltrack.benchmark.MainKt' }

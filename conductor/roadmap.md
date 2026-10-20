@@ -145,3 +145,10 @@ testing requirements and coverage starting at default-role activation. It neithe
 establishes project eligibility nor universal pre-existing history. Reopen Track8/9
 only after actual native workflow/contract/packaging tests; research closure does
 not fulfill those implementation prerequisites.
+
+## Rust evaluation decision
+
+[Track13 RUST-D01](tracks/rust_20261020/decisions.md) retains Kotlin/JVM/native code
+after a bounded signature experiment. Reopen for a named independent consumer or
+profiled deficiency; require full contracts and actual target/FFI packaging plus
+end-to-end measurements. No Rust rewrite or prerequisite is created by this research.
