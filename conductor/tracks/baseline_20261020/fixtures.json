@@ -1,0 +1,247 @@
+{
+  "status": "proposed acceptance catalogue; no app execution",
+  "synthetic": true,
+  "cases": [
+    {
+      "id": "F01",
+      "requirement": "R03",
+      "scenario": "known incoming",
+      "input": {
+        "type": 1,
+        "name": "Example Contact",
+        "number": "TEST-NUMBER-A",
+        "date_ms": 1000250,
+        "duration_s": 65
+      },
+      "expected": "Call From Example Contact; legacy start1000000,end1065000; successor retains source instant"
+    },
+    {
+      "id": "F02",
+      "requirement": "R03",
+      "scenario": "outgoing unknown contact",
+      "input": {
+        "type": 2,
+        "name": "",
+        "number": "TEST-NUMBER-B",
+        "duration_s": 12
+      },
+      "expected": "Direction and number fallback; no fabricated name"
+    },
+    {
+      "id": "F03",
+      "requirement": "R04",
+      "scenario": "missed zero duration",
+      "input": {
+        "type": 3,
+        "duration_s": 0
+      },
+      "expected": "Legacy start=end; successor display policy U03 remains open"
+    },
+    {
+      "id": "F04",
+      "requirement": "R03",
+      "scenario": "withheld/null number",
+      "input": {
+        "number": null
+      },
+      "expected": "Safe unknown presentation; legacy unguarded description concat may fail; ACS number.length can fail"
+    },
+    {
+      "id": "F05",
+      "requirement": "R03",
+      "scenario": "short legitimate number",
+      "input": {
+        "number": "12"
+      },
+      "expected": "Preserve raw value; do not blindly copy legacy unknown-number rule"
+    },
+    {
+      "id": "F06",
+      "requirement": "R01",
+      "scenario": "filters and pause",
+      "input": {
+        "enabled": false,
+        "incoming": true,
+        "outgoing": false,
+        "missed": true
+      },
+      "expected": "No auto writes; manual import pause policy explicitly resolved under U06/R01"
+    },
+    {
+      "id": "F07",
+      "requirement": "R06",
+      "scenario": "five eligible rows while stopped",
+      "input": {
+        "new_rows": 5
+      },
+      "expected": "Legacy auto scans4; successor recovers5 once"
+    },
+    {
+      "id": "F08",
+      "requirement": "R06",
+      "scenario": "filtered/already logged rows at head",
+      "input": {
+        "head_rows": 4,
+        "eligible_older_rows": 1
+      },
+      "expected": "Legacy can miss older row; successor finds eligible missing record"
+    },
+    {
+      "id": "F09",
+      "requirement": "R05",
+      "scenario": "full import twice",
+      "input": {
+        "eligible_rows": 8,
+        "runs": 2
+      },
+      "expected": "Successor event set8; no replay duplicates"
+    },
+    {
+      "id": "F10",
+      "requirement": "R07",
+      "scenario": "edited title and description",
+      "input": {
+        "source_unchanged": true
+      },
+      "expected": "Legacy title edit can duplicate; successor preserves edits and identity"
+    },
+    {
+      "id": "F11",
+      "requirement": "R06",
+      "scenario": "same-second collision",
+      "input": {
+        "different_sources": 2,
+        "same_rounded_time_and_title": true
+      },
+      "expected": "Successor keeps two identities; legacy equality insufficient"
+    },
+    {
+      "id": "F12",
+      "requirement": "R06",
+      "scenario": "crash after event before ledger",
+      "input": {
+        "crash_point": "after_insert"
+      },
+      "expected": "Reconciliation yields one event, not blind replay"
+    },
+    {
+      "id": "F13",
+      "requirement": "R06",
+      "scenario": "concurrent jobs",
+      "input": {
+        "workers": 2
+      },
+      "expected": "Single durable effect per source/destination"
+    },
+    {
+      "id": "F14",
+      "requirement": "R02",
+      "scenario": "destination removed/read-only",
+      "input": {
+        "destination_missing": true
+      },
+      "expected": "Pending/error; never silently choose calendar1 or first calendar"
+    },
+    {
+      "id": "F15",
+      "requirement": "R08",
+      "scenario": "permission denial/null cursor",
+      "input": {
+        "permission_granted": false
+      },
+      "expected": "No crash or write; recoverable status and regrant path"
+    },
+    {
+      "id": "F16",
+      "requirement": "R09",
+      "scenario": "offline reboot process death",
+      "input": {
+        "network": false
+      },
+      "expected": "Local write independent of network; reconciliation on supported reopen/restart; cloud sync measured separately"
+    },
+    {
+      "id": "F17",
+      "requirement": "R04",
+      "scenario": "nearest-second tie",
+      "input": {
+        "date_ms": 1000500,
+        "duration_s": 1
+      },
+      "expected": "Legacy start1001000,end1002000; successor policy explicit"
+    },
+    {
+      "id": "F18",
+      "requirement": "R04",
+      "scenario": "very long duration overflow",
+      "input": {
+        "duration_s": 2147484
+      },
+      "expected": "Legacy int multiply wraps; successor arithmetic remains monotonic"
+    },
+    {
+      "id": "F19",
+      "requirement": "R06",
+      "scenario": "restored source IDs",
+      "input": {
+        "same_row_id_different_namespace": true
+      },
+      "expected": "Do not skip new source history using stale numeric checkpoint"
+    },
+    {
+      "id": "F20",
+      "requirement": "R12",
+      "scenario": "endpoint test",
+      "input": {
+        "synthetic": true
+      },
+      "expected": "Successor sends only synthetic data; ACS existing test0 reads actual history"
+    },
+    {
+      "id": "F21",
+      "requirement": "R03",
+      "scenario": "international numbers/extensions",
+      "input": {
+        "number": "+TEST;ext=9"
+      },
+      "expected": "Keep raw/presentation separately; do not mistake sanitised string for valid canonical number"
+    },
+    {
+      "id": "F22",
+      "requirement": "R07",
+      "scenario": "intentional event delete",
+      "input": {
+        "user_deleted": true
+      },
+      "expected": "Apply explicit tombstone/resync policy; no unannounced recreation"
+    },
+    {
+      "id": "F23",
+      "requirement": "R08",
+      "scenario": "call-only access",
+      "input": {
+        "sms_permission": false
+      },
+      "expected": "Core call logging does not require SMS permission"
+    },
+    {
+      "id": "F24",
+      "requirement": "R04",
+      "scenario": "timezone and midnight",
+      "input": {
+        "zone": "Australia/Brisbane",
+        "cross_midnight": true
+      },
+      "expected": "Instants preserved; destination timezone/display verified"
+    },
+    {
+      "id": "F25",
+      "requirement": "R11",
+      "scenario": "partial bulk insertion/failure",
+      "input": {
+        "partial_effect": true
+      },
+      "expected": "Readback, retry and pending state reflect actual results; no assumed full success"
+    }
+  ]
+}
