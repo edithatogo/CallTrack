@@ -136,4 +136,75 @@ public class ParityStoreTest {
             context().deleteDatabase(name);
         }
     }
+
+    @Test
+    public void kotlinMappingRecognisesPreservedJavaReceiptWithoutReinsert() {
+        String name = database();
+        context().deleteDatabase(name);
+        CallRecord call = new CallRecord("fixture", "1", 1234, 0, 1, "Cached", "000", true, "SIM");
+        String javaFingerprint = "c19af50b5118168637d7c85bc6d34bce6739086cbc4510d416bbd2d7799539b1";
+        CallEvent original = CallEvent.from(call, "UTC");
+        assertEquals(javaFingerprint, original.fingerprint());
+        CallEvent[] observed = {original};
+        SliceEngine.CalendarSink sink =
+                new SliceEngine.CalendarSink() {
+                    @Override
+                    public boolean writable(long calendar) {
+                        return calendar == 7;
+                    }
+
+                    @Override
+                    public java.util.List<SliceEngine.StoredEvent> find(
+                            long calendar, String marker) {
+                        throw new AssertionError("Known Java receipt must use its event ID");
+                    }
+
+                    @Override
+                    public long insert(long calendar, CallEvent event) {
+                        throw new AssertionError("Migration must not create a second event");
+                    }
+
+                    @Override
+                    public SliceEngine.StoredEvent read(long id) {
+                        assertEquals(42, id);
+                        return new SliceEngine.StoredEvent(42, 7, observed[0]);
+                    }
+                };
+        try {
+            try (SQLiteDatabase db =
+                    context().openOrCreateDatabase(name, Context.MODE_PRIVATE, null)) {
+                db.execSQL(
+                        "CREATE TABLE receipts (source TEXT NOT NULL, calendar INTEGER NOT NULL,"
+                                + " event INTEGER NOT NULL, fingerprint TEXT NOT NULL, PRIMARY"
+                                + " KEY(source,calendar))");
+                db.execSQL(
+                        "INSERT INTO receipts VALUES (?,7,42,?)",
+                        new Object[] {call.key(), javaFingerprint});
+                db.setVersion(1);
+            }
+            try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+                assertEquals(
+                        SliceEngine.Result.ALREADY_LOGGED,
+                        new SliceEngine(() -> call, sink, ledger, "UTC").run(7));
+                assertEquals(javaFingerprint, ledger.get(call.key(), 7).fingerprint);
+            }
+            observed[0] =
+                    new CallEvent(
+                            "Human edit",
+                            original.description,
+                            original.start,
+                            original.end,
+                            original.timezone,
+                            original.marker);
+            try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+                assertEquals(
+                        SliceEngine.Result.REVIEW_REQUIRED,
+                        new SliceEngine(() -> call, sink, ledger, "UTC").run(7));
+                assertEquals(javaFingerprint, ledger.get(call.key(), 7).fingerprint);
+                assertEquals(2, ledger.getReadableDatabase().getVersion());
+            }
+        } finally {
+            context().deleteDatabase(name);
+        }
+    }
 }

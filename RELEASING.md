@@ -15,7 +15,7 @@ track's scope; use a separately authorised execution after these gates pass.
    disposable development identity. Do not overwrite the old CallTrack installation
    or claim its signing/branding rights. Audit inherited assets/translations.
 3. Freeze a clean Git commit. Build from a fresh checkout with JDK17, Gradle8.13,
-   AGP8.13.2, compile/target36 and build-tools35.0.0, or explicitly qualify any
+   AGP8.13.2, Kotlin/KGP2.3.21, compile/target36 and build-tools35.0.0, or explicitly qualify any
    changes. Follow CONTRIBUTING.md and preserve all test/build evidence. No private
    reference checkout or APK may be required for the root build.
 4. Capture the actual releaseRuntimeClasspath graph and all artifact licences and
