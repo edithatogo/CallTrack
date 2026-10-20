@@ -35,7 +35,7 @@ cannot. Track remains active and cannot yet be archived as complete.
 
 ## Phase: Review Fixes
 
-- [~] Task: Apply review suggestions — README schema2 correction, transitive inventory, test fixture completeness and retained release gate
+- [x] Task: Apply review suggestions — 7a7d180; README schema2 correction, transitive inventory, test fixture completeness and retained release gate
 
 ## Execution checkpoint
 
@@ -44,3 +44,7 @@ archive once completed. Track4 remains active, physical-call acceptance pending;
 that prerequisite cannot be manufactured by release documentation. No publishing,
 key generation, account consent or external messaging was performed. Resume at
 D01–D09 after the M3 evidence exists; do not repeat discovery without changed inputs.
+
+Preparation implementation: 4754d72. Review corrections: 7a7d180. Final repository
+checks passed; no candidate release was created and archive remains conditional on
+the open Phase3/4 acceptance tasks.

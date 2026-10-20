@@ -9,6 +9,8 @@
     "parity_20261020"
   ],
   "requirements": "R13, R27",
-  "implementation_status": "community-preparation-reviewing-release-acceptance-deferred",
-  "release_ready": false
+  "implementation_status": "community-preparation-reviewed-release-acceptance-pending",
+  "release_ready": false,
+  "implementation_commit": "4754d72",
+  "review_commit": "7a7d180"
 }
