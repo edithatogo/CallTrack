@@ -4,7 +4,7 @@ All tasks pending. Discovery is real track work. Implementation is conditional; 
 
 ## Phase 1: Discovery and mapping
 
-- [ ] Task: Reproduce upstream build and assess modern SDK/permission constraints
+- [~] Task: Reproduce upstream build and assess modern SDK/permission constraints
 - [ ] Task: Compare fork repair with fresh implementation; inventory library versus custom-code replacement opportunities
 - [ ] Task: Qualify JDK/Gradle/AGP/SDK, formatting and CI commands; record package/signing strategy
 - [ ] Task: Write findings and refine track requirements/acceptance with source provenance
