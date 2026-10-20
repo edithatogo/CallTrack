@@ -137,7 +137,7 @@ Track4/5 acceptance; existing parity/release work remains prior scope.
 
 ## Platform feasibility refresh
 
-[Track12 PLAT-D01](tracks/platform_feasibility_20261020/decisions.md) recommends ordinary
+[Track12 PLAT-D01](archive/platform_feasibility_20261020/decisions.md) recommends ordinary
 manual/import companion scope, starting native integration experiments on macOS.
 This is a research candidate, not a committed production target. iOS26+ entitled
 default-dialer recent history is a separate conditional option with documented EU

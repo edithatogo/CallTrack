@@ -14,7 +14,7 @@ Evidence-backed capability matrix and useful second-platform scope; rejection/de
 
 ## Inputs and dependencies
 
-Prerequisites: [baseline](../../archive/baseline_20261020/index.md). Requirement references: R24 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
+Prerequisites: [baseline](../baseline_20261020/index.md). Requirement references: R24 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
 
 ## Required outputs
 
@@ -30,14 +30,14 @@ No automatic adoption of shortlisted technology, wholesale rewrite, paid service
 
 ## Shared-core research handoff
 
-[Track8 findings](../../archive/kmp_20261020/findings.md) propose manual/import companion
+[Track8 findings](../kmp_20261020/findings.md) propose manual/import companion
 workflows without selecting a platform. Qualify supported acquisition, calendar,
 background and packaging capabilities here before reopening KMP-D01. No native
 companion or target feasibility is established by that research closure.
 
 ## Shared-UI experiment handoff
 
-[Track9 UI-D01](../../archive/multiplatform_ui_20261020/decisions.md) tests a synthetic desktop
+[Track9 UI-D01](../multiplatform_ui_20261020/decisions.md) tests a synthetic desktop
 preview screen only. Choose a useful platform/workflow and qualify native import,
 calendar, background, accessibility and packaging capabilities here; no such native
 capability follows from the desktop renderer tests.

@@ -29,3 +29,7 @@ Root app/build/scripts/tests and prior prototypes are unchanged from baseline.
 No production stack, brand or guideline change was selected. Detailed local
 logs/docs remain excluded under `.local/platform-evidence/`. These checks do not
 prove entitlement/region eligibility, native workflow or calendar/call acceptance.
+
+Post-archive:113 documents/13 tracks/25 scenarios and25 host tests pass. Internal
+and incoming links, including prototype README, were rebased. Probe source remains
+unchanged since its compiler receipt; no runtime qualification is inferred.

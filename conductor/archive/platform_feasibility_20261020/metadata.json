@@ -1,0 +1,21 @@
+{
+  "track_id": "platform_feasibility_20261020",
+  "type": "research-led-development",
+  "status": "completed",
+  "milestone": "Early research",
+  "created_at": "2026-10-20",
+  "updated_at": "2026-10-21",
+  "depends_on": [
+    "baseline_20261020"
+  ],
+  "requirements": "R24",
+  "implementation_status": "compile-only SDK probe; production deferred",
+  "archived": true,
+  "archived_at": "2026-10-21",
+  "research_outcome": "limited-companion-recommended; conditional-dialer-route-documented",
+  "sdk_surface_qualified": true,
+  "native_runtime_qualified": false,
+  "ios_qualified": false,
+  "dialer_history_qualified": false,
+  "production_target_selected": false
+}

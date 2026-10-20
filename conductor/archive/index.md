@@ -15,3 +15,5 @@
 - [Calendar and service integration discovery](destinations_20261020/index.md) — research completed, reviewed with endpoint-contract fix and archived2026-10-21. Retain native-provider-first; direct connectors/optional endpoint deferred. No cloud/provider live acceptance or network dependency added.
 
 - [Call journal and productivity requirements](productivity_20261020/index.md) — research completed, reviewed with restore-trust fix and archived2026-10-21. Candidate feature order remains provisional; production implementation/dependencies deferred pending validated workflow, retention/recovery and Track4/5 gates.
+
+- [iOS and desktop acquisition feasibility](platform_feasibility_20261020/index.md) — research completed, reviewed and archived2026-10-21. Conditional iOS default-dialer history corrects earlier assumptions; limited ordinary companion recommended. macOS SDK method signatures typecheck only; no native/iOS/calendar/dialer runtime acceptance.

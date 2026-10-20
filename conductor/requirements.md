@@ -129,7 +129,7 @@ feature is delivered. Receipt payload clearing is not journal retention.
 
 ## Track12 platform feasibility outcome
 
-R24 now has [F01–F12](tracks/platform_feasibility_20261020/requirements.md) and a capability
+R24 now has [F01–F12](archive/platform_feasibility_20261020/requirements.md) and a capability
 matrix distinguishing ordinary manual/import companions, conditional iOS26+ default
 dialer history and Windows history APIs. A macOS EventKit signature probe typechecks
 without runtime API calls. PLAT-D01 recommends a limited native companion experiment
