@@ -41,3 +41,12 @@ companion or target feasibility is established by that research closure.
 preview screen only. Choose a useful platform/workflow and qualify native import,
 calendar, background, accessibility and packaging capabilities here; no such native
 capability follows from the desktop renderer tests.
+
+## Bounded experiment,2026-10-21
+
+Use installed macOS SDK only to type-check public EventKit permission/list/read
+function references. Do not instantiate a store, call permission methods, query or
+write calendars. This resolves SDK surface availability only; no native runtime,
+iOS build, entitlement or operational feasibility is inferred. No dependency or
+application integration is selected. Manual/import companion scope remains the
+recommended candidate; default-dialer capture is a separate conditional option.
