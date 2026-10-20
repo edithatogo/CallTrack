@@ -15,13 +15,14 @@ members. Private/free event flags do not encrypt content or revoke calendar acce
 |---|---|---|
 | Android call-log provider | Source call metadata | Owned by the system; this app does not delete source rows |
 | Private `slice` preferences | Random source namespace and selected calendar ID | Retained across restart; no in-app reset workflow |
-| Private `calltrack-ledger.db`, schema4 | Source/destination keys, event IDs, fingerprints, outbox state, operation owner/generation and source instant/actual duration/raw type/presentation | Retained for duplicate prevention and recovery; no age-based expiry |
+| Private `calltrack-ledger.db`, schema5 | Source/destination keys, event IDs, fingerprints, outbox state, operation owner/generation and source instant/actual duration/raw type/presentation | Retained for duplicate prevention and recovery; no age-based expiry |
 | Outbox personal payload | Frozen event title/description/time data for interrupted delivery | DurableDelivery clears payload on confirmed/review/suppressed transitions; pending payload has no time-based expiry |
+| Private scan checkpoints | Operation owner/generation, source namespace, frozen upper and last processed IDs and hashed source bindings | Retained for recovery; no expiry or automatic cleanup yet; no caller names/numbers stored |
 | Selected calendar provider | Title, description, start/end, timezone and app marker; name/number may be included | Remains after uninstall; calendar/provider controls cloud retention and deletion |
 | Local developer evidence | Toolchain paths, hashes, synthetic fixture receipts and test output | `.local` excluded from Git; no automated expiry implemented |
 
 The current launcher uses SliceEngine receipts, not the new DurableDelivery path.
-Schema1–3 receipts and pending rows survive migration to schema4. Older source facts
+Schema1–4 receipts and pending rows survive migration to schema5. Older source facts
 remain unknown; they are never inferred from event marker length. New source facts
 survive payload clearing and remain potentially sensitive; no age-based expiry is
 implemented for them or operation metadata. Clearing an outbox payload is logical

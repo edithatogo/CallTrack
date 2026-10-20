@@ -79,3 +79,16 @@ bounded source traversal with stable snapshot/anchor reset handling, then frozen
 historical sessions and automatic scheduling/UI integration. Prior resume sections
 are historical; use this checkpoint and fresh device/process checks. Full review/
 fixes/archive remain outstanding.
+
+
+## Current paging checkpoint
+
+Schema5 bounded paging/checkpoint foundation verified in paging-evidence.json:
+48 JVM tests,25 host tests,13 API36 native invocations; package cleanup passed.
+The initial native build exposed unavailable JUnit assertThrows; local assertion
+helpers fixed compilation without changing test dependencies. Source-bound build,
+formatting and lint pass (0 errors,30 warnings,5 hints). Frozen bounds, anchor
+validation, cursor limits and preserving v4 migration are implemented. Filter/
+activation settings and coordinator advancement are still required before P02 can
+close. Next integrate scan delivery and frozen import sessions, then scheduler/UI.
+Full-track review/fixes/archive remain outstanding.

@@ -13,7 +13,7 @@ public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.
     }
 
     public SqliteLedger(Context context, String name) {
-        super(context, name, null, 4);
+        super(context, name, null, 5);
     }
 
     @Override
@@ -23,11 +23,12 @@ public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.
                         + " INTEGER NOT NULL, fingerprint TEXT NOT NULL, PRIMARY"
                         + " KEY(source,calendar))");
         createOutbox(db);
+        createScans(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (newVersion != 4 || oldVersion < 1 || oldVersion > 3)
+        if (newVersion != 5 || oldVersion < 1 || oldVersion > 4)
             throw new IllegalStateException("A preserving ledger migration is required");
         if (oldVersion == 1) {
             createOutbox(db);
@@ -42,11 +43,89 @@ public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.
                         "ALTER TABLE outbox ADD COLUMN operation_generation INTEGER NOT NULL"
                                 + " DEFAULT 0");
             }
-            db.execSQL("ALTER TABLE outbox ADD COLUMN source_start INTEGER");
-            db.execSQL("ALTER TABLE outbox ADD COLUMN source_seconds INTEGER");
-            db.execSQL("ALTER TABLE outbox ADD COLUMN source_type INTEGER");
-            db.execSQL("ALTER TABLE outbox ADD COLUMN source_presentation INTEGER");
-            db.execSQL("ALTER TABLE outbox ADD COLUMN source_presentation_supplied INTEGER");
+            if (oldVersion < 4) {
+                db.execSQL("ALTER TABLE outbox ADD COLUMN source_start INTEGER");
+                db.execSQL("ALTER TABLE outbox ADD COLUMN source_seconds INTEGER");
+                db.execSQL("ALTER TABLE outbox ADD COLUMN source_type INTEGER");
+                db.execSQL("ALTER TABLE outbox ADD COLUMN source_presentation INTEGER");
+                db.execSQL("ALTER TABLE outbox ADD COLUMN source_presentation_supplied INTEGER");
+            }
+        }
+        createScans(db);
+    }
+
+    private static void createScans(SQLiteDatabase db) {
+        db.execSQL(
+                "CREATE TABLE scan_cursors (owner TEXT NOT NULL, generation INTEGER NOT NULL,"
+                        + " namespace TEXT NOT NULL, upper_id INTEGER NOT NULL, upper_binding TEXT,"
+                        + " last_id INTEGER NOT NULL, last_binding TEXT, PRIMARY"
+                        + " KEY(owner,generation))");
+    }
+
+    public PagedCalls.Checkpoint checkpoint(DurableDelivery.Operation operation) {
+        if (operation == null) throw new IllegalArgumentException("Operation required");
+        try (Cursor cursor =
+                getReadableDatabase()
+                        .query(
+                                "scan_cursors",
+                                new String[] {
+                                    "namespace",
+                                    "upper_id",
+                                    "upper_binding",
+                                    "last_id",
+                                    "last_binding"
+                                },
+                                "owner=? AND generation=?",
+                                new String[] {operation.owner, Long.toString(operation.generation)},
+                                null,
+                                null,
+                                null)) {
+            return !cursor.moveToFirst()
+                    ? null
+                    : new PagedCalls.Checkpoint(
+                            cursor.getString(0),
+                            cursor.getLong(1),
+                            cursor.getString(2),
+                            cursor.getLong(3),
+                            cursor.getString(4));
+        }
+    }
+
+    /**
+     * Commit after handling a row, never in the provider-effect transaction. Snapshot is immutable.
+     */
+    public void checkpoint(DurableDelivery.Operation operation, PagedCalls.Checkpoint next) {
+        if (operation == null || next == null)
+            throw new IllegalArgumentException("Checkpoint required");
+        SQLiteDatabase db = getWritableDatabase();
+        if (db.inTransaction())
+            throw new IllegalStateException("Checkpoint must commit independently");
+        db.beginTransaction();
+        try {
+            PagedCalls.Checkpoint prior = checkpoint(operation);
+            if (prior != null
+                    && (!prior.namespace.equals(next.namespace)
+                            || prior.upperId != next.upperId
+                            || !java.util.Objects.equals(prior.upperBinding, next.upperBinding)
+                            || next.lastId < prior.lastId
+                            || next.lastId == prior.lastId
+                                    && !java.util.Objects.equals(
+                                            prior.lastBinding, next.lastBinding)))
+                throw new IllegalStateException("Frozen checkpoint cannot be reset or rebound");
+            ContentValues values = new ContentValues();
+            values.put("owner", operation.owner);
+            values.put("generation", operation.generation);
+            values.put("namespace", next.namespace);
+            values.put("upper_id", next.upperId);
+            values.put("upper_binding", next.upperBinding);
+            values.put("last_id", next.lastId);
+            values.put("last_binding", next.lastBinding);
+            if (db.insertWithOnConflict(
+                            "scan_cursors", null, values, SQLiteDatabase.CONFLICT_REPLACE)
+                    < 0) throw new IllegalStateException("Checkpoint not stored");
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
         }
     }
 
