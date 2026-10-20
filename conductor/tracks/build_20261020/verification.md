@@ -19,3 +19,9 @@ Same-host repeatability is narrower than independent-host reproducibility. Nativ
 ## Handoff
 
 Proceed with calendar_slice using the selected fork/toolchain. Use the denied/granted harness as a bounded provider check; add actual feature tests in that track. Revisit source identity, defaults, app lifecycle, token/HTTP safety and background behavior mapped in Track1 before enabling sync on personal data. Release controls remain with the release track.
+
+## Final verification record
+
+Both final modern build receipts returned0; the fresh-preparation repeat produced the identical app and test APK hashes as the repaired clean build. The final device transcript tests exactly those hashes. All three permission cases passed and both test packages were removed with successful package-list absence checks. The final source-input digests still match current files. Modern lint:0 errors/30 warnings, no ObsoleteLintCustomCheck registry skip. Original lint:0 errors/25 warnings. Same-host repeatability was verified for both variants.
+
+`python3 -m unittest discover -s tests -v`:12 tests passed. Formatter, YAML matrix parse, Conductor/source-digest validation and `git diff --check` passed. Inherited Android app unit task remains NO-SOURCE; instrumentation runs are the bounded runtime evidence. Exact commands/artifact hashes/source fingerprints/log digests are preserved in evidence.json.

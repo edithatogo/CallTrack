@@ -9,5 +9,5 @@
     "baseline_20261020"
   ],
   "requirements": "R08, R13, R26",
-  "implementation_status": "conditional-not-started"
+  "implementation_status": "qualification-implemented-final-verification"
 }

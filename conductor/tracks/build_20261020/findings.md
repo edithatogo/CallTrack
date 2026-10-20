@@ -18,7 +18,7 @@ These checks prove provider permission enforcement and zero-row query availabili
 
 ## Dependency and implementation assessment
 
-Original dependencies resolved successfully from Google Maven/Maven Central; deprecated JCenter remains declared in untouched upstream but is unnecessary for the qualified modern copy. Notable inherited transitives include Room2.2.5/SQLite2.1.0 through WorkManager, Kotlin stdlib1.6.0 and core1.7.0. Their presence does not mean the successor has selected Room as its own ledger or migrated its own Java to Kotlin. Generated View Binding follows the chosen AGP version. See the committed resolved dependency inventory for precise selected versions; security/licence approval is not inferred from successful resolution.
+Original dependencies resolved successfully from Google Maven/Maven Central; deprecated JCenter remains declared in untouched upstream but is unnecessary for the qualified modern copy. Notable inherited transitives include Room2.2.5/SQLite2.1.0 through WorkManager, Kotlin stdlib1.6.0 and core1.7.0. Their presence does not mean the successor has selected Room as its own ledger or migrated its own Java to Kotlin. Generated View Binding follows the chosen AGP version. See the [committed resolved dependency inventory](dependencies.json) for precise selected versions; security/licence approval is not inferred from successful resolution.
 
 The upstream has14 app Java files: reusable settings/navigation, permission request and worker scaffolding, plus problematic app-owned query/HTTP/token/checkpoint logic mapped in Track1. Repairing the build required small configuration changes and two targeted compatibility overrides; no broad code rewrite was needed. This is concrete evidence favouring a fork over recreating the UI/build/scheduling scaffolding. Core identity/recovery/calendar behaviour still needs deliberate replacement in the next tracks.
 
@@ -35,3 +35,7 @@ Root scripts bootstrap the audited reference, prepare an isolated modern copy, r
 - [AGP9.1.1 compatibility](https://developer.android.com/build/releases/agp-9-1-0-release-notes): supports API37; this newer toolchain was researched but not needed/adopted for the target36 experiment.
 - [Android17 behaviour changes](https://developer.android.com/about/versions/17/behavior-changes-all): higher OS behaviour needs its own runtime tests even for older targets.
 - [Fragment releases](https://developer.android.com/jetpack/androidx/releases/fragment): version choice is an interim compatibility decision, not a latest-version claim.
+
+## Final outcome
+
+The repaired modern copy has0 lint errors,30 warnings and no skipped Fragment registry. Its clean and canonical fresh-preparation repeat APK hashes match. The final native device transcript covers the same APK hashes and confirms cleanup. Twelve host tooling tests pass. Proceed with the qualified fork; retain the documented downstream runtime/release gates.

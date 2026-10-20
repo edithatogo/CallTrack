@@ -5,7 +5,6 @@ import io
 from pathlib import Path
 import subprocess
 import tarfile
-import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
 REVISION = 'aaa56443a294aa61bad48b620427e53f9521c5fe'
@@ -37,9 +36,8 @@ def prepare(modern=False):
         settings = output / 'settings.gradle'
         settings.write_text(settings.read_text().replace('        jcenter() // Warning: this repository is going to shut down soon\n', ''))
         wrapper = output / 'gradle/wrapper/gradle-wrapper.properties'
-        checksum = urllib.request.urlopen('https://services.gradle.org/distributions/gradle-8.13-bin.zip.sha256').read().decode().strip()
-        if len(checksum) != 64 or any(c not in '0123456789abcdef' for c in checksum):
-            raise SystemExit('Invalid official Gradle checksum')
+        # Verified against the official Gradle8.13 distribution SHA256 during qualification.
+        checksum = '20f1b1176237254a6fc204d8434196fa11a4cfb387567519c61556e8710aed78'
         wrapper.write_text(wrapper.read_text().replace('gradle-7.3.3-bin.zip', 'gradle-8.13-bin.zip') + '\ndistributionSha256Sum=' + checksum + '\n')
     build.write_text(script)
     print(output.relative_to(ROOT))

@@ -1,31 +1,47 @@
 # Plan: Fork feasibility and build qualification
 
-All tasks pending. Discovery is real track work. Implementation is conditional; do not mark it complete when only research/prototypes exist.
+Build qualification, exact-artifact native checks and review fixes verified; archive/checkpoint finalisation follows. Application parity is outside this track.
 
 ## Phase 1: Discovery and mapping
 
-- [~] Task: Reproduce upstream build and assess modern SDK/permission constraints
-- [ ] Task: Compare fork repair with fresh implementation; inventory library versus custom-code replacement opportunities
-- [ ] Task: Qualify JDK/Gradle/AGP/SDK, formatting and CI commands; record package/signing strategy
-- [ ] Task: Write findings and refine track requirements/acceptance with source provenance
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- [x] Task: Reproduce upstream build and assess modern SDK/permission constraints
+- [x] Task: Compare fork repair with fresh implementation; inventory library versus custom-code replacement opportunities
+- [x] Task: Qualify JDK/Gradle/AGP/SDK, formatting and CI commands; record package/signing strategy
+- [x] Task: Write findings and refine track requirements/acceptance with source provenance
+- [x] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
 
 ## Phase 2: Options and dependency decision
 
-- [ ] Task: Compare retained/native/custom implementation with dependencies and deferral
-- [ ] Task: Run a bounded prototype only where it resolves uncertainty; identify temporary dependencies and expiry criteria
-- [ ] Task: Record decision, update spec and implementation tasks; propagate any changed prerequisite assumptions
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- [x] Task: Compare retained/native/custom implementation with dependencies and deferral
+- [x] Task: Run a bounded prototype only where it resolves uncertainty; identify temporary dependencies and expiry criteria
+- [x] Task: Record decision, update spec and implementation tasks; propagate any changed prerequisite assumptions
+- [x] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
 
 ## Phase 3: Conditional implementation and verification
 
-- [ ] Task: If adopted, write meaningful failing contract/regression tests before changing behaviour
-- [ ] Task: Implement the selected bounded change and any data/config migration; remove superseded code only after parity
-- [ ] Task: Verify tests plus applicable device/provider readback and rollback; otherwise document justified deferral
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- [x] Task: If adopted, write meaningful failing contract/regression tests before changing behaviour
+- [x] Task: Implement the selected bounded change and any data/config migration; remove superseded code only after parity
+- [x] Task: Verify tests plus applicable device/provider readback and rollback; otherwise document justified deferral
+- [x] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
 
 ## Phase 4: Handoff
 
-- [ ] Task: Update consolidated requirements, stack and dependency decisions with actual outcomes
-- [ ] Task: Document residual gaps, next-track inputs and checkpoint evidence
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- [x] Task: Update consolidated requirements, stack and dependency decisions with actual outcomes
+- [x] Task: Document residual gaps, next-track inputs and checkpoint evidence
+- [x] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+
+## Execution evidence and scope
+
+- Phase1: pinned original build/lint and clean repeat, toolchain compatibility research, source/dependency inventory, findings and requirements.
+- Phase2: D-B01–D-B05 compare fork/fresh/native/retention and document interim tooling/dependency roles.
+- Phase3: preparation/build/device harness, formatter/CI definition and tests implemented; clean build and zero-row native checks executed. Missing SDK and dependency-conflict failures were preserved before repair. No application logging or data migration claimed.
+- Phase4: downstream handoff in requirements/verification and project stack/workflow updated.
+
+## Phase: Review Fixes
+
+- [~] Task: Resolve skipped Fragment lint/transitive mismatch, checksum/artifact identity and cleanup reporting; validate final source/artifact and archive continuity
+
+## Commit history
+
+- 2c3964a: track start.
+- eec3a32: qualification implementation, tests, prepared CI and research decisions.

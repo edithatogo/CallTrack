@@ -90,6 +90,9 @@ def qualify(serial):
             output = command('shell', 'pm', 'list', 'packages', package, allow_failure=True)
             cleanup_checks.append(steps[-1]['exit_code'] == 0 and 'package:' + package not in output.splitlines())
         receipt['cleanup_complete'] = len(installed) == 2 and all(cleanup_checks)
+        if not receipt['cleanup_complete']:
+            receipt['result'] = 'failed'
+            receipt['cleanup_error'] = 'Test-package absence was not verified'
         evidence.mkdir(parents=True, exist_ok=True)
         (evidence / 'device-receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
         print(json.dumps({'result': receipt.get('result'), 'cleanup_complete': receipt['cleanup_complete']}))

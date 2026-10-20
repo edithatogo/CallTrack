@@ -3,6 +3,10 @@ import importlib.util
 from pathlib import Path
 import tempfile
 import json
+import hashlib
+import contextlib
+import io
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -77,6 +81,55 @@ class QualificationGuards(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, 'unsuccessful build'):
                     module.qualify('test-device')
                 self.assertEqual(2, run.call_count)
+
+    def test_disconnected_cleanup_cannot_report_passed(self):
+        module = load('qualify_device')
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            artifacts = []
+            for path in ('debug/app-debug.apk', 'androidTest/debug/app-debug-androidTest.apk'):
+                apk = root / '.local/modern-qualification/app/build/outputs/apk' / path
+                apk.parent.mkdir(parents=True, exist_ok=True)
+                apk.write_bytes(b'test only')
+                artifacts.append({'path': str(apk.relative_to(root)), 'sha256': hashlib.sha256(apk.read_bytes()).hexdigest()})
+            evidence = root / '.local/build-evidence'
+            evidence.mkdir()
+            (evidence / 'modern-clean-receipt.json').write_text(json.dumps({'exit_code': 0, 'artifacts': artifacts}))
+            package_checks = 0
+
+            def fake_run(arguments, **kwargs):
+                nonlocal package_checks
+                command = arguments[3:]
+                output = ''
+                code = 0
+                if command[:4] == ['shell', 'pm', 'list', 'packages']:
+                    package_checks += 1
+                    if package_checks > 2:
+                        code = 1
+                elif command[0] in ('install', 'uninstall'):
+                    output = 'Success'
+                elif command[:3] == ['shell', 'am', 'start']:
+                    output = 'Status: ok'
+                elif command[:2] == ['shell', 'pidof']:
+                    output = '123'
+                elif command[:3] == ['shell', 'am', 'instrument']:
+                    output = 'OK (1 test)'
+                elif command[:2] == ['shell', 'getprop']:
+                    output = '37'
+                return SimpleNamespace(returncode=code, stdout=output, stderr='device offline' if code else '')
+
+            def fake_identity(arguments, **kwargs):
+                package = module.TEST_PACKAGE if 'androidTest' in arguments[-1] else module.PACKAGE
+                return "package: name='" + package + "'"
+
+            with patch.object(module, 'ROOT', root), patch.object(module.subprocess, 'run', side_effect=fake_run), patch.object(
+                module.subprocess, 'check_output', side_effect=fake_identity
+            ), contextlib.redirect_stdout(io.StringIO()):
+                with self.assertRaisesRegex(RuntimeError, 'cleanup not verified'):
+                    module.qualify('test-device')
+            receipt = json.loads((evidence / 'device-receipt.json').read_text())
+            self.assertEqual('failed', receipt['result'])
+            self.assertFalse(receipt['cleanup_complete'])
 
     def test_build_requires_installed_toolchain(self):
         module = load('run_qualification')
