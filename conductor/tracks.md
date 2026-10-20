@@ -15,7 +15,7 @@ Tracks 4, 5 and 6 are in progress. Track5 community preparation does not establi
   *Link: [Track](tracks/kotlin_20261020/index.md)*
 
 ---
-- [ ] **Track: Calendar and service integration discovery** (Post-M3)
+- [~] **Track: Calendar and service integration discovery** (Post-M3)
   *Link: [Track](tracks/destinations_20261020/index.md)*
 
 ---
