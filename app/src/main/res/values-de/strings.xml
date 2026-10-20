@@ -108,7 +108,7 @@
     <string name="auto_status_summary">%1$s\n%2$s</string>
     <string name="import_history_item">%1$s — %2$s</string>
     <string name="recovery_open">Übertragungen prüfen und wiederherstellen</string>
-    <string name="recovery_intro">Prüfe gespeicherte Übertragungsnachweise aller Kalender. Zeiten verwenden die aktuelle Gerätezeitzone. Die Prüfung liest nur bestehende Termine und erstellt oder ändert keine. Das Unterdrücken stoppt Wiederholungen und entfernt ausstehende persönliche Nutzdaten; der Duplikatschutz bleibt erhalten. Termine bleiben unverändert.</string>
+    <string name="recovery_intro">Prüfe gespeicherte Übertragungsnachweise aller Kalender. Zeiten verwenden die aktuelle Gerätezeitzone. Die Prüfung liest nur bestehende Termine und erstellt oder ändert keine. Das Unterdrücken stoppt Wiederholungen und entfernt ausstehende persönliche Nutzdaten; der Duplikatschutz bleibt erhalten. Termine bleiben unverändert. Eine neue Einfügefreigabe ist eine getrennte, ausdrücklich bestätigte Aktion für noch nicht versuchte Vorgänge.</string>
     <string name="recovery_access">Lesezugriff auf Kalender erlauben</string>
     <string name="recovery_refresh">Aktuelle Nachweise aktualisieren</string>
     <string name="recovery_previous">Vorherige Nachweise</string>
@@ -133,10 +133,19 @@
     <string name="recovery_suppressed">Wiederholungen unterdrückt</string>
     <string name="recovery_legacy">Früherer Nachweis — Quellidentität noch nicht zugeordnet</string>
     <string name="recovery_verified">Bestehender Kalenderinhalt geprüft; kein Termin wurde erstellt.</string>
-    <string name="recovery_never_attempted">Dieser Vorgang wurde noch nicht versucht. Die Prüfung hat keinen Termin erstellt. Setze den ursprünglich aktiven Vorgang fort oder unterdrücke ihn.</string>
+    <string name="recovery_never_attempted">Dieser Vorgang wurde noch nicht versucht. Die Prüfung hat keinen Termin erstellt. Setze den ursprünglich aktiven Vorgang fort, nutze bei Verfügbarkeit eine getrennte neue Einfügefreigabe oder unterdrücke ihn.</string>
     <string name="recovery_suppressed_result">Wiederholungen unterdrückt und ausstehende persönliche Nutzdaten entfernt. Termine bleiben unverändert.</string>
     <string name="recovery_permission">Zum Prüfen bestehender Wirkungen ist Kalender-Lesezugriff erforderlich. Kein Termin wurde geändert.</string>
     <string name="recovery_review_result">Der Termin fehlt, wurde geändert oder ist nicht eindeutig. Die Prüfung bleibt erforderlich. Kein Termin wurde neu erstellt oder überschrieben.</string>
     <string name="recovery_not_found">Der ausgewählte Nachweis ist nicht mehr verfügbar. Aktualisiere die Liste.</string>
     <string name="recovery_failed">Diese Prüfung konnte nicht bestätigt werden. Bestehende Nachweise bleiben verfügbar. Aktualisiere vor einem erneuten Versuch.</string>
+
+    <string name="reapproval_open">Noch nicht versuchtes Einfügen neu bestätigen</string>
+    <string name="reapproval_preview">Den ursprünglich ausstehenden Termin in %1$s erstellen? Dies ist eine neue ausdrückliche Einfügefreigabe, getrennt von der Prüfung bestehender Wirkungen.\n\nTitel: %2$s\nDetails: %3$s\nBeginn: %4$s\nEnde: %5$s\n\nDer ursprünglich ausstehende Vorgang bleibt inaktiv. Wenn sich der Nachweis ändert oder bereits ein Einfügeversuch erfolgt ist, wird kein neuer Termin erstellt.</string>
+    <string name="reapproval_confirm">Dieses Einfügen bestätigen</string>
+    <string name="reapproval_tap_again">Kalender-Lese- und Schreibzugriff sind erforderlich. Berechtigungsänderungen bestätigen dieses Einfügen nicht. Tippe erneut auf Bestätigen, um den ursprünglichen Termin zu prüfen.</string>
+    <string name="reapproval_verified">Der ausdrücklich neu bestätigte Termin wurde gespeichert und geprüft. Sein Nachweis verhindert erneutes automatisches Einfügen.</string>
+    <string name="reapproval_changed">Dieser Nachweis wurde geändert oder ein Einfügeversuch könnte bereits erfolgt sein. Aktualisiere und prüfe die bestehende Wirkung. Kein neues Einfügen wurde freigegeben.</string>
+    <string name="reapproval_paused">Die Einfügefreigabe wurde vor Abschluss angehalten. Aktualisiere vor einem erneuten Versuch den Nachweis. Der ausstehende Vorgang bleibt erfasst.</string>
+    <string name="reapproval_failed">Das neu bestätigte Einfügen konnte nicht geprüft werden. Prüfe vor einer weiteren Aktion die bestehende Wirkung. Ein Termin könnte bereits vorhanden sein.</string>
 </resources>

@@ -27,7 +27,9 @@ The manual latest-call action and automatic worker now share DurableDelivery rec
 Automatic settings require explicit activation; opening that settings screen can
 request recovery only for a previously enabled policy. Historical import controls now expose bounded preview/confirmation, saved sessions
 and stop/resume/cancel. Recovery controls can now check existing effects or suppress a receipt without
-calendar writes. Suppression clears the pending personal payload but retains source
+calendar writes. A separate, explicit reapproval can insert an unchanged, never-attempted
+frozen event after showing its original data and destination; it uses fresh ownership
+and does not reactivate the original operation. Suppression clears the pending personal payload but retains source
 facts/keys/hashes and any event ID; it is not deletion of all personal metadata or
 of calendar data. Age-based retention and full positive native/provider/UI acceptance
 remain incomplete.

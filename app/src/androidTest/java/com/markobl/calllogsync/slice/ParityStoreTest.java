@@ -697,4 +697,87 @@ public class ParityStoreTest {
             assertTrue(context().deleteDatabase(name));
         }
     }
+
+    @Test
+    public void explicitReapprovalPersistsFreshOwnerAndSuppressionClearsReadyPayload() {
+        String name = database();
+        context().deleteDatabase(name);
+        DurableDelivery.Operation old = new DurableDelivery.Operation("cancelled-import", 1);
+        HistoricalImportStoreTest.Sink sink = new HistoricalImportStoreTest.Sink();
+        CallRecord call = HistoricalImportStoreTest.row(1);
+        CallEvent event = CallEvent.from(call, "UTC");
+        CallRecord other = HistoricalImportStoreTest.row(2);
+        CallEvent pending = CallEvent.from(other, "UTC");
+        try {
+            try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+                ledger.outbox()
+                        .put(
+                                new DurableDelivery.Intent(
+                                        DurableDelivery.State.READY,
+                                        call.key(),
+                                        7,
+                                        CallIdentity.signature(call),
+                                        event.marker,
+                                        event.fingerprint(),
+                                        -1,
+                                        event,
+                                        old,
+                                        DurableDelivery.SourceFacts.from(call)));
+                DurableDelivery.Intent expected = ledger.outbox().get(call.key(), 7);
+                assertEquals(
+                        DurableDelivery.Result.SAVED,
+                        new ReadyReapproval(ledger.outbox(), sink).approve(expected, () -> true));
+                ledger.outbox()
+                        .put(
+                                new DurableDelivery.Intent(
+                                        DurableDelivery.State.READY,
+                                        other.key(),
+                                        7,
+                                        CallIdentity.signature(other),
+                                        pending.marker,
+                                        pending.fingerprint(),
+                                        -1,
+                                        pending,
+                                        old,
+                                        DurableDelivery.SourceFacts.from(other)));
+                ReceiptRecovery recovery =
+                        new ReceiptRecovery(
+                                ledger.outbox(),
+                                new ReceiptRecovery.ExistingEvents() {
+                                    public SliceEngine.StoredEvent read(long id) {
+                                        throw new AssertionError(
+                                                "Suppression cannot read provider");
+                                    }
+
+                                    public java.util.List<SliceEngine.StoredEvent> find(
+                                            long c, String m) {
+                                        throw new AssertionError(
+                                                "Suppression cannot read provider");
+                                    }
+                                });
+                assertEquals(ReceiptRecovery.Result.SUPPRESSED, recovery.suppress(other.key(), 7));
+            }
+            try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
+                DurableDelivery.Intent saved = ledger.outbox().get(call.key(), 7);
+                assertEquals(DurableDelivery.State.CONFIRMED, saved.state);
+                assertTrue(saved.operation.owner.startsWith("manual-reapproval/"));
+                assertEquals(event.fingerprint(), saved.fingerprint);
+                assertEquals(call.start, saved.facts.start);
+                assertNull(saved.payload);
+                assertEquals(
+                        DurableDelivery.Result.PAUSED,
+                        new DurableDelivery(ledger.outbox(), sink)
+                                .resume(call.key(), 7, old, () -> true));
+                assertEquals(1, sink.inserts);
+                DurableDelivery.Intent suppressed = ledger.outbox().get(other.key(), 7);
+                assertEquals(DurableDelivery.State.SUPPRESSED, suppressed.state);
+                assertNull(suppressed.payload);
+                assertEquals(-1, suppressed.eventId);
+                assertEquals(old.owner, suppressed.operation.owner);
+                assertEquals(other.start, suppressed.facts.start);
+            }
+        } finally {
+            assertTrue(context().deleteDatabase(name));
+        }
+    }
 }

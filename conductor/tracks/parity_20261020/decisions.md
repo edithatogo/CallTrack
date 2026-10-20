@@ -373,3 +373,26 @@ comparisons fix the issue. The red device receipt is retained locally; final gre
 proof must be source-bound. Status/history text concatenation is replaced by English/
 German formatted resources. Native UI default state, fake-port core behavior and
 real-provider/manual acceptance remain separate gates.
+
+
+## Explicit never-attempted insertion reapproval
+
+ReadyReapproval is separate from read-only ReceiptRecovery. It accepts only READY
+with no event ID, a complete frozen payload, source signature, matching marker and
+fingerprint. Under DELIVERY_LOCK it rereads the current intent and compares original
+source signature/facts, marker, fingerprint and operation ownership against the
+user-reviewed snapshot. Any attempted, suppressed, changed or incomplete intent is
+rejected. Calendar permissions/availability and still-current user confirmation are
+checked before ownership changes. A fresh manual-reapproval operation then owns the
+same frozen source/payload, and normal pre-insert durable transitions/readback apply.
+Old/cancelled operations never gain authority over this new operation. A crash after
+insert is reconciled through existing-effect checks, never by reapproving IN_FLIGHT.
+
+The recovery screen offers a separate original title/details/time/destination preview
+and positive insertion confirmation only for eligible records. Permission grant is
+not confirmation; the user must tap reapprove again. Leaving the screen withdraws
+its pending insertion authorization. No call-log query or cached identity refresh is
+needed: this is explicit publication of previously collected frozen data. It does
+not reactivate the original automatic/import policy or change original source facts.
+English/German copy distinguishes checking, suppression and insertion reapproval.
+Native positive calendar/permission/lifecycle interaction remains a separate gate.

@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/** Existing-effect checks and local suppression only; this screen never authorizes a new insert. */
+/** Existing-effect checks are separate from explicitly confirmed never-attempted insertion. */
 public final class ReceiptRecoveryActivity extends Activity {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final List<SqliteLedger.RecoveryCursor> back = new ArrayList<>();
@@ -26,6 +26,7 @@ public final class ReceiptRecoveryActivity extends Activity {
     private TextView feedback;
     private Button previous, more;
     private boolean busy;
+    private volatile boolean resumed;
     private long version;
 
     @Override
@@ -199,6 +200,10 @@ public final class ReceiptRecoveryActivity extends Activity {
                                     R.string.recovery_suppress, (d, w) -> action(intent, true))
                             .show();
                 });
+        if (ReadyReapproval.eligible(intent)) {
+            Button approve = button(card, R.string.reapproval_open);
+            approve.setOnClickListener(v -> confirmReapproval(intent, calendar));
+        }
         if (intent.eventId >= 0) {
             Button open = button(card, R.string.recovery_open_event);
             open.setOnClickListener(
@@ -216,6 +221,99 @@ public final class ReceiptRecoveryActivity extends Activity {
                     });
         }
         rows.addView(card);
+    }
+
+    private void confirmReapproval(DurableDelivery.Intent intent, String calendar) {
+        if (busy || !ReadyReapproval.eligible(intent)) return;
+        if (checkSelfPermission(Manifest.permission.READ_CALENDAR)
+                        != PackageManager.PERMISSION_GRANTED
+                || checkSelfPermission(Manifest.permission.WRITE_CALENDAR)
+                        != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(
+                    new String[] {
+                        Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR
+                    },
+                    12);
+            feedback.setText(R.string.reapproval_tap_again);
+            return;
+        }
+        String preview =
+                getString(
+                        R.string.reapproval_preview,
+                        calendar,
+                        intent.payload.title,
+                        intent.payload.description,
+                        DateFormat.getDateTimeInstance().format(new Date(intent.payload.start)),
+                        DateFormat.getDateTimeInstance().format(new Date(intent.payload.end)));
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.reapproval_open)
+                .setMessage(preview)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(
+                        R.string.reapproval_confirm, (dialog, which) -> reapprove(intent))
+                .show();
+    }
+
+    private void reapprove(DurableDelivery.Intent expected) {
+        if (busy) return;
+        busy = true;
+        navigation();
+        executor.execute(
+                () -> {
+                    DurableDelivery.Result result;
+                    try (SqliteLedger ledger = new SqliteLedger(getApplicationContext())) {
+                        result =
+                                new ReadyReapproval(
+                                                ledger.outbox(),
+                                                new AndroidCalendarSink(getApplicationContext()))
+                                        .approve(expected, () -> resumed);
+                    } catch (RuntimeException failed) {
+                        result = DurableDelivery.Result.FAILED;
+                    }
+                    final DurableDelivery.Result outcome = result;
+                    runOnUiThread(
+                            () -> {
+                                if (isDestroyed()) return;
+                                busy = false;
+                                int label;
+                                switch (outcome) {
+                                    case SAVED:
+                                    case RECOVERED:
+                                    case ALREADY_LOGGED:
+                                        label = R.string.reapproval_verified;
+                                        break;
+                                    case PERMISSION_REQUIRED:
+                                        label = R.string.reapproval_tap_again;
+                                        break;
+                                    case DESTINATION_UNAVAILABLE:
+                                        label = R.string.slice_calendar_unavailable;
+                                        break;
+                                    case SOURCE_CHANGED:
+                                    case REVIEW_REQUIRED:
+                                        label = R.string.reapproval_changed;
+                                        break;
+                                    case PAUSED:
+                                        label = R.string.reapproval_paused;
+                                        break;
+                                    default:
+                                        label = R.string.reapproval_failed;
+                                }
+                                feedback.setText(label);
+                                load(current);
+                            });
+                });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        resumed = true;
+    }
+
+    @Override
+    public void onPause() {
+        resumed = false;
+        super.onPause();
     }
 
     private void action(DurableDelivery.Intent intent, boolean suppress) {
@@ -304,6 +402,7 @@ public final class ReceiptRecoveryActivity extends Activity {
 
     @Override
     public void onDestroy() {
+        resumed = false;
         version++;
         executor.shutdown();
         super.onDestroy();
