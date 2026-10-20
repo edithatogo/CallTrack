@@ -32,8 +32,8 @@ public class ParityStoreTest {
                     context().openOrCreateDatabase(name, Context.MODE_PRIVATE, null)) {
                 db.execSQL(
                         "CREATE TABLE receipts (source TEXT NOT NULL, calendar INTEGER NOT NULL,"
-                            + " event INTEGER NOT NULL, fingerprint TEXT NOT NULL, PRIMARY"
-                            + " KEY(source,calendar))");
+                                + " event INTEGER NOT NULL, fingerprint TEXT NOT NULL, PRIMARY"
+                                + " KEY(source,calendar))");
                 db.execSQL("INSERT INTO receipts VALUES ('fixture-key',7,42,'old-fingerprint')");
                 db.setVersion(1);
             }

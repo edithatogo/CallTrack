@@ -20,7 +20,8 @@ public final class AndroidCallLogSource implements SliceEngine.CallSource {
         Calls.DATE,
         Calls.DURATION,
         Calls.CACHED_NAME,
-        Calls.NUMBER_PRESENTATION
+        Calls.NUMBER_PRESENTATION,
+        Calls.PHONE_ACCOUNT_ID
     };
     private final Context context;
 
@@ -68,21 +69,15 @@ public final class AndroidCallLogSource implements SliceEngine.CallSource {
 
     static CallRecord first(Cursor c, String namespace) {
         if (!c.moveToFirst()) return null;
-        int type = c.getInt(2);
-        String direction =
-                type == Calls.INCOMING_TYPE
-                        ? "Incoming"
-                        : type == Calls.OUTGOING_TYPE
-                                ? "Outgoing"
-                                : type == Calls.MISSED_TYPE ? "Missed" : "Unknown";
         return new CallRecord(
                 namespace,
                 c.getString(0),
                 c.getLong(3),
                 c.getLong(4),
-                direction,
+                c.getInt(2),
                 c.getString(5),
                 c.getString(1),
-                c.getInt(6) == Calls.PRESENTATION_ALLOWED);
+                c.getInt(6) == Calls.PRESENTATION_ALLOWED,
+                c.getString(7));
     }
 }

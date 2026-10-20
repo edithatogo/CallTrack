@@ -32,7 +32,7 @@ public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.
         createOutbox(db);
         db.execSQL(
                 "INSERT INTO outbox (source,calendar,state,event,fingerprint) SELECT"
-                    + " source,calendar,'LEGACY',event,fingerprint FROM receipts");
+                        + " source,calendar,'LEGACY',event,fingerprint FROM receipts");
     }
 
     @Override

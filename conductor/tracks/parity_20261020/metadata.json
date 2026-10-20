@@ -9,5 +9,6 @@
     "calendar_slice_20261020"
   ],
   "requirements": "R01\u2013R11, R23, R27",
-  "implementation_status": "conditional-not-started"
+  "implementation_status": "native-qualified-durable-foundation-full-parity-in-progress",
+  "implementation_commit": "9fc2466"
 }

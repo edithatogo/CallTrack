@@ -39,3 +39,15 @@ Emulator tool 37.2.12 installed using the already-accepted SDK terms. API36 Goog
 - New durable core contract compile first failed due to missing DurableDelivery; initial 11 contracts then passed alongside 16 prior slice contracts (27 total); committed-payload resume without a source row adds a twelfth contract (28 total).
 - Tests cover committed intent ordering, interruption before insert, marker recovery after insert, lost-marker ambiguity, deleted-event protection, cached label/timezone stability, reused source IDs, pause/denial and overlapping instances.
 - Android store contracts first failed to compile because outbox() did not exist. A preserving schema2/outbox implementation built successfully with unchanged inputs; native execution remains pending. Native migration/reopen and full scheduling/import acceptance are not yet claimed.
+
+## WorkManager compatibility spike (not yet adopted)
+
+Official Google Maven work-runtime2.12.0 AAR metadata was fetched read-only. It declares minCompileSdk35 and minAndroidGradlePluginVersion8.6.0, within this app's compile36/AGP8.13.2 baseline; source release notes list minSdk24, within min26. The artifact URL/hash and raw metadata are retained locally in `.local/parity-dependency-research/work-2.12.0-metadata.json`. Transitive dependency resolution, actual build/native scheduler behaviour and interim lifecycle compatibility overrides still require qualification before adoption.
+
+The dedicated API36 AVD was created on external cache storage and launched with HVF/software graphics. First boot has progressed from ADB offline to an online API36 guest; boot-completed readiness and native tests are still pending. No physical phone has been used for Track 4 tests.
+
+## Source-model follow-up required
+
+Raw type and phone-account metadata are now retained; filter tests cover all eight configurations and exclude extended types. Next refine raw presentation (allowed/restricted/unknown) instead of conflating every non-allowed value into private-number text. Preserve source facts in the ledger independently of optional personal payload. These are explicit remaining implementation requirements, not completed claims.
+
+Foundation native tests now passed on the source-bound API36 emulator build; see verification.md and foundation-evidence.json. The private database fixtures and both packages were cleaned. This does not qualify the not-yet-wired scheduler/import/UI.

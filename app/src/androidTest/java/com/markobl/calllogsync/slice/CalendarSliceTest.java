@@ -302,7 +302,8 @@ public class CalendarSliceTest {
                     1700000000123L,
                     65,
                     "Cached Secret",
-                    android.provider.CallLog.Calls.PRESENTATION_RESTRICTED
+                    android.provider.CallLog.Calls.PRESENTATION_RESTRICTED,
+                    null
                 });
         CallRecord call = AndroidCallLogSource.first(cursor, "fixture");
         assertNotNull(call);
