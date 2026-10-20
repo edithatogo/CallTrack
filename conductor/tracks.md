@@ -15,7 +15,7 @@ Tracks 4, 5 and 6 are in progress. Track5 community preparation does not establi
   *Link: [Track](tracks/kotlin_20261020/index.md)*
 
 ---
-- [ ] **Track: KMP shared core and second-platform requirements** (M7)
+- [~] **Track: KMP shared core and second-platform requirements** (M7)
   *Link: [Track](tracks/kmp_20261020/index.md)*
 
 ---
