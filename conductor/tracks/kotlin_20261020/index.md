@@ -8,3 +8,7 @@
 - [Refined requirements](requirements.md)
 - [Decisions](decisions.md)
 - [Verification](verification.md)
+- [Pilot evidence](pilot-evidence.json)
+- [Dependency readback](dependency-report.json)
+- [Tool provenance](tool-provenance.json)
+- [Review](review.md)

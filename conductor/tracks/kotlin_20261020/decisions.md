@@ -59,3 +59,11 @@ was located and used. No app/ABI/persistence effect. Promote to contributor/CI c
 after local formatting and dry-run pass; reevaluate if later Kotlin syntax exceeds
 parser support, remove the tool/check if replaced, preserve source-style parity.
 The bundled tool transitives stay outside APK/runtime dependency graphs.
+
+## Qualification outcome (2026-10-21)
+
+K01/K02 promotion criteria passed for the bounded development slice:36 JVM/20 host
+and five native methods, source-bound packaging, unsigned release and dependency
+readback. Retain Kotlin2.3.21 and ktfmt0.59 for these three components. This adopts
+the bounded development implementation, not all suggested libraries or full M5.
+See [verification](verification.md); compiler and app/runtime graphs remain distinct.
