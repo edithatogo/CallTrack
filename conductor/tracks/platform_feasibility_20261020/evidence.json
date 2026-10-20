@@ -1,0 +1,29 @@
+{
+  "baseline": "c2b1a5c",
+  "date": "2026-10-21",
+  "kind": "compile-only SDK surface, not runtime",
+  "source_inputs": {
+    "prototypes/platform-api/EventKitSurface.swift": "efc347d34adc26f2a5482f0a1f9cb63fe6b27887027c3853b9e46c7998b4de64"
+  },
+  "command": "xcrun --sdk macosx swiftc -typecheck -warnings-as-errors -target arm64-apple-macosx14.0 prototypes/platform-api/EventKitSurface.swift",
+  "exit_code": 0,
+  "compiler": "Apple Swift6.4",
+  "sdk": "macOS27.0 CommandLineTools",
+  "host": "arm64 macOS",
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "documentation_sha256": {
+    "background.md": "483dd44024952f8934e13dba55d4435244efaea9fbec064335b1b87b3be8feec",
+    "conversationhistory.md": "cb58e95a30d75943128ac3363eae68acfb42eba0e75861d81d266155fe2bda90",
+    "cxcall.md": "2350951cfea52c015d624224ea0b03666a9210d363a554688c5acbd86ede63c0",
+    "defaultdialer.md": "a64e72350d4128de8e6b65ee78f05b35af572eec071d099c075e975167403cb4",
+    "dialingentitlement.md": "18803a4f955121e2f73bd704ae2b591247bb5ad0b7b1f4b007f2b0db6fe27349",
+    "eventstore.md": "94ca06abc77e4716275ccde4a8790bd2cfb2a48face19a1ae3873566309b8cc3",
+    "livecommunication.md": "e51ac6290ec545709f9461981ca56cabe8fd25a797d96c984967427687c66c6c",
+    "observer.md": "2633bbc4cd4bbbfb83faa428f97b7919d7040edd01d9a5c9eadbe012211e29f0",
+    "recentconversation.md": "e971ce8129e2cad7b9882f4260666f640795bb0cd8119b685d4fa7ad3a031dd7"
+  },
+  "permission_requested": false,
+  "runtime_qualified": false,
+  "ios_qualified": false,
+  "dialer_history_qualified": false
+}
