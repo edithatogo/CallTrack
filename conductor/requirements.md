@@ -121,7 +121,7 @@ new endpoint, multi-destination routing or auth library was implemented.
 
 ## Track11 productivity research outcome
 
-R18/R21–R23/R27 have [J01–J12](tracks/productivity_20261020/requirements.md) covering
+R18/R21–R23/R27 have [J01–J12](archive/productivity_20261020/requirements.md) covering
 independent annotations, search, recovery/export, callback, rules and time summaries.
 The proposed order remains subject to user workflow validation. PROD-D01 defers
 implementation and dependencies; no journal, restore, reminder, SMS or routing

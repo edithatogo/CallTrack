@@ -51,7 +51,7 @@ the open Phase3/4 acceptance tasks.
 
 ## Productivity research handoff
 
-[Track11 requirements](../productivity_20261020/requirements.md) distinguish future
+[Track11 requirements](../../archive/productivity_20261020/requirements.md) distinguish future
 annotations/index/export copies from existing payload/receipt retention. No new
 storage/backup policy is adopted. Reopen lifecycle and recovery acceptance before
 shipping authored journal data; research closure is not release readiness.

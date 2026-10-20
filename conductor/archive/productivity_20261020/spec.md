@@ -14,7 +14,7 @@ Prioritised validated feature slices and dependency decisions before each implem
 
 ## Inputs and dependencies
 
-Prerequisites: [release](../release_20261020/index.md). Requirement references: R18, R21–R23, R27 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
+Prerequisites: [release](../../tracks/release_20261020/index.md). Requirement references: R18, R21–R23, R27 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
 
 ## Required outputs
 

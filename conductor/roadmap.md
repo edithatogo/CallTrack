@@ -129,7 +129,7 @@ provider-cloud readback, direct Graph, endpoint output or fan-out acceptance.
 
 ## Productivity discovery disposition
 
-[Track11 PROD-D01](tracks/productivity_20261020/decisions.md) maps candidate slices:
+[Track11 PROD-D01](archive/productivity_20261020/decisions.md) maps candidate slices:
 notes/tags/search with recovery gates, then callback/routing/time summaries as
 validated needs emerge. This is provisional ordering, not an adopted product
 commitment. Reopen after selected workflow/retention/recovery decisions and
