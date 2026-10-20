@@ -79,3 +79,17 @@ upper bound belong to a later scan. This freezes ID bounds, not provider content
 historical confirmation still requires persisted candidates and revalidation before
 effects. Synthetic cursor/query contracts do not prove every vendor provider honors
 limits. No scheduler, import confirmation or automatic UI is enabled by this change.
+
+
+## Scan delivery coordinator contract
+
+A bounded scan step shares the delivery process lock. Persist snapshot before
+handling, recheck each candidate binding before effects, apply activation-time and
+incoming/outgoing/missed policy, commit each delivery receipt before checkpoint
+advancement. Review receipts are terminal handled rows; permission, destination,
+pause or failure stop at the current row. A crash between receipt and checkpoint
+replays through delivery verification. Counts describe this batch, not a persisted
+user status total. Activation policy/route must be immutable within an operation;
+its persisted publication and generation lifecycle remain the next integration task.
+The new coordinator is not yet invoked from launcher/background work. No automatic
+activation, historical preview or scheduling completion is claimed.

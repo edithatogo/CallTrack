@@ -7,7 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /** Durable receipt per source/destination. A writer transaction serializes concurrent instances. */
-public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.Ledger {
+public final class SqliteLedger extends SQLiteOpenHelper
+        implements SliceEngine.Ledger, ScanDelivery.Progress {
     public SqliteLedger(Context context) {
         this(context, "calltrack-ledger.db");
     }
@@ -60,6 +61,16 @@ public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.
                         + " namespace TEXT NOT NULL, upper_id INTEGER NOT NULL, upper_binding TEXT,"
                         + " last_id INTEGER NOT NULL, last_binding TEXT, PRIMARY"
                         + " KEY(owner,generation))");
+    }
+
+    @Override
+    public PagedCalls.Checkpoint get(DurableDelivery.Operation operation) {
+        return checkpoint(operation);
+    }
+
+    @Override
+    public void put(DurableDelivery.Operation operation, PagedCalls.Checkpoint checkpoint) {
+        checkpoint(operation, checkpoint);
     }
 
     public PagedCalls.Checkpoint checkpoint(DurableDelivery.Operation operation) {
