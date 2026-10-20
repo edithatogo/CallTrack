@@ -97,7 +97,7 @@ remain open before M5 completion; a pilot does not authorize Compose/KMP rewrite
 
 ## M6 research decision
 
-[Track7 research](tracks/compose_20261020/index.md) tested an isolated Compose screen
+[Track7 research](archive/compose_20261020/index.md) tested an isolated Compose screen
 and compared incremental/native/library options. Retain the working Views UI;
 production M6 migration is deferred pending stable M3/M5 controller/state contracts
 and actual behavioural/manual accessibility acceptance. The conditional research

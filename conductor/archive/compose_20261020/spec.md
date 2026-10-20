@@ -14,7 +14,7 @@ Evidence-backed UI decision; adopted screens match behavioural and accessibility
 
 ## Inputs and dependencies
 
-Prerequisites: [kotlin](../kotlin_20261020/index.md). Requirement references: R15, R26 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
+Prerequisites: [kotlin](../../tracks/kotlin_20261020/index.md). Requirement references: R15, R26 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
 
 ## Required outputs
 

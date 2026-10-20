@@ -52,7 +52,7 @@ in Compose track. Archive remains conditional on full original M5 acceptance.
 
 Review fixes/evidence: 491f936; original full-track acceptance remains open.
 
-Compose handoff: [Track7 research](../compose_20261020/decisions.md) retains Views
+Compose handoff: [Track7 research](../../archive/compose_20261020/decisions.md) retains Views
 and defers production integration. After stabilizing M3/M5, reopen its adoption
 gates rather than assume the isolated prototype migrated the real Activity. This
 is a handoff note, not a new Compose prerequisite for completing Kotlin work.
