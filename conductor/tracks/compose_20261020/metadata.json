@@ -9,5 +9,10 @@
     "kotlin_20261020"
   ],
   "requirements": "R15, R26",
-  "implementation_status": "discovery-isolated-prototype"
+  "implementation_status": "production-not-applicable-justified-deferral",
+  "implementation_commit": "b10aa28",
+  "research_outcome": "retain-Views-defer-production-adoption",
+  "prototype_native_qualified": false,
+  "production_migration_complete": false,
+  "prerequisite_disposition": "research-only; full Kotlin/M3 prerequisites remain for production adoption"
 }

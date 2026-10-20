@@ -1,7 +1,7 @@
 {
   "date": "2026-10-21",
   "role": "prototype-only-standalone-debug-runtime-graph-not-SBOM",
-  "report_sha256": "e1f32de6021a9345e86cdc11c018996ea1d5cfe1e893d669b2a2813a00ba1855",
+  "report_sha256": "9a7ae427b8e76ce9e9544319e5fa5917164a64f9501ad0b0ee2a295e3b93c8fd",
   "primary_pom_declarations": [
     {
       "module": "androidx.compose:compose-bom",
@@ -37,6 +37,15 @@
       "pom_sha256": "32143979b8cf42473ad25ce42a3ed749ec900e039c65adc6517e28019a3436c9",
       "declared_licences": [
         "The Apache Software License, Version 2.0"
+      ]
+    },
+    {
+      "module": "org.jetbrains.kotlin:compose-compiler-gradle-plugin",
+      "version": "2.3.21",
+      "pom_url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/compose-compiler-gradle-plugin/2.3.21/compose-compiler-gradle-plugin-2.3.21.pom",
+      "pom_sha256": "c927d7c4470d22bc585374c6056c7dcea5b386507dc4540c1c988b9fb259976c",
+      "declared_licences": [
+        "Apache-2.0"
       ]
     }
   ],

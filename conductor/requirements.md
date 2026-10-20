@@ -86,3 +86,12 @@ legacy null/whitespace/overflow semantics. [K01–K07](tracks/kotlin_20261020/re
 separate this bounded qualification from the remaining21 Java files, prerequisite
 release acceptance and whole-app migration/upgrade requirements. No Compose/KMP
 or coroutine architecture adoption follows from adding Kotlin source.
+
+## Track7 Compose research outcome
+
+R15/R26 now have screen/state/accessibility mapping, dependency comparisons and an
+isolated synthetic Compose experiment. [C01–C08](tracks/compose_20261020/requirements.md)
+distinguish prototype evidence from production adoption. The final decision retains
+Views and defers real migration with reopening gates; R15's production UI outcome
+remains pending. Conditional research closure does not establish an adopted screen
+or waive manual accessibility, permission/provider or process-recovery acceptance.

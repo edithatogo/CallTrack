@@ -88,4 +88,7 @@ a system window obstructs the user. Tests now require the prototype to own the
 active accessible window, as well as inspecting the final image. The emulator's
 observed system dialog was dismissed with Wait, without changing ANR settings or
 restarting it. This is environment evidence, not an app performance attribution.
-Final unobstructed results are recorded in verification after the guarded rerun.
+One verified dedicated-guest reboot cleared the recorded ANR, but system crash
+dialogs still prevented a qualified foreground window. Final guarded native result
+is5 failures/5 cases; packages were removed. See verification/evidence: this supports
+production deferral and does not establish unobstructed UI acceptance.

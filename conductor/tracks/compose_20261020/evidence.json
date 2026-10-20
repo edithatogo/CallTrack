@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-21",
+  "implementation_commit": "b10aa28",
+  "decision": "retain-Views-defer-production-Compose-adoption",
+  "research_closure": "justified-deferral",
+  "prototype_qualified_for_adoption": false,
+  "production_migration_complete": false,
+  "build_exit_code": 0,
+  "inputs_unchanged": true,
+  "inputs": {
+    "gradle/wrapper/gradle-wrapper.jar": "e996d452d2645e70c01c11143ca2d3742734a28da2bf61f25c82bdc288c9e637",
+    "gradle/wrapper/gradle-wrapper.properties": "91c1ed951e7e61e66acf8f08b181df8d9af06bac43d5b4a3a9c6b3ff353ad6d5",
+    "gradlew": "63135287117a1e6d12c84580f1f49c61d1ba02218ecd28660605e97f976e7d65",
+    "prototypes/compose/README.md": "fe4b95febaa87e3bdc2324eddb61a67a00aa97d9b634764bbb9ff733698e55ab",
+    "prototypes/compose/build.gradle": "8dc6f5f981176c701162c4261b63e73feaa426cc8b817cdab1ee69fdb64c3f33",
+    "prototypes/compose/gradle.properties": "4d4c82226865844bdc85391d907a383da4a35d3a3f5348985d5ec3997ab932fe",
+    "prototypes/compose/settings.gradle": "6ca445d1bbf75fc5df8f517c9d9f5a9091ede592b50624edd9f8e1e9dd0e3884",
+    "prototypes/compose/src/androidTest/kotlin/org/calltrack/composeprototype/PrototypeLayoutTest.kt": "97d369ad2a06060cf2a5913fcb3c079d4c873d41bd848fa17392b9373e013cd8",
+    "prototypes/compose/src/androidTest/kotlin/org/calltrack/composeprototype/PrototypeScreenTest.kt": "0d2e9f65656b27d3d039b3d23ee8385ee11f292a0fdd17df7c5d0f9635ef1aef",
+    "prototypes/compose/src/androidTest/kotlin/org/calltrack/composeprototype/WindowAssertions.kt": "e45aa3edaf1a388b7c1311b85cdac108b5938ae1d3f080b2696fe7c7a09d21e4",
+    "prototypes/compose/src/main/AndroidManifest.xml": "02e88309de833f5cec7d7f1f0af420635672c562ffedfef31a525e632209bd7c",
+    "prototypes/compose/src/main/kotlin/org/calltrack/composeprototype/PreviewScreen.kt": "54e79c828c6976f6aa23e3da0bd3e991c9d5780b6e23736d8d642152f40a0024",
+    "prototypes/compose/src/main/kotlin/org/calltrack/composeprototype/PreviewState.kt": "225784e020d9491fa46b7e871a5db135db9288a1f11e09601a7ede488ad31709",
+    "prototypes/compose/src/main/kotlin/org/calltrack/composeprototype/PrototypeActivity.kt": "ccffcf79dd18dd55e4fac605018a2499cf6b17857dd0cb159ad20426595ac102",
+    "prototypes/compose/src/main/res/values/strings.xml": "5283bbf066d05e02d1f3db3a04115cded63fcd96179b31d8b3e5a0d65a29cb0b",
+    "prototypes/compose/src/test/kotlin/org/calltrack/composeprototype/PreviewStateTest.kt": "30062cb6d99e87b079c340903210f7233f7f8c5960212690e79ebe5cba4637a3",
+    "scripts/qualify_compose_prototype.py": "f5ea02697e714d371e955f84ac583c92ee5eabb7e877fa42f6f5a06c1511c633"
+  },
+  "artifacts": {
+    "prototypes/compose/build/outputs/apk/androidTest/debug/compose-prototype-debug-androidTest.apk": "e2db94b527453687fe27a93aac32c89de9f67f7633e9287dc3a1592edb52f8c3",
+    "prototypes/compose/build/outputs/apk/debug/compose-prototype-debug.apk": "096a46309737f2869edac1535ca5c4447be9e93056233b883f7e1fae3f9298c9"
+  },
+  "jvm_tests": 3,
+  "jvm_failures": 0,
+  "host_tests": 25,
+  "host_failures": 0,
+  "lint": {
+    "Fatal": 0,
+    "Error": 0,
+    "Warning": 7
+  },
+  "native": {
+    "result": "blocked-by-system-window",
+    "tests_run": 5,
+    "tests_failed": 5,
+    "sdk": "36",
+    "packages_removed": true,
+    "receipt_sha256": "82a15220e168d069517f47494727af68bf0d9935fd315eb82ea531a5d2dada86",
+    "assertion": "expected prototype package active; observed android",
+    "previous_semantics_pass_rejected_as_visual_acceptance": true,
+    "final_blocking_window_title": "System UI isn't responding"
+  },
+  "working_app": {
+    "previous_input_hashes_unchanged": 74,
+    "input_manifest_sha256": "95270e4187b995c9746355f50a0bae525797b11a97ef39e43bb4fc69c32f488d",
+    "tests_not_rerun_or_relabelled": true
+  },
+  "rejected_obstructed_image_sha256": "d1642be50375a1026e60d90616cd7efcb35e7545c62614d43a12de8eaccc4646",
+  "final_blocking_window_xml_sha256": "b6f855f58c26d4365f7453319025503eb4a31b23ffdf74c1f620329ed54e569e",
+  "root_runtime_dependencies_changed": false,
+  "manual_accessibility_accepted": false
+}

@@ -70,3 +70,13 @@ calendar dumps, database files, APK analysis, tokens or signing keys.
 For a suspected vulnerability, follow [security reporting](SECURITY.md). Source
 publication, issue submission and messaging other maintainers are separate actions;
 these instructions do not submit anything automatically.
+
+## Isolated Compose research
+
+The [standalone synthetic prototype](prototypes/compose/README.md) is not part of
+the root app dependency graph. Its optional build uses
+`python3 scripts/qualify_compose_prototype.py build --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"`.
+Device mode accepts only the dedicated emulator; it installs a separate no-data
+fixture app and verifies cleanup. It is not a way to try Compose against personal
+calls/calendars. Production UI adoption remains a separate behavioural/accessibility
+gate; research archive status must not be read as a migrated working screen.
