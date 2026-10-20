@@ -20,5 +20,7 @@
   "review_fix_commits": [
     "b10aa28",
     "bc9fee8"
-  ]
+  ],
+  "archived": true,
+  "archived_at": "2026-10-21"
 }

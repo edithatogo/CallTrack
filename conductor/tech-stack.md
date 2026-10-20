@@ -45,7 +45,7 @@ the track. Mixed-language qualification and full M5 completion remain distinct.
 
 ## Track7 Compose research outcome
 
-The [isolated experiment](tracks/compose_20261020/index.md) uses prototype-only
+The [isolated experiment](archive/compose_20261020/index.md) uses prototype-only
 Compose BOM2026.03.00 (UI1.10.5/Material3 1.4.0), Activity Compose1.12.4 and
 Kotlin/Compose compiler2.3.21. It is a standalone Gradle project absent from root
 settings, with separate ID, no sensitive/network permissions and no provider code.

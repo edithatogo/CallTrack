@@ -50,3 +50,6 @@ pass or obstructed screenshot as acceptance. Prototype remains prototype-only.
 
 Review record: bc9fee8. Research complete with justified deferral; native acceptance
 remains blocked and must pass on reopening. Archive is authorised by the user.
+
+Archived2026-10-21 as completed conditional research with justified deferral.
+Production M6 and native UI acceptance remain open; see the retained reopening gate.
