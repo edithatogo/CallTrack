@@ -1,31 +1,36 @@
 # Plan: KMP shared core and second-platform requirements
 
-All tasks pending. Discovery is real track work. Implementation is conditional; do not mark it complete when only research/prototypes exist.
+Research closure with justified production deferral under KMP-D01. Full M7 and
+cross-target contract acceptance remain pending. No second target was selected.
 
-## Phase 1: Discovery and mapping
+## Phase1: Discovery and mapping
 
-- [ ] Task: Map target-platform user workflows and portable/native boundaries
-- [ ] Task: Refresh KMP storage/network/auth libraries and compare app-owned code, native adapters and Rust findings
-- [ ] Task: Specify common contracts and second-target fixture/packaging acceptance
-- [ ] Task: Write findings and refine track requirements/acceptance with source provenance
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- [x] Map proposed Android/iOS/desktop workflows and native/common ownership in findings.
+- [x] Refresh storage/network/auth/compiler alternatives and existing-code takeover costs.
+- [x] Specify common contracts and target fixture/packaging gates S01–S08.
+- [x] Record primary sources, current code limitations and prerequisite uncertainty.
+- [x] Checkpoint: prerequisite completion is not inferred from research activation.
 
-## Phase 2: Options and dependency decision
+## Phase2: Options and decision
 
-- [ ] Task: Compare retained/native/custom implementation with dependencies and deferral
-- [ ] Task: Run a bounded prototype only where it resolves uncertainty; identify temporary dependencies and expiry criteria
-- [ ] Task: Record decision, update spec and implementation tasks; propagate any changed prerequisite assumptions
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- [x] Compare retained/native/custom/library/Rust options and deferral in KMP-D01.
+- [x] Bounded prototype assessed: N/A; no selected target/stable source boundary,
+  so a toy extraction would not resolve the blocking product questions.
+- [x] Refine spec and propagate dependency assumptions to downstream tracks.
+- [x] Checkpoint: no production dependency selection or performance claim.
 
-## Phase 3: Conditional implementation and verification
+## Phase3: Conditional implementation
 
-- [ ] Task: If adopted, write meaningful failing contract/regression tests before changing behaviour
-- [ ] Task: Implement the selected bounded change and any data/config migration; remove superseded code only after parity
-- [ ] Task: Verify tests plus applicable device/provider readback and rollback; otherwise document justified deferral
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- N/A: new failing implementation tests and production extraction are deferred.
+- N/A: no data/config migration or code retirement; existing app remains intact.
+- [x] Specify cross-target, transaction, native-consumer and rollback verification.
+- [x] Checkpoint: equivalent target tests are specified, not passed or waived.
 
-## Phase 4: Handoff
+## Phase4: Handoff and review
 
-- [ ] Task: Update consolidated requirements, stack and dependency decisions with actual outcomes
-- [ ] Task: Document residual gaps, next-track inputs and checkpoint evidence
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- [x] Synchronize research outcomes, run25 host/link checks, review and apply fixes.
+- [ ] Archive research record with remaining M7 implementation gate explicit.
+
+## History
+
+- `59c6543`: activate research track.

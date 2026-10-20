@@ -34,3 +34,10 @@ The [Compose research decision](../../archive/compose_20261020/decisions.md) ret
 the working Android app; a completed research track does not mean an Android
 Compose UI exists. At activation, map the actual Android/second-platform workflows
 and qualify the UI/state adoption requirements afresh before proposing shared UI.
+
+## KMP prerequisite disposition
+
+[Track8 KMP-D01](../kmp_20261020/decisions.md) retains current implementation and
+defers extraction. No common module or qualified second target exists. Reopen its
+contract/packaging gates before shared UI depends on a shared runtime; archived
+research completion is not implemented prerequisite acceptance.
