@@ -34,4 +34,10 @@ Research and bounded host experiment complete; production Rust adoption is defer
 
 - `a0da851`: activate research track.
 - Rust3 tests and JVM4 golden assertions pass; sequential raw benchmark receipt recorded.
-- [~] Host/link/format validation, formal review/fixes and archive.
+- [x] Host/link/format validation and formal review/fixes; archive follows.
+
+- `512edaf`: implement bounded Rust/JVM experiment and record research/decision.
+
+## Phase: Review Fixes
+
+- [~] Expand benchmark provenance with exact tool/artifact hashes and validate.
