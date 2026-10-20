@@ -24,3 +24,7 @@ Local documentation/host validation results are recorded below after execution.
   shared-UI prerequisite ambiguity. Product identity and selected production stack
   are unchanged, so product/stack/guidelines need no adoption update.
 - Local detailed host output: excluded `.local/kmp-evidence/host-tests.log`.
+
+Post-archive verification:92 documents/13 tracks/25 scenarios passed;25 host
+tests passed again. Links were rebased; application, build, prototype, script and
+test trees remain identical to baseline. No native acceptance was run.

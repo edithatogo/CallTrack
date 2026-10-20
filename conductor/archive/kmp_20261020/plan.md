@@ -29,8 +29,11 @@ cross-target contract acceptance remain pending. No second target was selected.
 ## Phase4: Handoff and review
 
 - [x] Synchronize research outcomes, run25 host/link checks, review and apply fixes.
-- [ ] Archive research record with remaining M7 implementation gate explicit.
+- [x] Archive research record with remaining M7 implementation gate explicit.
 
 ## History
 
 - `59c6543`: activate research track.
+
+- `a309dcb`: mapping, requirements, decision, review fix and validation.
+- Research complete; conditional production implementation remains deferred.

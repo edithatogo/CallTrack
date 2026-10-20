@@ -14,7 +14,7 @@ Decision supported by second-platform prototype; production migration only if ju
 
 ## Inputs and dependencies
 
-Prerequisites: [compose](../../archive/compose_20261020/index.md), [kmp](../kmp_20261020/index.md). Requirement references: R17, R24 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
+Prerequisites: [compose](../../archive/compose_20261020/index.md), [kmp](../../archive/kmp_20261020/index.md). Requirement references: R17, R24 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
 
 ## Required outputs
 
@@ -37,7 +37,7 @@ and qualify the UI/state adoption requirements afresh before proposing shared UI
 
 ## KMP prerequisite disposition
 
-[Track8 KMP-D01](../kmp_20261020/decisions.md) retains current implementation and
+[Track8 KMP-D01](../../archive/kmp_20261020/decisions.md) retains current implementation and
 defers extraction. No common module or qualified second target exists. Reopen its
 contract/packaging gates before shared UI depends on a shared runtime; archived
 research completion is not implemented prerequisite acceptance.
