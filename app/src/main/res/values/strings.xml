@@ -93,4 +93,33 @@
     <string name="auto_run_failed">Last background attempt failed. Pending receipts remain available for recovery.</string>
     <string name="auto_failure_count">Recorded failed background attempts in this logging period: %1$d. Earlier attempts may be unavailable. This is not a count of failed calls.</string>
     <string name="auto_unknown">The latest attempt status is unavailable. Refresh or request recovery.</string>
+
+    <string name="import_open">Historical imports</string>
+    <string name="import_intro">Preview a historical range before importing. Dates use %1$s and YYYY-MM-DD format. The end date is excluded. Previewing never writes calendar events. Closing or stopping a run leaves its saved session available to resume.</string>
+    <string name="import_from">Start date (inclusive, YYYY-MM-DD)</string>
+    <string name="import_to">End date (exclusive, YYYY-MM-DD)</string>
+    <string name="import_create">Create read-only preview</string>
+    <string name="import_none">No import session selected.</string>
+    <string name="import_continue">Continue selected preview / import</string>
+    <string name="import_confirm">Confirm historical import</string>
+    <string name="import_confirm_text">Import the frozen set of %1$d calls into %2$s? Range: %3$s. Current call data is checked before writing. Existing edited or deleted events are not recreated automatically. Some items may require review.</string>
+    <string name="import_stop">Stop this run; keep session</string>
+    <string name="import_stopping">Stopping at the next safe boundary. The session remains available to resume.</string>
+    <string name="import_cancel">Cancel remaining work</string>
+    <string name="import_cancel_text">Cancel all remaining work in this session? Current effects are preserved. A cancelled session cannot resume; use a new preview if needed.</string>
+    <string name="import_history">Saved import sessions</string>
+    <string name="import_newer">Newer sessions</string>
+    <string name="import_older">Older sessions</string>
+    <string name="import_invalid_range">Enter valid YYYY-MM-DD dates with an exclusive end after the start. Dates must exist in the selected timezone and be on or after the supported epoch.</string>
+    <string name="import_another">Create another preview? The previous session stays saved and stopped. You can select it from the saved sessions list.</string>
+    <string name="import_blocked">The run stopped and its result was saved. Check permissions, destination availability and review items before continuing. Progress was not guessed.</string>
+    <string name="import_progress">%1$s\n%2$s\nDestination: %3$s\nCall types: %4$s\nCandidates: %5$d; verified: %6$d; review: %7$d. Verified includes existing events checked during this import.</string>
+    <string name="import_building">Building preview — no calendar writes</string>
+    <string name="import_preview">Preview ready — confirmation required</string>
+    <string name="import_confirmed">Confirmed — resumable work remains</string>
+    <string name="import_complete">Session complete</string>
+    <string name="import_cancelled">Session cancelled</string>
+    <string name="import_review">Source changed — create a new preview</string>
+    <string name="import_empty_history">No saved sessions on this page.</string>
+    <string name="import_failed">This action could not be verified. Saved session progress and delivery receipts remain available. Refresh by selecting the saved session before retrying.</string>
 </resources>

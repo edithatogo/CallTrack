@@ -177,4 +177,34 @@ public class HistoricalImportTest {
         assertEquals(1, sink.inserts);
         assertEquals(DurableDelivery.Result.SAVED, store.rows.get(0).outcome);
     }
+
+    @Test
+    public void stoppedRunCanResumeButDoesNotInsertAfterStopAtIntentBoundary() {
+        Store store = new Store();
+        PagedCallsTest.Source source = new PagedCallsTest.Source();
+        source.rows.put(1L, PagedCallsTest.row(1, 1));
+        java.util.concurrent.atomic.AtomicBoolean running =
+                new java.util.concurrent.atomic.AtomicBoolean(true);
+        DurableDeliveryTest.Store receipts =
+                new DurableDeliveryTest.Store() {
+                    @Override
+                    public void put(DurableDelivery.Intent intent) {
+                        super.put(intent);
+                        if (intent.state == DurableDelivery.State.READY) running.set(false);
+                    }
+                };
+        SliceTest.Sink sink = new SliceTest.Sink();
+        HistoricalImport importer =
+                new HistoricalImport(store, source, receipts, new DurableDelivery(receipts, sink));
+        String id = importer.start(7, "UTC", 0, 2000, true, true, true).id;
+        importer.preview(id, 4);
+        importer.confirm(id);
+        assertEquals(DurableDelivery.Result.PAUSED, importer.deliver(id, 4, running::get).stopped);
+        assertEquals(0, sink.inserts);
+        assertEquals(HistoricalImport.Phase.CONFIRMED, store.value.phase);
+        assertEquals(-1, store.value.processedId);
+        importer.deliver(id, 4, () -> true);
+        assertEquals(1, sink.inserts);
+        assertEquals(HistoricalImport.Phase.COMPLETE, store.value.phase);
+    }
 }

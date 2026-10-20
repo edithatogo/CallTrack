@@ -281,4 +281,41 @@ public class HistoricalImportStoreTest {
             assertTrue(context().deleteDatabase(name));
         }
     }
+
+    @Test
+    public void sessionHistoryPagesNewestFirstWithoutLosingOlderSessions() {
+        String name = fixture() + ".db";
+        try (SqliteImportStore imports = new SqliteImportStore(context(), name)) {
+            HistoricalImport importer = new HistoricalImport(imports, new Source(), null, null);
+            java.util.Set<String> expected = new java.util.HashSet<>();
+            for (int i = 0; i < 25; i++)
+                expected.add(importer.start(7, "UTC", 0, 2000, true, true, true).id);
+            java.util.Set<String> seen = new java.util.HashSet<>();
+            long before = -1, previous = Long.MAX_VALUE;
+            while (true) {
+                java.util.List<SqliteImportStore.ListedSession> page = imports.sessions(before, 4);
+                if (page.isEmpty()) break;
+                assertTrue(page.size() <= 4);
+                for (SqliteImportStore.ListedSession row : page) {
+                    assertTrue(row.cursor < previous);
+                    assertTrue(seen.add(row.session.id));
+                    previous = row.cursor;
+                }
+                before = page.get(page.size() - 1).cursor;
+            }
+            assertEquals(expected, seen);
+            try {
+                imports.sessions(0, 4);
+                fail("Invalid cursor must fail");
+            } catch (IllegalArgumentException expectedFailure) {
+            }
+            try {
+                imports.sessions(-1, 51);
+                fail("Oversized page must fail");
+            } catch (IllegalArgumentException expectedFailure) {
+            }
+        } finally {
+            assertTrue(context().deleteDatabase(name));
+        }
+    }
 }

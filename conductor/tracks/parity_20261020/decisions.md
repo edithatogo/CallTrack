@@ -315,3 +315,30 @@ SharedPreferences in-memory readback is not proof of disk persistence after a fa
 commit. Permission wording now distinguishes an explicit manual action from a
 previously enabled automatic policy resuming when access returns. Remove duplicate
 reload callback; import/recovery user flows and rendered accessibility remain next.
+
+
+## Historical import controls and date interpretation
+
+Expose a nonexported historical-import Activity from automatic settings. Creating a
+preview reads a user-selected date range/destination/type policy without calendar
+writes. Dates are ISO calendar dates in a captured timezone, start inclusive/end
+exclusive; DST day length is preserved and skipped local dates are rejected rather
+than silently shifted. No fallback destination is chosen. The selected session's
+saved range, destination and filters are displayed separately from new-preview drafts.
+
+A completed preview requires explicit count/range/destination confirmation. Foreground
+runs process20 candidates/source rows per step and publish progress between steps.
+Stop/closing leaves the session resumable; cancel is separately confirmed, preserves
+prior effects and permanently cancels remaining work. A running predicate reaches
+final delivery authorization, so UI stop cannot authorize a later insertion. A
+render-version guard rejects obsolete action callbacks; queued steps require current
+run authorization. Opening, recreating or selecting a saved session does not start
+or confirm delivery. Saved-session paging reads the database in bounded newest-first
+pages; display cursors do not authorize effects. Session ID and input drafts survive
+Activity state recreation. English/German resources are included.
+
+Native tests cover underlying default Activity state and storage paging, not rendered
+manual interaction or positive permission/provider flow. Pending: actual confirmation/
+stop/cancel/reopen UI interaction, review/recovery controls, storage faults and full
+worker/provider/background acceptance. No native import success is inferred from a
+read-only screen opening.

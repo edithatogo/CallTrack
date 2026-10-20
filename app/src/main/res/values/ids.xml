@@ -13,4 +13,16 @@
     <item name="auto_counts" type="id" />
     <item name="auto_last" type="id" />
     <item name="auto_feedback" type="id" />
+    <item name="open_imports" type="id" />
+    <item name="import_calendar_picker" type="id" />
+    <item name="import_from" type="id" />
+    <item name="import_to" type="id" />
+    <item name="import_create" type="id" />
+    <item name="import_summary" type="id" />
+    <item name="import_continue" type="id" />
+    <item name="import_confirm" type="id" />
+    <item name="import_stop" type="id" />
+    <item name="import_cancel" type="id" />
+    <item name="import_feedback" type="id" />
+    <item name="import_history" type="id" />
 </resources>

@@ -289,6 +289,10 @@ public final class HistoricalImport {
     }
 
     public Session deliver(String id, int limit) {
+        return deliver(id, limit, () -> true);
+    }
+
+    public Session deliver(String id, int limit, java.util.function.BooleanSupplier running) {
         bounds(limit);
         synchronized (DurableDelivery.DELIVERY_LOCK) {
             Session session = required(id);
@@ -297,10 +301,11 @@ public final class HistoricalImport {
             if (page == null || page.isEmpty() || page.size() > limit)
                 throw new IllegalStateException("Import candidates unavailable");
             for (Candidate candidate : page) {
+                if (!running.getAsBoolean()) return session;
                 if (candidate.sourceId <= session.processedId
                         || candidate.sourceId > session.checkpoint.upperId)
                     throw new IllegalStateException("Invalid candidate order");
-                DurableDelivery.Result result = attempt(session, candidate);
+                DurableDelivery.Result result = attempt(session, candidate, running);
                 long saved = session.saved, review = session.review;
                 switch (result) {
                     case SAVED:
@@ -342,7 +347,8 @@ public final class HistoricalImport {
         }
     }
 
-    private DurableDelivery.Result attempt(Session session, Candidate candidate) {
+    private DurableDelivery.Result attempt(
+            Session session, Candidate candidate, java.util.function.BooleanSupplier running) {
         try {
             final Session active = session;
             DurableDelivery.Result result;
@@ -353,7 +359,7 @@ public final class HistoricalImport {
                                 candidate.key,
                                 session.calendar,
                                 session.operation(),
-                                () -> allowed(active));
+                                () -> running.getAsBoolean() && allowed(active));
             } else {
                 CallRecord call = source.at(candidate.sourceId);
                 if (call == null
@@ -367,7 +373,7 @@ public final class HistoricalImport {
                                     session.calendar,
                                     session.timezone,
                                     session.operation(),
-                                    () -> allowed(active));
+                                    () -> running.getAsBoolean() && allowed(active));
             }
             return result;
         } catch (SecurityException denied) {

@@ -236,3 +236,23 @@ in status-evidence.json. Disk-failure/commit uncertainty and process-death proof
 remain required; adapter recreation is not process restart. Next implement import/
 recovery user flows and draft/accessibility checks, then positive worker/provider,
 reboot/reopen/offline/Doze/latency acceptance and final review/fixes/archive.
+
+
+## Historical import controls checkpoint
+
+HistoricalImportActivity exposes date range/destination/types, bounded read-only
+preview, saved-profile confirmation, progress, stop/resume, separate cancellation
+and database-backed saved-session paging. Captured timezone and exclusive end are
+shown; skipped local dates first failed a regression and now reject rather than
+shift. DST/invalid-range contracts pass. Stop reaches final intent authorization;
+confirmed work stays resumable. Native tests verify25 saved sessions over bounded
+pages and screen opening without preview creation/confirmation. Initial compile
+caught an out-of-scope callback ticket; scoped error handling corrected it.
+Full source-bound build82 JVM tests/APKs/lint and25 host tests pass;30 API36 native
+checks pass and packages are removed. Exact inputs/debug artifacts/native outputs
+in import-ui-evidence.json. Lint0 errors/32 warnings/5 hints includes locale text
+concatenation cleanup for later UI review. Positive rendered confirmation/provider,
+stop/cancel/recreate interaction and accessibility remain unqualified. Next add
+recovery/retention controls and UI hardening, then persistence faults and complete
+positive worker/provider/reboot/reopen/offline/Doze/latency acceptance. Final full-track
+review/fixes/archive remain outstanding; P07 is not closed by default-state tests.
