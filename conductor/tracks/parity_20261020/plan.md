@@ -226,3 +226,20 @@ checks pass and packages are removed. Exact inputs/debug artifacts/native output
 in work-evidence.json. Positive worker/provider, reboot/Doze/offline/reopen/latency and
 UI acceptance remain open. Next wire user settings/status/import/recovery controls,
 then full native acceptance and final review/fixes/archive.
+
+
+## Explicit controls checkpoint
+
+Automatic settings/status screen and manual launcher entry are implemented with
+explicit enable/apply confirmation, pause, type filters and no fallback calendar.
+Manual action now shares the durable path; two test-first JVM contracts verify
+manual/automatic receipt reuse and missing/denied source behavior. Native tests
+verify disabled-on-open Activity state and all-route counts including late legacy
+receipts. English/German resources pass lint after fixing missing translations.
+Full source-bound build76 JVM tests/APKs/lint and25 host tests pass;26 API36 native
+checks pass and packages are removed. Exact inputs/debug artifacts/native outputs
+in controls-evidence.json. This is underlying Activity state, not rendered/manual
+UI or positive activation/provider/background acceptance. Next fix worker status
+monotonicity and permission wording/failed counts, add import/recovery user flows,
+then positive worker/calendar and restart/reboot/offline/Doze/latency acceptance.
+Final full-track review/fixes/archive remain outstanding.

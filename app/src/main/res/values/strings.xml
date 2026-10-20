@@ -52,7 +52,7 @@
     <string name="batteryopt">Please disable battery optimization.</string>
     <string name="restrictopt">Please disable "Pause app activity if unused".</string>
 
-    <string name="slice_intro" translatable="false">CallTrack development slice. Choose a calendar, then explicitly log the latest call. Automatic logging is not enabled. Calendar providers may sync saved events to their accounts.</string>
+    <string name="slice_intro" translatable="false">CallTrack development slice. Choose a calendar, then explicitly log the latest call. Automatic logging starts only after you explicitly enable it in Automatic logging settings. Calendar providers may sync saved events to their accounts.</string>
     <string name="slice_calendar_access" translatable="false">Allow calendar access / refresh calendars</string>
     <string name="slice_choose" translatable="false">Choose a destination calendar</string>
     <string name="slice_log_latest" translatable="false">Log latest call</string>
@@ -69,4 +69,26 @@
     <string name="slice_review" translatable="false">An existing event or source has changed. Review is required; no existing event was overwritten.</string>
     <string name="slice_invalid" translatable="false">The call contains invalid time or duration data.</string>
     <string name="slice_failed" translatable="false">The operation could not be verified. Retry can reconcile an existing event; check the calendar before further action.</string>
+
+    <string name="auto_open">Automatic logging settings</string>
+    <string name="auto_intro">Choose a calendar and call types, then enable logging from now. Draft changes do not alter an active policy until applied. Calls during a pause require a historical import. Calendar providers may sync events to their accounts. Phone-state access supports prompt call-end wakeups; periodic recovery still works without it.</string>
+    <string name="auto_access">Grant call/calendar access</string>
+    <string name="auto_incoming">Incoming calls</string>
+    <string name="auto_outgoing">Outgoing calls</string>
+    <string name="auto_missed">Missed calls</string>
+    <string name="auto_enable">Enable / apply from now</string>
+    <string name="auto_pause">Pause automatic logging</string>
+    <string name="auto_confirm">Start a new logging period from now with the selected calendar and call types? Existing calendar events remain unchanged. Earlier calls and paused work are not imported by enabling. Android can delay background work; reopen this screen to request recovery.</string>
+    <string name="auto_refresh">Refresh logging status</string>
+    <string name="auto_enabled">Automatic logging enabled. Active destination: %1$s</string>
+    <string name="auto_disabled">Automatic logging paused or not enabled.</string>
+    <string name="auto_destination_unavailable">Previously selected calendar unavailable</string>
+    <string name="auto_count_text">Across all destinations — pending: %1$d; previously verified: %2$d; review: %3$d; suppressed: %4$d. Previously verified events may have since changed or been deleted.</string>
+    <string name="auto_action_failed">The action could not be verified. Refresh status before retrying; existing events were not moved or deleted.</string>
+    <string name="auto_action_saved">Settings saved. Background delivery is separate; refresh status to check the latest result.</string>
+    <string name="auto_not_run">No completed background attempt is recorded for this logging period.</string>
+    <string name="auto_complete">Last background attempt finished its bounded scan. This does not confirm cloud synchronisation.</string>
+    <string name="auto_paused">Last background attempt stopped because it was paused or no longer current.</string>
+    <string name="auto_backlog">More pending work remains; recovery has been requested.</string>
+    <string name="auto_run_failed">Last background attempt failed. Pending receipts remain available for recovery.</string>
 </resources>

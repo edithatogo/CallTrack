@@ -63,6 +63,40 @@ public final class SqliteLedger extends SQLiteOpenHelper
                         + " KEY(owner,generation))");
     }
 
+    public DeliveryCounts counts() {
+        long pending = 0, verified = 0, review = 0, suppressed = 0;
+        try (Cursor cursor =
+                getReadableDatabase()
+                        .rawQuery(
+                                "SELECT state,COUNT(*) FROM (SELECT state FROM outbox UNION ALL"
+                                    + " SELECT 'LEGACY' AS state FROM receipts r WHERE NOT EXISTS"
+                                    + " (SELECT 1 FROM outbox o WHERE o.source=r.source AND"
+                                    + " o.calendar=r.calendar)) GROUP BY state",
+                                null)) {
+            while (cursor.moveToNext()) {
+                long count = cursor.getLong(1);
+                switch (DurableDelivery.State.valueOf(cursor.getString(0))) {
+                    case READY:
+                    case IN_FLIGHT:
+                    case ATTEMPTED:
+                        pending = Math.addExact(pending, count);
+                        break;
+                    case CONFIRMED:
+                        verified = Math.addExact(verified, count);
+                        break;
+                    case REVIEW:
+                    case LEGACY:
+                        review = Math.addExact(review, count);
+                        break;
+                    case SUPPRESSED:
+                        suppressed = Math.addExact(suppressed, count);
+                        break;
+                }
+            }
+        }
+        return new DeliveryCounts(pending, verified, review, suppressed);
+    }
+
     /** Bounded source-independent recovery, restricted to this owner/generation/destination. */
     @Override
     public java.util.List<String> pending(

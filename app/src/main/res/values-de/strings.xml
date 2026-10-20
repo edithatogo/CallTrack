@@ -51,4 +51,26 @@
 
     <string name="batteryopt">Bitte die Akkuoptimierung für Anrufe-Transfer deaktivieren.</string>
     <string name="restrictopt">Bitte "App-Aktivität bei Nichtnutzung stoppen" deaktivieren.</string>
+
+    <string name="auto_open">Einstellungen zur automatischen Protokollierung</string>
+    <string name="auto_intro">Wähle einen Kalender und die Anrufarten aus und aktiviere die Protokollierung ab jetzt. Änderungen am Entwurf ändern eine aktive Konfiguration erst nach dem Anwenden. Anrufe während einer Pause müssen über einen historischen Import übernommen werden. Kalenderanbieter können Termine mit ihren Konten synchronisieren. Der Zugriff auf den Telefonstatus ermöglicht zeitnahe Ausführungen nach Gesprächsende; die regelmäßige Wiederherstellung funktioniert auch ohne diesen Zugriff.</string>
+    <string name="auto_access">Zugriff auf Anrufe und Kalender erlauben</string>
+    <string name="auto_incoming">Eingehende Anrufe</string>
+    <string name="auto_outgoing">Ausgehende Anrufe</string>
+    <string name="auto_missed">Verpasste Anrufe</string>
+    <string name="auto_enable">Ab jetzt aktivieren / anwenden</string>
+    <string name="auto_pause">Automatische Protokollierung pausieren</string>
+    <string name="auto_confirm">Soll ab jetzt ein neuer Protokollierungszeitraum mit dem ausgewählten Kalender und den ausgewählten Anrufarten beginnen? Bestehende Termine bleiben unverändert. Frühere Anrufe und pausierte Vorgänge werden durch das Aktivieren nicht importiert. Android kann die Hintergrundausführung verzögern. Öffne diese Ansicht erneut, um eine Wiederherstellung anzufordern.</string>
+    <string name="auto_refresh">Protokollierungsstatus aktualisieren</string>
+    <string name="auto_enabled">Automatische Protokollierung aktiviert. Aktiver Zielkalender: %1$s</string>
+    <string name="auto_disabled">Automatische Protokollierung pausiert oder nicht aktiviert.</string>
+    <string name="auto_destination_unavailable">Der zuvor ausgewählte Kalender ist nicht verfügbar</string>
+    <string name="auto_count_text">Alle Zielkalender — ausstehend: %1$d; zuvor geprüft: %2$d; zu prüfen: %3$d; unterdrückt: %4$d. Zuvor geprüfte Termine können inzwischen geändert oder gelöscht worden sein.</string>
+    <string name="auto_action_failed">Die Aktion konnte nicht bestätigt werden. Aktualisiere vor einem erneuten Versuch den Status. Bestehende Termine wurden weder verschoben noch gelöscht.</string>
+    <string name="auto_action_saved">Einstellungen gespeichert. Die Hintergrundübertragung erfolgt separat. Aktualisiere den Status, um das letzte Ergebnis zu prüfen.</string>
+    <string name="auto_not_run">Für diesen Protokollierungszeitraum ist noch kein abgeschlossener Hintergrundversuch verzeichnet.</string>
+    <string name="auto_complete">Der letzte Hintergrundversuch hat seine begrenzte Suche abgeschlossen. Dies bestätigt keine Cloud-Synchronisierung.</string>
+    <string name="auto_paused">Der letzte Hintergrundversuch wurde angehalten, weil er pausiert oder nicht mehr aktuell war.</string>
+    <string name="auto_backlog">Weitere Vorgänge stehen aus. Eine Wiederherstellung wurde angefordert.</string>
+    <string name="auto_run_failed">Der letzte Hintergrundversuch ist fehlgeschlagen. Ausstehende Einträge bleiben zur Wiederherstellung erhalten.</string>
 </resources>

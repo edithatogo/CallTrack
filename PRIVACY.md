@@ -23,7 +23,10 @@ members. Private/free event flags do not encrypt content or revoke calendar acce
 | Selected calendar provider | Title, description, start/end, timezone and app marker; name/number may be included | Remains after uninstall; calendar/provider controls cloud retention and deletion |
 | Local developer evidence | Toolchain paths, hashes, synthetic fixture receipts and test output | `.local` excluded from Git; no automated expiry implemented |
 
-The current launcher uses SliceEngine receipts, not the new DurableDelivery path.
+The manual latest-call action and automatic worker now share DurableDelivery receipts.
+Automatic settings require explicit activation; opening that settings screen can
+request recovery only for a previously enabled policy. Import/recovery user flows
+and their native acceptance remain incomplete.
 Schema1–4 receipts and pending rows survive migration to schema5. Older source facts
 remain unknown; they are never inferred from event marker length. New source facts
 survive payload clearing and remain potentially sensitive; no age-based expiry is

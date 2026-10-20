@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="slice_calendar_picker" type="id" />
+    <item name="open_automatic" type="id" />
+    <item name="auto_permissions" type="id" />
+    <item name="auto_calendar_picker" type="id" />
+    <item name="auto_incoming" type="id" />
+    <item name="auto_outgoing" type="id" />
+    <item name="auto_missed" type="id" />
+    <item name="auto_enable" type="id" />
+    <item name="auto_pause" type="id" />
+    <item name="auto_state" type="id" />
+    <item name="auto_counts" type="id" />
+    <item name="auto_last" type="id" />
+    <item name="auto_feedback" type="id" />
 </resources>
