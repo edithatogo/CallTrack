@@ -23,10 +23,9 @@ class VerificationFailures(unittest.TestCase):
         shutil.copytree(MODULE.parent.parent / 'conductor', self.root / 'conductor')
         if (MODULE.parent.parent / 'qualification').exists():
             shutil.copytree(MODULE.parent.parent / 'qualification', self.root / 'qualification')
-        for name in ('README.md', 'NOTICE.md', 'LICENSE'):
-            source = MODULE.parent.parent / name
+        for source in [*MODULE.parent.parent.glob('*.md'), MODULE.parent.parent / 'LICENSE']:
             if source.exists():
-                shutil.copy2(source, self.root / name)
+                shutil.copy2(source, self.root / source.name)
         self.baseline = next((self.root / 'conductor').glob('*/baseline_20261020'))
 
     def run_verifier(self):
