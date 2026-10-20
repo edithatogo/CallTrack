@@ -16,5 +16,7 @@
     "66ca1e7",
     "a7e54a5"
   ],
-  "completed_at": "2026-10-20"
+  "completed_at": "2026-10-20",
+  "archived": true,
+  "archived_at": "2026-10-20"
 }

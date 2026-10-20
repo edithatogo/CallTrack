@@ -8,7 +8,7 @@ Reference only: AndroidCallLogSync is Java/XML, AndroidX/View Binding/WorkManage
 
 Preserve useful upstream behaviour while proving a modern build. Kotlin is the planned migration language. Android call-log/calendar providers and native scheduling are initial integration candidates. Room, DataStore, coroutines/Flow, Ktor, serialization, Compose, KMP and Rust/UniFFI are candidates, not installed or selected production dependencies.
 
-The build track will select a compatible JDK/Gradle/AGP/SDK baseline. Kotlin, Compose and multiplatform tracks refresh compatibility and alternatives at activation. Platform APIs remain platform-specific; cross-platform code cannot confer call-history access.
+The completed build track selected the qualified JDK/Gradle/AGP/SDK baseline below. Kotlin, Compose and multiplatform tracks refresh compatibility and alternatives at activation. Platform APIs remain platform-specific; cross-platform code cannot confer call-history access.
 
 ## Dependency governance
 
@@ -29,3 +29,5 @@ This does not adopt all old runtime dependencies for the long term. Kotlin/Compo
 ## Track 3 implementation decision
 
 Native Android CalendarContract/CallLog provider adapters and a small SQLiteOpenHelper ledger are selected for the initial manual vertical slice. Pure Java mapping/ports stay independent of Android for later Kotlin migration. No new runtime framework is added; provider wrappers and richer persistence libraries are reassessed when they address a demonstrated need. New development app ID is org.calltrack.community.dev.
+
+Track 3 native CalendarContract/CallLog and SQLite selection is now implemented and [verified](archive/calendar_slice_20261020/verification.md) for the bounded manual slice. The app omits network permission, disables legacy boot entry, uses explicit backup/transfer exclusions and retains insert-attempt receipts across uncertain readback. No new runtime framework was added. The modern build passed with 16 JVM tests and zero lint errors; Android17/API37 synthetic provider/SQLite/UI acceptance passed and disposable state was removed. Live source acquisition, remote sync, full parity and production upgrade/restore remain unqualified.
