@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/** Deliberately manual development slice; launch and permission grant never read calls. */
+/** Explicit manual action; previously enabled background policy is controlled independently. */
 public final class CalendarSliceActivity extends Activity {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private Spinner picker;

@@ -72,6 +72,8 @@ def qualify(serial):
             attempted.append(package)
             if 'Success' not in command('install', str(apk)):
                 raise RuntimeError('Install not confirmed')
+        check('WorkStatusStoreTest', 'publicationPersistsFailureCountAndRejectsOldActivationAfterReopen')
+        check('WorkStatusStoreTest', 'legacyStatusWithoutCounterRemainsReadableAndUnknownCodesAreSanitised')
         check('AutomaticSettingsTest', 'openingSettingsDoesNotEnableOrSelectDestinationWithoutAccess')
         check('AutomaticWorkTest', 'absentActivationExecutesWithoutCallCalendarPermission')
         check('AutomaticWorkTest', 'staleGenerationExecutesWithoutOpeningProviders')

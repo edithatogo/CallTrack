@@ -240,15 +240,12 @@ public final class AutomaticSettingsActivity extends Activity {
                         try (SqliteLedger ledger = new SqliteLedger(getApplicationContext())) {
                             summary = ledger.counts();
                         }
-                        android.content.SharedPreferences preferences =
-                                getSharedPreferences("slice", MODE_PRIVATE);
-                        String code =
-                                settings != null
-                                                && preferences.getLong(
-                                                                "automaticStatusGeneration", -1)
-                                                        == settings.generation
-                                        ? preferences.getString("automaticStatusCode", null)
-                                        : null;
+                        WorkStatus worker =
+                                settings == null
+                                        ? null
+                                        : new AndroidWorkStatusStore(getApplicationContext())
+                                                .read(settings.generation);
+                        String code = worker == null ? null : worker.code.name();
                         runOnUiThread(
                                 () -> {
                                     if (isDestroyed()) return;
@@ -271,7 +268,12 @@ public final class AutomaticSettingsActivity extends Activity {
                                                     summary.verified,
                                                     summary.review,
                                                     summary.suppressed));
-                                    last.setText(workerMessage(code));
+                                    last.setText(
+                                            getString(workerMessage(code))
+                                                    + "\n"
+                                                    + getString(
+                                                            R.string.auto_failure_count,
+                                                            worker == null ? 0 : worker.failures));
                                     {
                                         choices = loaded;
                                         List<String> labels = new ArrayList<>();
@@ -318,7 +320,6 @@ public final class AutomaticSettingsActivity extends Activity {
                                     state.setText(R.string.auto_action_failed);
                                     buttons();
                                     reloadIfRequested();
-                                    reloadIfRequested();
                                 });
                     }
                 });
@@ -351,8 +352,10 @@ public final class AutomaticSettingsActivity extends Activity {
                 return R.string.slice_review;
             case "INVALID_CALL":
                 return R.string.slice_invalid;
-            default:
+            case "FAILED":
                 return R.string.auto_run_failed;
+            default:
+                return R.string.auto_unknown;
         }
     }
 

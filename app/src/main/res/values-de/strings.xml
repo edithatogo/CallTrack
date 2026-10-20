@@ -73,4 +73,6 @@
     <string name="auto_paused">Der letzte Hintergrundversuch wurde angehalten, weil er pausiert oder nicht mehr aktuell war.</string>
     <string name="auto_backlog">Weitere Vorgänge stehen aus. Eine Wiederherstellung wurde angefordert.</string>
     <string name="auto_run_failed">Der letzte Hintergrundversuch ist fehlgeschlagen. Ausstehende Einträge bleiben zur Wiederherstellung erhalten.</string>
+    <string name="auto_failure_count">Erfasste fehlgeschlagene Hintergrundversuche in diesem Protokollierungszeitraum: %1$d. Frühere Versuche sind möglicherweise nicht verfügbar. Dies zählt keine fehlgeschlagenen Anrufe.</string>
+    <string name="auto_unknown">Der Status des letzten Versuchs ist nicht verfügbar. Aktualisiere den Status oder fordere eine Wiederherstellung an.</string>
 </resources>

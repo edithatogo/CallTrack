@@ -36,6 +36,8 @@ public class AutomaticWorkTest {
                         .remove("automaticStatusCode")
                         .remove("automaticStatusDelivered")
                         .remove("automaticStatusReview")
+                        .remove("automaticStatusFailures")
+                        .remove("automaticStatusToken")
                         .commit());
     }
 

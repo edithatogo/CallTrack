@@ -243,3 +243,21 @@ UI or positive activation/provider/background acceptance. Next fix worker status
 monotonicity and permission wording/failed counts, add import/recovery user flows,
 then positive worker/calendar and restart/reboot/offline/Doze/latency acceptance.
 Final full-track review/fixes/archive remain outstanding.
+
+
+## Status hardening checkpoint
+
+Generation-checked publication prevents late old-activation jobs from replacing
+current status. Recorded failure attempts are generation-scoped and one attempt
+token cannot increment twice. English/German UI labels distinguish attempts from
+failed calls and warn that earlier counters can be incomplete. Legacy codes are
+sanitised to UNKNOWN; manual permission text acknowledges an existing automatic
+policy resuming when access returns. Worker status-write failures have bounded
+retries and explicit unverified output. Two test-first JVM status contracts and two
+native preference contracts pass for stale rejection, reopen and legacy fallback.
+Full source-bound build78 JVM tests/APKs/lint and25 host tests pass;28 API36 native
+checks pass and packages are removed. Exact inputs/debug artifacts/native outputs
+in status-evidence.json. Disk-failure/commit uncertainty and process-death proof
+remain required; adapter recreation is not process restart. Next implement import/
+recovery user flows and draft/accessibility checks, then positive worker/provider,
+reboot/reopen/offline/Doze/latency acceptance and final review/fixes/archive.
