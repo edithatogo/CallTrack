@@ -330,4 +330,42 @@ public class DurableDeliveryTest {
         assertThrows(
                 IllegalArgumentException.class, () -> new DurableDelivery.Operation("import", -1));
     }
+
+    @Test
+    public void sourceFactsSurviveZeroMarkerAndPayloadPurge() {
+        Store store = new Store();
+        SliceTest.Sink sink = sink();
+        CallRecord zero =
+                new CallRecord(
+                        "facts", "1", 123456789, 0, 3, "Secret", "123", Integer.valueOf(3), null);
+        assertEquals(
+                DurableDelivery.Result.SAVED,
+                delivery(store, sink).deliver(zero, 7, "UTC", () -> true));
+        DurableDelivery.Intent receipt = store.get(zero.key(), 7);
+        assertNull(receipt.payload);
+        assertEquals(123456789, receipt.facts.start);
+        assertEquals(0, receipt.facts.seconds);
+        assertEquals(3, receipt.facts.type);
+        assertEquals(Integer.valueOf(3), receipt.facts.presentation);
+        assertEquals(60000, sink.rows.get(1L).end - sink.rows.get(1L).start);
+    }
+
+    @Test
+    public void changedRawPresentationIsReviewedWithoutChangingLegacySignature() {
+        Store store = new Store();
+        SliceTest.Sink sink = sink();
+        CallRecord restricted =
+                new CallRecord("facts", "1", 123, 1, 1, "Secret", "123", Integer.valueOf(2), null);
+        CallRecord unknown =
+                new CallRecord("facts", "1", 123, 1, 1, "Secret", "123", Integer.valueOf(3), null);
+        assertEquals(CallIdentity.signature(restricted), CallIdentity.signature(unknown));
+        assertEquals(
+                DurableDelivery.Result.SAVED,
+                delivery(store, sink).deliver(restricted, 7, "UTC", () -> true));
+        assertEquals(
+                DurableDelivery.Result.SOURCE_CHANGED,
+                delivery(store, sink).deliver(unknown, 7, "UTC", () -> true));
+        assertEquals(1, sink.inserts);
+        assertEquals(Integer.valueOf(2), store.get(restricted.key(), 7).facts.presentation);
+    }
 }

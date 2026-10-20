@@ -7,6 +7,8 @@ public final class CallRecord {
     public final boolean identityAllowed;
 
     public final int type;
+    public final Integer numberPresentation;
+    public final boolean presentationSupplied;
     public final String phoneAccountId;
 
     public CallRecord(
@@ -28,7 +30,9 @@ public final class CallRecord {
                 number,
                 identityAllowed,
                 typeOf(direction),
-                null);
+                null,
+                null,
+                false);
     }
 
     public CallRecord(
@@ -51,7 +55,37 @@ public final class CallRecord {
                 number,
                 identityAllowed,
                 type,
-                phoneAccountId);
+                phoneAccountId,
+                null,
+                false);
+    }
+
+    /**
+     * Raw provider presentation, including a distinct null value. Only allowed exposes identity.
+     */
+    public CallRecord(
+            String namespace,
+            String id,
+            long start,
+            long seconds,
+            int type,
+            String name,
+            String number,
+            Integer presentation,
+            String phoneAccountId) {
+        this(
+                namespace,
+                id,
+                start,
+                seconds,
+                directionOf(type),
+                name,
+                number,
+                Integer.valueOf(1).equals(presentation),
+                type,
+                phoneAccountId,
+                presentation,
+                true);
     }
 
     private CallRecord(
@@ -64,7 +98,9 @@ public final class CallRecord {
             String number,
             boolean identityAllowed,
             int type,
-            String phoneAccountId) {
+            String phoneAccountId,
+            Integer presentation,
+            boolean presentationSupplied) {
         if (namespace == null
                 || namespace.isEmpty()
                 || id == null
@@ -81,6 +117,8 @@ public final class CallRecord {
         this.identityAllowed = identityAllowed;
         this.type = type;
         this.phoneAccountId = phoneAccountId;
+        this.numberPresentation = presentation;
+        this.presentationSupplied = presentationSupplied;
     }
 
     private static int typeOf(String direction) {

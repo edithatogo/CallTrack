@@ -77,7 +77,7 @@ public final class AndroidCallLogSource implements SliceEngine.CallSource {
                 c.getInt(2),
                 c.getString(5),
                 c.getString(1),
-                c.getInt(6) == Calls.PRESENTATION_ALLOWED,
+                c.isNull(6) ? (Integer) null : Integer.valueOf(c.getInt(6)),
                 c.getString(7));
     }
 }
