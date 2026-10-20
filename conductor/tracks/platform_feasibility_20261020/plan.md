@@ -34,4 +34,10 @@ Research and compile-only surface experiment complete; production implementation
 
 - `cdd61e8`: activate research track.
 - SDK typecheck passes with warnings-as-errors; no runtime API invocation.
-- [~] Final source/link/host verification, formal review and archive.
+- [x] Final source/link/host verification and formal review; archive follows.
+
+- `030cc66`: capability matrix, SDK surface probe and prior-assumption correction.
+
+## Phase: Review
+
+- [x] Formal scope/source review and final host/link checks; no code fix required.
