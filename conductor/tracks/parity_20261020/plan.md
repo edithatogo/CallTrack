@@ -485,3 +485,30 @@ expected process termination. All97 JVM/50 host tests pass; lint0 errors/32 warn
 and archive are not complete while the explicit remaining gates above are open.
 
 - `ca132a4`: launcher resume recovery, bounded scheduler acknowledgement, native process-death/reboot/offline/Doze acceptance and restored emulator state.
+
+
+## Local counter correction while qualified storage is disconnected
+
+Recovery followed by a source rescan previously reported two delivery actions for
+one newly confirmed receipt. Two targeted regressions failed before the fix; the
+scan now excludes already CONFIRMED receipts while still counting an ATTEMPTED
+known-ID receipt that becomes confirmed without another insertion. The state read
+and delivery share DELIVERY_LOCK. This diagnostic count describes newly confirmed
+receipts, not necessarily newly inserted events. No schema/provider policy changes.
+
+Local javac --release8 compilation and96 pure JVM tests pass, including11 targeted
+scan/automatic contracts;50 host tests pass. Current Kotlin source hashes match the
+last successful Android build before reusing its retained Kotlin classes. Exact
+compiled Java hashes, dependency URLs/digests and red/green output are recorded in
+counter-local-evidence.json. SchedulingCommitTest is excluded from this fallback.
+This is not a Gradle build, APK qualification, lint or emulator runtime proof.
+
+PortableSSD is absent from diskutil; the qualified SDK and Gradle-cache symlinks
+are dangling. Gradle failed before compilation, which is infrastructure failure,
+not the regression red. User directed continuing local work and will reconnect
+later. No global paths or emulator process were replaced. After reconnect: inspect
+the existing guest/process/storage first, refresh the complete source-bound build,
+then qualify native counter/fault contracts and the remaining protected call-end
+wake/rendered UI gates. Full-track review and archive remain open.
+
+- `2da53cc`: locally verified receipt-count correction; complete Android/native requalification pending storage reconnect.
