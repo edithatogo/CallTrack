@@ -39,6 +39,63 @@ public class WorkerProviderTest {
         FixtureCallLog.asShell(action);
     }
 
+    @Test
+    public void shellFixtureRoundTripDoesNotGrantAppWritePermission() {
+        assertEquals(
+                android.content.pm.PackageManager.PERMISSION_DENIED,
+                context().checkSelfPermission(Manifest.permission.WRITE_CALL_LOG));
+        shellCalls(
+                () -> {
+                    try (Cursor before =
+                            FixtureCallLog.query(
+                                    context(), new String[] {Calls._ID}, null, null, null)) {
+                        assertEquals("Refusing a nonempty source", 0, before.getCount());
+                    }
+                    try {
+                        ContentValues call = new ContentValues();
+                        call.put(Calls.NUMBER, "0000000000");
+                        call.put(Calls.CACHED_NAME, "Fixture O'Brien");
+                        call.put(Calls.DATE, System.currentTimeMillis());
+                        call.put(Calls.DURATION, 1);
+                        call.put(Calls.TYPE, Calls.INCOMING_TYPE);
+                        call.put(Calls.PHONE_ACCOUNT_ID, tag());
+                        assertNotNull(FixtureCallLog.insert(context(), call));
+                        try (Cursor row =
+                                FixtureCallLog.query(
+                                        context(),
+                                        new String[] {Calls._ID, Calls.CACHED_NAME},
+                                        Calls.PHONE_ACCOUNT_ID + "=?",
+                                        new String[] {tag()},
+                                        null)) {
+                            assertEquals(1, row.getCount());
+                            assertTrue(row.moveToFirst());
+                            assertEquals("Fixture O'Brien", row.getString(1));
+                        }
+                        if (android.os.Build.VERSION.SDK_INT < 29)
+                            assertEquals(
+                                    android.content.pm.PackageManager.PERMISSION_DENIED,
+                                    context()
+                                            .checkSelfPermission(
+                                                    Manifest.permission.WRITE_CALL_LOG));
+                    } finally {
+                        FixtureCallLog.delete(
+                                context(), Calls.PHONE_ACCOUNT_ID + "=?", new String[] {tag()});
+                        try (Cursor after =
+                                FixtureCallLog.query(
+                                        context(),
+                                        new String[] {Calls._ID},
+                                        Calls.PHONE_ACCOUNT_ID + "=?",
+                                        new String[] {tag()},
+                                        null)) {
+                            assertEquals(0, after.getCount());
+                        }
+                    }
+                });
+        assertEquals(
+                android.content.pm.PackageManager.PERMISSION_DENIED,
+                context().checkSelfPermission(Manifest.permission.WRITE_CALL_LOG));
+    }
+
     private void insertCalls(int first, int last, long at) {
         shellCalls(
                 () -> {

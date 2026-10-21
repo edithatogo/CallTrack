@@ -43,7 +43,7 @@ def qualify(serial):
 
     def command(*args):
         result = subprocess.run([str(ROOT / '.local/android-sdk/platform-tools/adb'), '-s', serial, *args],
-                                capture_output=True, text=True, timeout=180)
+                                capture_output=True, text=True, timeout=300 if 'instrument' in args else 180)
         receipt['steps'].append({'args': list(args), 'exit_code': result.returncode,
                                  'output': result.stdout + result.stderr})
         if result.returncode:
@@ -77,6 +77,7 @@ def qualify(serial):
         for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
             command('shell', 'pm', 'grant', PACKAGE, 'android.permission.' + permission)
         fixture_possible = True
+        check('shellFixtureRoundTripDoesNotGrantAppWritePermission')
         check('prepareTaggedCallsAndExplicitActivation')
         command('shell', 'pm', 'grant', PACKAGE, 'android.permission.READ_CALL_LOG')
         check('promptWorkerCatchesUpFiltersRepeatsPausesAndReactivates')
