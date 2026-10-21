@@ -10,7 +10,8 @@ The selected macOS debug/instrumentation/release/JVM/lint build passes under str
 verification. An intentionally wrong AGP JAR checksum and a missing AGP JAR entry
 both fail before app compilation; the original policy is restored afterward.
 The Linux aapt2 JAR is downloaded and checked for the hosted build recipe, but
-Linux/hosted execution is still unobserved. Windows has no qualified build claim.
+Native separate-host Linux release/JVM/lint execution is now qualified by the
+Track5 independent-build follow-up; hosted execution remains unobserved. Windows has no qualified build claim.
 
 No broad trusted-artifact exceptions or disabled metadata checks are introduced.
 Publisher signature verification is not enabled; verification uses approved SHA256

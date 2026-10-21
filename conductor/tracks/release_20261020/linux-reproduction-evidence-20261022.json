@@ -1,0 +1,237 @@
+{
+  "date": "2026-10-22",
+  "success": true,
+  "release_ready": false,
+  "candidate_revision": "94644086159137bab27767b6a1a46727409695b5",
+  "apk_sha256": "0f672916f06afbc2ec4b0730c1df167d44dcb094b41385cb8a0bfc6b234f48df",
+  "macos_clean_builds": [
+    {
+      "jvm": {
+        "tests": 115,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "lint": {
+        "Hint": 2,
+        "Warning": 23
+      },
+      "unsigned_verified": true,
+      "apk_sha256": "0f672916f06afbc2ec4b0730c1df167d44dcb094b41385cb8a0bfc6b234f48df",
+      "log_sha256": "e194bceac797a272fd671ec928a2698e43da535ba88d03f25b4b07efc50f4421"
+    },
+    {
+      "jvm": {
+        "tests": 115,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "lint": {
+        "Hint": 2,
+        "Warning": 23
+      },
+      "unsigned_verified": true,
+      "apk_sha256": "0f672916f06afbc2ec4b0730c1df167d44dcb094b41385cb8a0bfc6b234f48df",
+      "log_sha256": "f1a388ed53140f9c8ce2ea1b54508aa82c5f65c4665f9032dd85621c4df318e9"
+    }
+  ],
+  "independent_linux_build": {
+    "success": true,
+    "linux": true,
+    "kernel": "6.12.63+",
+    "machine": "x86_64",
+    "cache_empty_before": true,
+    "sdk_empty_before": true,
+    "sdk_packages": [
+      {
+        "package": "cmdline-tools;19.0",
+        "url": "https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip",
+        "size": 164760899,
+        "checksum_algorithm": "sha1",
+        "checksum": "5fdcc763663eefb86a5b8879697aa6088b041e70",
+        "licence": "android-sdk-license",
+        "sha256": "7ec965280a073311c339e571cd5de778b9975026cfcbe79f2b1cdcb1e15317ee"
+      },
+      {
+        "package": "platforms;android-36",
+        "url": "https://dl.google.com/android/repository/platform-36_r02.zip",
+        "size": 65878410,
+        "checksum_algorithm": "sha1",
+        "checksum": "2c1a80dd4d9f7d0e6dd336ec603d9b5c55a6f576",
+        "licence": "android-sdk-license",
+        "sha256": "37607369a28c5b640b3a7998868d45898ebcb777565a0e85f9acf36f29631d2e"
+      },
+      {
+        "package": "build-tools;35.0.0",
+        "url": "https://dl.google.com/android/repository/build-tools_r35_linux.zip",
+        "size": 61958799,
+        "checksum_algorithm": "sha1",
+        "checksum": "2cfaa0bbb2336e9ec18ed3ecea84fa2e2af607bc",
+        "licence": "android-sdk-license",
+        "sha256": "bd3a4966912eb8b30ed0d00b0cda6b6543b949d5ffe00bea54c04c81e1561d88"
+      }
+    ],
+    "source_files_unchanged": true,
+    "jvm": {
+      "tests": 115,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "lint": {
+      "Hint": 2,
+      "Warning": 23
+    },
+    "unsigned_verified": true,
+    "bitwise_match_to_macos": true,
+    "elapsed_seconds": 590.9,
+    "script_sha256": "4202c335c0e88d1d4601ea339472d98531e711ccef512430b3bfd19400794fd9",
+    "sdk_manifest_sha256": "619bda0cc262a19c50dddb747e536af2d60c8f0ef4b83c1cfd10a3710e11f25f"
+  },
+  "physical_host_proof": {
+    "separate_physical_machine": true,
+    "existing_trusted_ssh_identity": true,
+    "native_x86_64_linux": true,
+    "host_virtualization_probe": "none",
+    "host_mounts": [],
+    "privileged": false,
+    "published_ports": false,
+    "cpu_limit": 2,
+    "memory_limit_gib": 5,
+    "host_source_and_cache_mounts": false,
+    "jdk_image_absent_before_independent_pull": true,
+    "image_manifest_digest": "sha256:67d52fac68c483f8a91dda88d4d0518ca2375d4c8260a9114d37aa49cf11cfac",
+    "source_transfer": "current commit/tree and frozen tooling/SDK metadata only for cold app build; repository history added after success solely for Linux tooling fixture checks",
+    "hosted_ci": false
+  },
+  "independent_environment_reproduction": true,
+  "independent_physical_host_reproduction": true,
+  "source_bundle": {
+    "revision": "94644086159137bab27767b6a1a46727409695b5",
+    "archive_sha256": "f0e7b1a16bd7d4b2a76414808821ad3a23f581e444d54edad3e219d8cc91b11b",
+    "file_count": 650,
+    "runtime_source_count": 63,
+    "unsigned_apk_sha256": "0f672916f06afbc2ec4b0730c1df167d44dcb094b41385cb8a0bfc6b234f48df",
+    "archive_readback_verified": true,
+    "repeatability_verified": true
+  },
+  "verification_policy": {
+    "entries": 739,
+    "previous_entries": 736,
+    "previous_hashes_unchanged": true,
+    "metadata_verification_enabled": true,
+    "broad_trust_exceptions_added": false,
+    "sha256": "7f381e1b92bcd31f060bd3c4b378067b2f7eafc1d073aff3f4b532428d602329",
+    "canonical_additions": [
+      {
+        "group": "com.google.guava",
+        "name": "guava-parent",
+        "version": "33.3.1-jre",
+        "artifact": "guava-parent-33.3.1-jre.pom",
+        "url": "https://repo.maven.apache.org/maven2/com/google/guava/guava-parent/33.3.1-jre/guava-parent-33.3.1-jre.pom",
+        "sha256": "55441db27e8869dfefe053059bdf478bdc7e95585642bf391f0023345fd56287",
+        "cold_guest_download_matches_canonical": true
+      },
+      {
+        "group": "org.junit",
+        "name": "junit-bom",
+        "version": "5.10.2",
+        "artifact": "junit-bom-5.10.2.module",
+        "url": "https://repo.maven.apache.org/maven2/org/junit/junit-bom/5.10.2/junit-bom-5.10.2.module",
+        "sha256": "de23b114b3e4119a8fe6eb17bed5a3852816698bace67071579d6d927ebb080a",
+        "cold_guest_download_matches_canonical": true
+      },
+      {
+        "group": "org.jetbrains.kotlinx",
+        "name": "kotlinx-coroutines-bom",
+        "version": "1.8.0",
+        "artifact": "kotlinx-coroutines-bom-1.8.0.pom",
+        "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-bom/1.8.0/kotlinx-coroutines-bom-1.8.0.pom",
+        "sha256": "1239e9dbe1397cd5971342956b2511bc3ace7b641842e4372a088dcfa8b9ad55",
+        "cold_guest_download_matches_canonical": true
+      }
+    ]
+  },
+  "artifact_runtime_continuity": {
+    "prior_candidate": "5a3a3e470ab0955714a1db33d6196063400ed5b1",
+    "current_candidate": "94644086159137bab27767b6a1a46727409695b5",
+    "zip_payload_differences": [
+      "META-INF/version-control-info.textproto"
+    ],
+    "app_runtime_payloads_unchanged": true
+  },
+  "host_tests_macos": 131,
+  "host_tests_native_linux": 131,
+  "ci_workflow_prepared": true,
+  "ci_actions": [
+    {
+      "name": "checkout",
+      "release": "v7.0.1",
+      "commit": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+      "release_url": "https://github.com/actions/checkout/releases/tag/v7.0.1"
+    },
+    {
+      "name": "upload-artifact",
+      "release": "v7.0.2",
+      "commit": "cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+      "release_url": "https://github.com/actions/upload-artifact/releases/tag/v7.0.2"
+    }
+  ],
+  "workflow_actionlint_passed": true,
+  "github_hosted_run_observed": false,
+  "git_remote_created": false,
+  "new_sdk_licence_accepted": false,
+  "licence_terms_comparison": {
+    "licence_id": "android-sdk-license",
+    "accepted_local_text_sha1": "24333f8a63b6825ea9c5514f83c2829b004d1fee",
+    "fresh_repository_text_sha1": "9002c006f4b8d9a16e715a9fa4df30ddb8abf9d9",
+    "difference": "Whitespace/line wrapping only; identical tokens and clauses",
+    "same_terms_after_whitespace_normalization": true,
+    "new_licence_acceptance": false
+  },
+  "native_android_tests_run": false,
+  "production_signing_qualified": false,
+  "initial_cold_guest_failure": {
+    "revision": "5a3a3e470ab0955714a1db33d6196063400ed5b1",
+    "exit_code": 1,
+    "reason": "three missing parent/BOM metadata checksums; preserved failed receipt, never accepted"
+  },
+  "diagnostic_overlay_accepted": false,
+  "same_hardware_emulated_build_accepted": false,
+  "raw_evidence": {
+    ".local/release-evidence/linux-independent-20261022/metadata-additions.json": "b2abc0fd97fe28d72ef1fdc6700d6d22bbd4361146679ae9bedd707db1805594",
+    ".local/release-evidence/linux-independent-20261022/image-origin.json": "f81f9699fd36ed9159eec668b1a217618c2494ad34eb13f046c0819fcae1976e",
+    ".local/release-evidence/linux-independent-20261022/image-registry-index.json": "73ed442231ec66cfe48cae0b263ce619a75ab96d162ab325f38fc0a269ee3aab",
+    ".local/release-evidence/linux-independent-20261022/container-isolation.json": "f70f1b5b9ee90efabdd46ad7e15f9cc990aad0aeba7500d5cc51fe7604a8113f",
+    ".local/release-evidence/linux-independent-20261022/guest-evidence/receipt.json": "39cd337de3309fb4c8e84394239e06727b3976ea762014e712cd0da066b09d51",
+    ".local/release-evidence/linux-independent-20261022/guest-evidence/build.log": "1a06a6173d451e6de8cbc9660b85a87efe6d5a9c7cced5ce2bccdbd260511b1c",
+    ".local/release-evidence/linux-independent-20261022/diagnostic-stop.json": "bb60bc760efcd6bf44e68d7c50a890fda0c12bfbefedd3862ae31a84994252d5",
+    ".local/release-evidence/linux-independent-20261022/supplemental-guest-stop.json": "c07387851da99faa0d146676a3eaf074173ad07426dbc9ecac3fb441459bb94f",
+    ".local/release-evidence/linux-independent-20261022/separate-host-preflight.log": "90960f9cde32c3f91ba6f44631c36016c39bc619f0788f985f3bb30044bf3c87",
+    ".local/release-evidence/linux-independent-20261022/separate-host-image-pull.log": "77725962331f2f889478886c113648152cf9f0bd5a2156bc32759aa2f153cd13",
+    ".local/release-evidence/linux-independent-20261022/separate-host-isolation.json": "da2a9dde34f79d7f6986844ea0c73a31f6559f580105f5302d5a5b0faf0ee406",
+    ".local/release-evidence/linux-independent-20261022/separate-host-cold-preflight.log": "4e087b660199fb75be6282b38a1427152de3cd89fdb4ec1fe23b9ff62ed2dea4",
+    ".local/release-evidence/linux-independent-20261022/separate-host-export/evidence/receipt.json": "65bc71b21d3749d9e096102001bb059f4b61520da21b23fb288ec9acf43f97a9",
+    ".local/release-evidence/linux-independent-20261022/separate-host-export/evidence/build.log": "cd40f50791f1fdd19c0e17e0cce6ea6ee5e108cfcefd72c85c526c9ad1f900d6",
+    ".local/release-evidence/linux-independent-20261022/separate-host-export/evidence/runtime-inventory.json": "74f7138b8d5ee827095aff1efa28009ff7043675fe77589faf74441d50c73c82",
+    ".local/release-evidence/linux-independent-20261022/separate-host-reports-readback.json": "f0820e932560a8636b0ab6753ef1b7583a88578d211c192466a703e5cbc72946",
+    ".local/release-evidence/linux-independent-20261022/separate-host-jvm-reports.tar": "99774a78dbc9c60eb6400eeee926c0a8004ccc0eaecf791fb3b8338c56c08f70",
+    ".local/release-evidence/linux-independent-20261022/separate-host-lint-report.tar": "d8b23c41d8496a31a95c49003dcfd7e0b8074c785d17332a2e260e3ef7499102",
+    ".local/release-evidence/linux-independent-20261022/separate-host-os-packages.txt": "3f46090dbedb5bd37a99bccbb74a93556803a4b72b7a078bc1e6c8782c0a3954",
+    ".local/release-evidence/linux-independent-20261022/separate-host-ci-tooling-tests.log": "0765493f7ee242955bdd1715aea43770dd5fb6c20d41eef7af60db5c2e732fe1",
+    ".local/release-evidence/linux-independent-20261022/separate-host-cleanup-readback.json": "d63a669f4295d671a493bb0a0ed59c33cdc57d98cfa2d46055105bd44dbef9c7",
+    ".local/release-evidence/linux-independent-20261022/source-bundle-9464408/receipt.json": "45d3d85815d9fdc904e2a26360ae970d243bfd91acd653197051167cff6f8232",
+    ".local/release-evidence/linux-independent-20261022/mac-baseline-9464408/receipt.json": "ffa542845eeb34821132bbcbc530f3e3eae06d8fe9f9fc97dbdfafc6ba254574",
+    ".local/release-evidence/linux-independent-20261022/gradle-help.log": "1562b4143f0398614942b44ece969b0edaf038ca6729d61be3a25e4853928a6f",
+    ".local/release-evidence/linux-independent-20261022/host-freeze.log": "a42cbf7e469e2bd96dad77ebcb4a619719d5858fcbc53f522bdec002e7e7a86c",
+    ".local/release-evidence/linux-independent-20261022/separate-host-final-cleanup.json": "234b974ed357a6d919c3a01b05340e137fe65627549d28d281011c675cff1d91",
+    ".local/release-evidence/linux-independent-20261022/final-host-tests.log": "85d3b0d5e14810831c9b89f72e3b7b88f3c7cba8b2b48463126bec55f8cf0c8f",
+    ".github/workflows/release-reproduction.yml": "a538504591df8747c1e267e9b6c89a46dc6163603a53f1a52dcfe769bc87895e"
+  },
+  "final_owned_container_cleanup_verified": true,
+  "native_linux_watcher_exception_observed": false,
+  "final_reporting_conductor_documents": 160,
+  "final_reporting_host_tests_macos": 131,
+  "final_reporting_fixture_fix": "Copy .github into isolated documentation test fixture; frozen Linux tooling passed before this reporting-only change."
+}

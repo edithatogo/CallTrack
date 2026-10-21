@@ -5,11 +5,11 @@ on:
       candidate_sha:
         description: Exact reviewed candidate commit (40 hex characters)
         required: true
-        default: 5a3a3e470ab0955714a1db33d6196063400ed5b1
+        default: 94644086159137bab27767b6a1a46727409695b5
       expected_apk_sha256:
         description: Expected unsigned macOS APK SHA256
         required: true
-        default: e3780da6e9162d29fd35553e8a7362b876857d016cc398ebea1ee26e67b4bc8a
+        default: 0f672916f06afbc2ec4b0730c1df167d44dcb094b41385cb8a0bfc6b234f48df
 permissions:
   contents: read
 jobs:

@@ -21,6 +21,7 @@ class VerificationFailures(unittest.TestCase):
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
         shutil.copytree(MODULE.parent.parent / 'conductor', self.root / 'conductor')
+        shutil.copytree(MODULE.parent.parent / '.github', self.root / '.github')
         if (MODULE.parent.parent / 'qualification').exists():
             shutil.copytree(MODULE.parent.parent / 'qualification', self.root / 'qualification')
         for source in [*MODULE.parent.parent.glob('*.md'), MODULE.parent.parent / 'LICENSE']:
