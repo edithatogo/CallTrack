@@ -58,11 +58,9 @@ final class FixtureCallLog {
     private static String shell(String command) {
         File script = null;
         try {
-            // executeShellCommand tokenizes arguments; use a script so quoted values stay intact.
+            // Keep privileged fixture scripts in protected app cache; preserve quoted arguments.
             File cache =
-                    InstrumentationRegistry.getInstrumentation()
-                            .getTargetContext()
-                            .getExternalCacheDir();
+                    InstrumentationRegistry.getInstrumentation().getTargetContext().getCacheDir();
             assertNotNull("Emulator fixture cache unavailable", cache);
             script = File.createTempFile("calltrack-shell-", ".sh", cache);
             assertTrue(script.getAbsolutePath().matches("[A-Za-z0-9_./-]+"));
