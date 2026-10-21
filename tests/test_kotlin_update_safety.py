@@ -59,7 +59,7 @@ class UpdateFaultTest(unittest.TestCase):
                 return b'source'
             if 'aapt' in command[0]:
                 package = update.TEST_PACKAGE if command[-1] == str(tests) else update.PACKAGE
-                return "package: name='" + package + "' versionCode='10'"
+                return "package: name='" + package + "' versionCode='" + ('' if package == update.TEST_PACKAGE else '10') + "'"
             if 'apksigner' in command[0]:
                 return 'Signer #1 certificate SHA-256 digest: ' + 'a' * 64
             raise AssertionError(command)
@@ -122,7 +122,7 @@ class UpdateFaultTest(unittest.TestCase):
         self.assertFalse(receipt['packages_removed'])
         self.assertEqual({update.PACKAGE}, installed)
 
-    def test_success_uses_in_place_replacement_then_verified_removal(self):
+    def test_unversioned_instrumentation_allows_in_place_update_and_verified_removal(self):
         commands, receipt, installed = self.fixture()
         update_index = next(i for i, c in enumerate(commands) if c[:2] == ['install', '-r'])
         self.assertFalse(any(c[0] == 'uninstall' for c in commands[:update_index]))
