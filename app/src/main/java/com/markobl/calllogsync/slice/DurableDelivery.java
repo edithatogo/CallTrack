@@ -401,7 +401,8 @@ public final class DurableDelivery {
     }
 
     private Result verify(Intent intent, boolean inserted) {
-        if (!matches(sink.read(intent.eventId), intent))
+        SliceEngine.StoredEvent existing = sink.read(intent.eventId);
+        if (!matches(existing, intent) || existing.id != intent.eventId)
             return review(intent, Result.REVIEW_REQUIRED);
         store.put(intent.state(State.CONFIRMED, intent.eventId));
         return inserted ? Result.SAVED : Result.ALREADY_LOGGED;
@@ -409,6 +410,7 @@ public final class DurableDelivery {
 
     private boolean matches(SliceEngine.StoredEvent event, Intent intent) {
         return event != null
+                && event.id >= 0
                 && event.calendar == intent.calendar
                 && event.event != null
                 && intent.fingerprint.equals(event.event.fingerprint());
