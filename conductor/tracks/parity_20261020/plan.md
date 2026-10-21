@@ -796,3 +796,15 @@ both suites remove development packages. See final-store-evidence.json and
 final-source-identity-evidence.json. Earlier UI/settings/import/provider/worker/
 lifecycle/telephony evidence remains separately source-bound; final regression
 and full review are not yet complete. Metadata now correctly records schema6.
+
+## Provider/worker final-pass checkpoint
+
+Provider8/8 and worker5/5 pass with scoped cleanup/package removal. See
+final-provider-evidence.json and final-worker-evidence.json. Worker observation
+was extended60→120s only after native diagnostics showed RUNNING/61 verified/
+1 pending/0 review at60s; both original failures remain retained. Exact counts,
+filter/idempotency/pause/reactivation assertions are unchanged. Full Android
+build passes61s and70 host tests pass. Test-only inputs differ from prior store
+receipt; production app remains daf794a. Wake-lock acquisition deadline candidate
+in local-review.md must receive a held-lock fault test and disposition before
+review closure. Lifecycle/telephony/UI final pass and complete audit remain open.

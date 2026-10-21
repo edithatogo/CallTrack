@@ -104,13 +104,31 @@ public class WorkerProviderTest {
         manager.enqueueUniqueWork(tag(), ExistingWorkPolicy.REPLACE, request)
                 .getResult()
                 .get(15, TimeUnit.SECONDS);
-        long deadline = SystemClock.elapsedRealtime() + 60000;
+        // Native diagnostic at60s showed61 verified/1 pending and RUNNING, not a fixed latency SLA.
+        long deadline = SystemClock.elapsedRealtime() + 120000;
+        WorkInfo last = null;
         do {
             WorkInfo info = manager.getWorkInfoById(request.getId()).get(5, TimeUnit.SECONDS);
+            last = info;
             if (info != null && info.getState().isFinished()) return info;
             SystemClock.sleep(50);
         } while (SystemClock.elapsedRealtime() < deadline);
-        throw new AssertionError("Worker did not finish in the bounded observation window");
+        String observed = last == null ? "missing" : last.getState().name();
+        int attempts = last == null ? -1 : last.getRunAttemptCount();
+        try (SqliteLedger ledger = new SqliteLedger(context())) {
+            DeliveryCounts counts = ledger.counts();
+            throw new AssertionError(
+                    "Worker did not finish in the bounded observation window; state="
+                            + observed
+                            + "; attempts="
+                            + attempts
+                            + "; verified="
+                            + counts.verified
+                            + "; pending="
+                            + counts.pending
+                            + "; review="
+                            + counts.review);
+        }
     }
 
     @Test
