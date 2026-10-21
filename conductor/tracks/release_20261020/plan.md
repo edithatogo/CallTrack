@@ -121,3 +121,11 @@ key generation, cloud consent, physical testing or elapsed observation is claime
 - [x] Task: Qualify an isolated publisher-signed JDK17 archive without restart, global install changes or ad-hoc re-signing — isolated-jdk-evidence-20261022.json;459 archive files, strict resource/publisher verification and real tamper rejection pass.
 - [x] Task: Rebuild frozen5578bf5 twice under the isolated JDK; verify unchanged installed tools and review evidence —115 JVM tests per build, zero lint errors, exact prior APK match;121 host tests. Review: review-isolated-jdk-20261022.md; implementation/review evidence95d3851.
 - [ ] Task: Complete independent-host/platform, production identity/signing, rights/conveyance and live/operational gates before full M4 and archive.
+
+
+## Asset/source/notices continuation — 2026-10-22
+
+- [x] Task: Finish current asset/translation provenance; replace uncertain launcher/store artwork and preserve active translations —5a3a3e4; ASSET_PROVENANCE.md, MODIFICATIONS.md and qualification/release/assets-provenance.json.
+- [x] Task: Prepare exact-source/licence/notices candidate with all63 published dependency source/POM archives and embedded APK notices —5a3a3e4; assets-source-evidence-20261022.json,643-member archive, four real CLI rejection cases and full readback/repeatability pass.
+- [x] Task: Qualify two clean unsigned builds and a source-only archive reconstruction outside Git; review and apply corrections —115 JVM tests per build, zero lint errors,126 host tests; review-assets-source-20261022.md; evidence/review1384c58. Original production/native/external gates retained.
+- [ ] Task: Complete signed/channel corresponding-source delivery, permanent identity/signing, independent/platform/native and live/operational acceptance before full M4/archive. Published source JARs are not proof of complete upstream dependency rebuilding.
