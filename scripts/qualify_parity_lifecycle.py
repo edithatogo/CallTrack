@@ -29,6 +29,8 @@ def ensure_legacy_fixture_root(command):
     if (command('shell', 'getprop', 'ro.kernel.qemu') != '1'
             or not is_dedicated_avd(command('emu', 'avd', 'name'))):
         raise RuntimeError('Refusing fixture root outside a dedicated emulator')
+    if command('shell', 'getprop', 'ro.build.version.sdk') != '26':
+        raise RuntimeError('Legacy fixture root is restricted to API26')
     if command('shell', 'id', '-u') == '0':
         return False
     output = command('root')
