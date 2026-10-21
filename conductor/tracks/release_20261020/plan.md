@@ -143,6 +143,8 @@ key generation, cloud consent, physical testing or elapsed observation is claime
 
 ## Extended emulator acceptance — 2026-10-22
 
-- [~] Task: Qualify exact dedicated API26 minimum and API33 intermediate images and source-bound builds; preserve existing emulator state.
-- [ ] Task: Run native store/provider, rendered settings/import/recovery, accessibility at normal/large text, lifecycle recovery and development-key schema/provider upgrades per version.
-- [ ] Task: Review, fix and rerun affected checks; retain physical-device, cloud, production-signing and operational gates separately.
+- [x] Task: Qualify exact dedicated API26 minimum and API33 intermediate images and source-bound builds; preserve existing guests — production6f3381c, emulator-matrix-evidence-20261022.json; one exact development APK across standard suites.
+- [x] Task: Run native store/provider/worker, rendered settings/import/recovery, accessibility at normal/large text, lifecycle and simulated telephony plus development-key schema/provider upgrades —109 successful native invocations each on API26/API33,11 affected API36 checks, two expected terminations,134 screenshot/tree pairs;115 JVM/141 host tests.
+- [x] Task: Review, fix and rerun affected checks — runtime fixes6f3381c, final fixture hardeningbd8c2e9, evidence/review fa7b944; protected-cache round-trip/worker regression and cleanup pass; API26 ordinary ADB privilege restored and both new guests stopped. Original external/manual gates retained.
+
+- [ ] Task: Refreeze the current runtime fixes into new unsigned artifacts/source-notices bundle and independently reproduce that exact candidate;9464408 remains the prior qualified release/source snapshot. Hosted execution awaits repository authority; original identity/signing, physical/OEM/manual, remote and operational gates remain before M4/archive.
