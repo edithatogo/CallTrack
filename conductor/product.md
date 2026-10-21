@@ -15,3 +15,8 @@ API36 emulator requirements P01–P10, including automatic enable/pause/filterin
 durable recovery, historical import and explicit recovery/retention UI. Its
 [handoff](archive/parity_20261020/handoff.md) preserves physical/cloud/release and
 wider-platform gates; this is development acceptance, not production availability.
+
+On2026-10-21 the user approved implementation of the sequenced future architecture,
+with iOS last. The [approved sequence](future-architecture.md) creates successor
+implementation tracks rather than overwriting archived research. Implementation
+authority remains subject to the explicit native/signing/cloud/operational gates.
