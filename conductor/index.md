@@ -51,6 +51,11 @@ M4-linked full acceptance remains open. Native providers/Views/SQLite remain sel
 adopt production Compose/KMP/shared UI/direct cloud connectors/Rust or establish
 second-platform runtime parity.
 
-Physical calls, remote provider synchronization, wider Android/OEM/manual
-accessibility qualification and public release remain pending. See [Track4 handoff](archive/parity_20261020/handoff.md)
+The [extended emulator matrix](tracks/release_20261020/emulator-matrix-qualification-20261022.md)
+now passes selected API26/API33 suites and affected API36 recovery/accessibility:
+229 native invocations, two expected terminations,115 JVM/141 host tests. It fixed
+minimum-platform SQLite scoped use and undersized controls. Physical/OEM/manual
+speech/contrast, remote synchronisation and public release remain pending. The
+current runtime fixes need refreezing/reproduction before inheriting release
+qualification; the older9464408 artifact retains its original evidence. See [Track4 handoff](archive/parity_20261020/handoff.md)
 and the [archive index](archive/index.md) for precise evidence boundaries.

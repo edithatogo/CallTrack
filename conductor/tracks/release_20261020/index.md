@@ -83,3 +83,21 @@ reproduction and original operational acceptance remain pending.
 - [Unsigned and corresponding-source checks](local-artifact-checks-20261021.json)
 
 - [Development-key increasing-version native evidence](development-upgrade-evidence-20261021.json)
+
+
+## Extended emulator checkpoint — 2026-10-22
+
+[Minimum/intermediate acceptance](emulator-matrix-qualification-20261022.md),
+[machine evidence](emulator-matrix-evidence-20261022.json) and
+[review](review-emulator-matrix-20261022.md) qualify109 native invocations each on
+API26/API33 plus11 affected API36 checks, with two deliberate terminations kept
+separate.115 JVM/141 host tests and zero lint errors pass. Fixes add explicit
+Closeable support for old SQLite helpers and48dp control minima. Real native
+reboot/Doze, permission loss, provider readback, imports, simulated missed-call
+logging and development10→11 preserving upgrades pass. Fixture root was confined
+to the owned API26 userdebug guest, restored and both new guests stopped.
+
+The current app fixes require a new release freeze/source bundle and independent
+reproduction;9464408 remains the previously qualified unsigned artifact. Physical/
+OEM/manual speech/contrast, cloud, production-signing and actual observation gates
+remain. Track5 is active.
