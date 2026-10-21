@@ -80,4 +80,10 @@ public class ExpandedKotlinContractTest {
         assertSame(AutomaticWorkPolicy.Action.STOP, AutomaticWorkPolicy.decide(failed, 5));
         assertThrows(NullPointerException.class, () -> AutomaticWorkPolicy.decide(null, 0));
     }
+
+    @Test
+    public void calendarChoiceKeepsJavaNullableLabelContract() {
+        assertNull(new AndroidCalendarSink.Choice(7, null, null).toString());
+        assertEquals("Fixture", new AndroidCalendarSink.Choice(7, "Fixture", null).toString());
+    }
 }
