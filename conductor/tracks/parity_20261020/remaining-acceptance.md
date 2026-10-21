@@ -1,5 +1,17 @@
 # Track 4 remaining acceptance ledger
 
+## Final authoritative checkpoint — 2026-10-21
+
+The selected emulator implementation/acceptance and review pass. See
+[final acceptance](final-acceptance-evidence.json), [closure audit](closure-audit.md),
+[final review](final-review.md) and [handoff](handoff.md). All confirmed findings,
+including reboot failure restoration088281b, are fixed. Historical failures and
+previous pending checkpoints below are retained; they do not override this final
+scoped result. Physical/cloud/release and wider-platform gates remain pending in
+the handoff. Archive follows final link/registry validation.
+
+## Preserved chronological record
+
 This is the closure checklist after local review. Earlier plan checkboxes describe
 historical slices and must be reconciled against current-source evidence before
 marking any phase complete. No item below waives P01–P10 or broadens emulator proof

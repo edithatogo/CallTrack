@@ -1,46 +1,46 @@
 # Plan: Parity and durable synchronisation
 
-Track active: schema6 implementation and rendered settings/import/recovery have bounded native evidence. Final-source regression, complete P01–P10 review, handoff and archive remain required. Historical checkboxes below await final evidence reconciliation.
+Track implemented, reviewed with fixes and accepted for the selected emulator scope. All plan gates below are reconciled against final-acceptance-evidence.json, closure-audit.md and final-review.md; physical/cloud/release gates remain with the handoff.
 
 ## Phase 1: Discovery and mapping
 
 - [x] Task: Refresh legacy parity matrix and missing/zero-duration/contact behaviour
-- [~] Task: Research durable outbox, deduplication and legacy-migration approaches including replacement libraries
-- [~] Task: Specify edit/deletion, restart, offline, import and privacy semantics before implementing
-- [~] Task: Write findings and refine track requirements/acceptance with source provenance
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- [x] Task: Research durable outbox, deduplication and legacy-migration approaches including replacement libraries
+- [x] Task: Specify edit/deletion, restart, offline, import and privacy semantics before implementing
+- [x] Task: Write findings and refine track requirements/acceptance with source provenance
+- [x] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
 
 ## Phase 2: Options and dependency decision
 
-- [ ] Task: Compare retained/native/custom implementation with dependencies and deferral
-- [ ] Task: Run a bounded prototype only where it resolves uncertainty; identify temporary dependencies and expiry criteria
-- [ ] Task: Record decision, update spec and implementation tasks; propagate any changed prerequisite assumptions
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- [x] Task: Compare retained/native/custom implementation with dependencies and deferral
+- [x] Task: Run a bounded prototype only where it resolves uncertainty; identify temporary dependencies and expiry criteria
+- [x] Task: Record decision, update spec and implementation tasks; propagate any changed prerequisite assumptions
+- [x] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
 
 ## Phase 3: Conditional implementation and verification
 
-- [ ] Task: If adopted, write meaningful failing contract/regression tests before changing behaviour
-- [ ] Task: Implement the selected bounded change and any data/config migration; remove superseded code only after parity
-- [ ] Task: Verify tests plus applicable device/provider readback and rollback; otherwise document justified deferral
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- [x] Task: If adopted, write meaningful failing contract/regression tests before changing behaviour
+- [x] Task: Implement the selected bounded change and any data/config migration; remove superseded code only after parity
+- [x] Task: Verify tests plus applicable device/provider readback and rollback; otherwise document justified deferral
+- [x] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
 
 ### Implementation slices still required
 
 - [x] Durable intent engine, source-independent resume, v1 preservation and native persistence tests (31 JVM/19 host tests; four API36 native invocations passed; packages removed)
 - [x] Operation owner/generation and preserving schema3 migration (39 JVM/25 host/7 API36 native checks; packages removed)
 - [x] Retained source facts/raw presentation, preserving schema4 migration (42 JVM/25 host/10 API36 native checks; packages removed)
-- [ ] Bounded source paging, checkpoint/anchor validation, filter/settings policy and reset handling
-- [ ] Frozen historical preview, confirmed bounded import, cancel/resume and partial-progress handling
+- [x] Bounded source paging, checkpoint/anchor validation, filter/settings policy and reset handling
+- [x] Frozen historical preview, confirmed bounded import, cancel/resume and partial-progress handling
 - [x] Read-only legacy confidence/ambiguity prototype (71 JVM/25 host tests and source-bound debug build; no live query or adoption)
-- [ ] Prompt scheduling plus periodic/reboot/reopen catch-up using a qualified WorkManager version
-- [ ] User settings, destination/permission flows, pending/review/error status and explicit recovery policy
-- [ ] Full emulator parity/background/failure matrix with exact artifact and cleanup evidence
+- [x] Prompt scheduling plus periodic/reboot/reopen catch-up using a qualified WorkManager version
+- [x] User settings, destination/permission flows, pending/review/error status and explicit recovery policy
+- [x] Full emulator parity/background/failure matrix with exact artifact and cleanup evidence
 
 ## Phase 4: Handoff
 
-- [ ] Task: Update consolidated requirements, stack and dependency decisions with actual outcomes
-- [ ] Task: Document residual gaps, next-track inputs and checkpoint evidence
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
+- [x] Task: Update consolidated requirements, stack and dependency decisions with actual outcomes
+- [x] Task: Document residual gaps, next-track inputs and checkpoint evidence
+- [x] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
 
 ## Execution checkpoints
 
@@ -744,7 +744,7 @@ until that finding is fixed and rerun; see local-review.md.
 
 ## Completion-feedback follow-up
 
-- [~] Native final-feedback assertion and successful-result feedback reset.
+- [x] Native final-feedback assertion and successful-result feedback reset.
   Full Android build passes (72s, unchanged inputs);69 host tests and Conductor
   validation pass. Native reruns before the fix failed at active63/120 timeout
   and Activity-launch/input-dispatch ANR respectively, not at the new assertion.
@@ -848,3 +848,20 @@ confirmed production issue in these inspected paths. Matrix session70804 remains
 authoritative for runtime progress; final receipt inspection and complete review/
 handoff/archive are still open. No plan completion checkbox is inferred from
 this interim review.
+
+## Final completion checkpoint — 2026-10-21
+
+All original phase tasks and implementation slices above are satisfied by the
+final requirement audit, native matrix, reviewed fixes, decisions and handoff.
+WORK-D01 adopts the qualified WorkManager update; native SQLite is retained with
+explicit takeover review triggers; legacy matching remains a bounded read-only
+prototype, not adoption. No additional prototype/rewrite is required merely to
+close a conditional research task.
+
+Current production code974a66d; failure-restoration harness fix088281b. Complete
+acceptance:110 JVM/73 host tests,89 successful native invocations plus one expected
+termination,10 suites,40 PNG/tree pairs; current inputs/APKs/receipts verified.
+Final post-run readback: responsive guest, packages absent, call/calendar providers
+empty, original environment matched. Final review has no confirmed open finding.
+Root requirements/stack/product/roadmap and Track5/6 handoffs are synchronized.
+Archive is authorized by the user and follows final repository validation.

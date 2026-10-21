@@ -486,3 +486,24 @@ latency guarantee or its data assertions. Earlier no-effect windows and enqueue
 acknowledgement limits must remain explicit rather than attributed to one cause
 without evidence. Physical/OEM dispatch policy and running while force-stopped are
 not qualified by these emulator cases.
+
+## Final retained architecture and review disposition
+
+WORK-D01 retains WorkManager2.12.0 with native provider adapters and schema6
+SQLiteOpenHelper persistence. Room takeover remains deferred to the store/migration
+reassessment gate; the read-only legacy matcher is prototype-only and cannot
+authorize adoption. Reassess these choices on new data/store requirements or
+upgrades, not merely because a new version exists. No new runtime library was
+needed for the review fixes.
+
+Wake admission has one running/one queued request with a caller deadline that
+includes monitor contention. Expired/interrupted admission cannot publish work
+after obtaining the lock; overload remains unconfirmed and periodic/reopen
+recovery remains available. Settings publication/order stays serialized. Explicit
+reapproval captures a token invalidated onPause so returning cannot revive consent.
+System/cutout/IME insets preserve reachable native controls. Reboot mutation is
+tracked before ADB dispatch so failure restoration cannot skip readback.
+
+All selected native gates pass; see final-acceptance-evidence.json. Earlier Room,
+Compose/KMP/Rust and wider service/provider suggestions remain research inputs
+owned by their tracks, not implied production adoption.

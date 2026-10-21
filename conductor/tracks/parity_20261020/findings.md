@@ -1,5 +1,17 @@
 # Track 4 findings — 2026-10-20, work in progress
 
+## Final authoritative checkpoint — 2026-10-21
+
+The selected emulator implementation/acceptance and review pass. See
+[final acceptance](final-acceptance-evidence.json), [closure audit](closure-audit.md),
+[final review](final-review.md) and [handoff](handoff.md). All confirmed findings,
+including reboot failure restoration088281b, are fixed. Historical failures and
+previous pending checkpoints below are retained; they do not override this final
+scoped result. Physical/cloud/release and wider-platform gates remain pending in
+the handoff. Archive follows final link/registry validation.
+
+## Preserved chronological record
+
 ## Baseline refresh and gap map
 
 Original CallTrack static sources remain pinned in the Track 1 archive; no new APK extraction is necessary. Its automatic scan examined four rows, used title/time equality, rounded source time and had weak edit recovery. Track 3 deliberately replaced those behaviours with exact instants, presentation-aware mapping and verified local event receipts, but remained manual/latest-row and did not commit a pre-insert intent.
