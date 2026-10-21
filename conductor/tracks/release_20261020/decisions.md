@@ -100,3 +100,35 @@ remain separate. Archive-based tool evidence is read-only; global tools and lice
 acceptances are not changed. The JDK payload comparison reproduces Homebrew
 relocation/signature allocation and records its remaining bundle resource-seal
 failure rather than silently claiming full resource-signature validity.
+
+
+## RD05 — Replace uncertain artwork and prepare exact-source materials (2026-10-22)
+
+Remove inherited bitmap/store/foreground artwork instead of treating a root source
+licence as proof of its independent artwork origin. Use an original geometric
+calendar/list vector with preferred editable XML under GPLv3 and an explicit
+working development label. Keep the development application ID, version and data
+identity. Retain upstream GPL functional configuration, attribution and unchanged
+licence; remove44 unused endpoint string keys per locale and preserve all active
+project-authored translations. No permanent trademark/store identity is selected.
+
+Use a small host-only preparation script, native Gradle runtime inventory and
+standard tar/ZIP/SHA256 facilities. No new runtime dependency, licence SDK or
+source-processing service is justified. Include the exact committed source tree,
+existing build/tests/trust policy, source/POM archives for all63 runtime artifacts,
+licence/notice texts and modification/provenance records. Put the relevant legal
+texts/notices in the APK as well. Do not export Git history, private APK evidence,
+keys or general-purpose SDK/JDK/Gradle distributions.
+
+Acceptance requires clean source-bound unsigned builds, a fresh runtime graph,
+complete checksum-bound source/POM coverage, notices readback from both APKs,
+repeatable archive bytes and full manifest readback. Test missing/changed inputs
+and private/unsafe paths. Retain original legal-text whitespace, not reformat it.
+A source-only extraction must build without private reference checkouts. It may
+lack AGP Git provenance metadata; compare payloads without stripping the original
+candidate's metadata or claiming bitwise equality where it does not exist.
+
+This is local candidate preparation. Published dependency source JARs plus POMs
+are not a qualification of each upstream build system or binary-from-source
+reproduction. Final source-conveyance/channel access, signed-artifact binding,
+permanent identity and operational acceptance remain explicit release gates.

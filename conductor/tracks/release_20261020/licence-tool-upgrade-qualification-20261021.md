@@ -144,7 +144,7 @@ they are not counted as newly executed here.
 | Gate | Remaining evidence/decision |
 |---|---|
 | Production identity/signing | Permanent package/name/icon, custodian/recovery, then authorised production signing and certificate continuity; pending by user choice |
-| Licence/conveyance | Resolve retained asset/branding rights and exact source/notices for the selected conveyance; no publication clearance inferred |
+| Licence/conveyance | Inherited artwork replaced and local source/notices candidate prepared on2026-10-22; permanent identity and final signed/channel conveyance remain pending (follow-up linked below) |
 | Tool/platform reproduction | Independent environment/contributor and hosted CI, Linux execution; isolated JDK bundle seal qualified on2026-10-22 (linked below), original Homebrew defect retained; no whole-host trust claim |
 | Supported production upgrades | Real supported release baselines/data and permanent-certificate routes; synthetic local schema/provider acceptance is not that claim |
 | Wider acceptance | Minimum/intermediate Android/OEM/manual accessibility, physical calls and real account/cloud readback where claimed |
@@ -158,3 +158,10 @@ external message, upload or computer restart occurred.
 [Isolated vendor-signed JDK qualification](isolated-jdk-qualification-20261022.md)
 resolves the resource-seal blocker for that explicit alternate build path. It does
 not repair Homebrew or complete independent/live/production acceptance.
+
+## Asset/source follow-up — 2026-10-22
+
+[Current asset/source/notices qualification](assets-source-qualification-20261022.md)
+replaces uncertain artwork, preserves active translations and qualifies the
+5a3a3e4 unsigned/source candidate. This report remains historical for5578bf5 and
+its original native evidence; no current-APK native acceptance is inferred.
