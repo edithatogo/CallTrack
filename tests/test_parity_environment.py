@@ -49,6 +49,29 @@ class EnvironmentSafety(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'baseline'): self.environment.snapshot()
         self.assertIsNone(self.environment.original)
 
+    def test_legacy_network_commands_restore_the_original_native_state(self):
+        original = self.command
+        def legacy(*args):
+            if args[:4] == ('shell', 'cmd', 'connectivity', 'airplane-mode'):
+                return 'No shell command implementation.'
+            if args == ('shell', 'dumpsys', 'wifi'):
+                return self.values['wifi'].replace('Wifi', 'Wi-Fi')
+            if args == ('shell', 'settings', 'get', 'global', 'airplane_mode_on'):
+                return '1' if self.values['airplane'] == 'enabled' else '0'
+            if args[:5] == ('shell', 'settings', 'put', 'global', 'airplane_mode_on'):
+                self.values['airplane'] = 'enabled' if args[-1] == '1' else 'disabled'
+                return ''
+            if args[:3] == ('shell', 'am', 'broadcast'):
+                return 'Broadcast completed: result=0'
+            return original(*args)
+        self.environment.command = legacy
+        before = self.environment.snapshot().copy()
+        self.assertTrue(self.environment.legacy_network)
+        self.environment.offline()
+        self.assertEqual('enabled', self.values['airplane'])
+        self.assertTrue(self.environment.restore()['verified'])
+        self.assertEqual(before, self.environment.snapshot())
+
     def test_older_battery_service_without_dock_flag_is_qualified(self):
         original = self.command
         def old_battery(*args):

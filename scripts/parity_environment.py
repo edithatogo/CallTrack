@@ -10,11 +10,18 @@ class EmulatorEnvironment:
         self.changed = False
         self.settle_timeout = settle_timeout
         self.poll_seconds = poll_seconds
+        self.legacy_network = False
 
     def snapshot(self):
         run = self.command
         airplane = run('shell', 'cmd', 'connectivity', 'airplane-mode')
-        wifi = run('shell', 'cmd', 'wifi', 'status').splitlines()[0]
+        if airplane == 'No shell command implementation.':
+            self.legacy_network = True
+            value = run('shell', 'settings', 'get', 'global', 'airplane_mode_on')
+            airplane = {'0': 'disabled', '1': 'enabled'}.get(value, value)
+            wifi = run('shell', 'dumpsys', 'wifi').splitlines()[0].replace('Wi-Fi', 'Wifi')
+        else:
+            wifi = run('shell', 'cmd', 'wifi', 'status').splitlines()[0]
         mobile = run('shell', 'settings', 'get', 'global', 'mobile_data')
         stay = run('shell', 'settings', 'get', 'global', 'stay_on_while_plugged_in')
         battery = run('shell', 'dumpsys', 'battery')
@@ -32,6 +39,15 @@ class EmulatorEnvironment:
                              power_flags=flags, awake=awake[1])
         return self.original
 
+    def airplane_actions(self, enabled):
+        if self.legacy_network:
+            return [
+                ('shell', 'settings', 'put', 'global', 'airplane_mode_on', '1' if enabled else '0'),
+                ('shell', 'am', 'broadcast', '--user', '0', '-a', 'android.intent.action.AIRPLANE_MODE',
+                 '--ez', 'state', 'true' if enabled else 'false'),
+            ]
+        return [('shell', 'cmd', 'connectivity', 'airplane-mode', 'enable' if enabled else 'disable')]
+
     def reboot(self):
         if self.original is None:
             raise RuntimeError('Snapshot required before emulator mutation')
@@ -44,10 +60,13 @@ class EmulatorEnvironment:
             raise RuntimeError('Snapshot required before emulator mutation')
         self.changed = True  # A command timeout is an uncertain mutation, too.
         run = self.command
-        run('shell', 'cmd', 'connectivity', 'airplane-mode', 'enable')
+        for action in self.airplane_actions(True):
+            run(*action)
         run('shell', 'svc', 'wifi', 'disable')
         run('shell', 'svc', 'data', 'disable')
-        if run('shell', 'cmd', 'connectivity', 'airplane-mode') != 'enabled':
+        observed = (run('shell', 'settings', 'get', 'global', 'airplane_mode_on') == '1'
+                    if self.legacy_network else run('shell', 'cmd', 'connectivity', 'airplane-mode') == 'enabled')
+        if not observed:
             raise RuntimeError('Offline setting not confirmed')
 
     def doze(self):
@@ -72,7 +91,7 @@ class EmulatorEnvironment:
             ('shell', 'dumpsys', 'deviceidle', 'unforce'),
             ('shell', 'dumpsys', 'battery', 'reset'),
             ('shell', 'settings', 'put', 'global', 'stay_on_while_plugged_in', old['stay']),
-            ('shell', 'cmd', 'connectivity', 'airplane-mode', 'enable' if old['airplane'] == 'enabled' else 'disable'),
+            *self.airplane_actions(old['airplane'] == 'enabled'),
             ('shell', 'svc', 'wifi', 'enable' if old['wifi'] == 'Wifi is enabled' else 'disable'),
             ('shell', 'svc', 'data', 'enable' if old['mobile'] == '1' else 'disable'),
             ('shell', 'input', 'keyevent', 'KEYCODE_WAKEUP' if old['awake'] == 'Awake' else 'KEYCODE_SLEEP'),

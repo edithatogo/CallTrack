@@ -36,15 +36,7 @@ public class WorkerProviderTest {
     }
 
     private void shellCalls(Runnable action) {
-        android.app.UiAutomation automation =
-                InstrumentationRegistry.getInstrumentation().getUiAutomation();
-        automation.adoptShellPermissionIdentity(
-                Manifest.permission.READ_CALL_LOG, Manifest.permission.WRITE_CALL_LOG);
-        try {
-            action.run();
-        } finally {
-            automation.dropShellPermissionIdentity();
-        }
+        FixtureCallLog.asShell(action);
     }
 
     private void insertCalls(int first, int last, long at) {
@@ -59,8 +51,7 @@ public class WorkerProviderTest {
                         call.put(Calls.TYPE, i % 4 == 0 ? Calls.BLOCKED_TYPE : i % 4);
                         call.put(Calls.NUMBER_PRESENTATION, Calls.PRESENTATION_ALLOWED);
                         call.put(Calls.PHONE_ACCOUNT_ID, tag());
-                        assertNotNull(
-                                context().getContentResolver().insert(Calls.CONTENT_URI, call));
+                        assertNotNull(FixtureCallLog.insert(context(), call));
                     }
                 });
     }
@@ -72,14 +63,8 @@ public class WorkerProviderTest {
         shellCalls(
                 () -> {
                     try (Cursor c =
-                            context()
-                                    .getContentResolver()
-                                    .query(
-                                            Calls.CONTENT_URI,
-                                            new String[] {Calls._ID},
-                                            null,
-                                            null,
-                                            null)) {
+                            FixtureCallLog.query(
+                                    context(), new String[] {Calls._ID}, null, null, null)) {
                         assertNotNull(c);
                         assertEquals(
                                 "Refusing a nonempty call-log fixture environment",
@@ -276,21 +261,15 @@ public class WorkerProviderTest {
                 .get(15, TimeUnit.SECONDS);
         shellCalls(
                 () -> {
-                    context()
-                            .getContentResolver()
-                            .delete(
-                                    Calls.CONTENT_URI,
-                                    Calls.PHONE_ACCOUNT_ID + "=?",
-                                    new String[] {tag()});
+                    FixtureCallLog.delete(
+                            context(), Calls.PHONE_ACCOUNT_ID + "=?", new String[] {tag()});
                     try (Cursor c =
-                            context()
-                                    .getContentResolver()
-                                    .query(
-                                            Calls.CONTENT_URI,
-                                            new String[] {Calls._ID},
-                                            Calls.PHONE_ACCOUNT_ID + "=?",
-                                            new String[] {tag()},
-                                            null)) {
+                            FixtureCallLog.query(
+                                    context(),
+                                    new String[] {Calls._ID},
+                                    Calls.PHONE_ACCOUNT_ID + "=?",
+                                    new String[] {tag()},
+                                    null)) {
                         assertNotNull(c);
                         assertEquals(0, c.getCount());
                     }

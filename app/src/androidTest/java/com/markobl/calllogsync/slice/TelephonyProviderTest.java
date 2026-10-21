@@ -33,29 +33,19 @@ public class TelephonyProviderTest {
     }
 
     private void shellCalls(Runnable action) {
-        android.app.UiAutomation ui =
-                InstrumentationRegistry.getInstrumentation().getUiAutomation();
-        ui.adoptShellPermissionIdentity(
-                Manifest.permission.READ_CALL_LOG, Manifest.permission.WRITE_CALL_LOG);
-        try {
-            action.run();
-        } finally {
-            ui.dropShellPermissionIdentity();
-        }
+        FixtureCallLog.asShell(action);
     }
 
     private Cursor calls(String selection, String[] args) {
         Cursor c =
-                context()
-                        .getContentResolver()
-                        .query(
-                                Calls.CONTENT_URI,
-                                new String[] {
-                                    Calls._ID, Calls.NUMBER, Calls.DATE, Calls.TYPE, Calls.DURATION
-                                },
-                                selection,
-                                args,
-                                null);
+                FixtureCallLog.query(
+                        context(),
+                        new String[] {
+                            Calls._ID, Calls.NUMBER, Calls.DATE, Calls.TYPE, Calls.DURATION
+                        },
+                        selection,
+                        args,
+                        null);
         assertNotNull(c);
         return c;
     }
@@ -192,12 +182,8 @@ public class TelephonyProviderTest {
                                     new String[] {
                                         Long.toString(id), NUMBER, NUMBER.substring(1), args()[2]
                                     };
-                            context()
-                                    .getContentResolver()
-                                    .delete(
-                                            Calls.CONTENT_URI,
-                                            Calls._ID + "=? AND " + selection(),
-                                            scoped);
+                            FixtureCallLog.delete(
+                                    context(), Calls._ID + "=? AND " + selection(), scoped);
                         }
                         try (Cursor c = calls(selection(), args())) {
                             assertEquals(0, c.getCount());
