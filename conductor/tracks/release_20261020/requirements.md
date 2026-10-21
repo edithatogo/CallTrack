@@ -1,13 +1,13 @@
 # Release requirements and acceptance mapping
 
-Date: 2026-10-21. R13/R27 are only partially satisfied. Discovery and contributor
+Date: 2026-10-22. R13/R27 are only partially satisfied. Discovery and contributor
 preparation can proceed before M3; release acceptance cannot. No requirement is
 waived by documenting a deferral.
 
 | ID | Current behaviour | Required evidence and owner | Disposition |
 |---|---|---|---|
-| D01 / R13 | Source provenance, GPL text and root build instructions exist | Contributor guide plus exact release source, notices/assets/transitive licence audit; release owner | Source/notices, runtime/build-tool declarations and origin audits delivered; inherited asset rights and final corresponding-source/conveyance clearance pending |
-| D02 / R13 | Debug source-input/APK receipts; no bitwise comparison | Clean committed source, resolved dependencies/checksums, toolchain, unsigned two-environment comparison, final signed artifact hash/certificate; release owner | 5578bf5 clean unsigned builds match;115 JVM tests each;736 binary/metadata entries enforced and fault-tested; independent environment/production identity pending |
+| D01 / R13 | Source provenance, GPL text and root build instructions exist | Contributor guide plus exact release source, notices/assets/transitive licence audit; release owner | Uncertain artwork removed; active translations preserved; exact app source,63 published dependency source/POM archives and notices candidate prepared/read back; final signed/channel corresponding-source conveyance remains pending; full upstream dependency rebuilding unqualified |
+| D02 / R13 | Debug source-input/APK receipts; no bitwise comparison | Clean committed source, resolved dependencies/checksums, toolchain, unsigned two-environment comparison, final signed artifact hash/certificate; release owner | 5a3a3e4 clean unsigned builds match;115 JVM tests each; source-only rebuild passes with only Git-provenance metadata differing;736 binary/metadata entries enforced and fault-tested; independent environment/production identity pending |
 | D03 / R13 | Disposable package, debug certificate; no signing config/remote | Choose owned package/name/icon, key custody/recovery and channel continuity; same-key upgrade plus unsupported-key rejection | Development identity retained by user choice; development-key upgrade and disposable wrong-key rejection probe; permanent identity/production key pending |
 | D04 / R13 | Track4 selected API36 emulator P01–P10 accepted | All M3 requirements, controlled emulator suite, real-call and provider-specific evidence where claimed | Selected emulator accepted; physical/cloud/wider-platform acceptance pending |
 | D05 / R13 | CI definitions, no observed hosted runs | Fresh contributor build and hosted workflow at candidate commit; supported API/device coverage | Local tooling tested; external build pending |

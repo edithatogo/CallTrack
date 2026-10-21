@@ -12,6 +12,18 @@
 - [Preparation evidence](preparation-evidence.json)
 - [Resolved dependency report](dependency-report.json)
 
+## Asset/source/notices checkpoint — 2026-10-22
+
+- [Current qualification](assets-source-qualification-20261022.md)
+- [Source/artifact evidence](assets-source-evidence-20261022.json)
+- [Current review](review-assets-source-20261022.md)
+
+Uncertain inherited artwork is replaced, active translations preserved, and an
+exact-source/published-dependency/licence/notices candidate prepared. Two unsigned
+5a3a3e4 builds and the source-only archive rebuild pass115 JVM tests each, with
+zero lint errors.126 host tests pass. Final source conveyance, signing and the
+original independent/native/live/operational gates remain pending.
+
 ## Isolated JDK checkpoint — 2026-10-22
 
 - [Isolated JDK qualification](isolated-jdk-qualification-20261022.md)

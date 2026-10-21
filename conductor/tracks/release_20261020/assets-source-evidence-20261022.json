@@ -1,0 +1,136 @@
+{
+  "date": "2026-10-22",
+  "success": true,
+  "release_ready": false,
+  "candidate_revision": "5a3a3e470ab0955714a1db33d6196063400ed5b1",
+  "app_id": "org.calltrack.community.dev",
+  "development_label": "CallTrack Community (dev)",
+  "version_code": 10,
+  "version_name": "0.1.0-dev",
+  "runtime_source_coordinates": 63,
+  "runtime_inventory_rows": 68,
+  "runtime_artifacts_unique": 63,
+  "notice_assets_in_each_apk": 11,
+  "embedded_notice_origins": 12,
+  "retained_unique_documents": 6,
+  "asset_inventory_sha256": "ab97b272317c14e87f2e1ce0ac7006edf1de5b18898c7fb39913130767227b19",
+  "runtime_source_inventory_sha256": "80afee111e200a8aa077a1d5c61acf827cd8f4bb0ce290b3e191c2803d923042",
+  "artwork_reuse_uncertainty_removed": true,
+  "permanent_trademark_identity_qualified": false,
+  "builds": [
+    {
+      "apk_sha256": "e3780da6e9162d29fd35553e8a7362b876857d016cc398ebea1ee26e67b4bc8a",
+      "jvm": {
+        "tests": 115,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "lint": {
+        "Hint": 2,
+        "Warning": 23
+      },
+      "unsigned_verified": true,
+      "log_sha256": "f5f2fe5a58f6c99b5c6331a2d6a04f3c6ef94895b1502e9937a14bf2a650ad31"
+    },
+    {
+      "apk_sha256": "e3780da6e9162d29fd35553e8a7362b876857d016cc398ebea1ee26e67b4bc8a",
+      "jvm": {
+        "tests": 115,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "lint": {
+        "Hint": 2,
+        "Warning": 23
+      },
+      "unsigned_verified": true,
+      "log_sha256": "6eb95ae364c2d99c1df8f079ecf1c8bed93414c29647e5a0b29490e62ea89bca"
+    }
+  ],
+  "same_host_shared_cache": true,
+  "independent_environment_reproduction": false,
+  "source_bundle": {
+    "archive_sha256": "a2003bba5e6242e6ec3504230c272f149cc188b9195950cee34a1d1cd0b0ee76",
+    "file_count": 643,
+    "archive_readback_verified": true,
+    "repeatability_verified": true
+  },
+  "source_only_app_rebuild": {
+    "success": true,
+    "exit_code": 0,
+    "outside_git": true,
+    "shared_host_and_dependency_cache": true,
+    "private_reference_inputs_used": false,
+    "apk_sha256": "e26cc354bfd673445342f59bb6652cc48b9fa67442fc0f6291abcd4af2472b33",
+    "jvm": {
+      "tests": 115,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "zip_payload_differences": [
+      "META-INF/version-control-info.textproto"
+    ],
+    "runtime_payloads_match": true,
+    "lint": {
+      "Hint": 2,
+      "Warning": 23
+    },
+    "unsigned_verified": true,
+    "source_files_unchanged_after_build": true
+  },
+  "dependency_from_source_rebuild_qualified": false,
+  "production_source_conveyance_qualified": false,
+  "production_signing_qualified": false,
+  "native_matrix_rerun": false,
+  "host_tests": 126,
+  "faults": [
+    {
+      "name": "wrong-revision",
+      "rejected": true,
+      "exit_code": 1,
+      "expected_error": "matching-source"
+    },
+    {
+      "name": "missing-runtime",
+      "rejected": true,
+      "exit_code": 1,
+      "expected_error": "runtime inventory differs"
+    },
+    {
+      "name": "missing-source",
+      "rejected": true,
+      "exit_code": 1,
+      "expected_error": "No such file"
+    },
+    {
+      "name": "missing-notice",
+      "rejected": true,
+      "exit_code": 1,
+      "expected_error": "assets/open_source/GPL-3.0.txt"
+    }
+  ],
+  "raw_evidence": {
+    ".local/release-evidence/asset-source-inputs-20261022/sources-receipt.json": "3c4ecad84456cc8655b86e41f9c30029b7ee546d33375ae63d33d118a094fa46",
+    ".local/release-evidence/asset-source-inputs-20261022/candidate-runtime.json": "74f7138b8d5ee827095aff1efa28009ff7043675fe77589faf74441d50c73c82",
+    ".local/release-evidence/asset-source-inputs-20261022/runtime-inventory.log": "fa2f7f356ba55cdcea2492a92dfe2d4556b8d108c4756ac4857f26d596c4034b",
+    ".local/release-evidence/asset-source-inputs-20261022/string-preservation.json": "f1e893b021c2a87ae73ef998d00b982461214043c5cfc7b5819140ff1482e35f",
+    ".local/release-evidence/asset-source-inputs-20261022/faults-receipt.json": "37131c5561eea2db8ecb7b5392ceb0103062ebf16c4de2fcf4da5aba63775aff",
+    ".local/release-evidence/asset-source-inputs-20261022/source-only-receipt.json": "7a6d31241efe9b9bbaa3fe4c408b878d15f714011d6575e62aa7f0cebc4a79ea",
+    ".local/release-evidence/asset-source-inputs-20261022/source-only-build.log": "e7e0de1815b74d09f0b4644e95fcd865ceec220046065647cc06ac4011a61013",
+    ".local/release-evidence/asset-source-inputs-20261022/review-notes.txt": "c2ba3e7bcb552527f22db8ad076f7a1aafd66c5fa92cfef00d6d91e369169dfc",
+    ".local/release-evidence/asset-source-inputs-20261022/candidate-badging.txt": "c597abbe1a0d1bbe400114b94e264184f36f02206aa4ef4bf777197fd2201314",
+    ".local/release-evidence/asset-source-builds-20261022/receipt.json": "dfad846d7a2c20af610558bd8e5a5e32b7d7b2955ca6b6a2a96ab38edb0a7231",
+    ".local/release-evidence/asset-source-bundle-20261022/receipt.json": "a4682adc604218094bd3aa918736ac7fcb829bf4f831f9cf4fc5ae1b03494605",
+    ".local/release-evidence/asset-source-inputs-20261022/host-final.log": "261b864ab108efa83fadc59bc0c830480c45434e0b5bed26fff4c56bde90ca10",
+    ".local/release-evidence/asset-source-inputs-20261022/post-build-readback.json": "5b845849a068acc759393a84291e048ddb2a98cf4ad4ff55624dd5d78531ff62"
+  },
+  "conductor_verification": {
+    "documents": 158,
+    "tracks": 20,
+    "synthetic_scenarios": 25,
+    "passed": true
+  }
+}
