@@ -68,3 +68,13 @@ host restart. All39 store/fault checks pass and both packages are removed. See
 recovery-store-evidence.json. The old guest is still stuck; do not touch its writable
 files or reuse its ports. Steps1–3 now have this bounded evidence. Broader current-
 source runtime acceptance and the source-identity review candidate remain pending.
+
+## Latest delivery/lifecycle status
+
+On the source-identity-fixed APK, provider8/8, worker5/5 and lifecycle11 plus expected
+held-insertion termination pass, including verified environment restoration and
+fixture/package cleanup. Native source-identity faults3/3 also pass. The earlier
+store39/39 receipt is version-bound separately. Main next work: protected call-end
+and positive rendered flows, followed by final-source regression/review and closure.
+The no-host-restart recovery contingency is operational; do not treat the original
+stuck guest as responsive.
