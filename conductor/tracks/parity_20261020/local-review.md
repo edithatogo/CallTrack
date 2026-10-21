@@ -202,3 +202,14 @@ recovery is being promoted to success. Before review closure, put reboot through
 EmulatorEnvironment with changed=True set before dispatch; test a reboot command
 that changes Awake→Asleep then raises, and require actual restore/readback.
 Wait until the live frozen matrix finishes before editing shared harness code.
+
+## Reboot restoration finding resolved
+
+EmulatorEnvironment now owns reboot dispatch and marks changed before calling ADB.
+New host regressions require a qualified snapshot and simulate Awake→Asleep followed
+by an uncertain reboot exception, then require actual restoration/readback of the
+original state. The two new tests first failed on the missing mutation-owner API;
+after implementation all73 host tests pass. The earlier native offline/unchanged
+receipt remains the integration evidence motivating this correction.
+Native matrix remains valid for the unchanged app/test APKs and normal lifecycle
+path; this post-matrix correction affects failure restoration only.

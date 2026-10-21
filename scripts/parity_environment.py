@@ -31,6 +31,13 @@ class EmulatorEnvironment:
                              power_flags=flags, awake=awake[1])
         return self.original
 
+    def reboot(self):
+        if self.original is None:
+            raise RuntimeError('Snapshot required before emulator mutation')
+        # Reboot can change power state even when ADB returns an uncertain outcome.
+        self.changed = True
+        self.command('reboot')
+
     def offline(self):
         if self.original is None:
             raise RuntimeError('Snapshot required before emulator mutation')
