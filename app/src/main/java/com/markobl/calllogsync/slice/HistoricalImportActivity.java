@@ -402,6 +402,10 @@ public final class HistoricalImportActivity extends Activity {
                                     if (result.stopped != null) {
                                         running = false;
                                         feedback.setText(R.string.import_blocked);
+                                    } else {
+                                        // Feedback describes this result, not an earlier stopped
+                                        // batch.
+                                        feedback.setText("");
                                     }
                                     buttons();
                                     if (follow

@@ -88,3 +88,16 @@ success. Treat full positive import UI acceptance as incomplete until a native
 regression checks the final feedback, the stale message is cleared and the
 source-bound suite is rerun. This finding does not contradict the verified123
 events or fixture cleanup.
+
+### Completion-feedback remediation in progress
+
+Added a native final-feedback assertion. First rerun timed out at63/120 verified
+with work still active;150-second observation is justified by measured progress.
+Second rerun failed during initial Activity launch, before the assertion, with
+instrumentation45-second launch timeout and input-dispatch ANR. Both scoped
+cleanup/package removal/environment restoration passed. Local receipts:
+import-feedback-native-red.json and import-feedback-extended-native.json under
+.local/parity-evidence. Neither is a confirmed failing final-feedback assertion.
+The original retained completed screenshot remains the direct visual defect proof.
+Applied minimal feedback reset after a successful result; native verification and
+ANR diagnosis remain open. No claim of completed import UI acceptance.

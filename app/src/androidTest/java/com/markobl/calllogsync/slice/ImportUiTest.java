@@ -281,7 +281,7 @@ public class ImportUiTest {
             ui.await(
                     () -> phase(HistoricalImport.Phase.COMPLETE),
                     "Explicit history resume did not complete",
-                    60000);
+                    150000);
             HistoricalImport.Session done = latest();
             assertEquals(state().getString("partial", null), done.id);
             assertEquals(PARTIAL_COUNT, done.saved + done.review);
@@ -290,6 +290,17 @@ public class ImportUiTest {
             assertEquals(3 + done.saved, fixture.events(calendar()));
             ui.revealId("import_summary");
             ui.capture("import-resumed-complete");
+            final Activity completedActivity = activity;
+            instrumentation.runOnMainSync(
+                    () ->
+                            assertEquals(
+                                    "Completed import must clear stale stop feedback",
+                                    "",
+                                    ((android.widget.TextView)
+                                                    completedActivity.findViewById(
+                                                            R.id.import_feedback))
+                                            .getText()
+                                            .toString()));
             android.os.Bundle observation = new android.os.Bundle();
             observation.putLong("stoppedSaved", stopped.saved);
             observation.putLong("finalSaved", done.saved);
