@@ -33,6 +33,7 @@ class LifecycleSafety(unittest.TestCase):
         self.receipt.write_text(json.dumps(self.build))
         self.calls = []
         self.cleanup_fails = False
+        self.phone_available = True
         self.avd = 'calltrack-parity-api36-20261020'
 
     def fake_run(self, command, **kwargs):
@@ -42,6 +43,7 @@ class LifecycleSafety(unittest.TestCase):
             ('shell', 'getprop', 'ro.kernel.qemu'): '1',
             ('emu', 'avd', 'name'): self.avd + '\nOK',
             ('shell', 'getprop', 'sys.boot_completed'): '1',
+            ('shell', 'service', 'check', 'phone'): 'Service phone: found' if self.phone_available else 'Service phone: not found',
             ('shell', 'cmd', 'connectivity', 'airplane-mode'): 'disabled',
             ('shell', 'cmd', 'wifi', 'status'): 'Wifi is enabled',
             ('shell', 'settings', 'get', 'global', 'mobile_data'): '1',
@@ -102,3 +104,9 @@ class LifecycleSafety(unittest.TestCase):
         receipt = json.loads((self.root / '.local/slice-evidence/parity-lifecycle-receipt.json').read_text())
         self.assertFalse(receipt['emulator_restored']['verified'])
         self.assertEqual('failed', receipt['result'])
+
+    def test_missing_phone_service_refuses_fixture_installation(self):
+        self.phone_available = False
+        with self.assertRaisesRegex(RuntimeError, 'phone service'):
+            self.qualify()
+        self.assertFalse(any(args[0] == 'install' for args in self.calls))

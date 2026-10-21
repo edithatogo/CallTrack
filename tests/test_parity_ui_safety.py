@@ -26,6 +26,7 @@ class UiSafety(unittest.TestCase):
             artifacts[relative] = device.hashlib.sha256(b'fixture').hexdigest()
         (evidence / 'build-receipt.json').write_text(json.dumps({'exit_code': 0, 'inputs_unchanged': True, 'inputs': {}, 'artifacts': artifacts}))
         self.calls = []
+        self.phone_available = True
         self.files = 'screen.png\nscreen.txt'
         self.fail_cleanup = False
         self.avd = RECOVERY_AVD
@@ -36,6 +37,8 @@ class UiSafety(unittest.TestCase):
         output = ''
         if args == ['shell', 'getprop', 'ro.kernel.qemu'] or args == ['shell', 'getprop', 'sys.boot_completed']:
             output = '1'
+        elif args == ['shell', 'service', 'check', 'phone']:
+            output = 'Service phone: found' if self.phone_available else 'Service phone: not found'
         elif args == ['emu', 'avd', 'name']:
             output = self.avd + '\nOK'
         elif args[0] in ('install', 'uninstall'):
@@ -134,3 +137,9 @@ class UiSafety(unittest.TestCase):
         pull = next(i for i, c in enumerate(self.calls) if c[0] == 'exec-out')
         uninstall = next(i for i, c in enumerate(self.calls) if c[0] == 'uninstall')
         self.assertLess(pull, uninstall)
+
+    def test_missing_phone_service_refuses_fixture_installation(self):
+        self.phone_available = False
+        with self.assertRaisesRegex(RuntimeError, 'phone service'):
+            self.run_fixture()
+        self.assertFalse(any(args[0] == 'install' for args in self.calls))
