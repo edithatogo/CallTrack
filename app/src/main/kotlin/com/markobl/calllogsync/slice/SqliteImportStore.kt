@@ -4,13 +4,15 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import java.io.Closeable
 import java.util.Collections
 import org.json.JSONException
 import org.json.JSONObject
 
 /** Versioned import sessions; delivery authority remains in the existing receipt ledger. */
+// SQLiteOpenHelper did not implement AutoCloseable on API26. Keep Kotlin use safe there.
 class SqliteImportStore(context: Context?, name: String?) :
-    SQLiteOpenHelper(context, name, null, 2), HistoricalImport.Store {
+    SQLiteOpenHelper(context, name, null, 2), HistoricalImport.Store, Closeable {
     constructor(context: Context?) : this(context, "calltrack-imports.db")
 
     override fun onConfigure(db: SQLiteDatabase) {

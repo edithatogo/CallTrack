@@ -4,12 +4,17 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import java.io.Closeable
 import java.util.Collections
 import java.util.function.LongSupplier
 
 /** Durable source/destination receipts; SQL transactions serialize concurrent instances. */
+// SQLiteOpenHelper did not implement AutoCloseable on API26. Keep Kotlin use safe there.
 class SqliteLedger(context: Context?, name: String?, private val clock: LongSupplier?) :
-    SQLiteOpenHelper(context, name, null, 6), SliceEngine.Ledger, AutomaticDelivery.Progress {
+    SQLiteOpenHelper(context, name, null, 6),
+    SliceEngine.Ledger,
+    AutomaticDelivery.Progress,
+    Closeable {
     constructor(context: Context?) : this(context, "calltrack-ledger.db")
 
     constructor(
