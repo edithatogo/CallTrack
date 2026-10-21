@@ -94,5 +94,14 @@
   "production_upgrade_requirement": "No issued predecessor before first release; retain first issued signed artifact and qualify actual first-to-second upgrade before second release",
   "prior_linux_reproduction_evidence": "linux-reproduction-evidence-20261022.json",
   "final_local_candidate_implementation_commit": "15998ba887e76ea223a6a8ba3430dd640330ed99",
-  "prior_extended_emulator_review_commit": "fa7b944898fa619481dd1512e7cd459bb46df42c"
+  "prior_extended_emulator_review_commit": "fa7b944898fa619481dd1512e7cd459bb46df42c",
+  "physical_route_preparation": "physical-calendar-qualification.md",
+  "physical_route_status": "awaiting-physical-device-participant-and-account-calendar-selection",
+  "physical_call_qualification": false,
+  "google_remote_route_qualified": false,
+  "outlook_remote_route_qualified": false,
+  "physical_calls_executed_this_continuation": 0,
+  "remote_cases_executed_this_continuation": 0,
+  "physical_route_preparation_review": "review-physical-preparation-20261022.md",
+  "physical_route_preparation_review_status": "prepared-scope-passed-actual-device-account-acceptance-pending"
 }

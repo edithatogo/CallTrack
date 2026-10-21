@@ -116,3 +116,6 @@ rejections. Source/notices are refreshed; fixtures/packages and new guests are
 cleaned up. First public release is fresh-install-first, with no issued predecessor.
 Permanent identity/key custody, production signing, physical/cloud/operational,
 hosted/source/support/channel gates remain. Track5 stays active.
+
+- [Physical calls and account-calendar qualification procedure](physical-calendar-qualification.md) — prepared; selected physical device, participant and remote routes pending.
+- [Physical-route preparation review](review-physical-preparation-20261022.md) — prepared scope only; actual runtime acceptance remains pending.

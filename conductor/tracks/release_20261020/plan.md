@@ -168,3 +168,17 @@ signing and original physical/cloud/operational/conveyance gates are not waived.
   Mac/Linux144 host tests pass; current Conductor check165 documents/20 tracks/25
   scenarios passes. Artifact freeze remains15998ba; evidence commits do not relabel
   that APK/source bundle. Original M4 release gates remain pending.
+
+
+## Physical calls and account-calendar continuation —2026-10-22
+
+- [x] Task: Inspect current device visibility, retained candidate and native calendar contract; refresh official provider/Google/Outlook prerequisites — physical-calendar-qualification.md; no physical phone visible, candidate15998ba artifact/signature/payload rechecked.
+- [x] Task: Prepare staged controlled-call, local/provider/remote readback, preservation and cleanup criteria; review preparation without treating it as executed acceptance — physical-calendar-qualification.md.
+- [ ] Task: Select connected physical phone, participating controlled second phone and dedicated account calendars; preserve existing installations/accounts before testing.
+- [ ] Task: Execute actual physical-call cases and independently read back each claimed Google/Outlook route; record failures/unsupported configurations without substituting destinations.
+- [ ] Task: Verify cleanup/settings restoration, review actual runtime outcomes and apply/requalify any fixes before promoting route claims.
+
+Physical preparation review: review-physical-preparation-20261022.md.144 host tests
+and167-document/20-track/25-scenario Conductor checks pass. Repeated discovery
+still exposes only emulators. Required device, participation and account-calendar
+answers remain pending; no physical/remote acceptance or observation time is claimed.
