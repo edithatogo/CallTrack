@@ -82,6 +82,15 @@ public class WorkStatusStoreTest {
 
     @Test
     public void uncertainCommitIsHiddenAcrossStoreInstancesUntilSuccessfulPublication() {
+        uncertainCommit(false);
+    }
+
+    @Test
+    public void thrownCommitIsHiddenAcrossStoreInstancesUntilSuccessfulPublication() {
+        uncertainCommit(true);
+    }
+
+    private void uncertainCommit(boolean throwsAfterCommit) {
         String name = fixture();
         SharedPreferences disk = context().getSharedPreferences(name, Context.MODE_PRIVATE);
         java.util.concurrent.atomic.AtomicBoolean fail =
@@ -104,7 +113,12 @@ public class WorkStatusStoreTest {
                                             (editorProxy, editMethod, editArgs) -> {
                                                 Object result = editMethod.invoke(editor, editArgs);
                                                 if (editMethod.getName().equals("commit")
-                                                        && fail.get()) return false;
+                                                        && fail.get()) {
+                                                    if (throwsAfterCommit)
+                                                        throw new IllegalStateException(
+                                                                "fixture uncertain commit");
+                                                    return false;
+                                                }
                                                 return result == editor ? editorProxy : result;
                                             });
                                 });
@@ -114,11 +128,11 @@ public class WorkStatusStoreTest {
             AndroidWorkStatusStore store = new AndroidWorkStatusStore(preferences);
             assertTrue(store.publish(1, 1001, "old", WorkStatus.Code.COMPLETE, 0, 0));
             fail.set(true);
-            assertFalse(store.publish(1, 1002, "attempt", WorkStatus.Code.FAILED, 0, 0));
+            expectUncommitted(store, 1002, throwsAfterCommit);
             assertEquals("attempt", disk.getString("automaticStatusToken", null));
             expectUnavailable(() -> store.read(1));
             expectUnavailable(() -> new AndroidWorkStatusStore(preferences).read(1));
-            assertFalse(store.publish(1, 1003, "attempt", WorkStatus.Code.FAILED, 0, 0));
+            expectUncommitted(store, 1003, throwsAfterCommit);
             expectUnavailable(() -> store.read(1));
             fail.set(false);
             assertTrue(
@@ -130,6 +144,15 @@ public class WorkStatusStoreTest {
             assertEquals("attempt", saved.token);
         } finally {
             assertTrue(context().deleteSharedPreferences(name));
+        }
+    }
+
+    private static void expectUncommitted(
+            AndroidWorkStatusStore store, long at, boolean throwsAfterCommit) {
+        if (throwsAfterCommit) {
+            expectUnavailable(() -> store.publish(1, at, "attempt", WorkStatus.Code.FAILED, 0, 0));
+        } else {
+            assertFalse(store.publish(1, at, "attempt", WorkStatus.Code.FAILED, 0, 0));
         }
     }
 }

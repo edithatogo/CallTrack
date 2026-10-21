@@ -138,3 +138,19 @@ retained; do not replace it or clear app data before using its saved fixture tok
 for scoped recovery. The receipt records the original emulator settings and exact
 failed command/state. These cases do not qualify physical calls, cloud delivery,
 rendered UI acceptance, every OEM/version or automatic execution while force-stopped.
+
+### Local JVM fallback while qualified storage is unavailable
+
+`scripts/run_parity_local.py` uses the existing `.local/counter-jvm` library manifest,
+classpath and last successful build receipt. It verifies library hashes and unchanged
+Kotlin source hashes, compiles current pure Java sources/tests into a fresh temporary
+directory and writes `.local/counter-jvm/latest-local-receipt.json`. It requires the
+locally retained compiled Kotlin/dependency classes and JDK17. It is an explicitly
+bounded development fallback, not a clean build or a portable qualification route.
+It does not change SDK/cache symlinks or install an alternative Android toolchain.
+
+Run `python3 scripts/run_parity_local.py` and `python3 -m unittest discover -s tests`.
+The fallback excludes SchedulingCommitTest, Android adapters and instrumentation.
+Its successful receipt must never authorise an APK install; native harnesses continue
+to require the full source-bound Android build. On storage restoration, use the normal
+build and native commands above before claiming Android acceptance.

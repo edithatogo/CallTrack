@@ -80,4 +80,70 @@ public class ActivationStoreTest {
             assertTrue(context().deleteSharedPreferences(name));
         }
     }
+
+    @Test
+    public void falseCommitAfterCacheMutationBlocksAllActivationAdapters() {
+        uncertainActivationCommit(false);
+    }
+
+    @Test
+    public void thrownCommitAfterCacheMutationBlocksAllActivationAdapters() {
+        uncertainActivationCommit(true);
+    }
+
+    // Each method must run in its own instrumentation process: uncertainty deliberately
+    // remains latched across adapters until process restart; tests must not reset it.
+    private void uncertainActivationCommit(boolean throwsAfterCommit) {
+        String name = fixture();
+        SharedPreferences disk = context().getSharedPreferences(name, Context.MODE_PRIVATE);
+        SharedPreferences fault =
+                (SharedPreferences)
+                        java.lang.reflect.Proxy.newProxyInstance(
+                                SharedPreferences.class.getClassLoader(),
+                                new Class<?>[] {SharedPreferences.class},
+                                (proxy, method, args) -> {
+                                    Object value = method.invoke(disk, args);
+                                    if (!method.getName().equals("edit")) return value;
+                                    SharedPreferences.Editor editor =
+                                            (SharedPreferences.Editor) value;
+                                    return java.lang.reflect.Proxy.newProxyInstance(
+                                            SharedPreferences.Editor.class.getClassLoader(),
+                                            new Class<?>[] {SharedPreferences.Editor.class},
+                                            (editorProxy, editMethod, editArgs) -> {
+                                                Object result = editMethod.invoke(editor, editArgs);
+                                                if (editMethod.getName().equals("commit")) {
+                                                    if (throwsAfterCommit)
+                                                        throw new IllegalStateException(
+                                                                "fixture uncertain commit");
+                                                    return false;
+                                                }
+                                                return result == editor ? editorProxy : result;
+                                            });
+                                });
+        try {
+            expectUnavailable(
+                    () ->
+                            new ActivationControl(new AndroidActivationStore(fault))
+                                    .activate(7, "UTC", 1000, true, true, true));
+            assertNotNull(disk.getString("automaticActivation", null));
+            expectUnavailable(() -> new AndroidActivationStore(fault).get());
+            expectUnavailable(() -> new AndroidActivationStore(disk).get());
+            expectUnavailable(
+                    () ->
+                            new AndroidActivationStore(disk)
+                                    .put(
+                                            new ActivationControl.Settings(
+                                                    2, true, 8, "UTC", 2000, true, true, true)));
+        } finally {
+            assertTrue(context().deleteSharedPreferences(name));
+        }
+    }
+
+    private static void expectUnavailable(Runnable action) {
+        try {
+            action.run();
+            fail("Uncertain activation must not authorise delivery");
+        } catch (IllegalStateException expected) {
+        }
+    }
 }

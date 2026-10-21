@@ -9,7 +9,7 @@ import org.json.JSONObject;
 /** One atomically committed settings document; no personal caller or account labels. */
 public final class AndroidActivationStore implements ActivationControl.Store {
     private final SharedPreferences preferences;
-    private static volatile boolean commitUncertain;
+    private static final ActivationCommitGuard commits = new ActivationCommitGuard();
 
     public AndroidActivationStore(Context context) {
         this(context.getApplicationContext().getSharedPreferences("slice", Context.MODE_PRIVATE));
@@ -21,8 +21,7 @@ public final class AndroidActivationStore implements ActivationControl.Store {
 
     @Override
     public ActivationControl.Settings get() {
-        if (commitUncertain)
-            throw new IllegalStateException("Activation commit uncertain; restart required");
+        commits.checkReadable();
         String encoded = preferences.getString("automaticActivation", null);
         if (encoded == null) return null;
         try {
@@ -56,10 +55,12 @@ public final class AndroidActivationStore implements ActivationControl.Store {
             value.put("incoming", settings.incoming);
             value.put("outgoing", settings.outgoing);
             value.put("missed", settings.missed);
-            if (!preferences.edit().putString("automaticActivation", value.toString()).commit()) {
-                commitUncertain = true;
-                throw new IllegalStateException("Activation not committed");
-            }
+            commits.commit(
+                    () ->
+                            preferences
+                                    .edit()
+                                    .putString("automaticActivation", value.toString())
+                                    .commit());
         } catch (JSONException invalid) {
             throw new IllegalStateException("Activation encoding failed", invalid);
         }
