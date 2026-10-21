@@ -2,6 +2,7 @@
 import sys
 from pathlib import Path
 import subprocess
+import tempfile
 import unittest
 from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
@@ -42,3 +43,20 @@ class UpgradeSafetyTest(unittest.TestCase):
     def test_cleanup_requires_package_absence_readback(self):
         command = unittest.mock.Mock(side_effect=['Success', 'package:' + upgrade.PACKAGE])
         self.assertEqual(['Package still present'], upgrade.cleanup_owned_packages(command, [upgrade.PACKAGE]))
+
+    def test_only_actual_native_fixture_inputs_are_bound(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            fixture = root / 'qualification/release'
+            for folder in ('java', 'assets', 'licences'):
+                (fixture / folder).mkdir(parents=True)
+            for name in ('schema-provenance.json', 'import-schema-provenance.json'):
+                (fixture / name).write_text('source-pinned')
+            (fixture / 'java/Test.java').write_text('test fixture')
+            (fixture / 'assets/schema.sql').write_text('schema')
+            with patch.object(upgrade, 'ROOT', root):
+                before = upgrade.qualification_inputs(fixture)
+                (fixture / 'licences/license.txt').write_text('independent audit work')
+                self.assertEqual(before, upgrade.qualification_inputs(fixture))
+                (fixture / 'assets/schema.sql').write_text('changed actual input')
+                self.assertNotEqual(before, upgrade.qualification_inputs(fixture))

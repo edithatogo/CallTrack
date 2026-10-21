@@ -39,6 +39,12 @@ def cleanup_owned_packages(adb, attempted):
     return errors
 
 
+def qualification_inputs(directory):
+    paths = [p for folder in ('java', 'assets') for p in (directory / folder).rglob('*') if p.is_file()]
+    paths.extend(directory / name for name in ('schema-provenance.json', 'import-schema-provenance.json'))
+    return {str(p.relative_to(ROOT)): sha(p) for p in sorted(paths)}
+
+
 def qualify(serial, output, provider_schema=False):
     if not re.fullmatch(r'emulator-\d+', serial):
         raise RuntimeError('Release upgrade probe refuses physical-device serials')
@@ -57,7 +63,7 @@ def qualify(serial, output, provider_schema=False):
         if current['artifacts'].get(str(apk.relative_to(ROOT))) != sha(apk):
             raise RuntimeError('Development artifact hash mismatch')
     qualification = ROOT / 'qualification/release'
-    fixture_inputs = {str(p.relative_to(ROOT)): sha(p) for p in sorted(qualification.rglob('*')) if p.is_file()} if provider_schema else {}
+    fixture_inputs = qualification_inputs(qualification) if provider_schema else {}
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     output.mkdir(parents=True, exist_ok=False)
     sdk = (ROOT / '.local/android-sdk').resolve()
@@ -133,7 +139,7 @@ gradle.beforeProject { project ->
         if subprocess.check_output(['git', 'status', '--porcelain'], cwd=checkout).strip():
             raise RuntimeError('Build modified committed source')
         if provider_schema:
-            if fixture_inputs != {str(p.relative_to(ROOT)): sha(p) for p in sorted(qualification.rglob('*')) if p.is_file()}:
+            if fixture_inputs != qualification_inputs(qualification):
                 raise RuntimeError('Qualification inputs changed during build')
             tests = checkout / 'app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk'
         candidate = checkout / 'app/build/outputs/apk/release/app-release.apk'
