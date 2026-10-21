@@ -22,3 +22,13 @@ Two clean same-host builds match; production signing, independent-host
 reproduction and original operational acceptance remain pending.
 
 - [Current unsigned Kotlin candidate evidence](unsigned-kotlin-evidence-20261021.json)
+
+## Local release continuation — 2026-10-21
+
+- [Local qualification and remaining gates](local-qualification-20261021.md)
+- [Current local review](review-local-qualification-20261021.md)
+- [Fresh canonical runtime artifact audit](canonical-runtime-audit-20261021.json)
+- [Inherited asset hash audit](assets-audit-20261021.json)
+- [Unsigned and corresponding-source checks](local-artifact-checks-20261021.json)
+
+- [Development-key increasing-version native evidence](development-upgrade-evidence-20261021.json)

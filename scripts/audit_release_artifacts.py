@@ -121,4 +121,7 @@ if __name__ == '__main__':
     parser.add_argument('--inventory', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
-    print(json.dumps(audit(args.inventory, args.output), indent=2))
+    receipt = audit(args.inventory, args.output)
+    print(json.dumps(receipt, indent=2))
+    if not receipt['all_repository_bytes_match']:
+        raise SystemExit(1)

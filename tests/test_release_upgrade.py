@@ -26,3 +26,19 @@ class UpgradeSafetyTest(unittest.TestCase):
         upgrade.require_rejection(result, 'INSTALL_FAILED_UPDATE_INCOMPATIBLE')
         with self.assertRaises(RuntimeError):
             upgrade.require_rejection(result, 'INSTALL_FAILED_VERSION_DOWNGRADE')
+
+    def test_cleanup_does_not_touch_unowned_packages(self):
+        command = unittest.mock.Mock()
+        self.assertEqual([], upgrade.cleanup_owned_packages(command, []))
+        command.assert_not_called()
+
+    def test_cleanup_continues_after_failure_and_reports_it(self):
+        command = unittest.mock.Mock(side_effect=[RuntimeError('test package uninstall failed'), 'Success', ''])
+        errors = upgrade.cleanup_owned_packages(command, [upgrade.PACKAGE, upgrade.TEST_PACKAGE])
+        self.assertEqual(['test package uninstall failed'], errors)
+        self.assertEqual(('uninstall', upgrade.TEST_PACKAGE), command.call_args_list[0].args)
+        self.assertEqual(('uninstall', upgrade.PACKAGE), command.call_args_list[1].args)
+
+    def test_cleanup_requires_package_absence_readback(self):
+        command = unittest.mock.Mock(side_effect=['Success', 'package:' + upgrade.PACKAGE])
+        self.assertEqual(['Package still present'], upgrade.cleanup_owned_packages(command, [upgrade.PACKAGE]))
