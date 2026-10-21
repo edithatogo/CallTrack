@@ -27,5 +27,8 @@
     "088281b"
   ],
   "completed_at": "2026-10-21",
-  "import_schema": 2
+  "import_schema": 2,
+  "archived": true,
+  "archived_at": "2026-10-21",
+  "completion_review_commit": "201c0da"
 }

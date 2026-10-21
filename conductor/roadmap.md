@@ -155,10 +155,10 @@ end-to-end measurements. No Rust rewrite or prerequisite is created by this rese
 
 ## M3 development checkpoint — 2026-10-21
 
-[Track4](tracks/parity_20261020/index.md) passes all selected API36 emulator
+[Track4](archive/parity_20261020/index.md) passes all selected API36 emulator
 requirements after review fixes.110 JVM/73 host tests and89 successful native
 invocations plus one expected process termination bind current app/test APKs.
 This unblocks M4 candidate qualification and M5 planning against stable contracts.
 The parity release matrix above still requires physical/OEM/manual accessibility,
 cloud/provider and operational evidence; no stable release or technology rewrite
-is inferred. See the [handoff](tracks/parity_20261020/handoff.md).
+is inferred. See the [handoff](archive/parity_20261020/handoff.md).

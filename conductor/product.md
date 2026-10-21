@@ -10,8 +10,8 @@ See [requirements](requirements.md), [roadmap](roadmap.md) and [tracks](tracks.m
 
 The [completed manual slice](archive/calendar_slice_20261020/index.md) now provides a development app with explicit calendar choice and a latest-call action. Its native acceptance used a synthetic source, actual LOCAL calendar storage and durable SQLite receipts. This is a foundation for parity, not an automatic logging or public release claim.
 
-The [parity implementation](tracks/parity_20261020/index.md) now passes the selected
+The [parity implementation](archive/parity_20261020/index.md) now passes the selected
 API36 emulator requirements P01–P10, including automatic enable/pause/filtering,
 durable recovery, historical import and explicit recovery/retention UI. Its
-[handoff](tracks/parity_20261020/handoff.md) preserves physical/cloud/release and
+[handoff](archive/parity_20261020/handoff.md) preserves physical/cloud/release and
 wider-platform gates; this is development acceptance, not production availability.

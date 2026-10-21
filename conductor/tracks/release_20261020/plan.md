@@ -58,7 +58,7 @@ shipping authored journal data; research closure is not release readiness.
 
 ## M3 acceptance handoff — 2026-10-21
 
-[Track4 handoff](../parity_20261020/handoff.md) now supplies selected API36 emulator
+[Track4 handoff](../../archive/parity_20261020/handoff.md) now supplies selected API36 emulator
 acceptance: schema6/import2,110 JVM/73 host tests and89 successful native invocations
 plus one expected process kill. Resume the original remaining gates above; do not
 repeat completed discovery or infer physical/cloud/release acceptance. This handoff

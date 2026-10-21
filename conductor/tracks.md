@@ -1,10 +1,12 @@
 # Tracks registry
 
-Tracks5 and6 remain in progress; Track4 is complete for the selected emulator scope. Track5 community preparation does not establish release readiness; its candidate acceptance depends on Track4. Other active tracks are planned, not implemented. Tracks 1–3 and research Tracks7–13 are archived. Track7 retains Views and defers production Compose adoption; its guarded native UI acceptance is blocked by emulator system dialogs. Discovery deliverables are required work within each track; earlier research is input to refresh. Later implementation phases are conditional on track findings. See [workflow](workflow.md).
-
----
-- [x] **Track: Parity and durable synchronisation** (M3)
-  *Link: [Track](tracks/parity_20261020/index.md)*
+Tracks5 and6 remain in progress. Track4 is implemented, reviewed with fixes and
+archived for the selected API36 emulator scope; it does not establish physical,
+cloud or public-release acceptance. Track5 retains candidate/operational gates and
+Track6 retains the full migration/removal and M4 gates beyond its bounded pilot.
+Tracks1–4 and research Tracks7–13 are archived. Research closure does not adopt
+production technologies or waive remaining native/platform prerequisites.
+See [workflow](workflow.md) and the [archive index](archive/index.md).
 
 ---
 - [~] **Track: Community distribution and release readiness** (M4)

@@ -18,7 +18,7 @@ Opening the app reconciles a previously enabled policy; granting permission alon
 does not enable logging or approve insertion.
 
 This remains a development app (`org.calltrack.community.dev`), not a public parity
-release. [Track4 acceptance](conductor/tracks/parity_20261020/final-review.md) passes
+release. [Track4 acceptance](conductor/archive/parity_20261020/final-review.md) passes
 on the dedicated API36 emulator:110 JVM/73 host tests and89 successful native
 invocations plus one expected process termination. Physical calls, cloud/provider
 sync, wider Android/OEM/accessibility qualification, production signing and
@@ -93,7 +93,7 @@ Views until real screen behaviour and manual accessibility are qualified.
 
 ## Parity acceptance and recovery
 
-Current evidence and remaining boundaries are in the [Track4 handoff](conductor/tracks/parity_20261020/handoff.md).
+Current evidence and remaining boundaries are in the [Track4 handoff](conductor/archive/parity_20261020/handoff.md).
 The parity harnesses require a disposable dedicated emulator, matching current
 build/APK receipts and absent development packages. They refuse physical targets
 and unrelated AVD names. Review the explicit target allowlist in
