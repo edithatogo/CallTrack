@@ -67,10 +67,10 @@ def qualify(serial):
         badging = subprocess.check_output([str(sdk / 'build-tools/35.0.0/aapt'), 'dump', 'badging', str(apk)], text=True)
         if "package: name='" + package + "'" not in badging:
             raise RuntimeError('Unexpected package')
-        version = re.search(r"versionCode='(\d+)'", badging)
-        if version is None:
-            raise RuntimeError('Package version missing')
         if package == PACKAGE:
+            version = re.search(r"versionCode='(\d+)'", badging)
+            if version is None:
+                raise RuntimeError('Package version missing')
             versions.append(version.group(1))
         signature = subprocess.check_output([str(sdk / 'build-tools/35.0.0/apksigner'), 'verify', '--print-certs', str(apk)], env=env, text=True)
         found = re.findall(r'Signer #\d+ certificate SHA-256 digest: ([a-f0-9]{64})', signature)
