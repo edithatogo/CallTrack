@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import io
 import json
+import re
 from pathlib import Path
 import urllib.request
 from urllib.parse import urljoin, urlsplit
@@ -24,7 +25,7 @@ def digest(data):
 
 def repository_url(row, pom=False):
     group, module, version = row['coordinate'].split(':')
-    base = 'https://dl.google.com/dl/android/maven2/' if group.startswith(('androidx.', 'com.android.', 'com.google.testing.platform')) or group in ('com.android', 'com.google.android', 'com.google.android.material') else 'https://repo.maven.apache.org/maven2/'
+    base = 'https://dl.google.com/dl/android/maven2/' if group.startswith(('androidx.', 'com.android.', 'com.google.testing.platform')) or group in ('com.android', 'com.google.android.material') else 'https://repo.maven.apache.org/maven2/'
     name = module + '-' + version + '.pom' if pom else row['name']
     if '/' in name or '..' in name:
         raise ValueError('Unsafe artifact filename')
@@ -51,6 +52,32 @@ def declarations(data):
             for node in root.findall('m:licenses/m:license', ns)]
 
 
+def inherited_licences(data, evidence, depth=0):
+    direct = declarations(data)
+    if direct:
+        return direct
+    if depth >= 8:
+        raise ValueError('POM parent chain exceeds audit limit')
+    root = ET.fromstring(data)
+    ns = {'m': 'http://maven.apache.org/POM/4.0.0'}
+    parent = root.find('m:parent', ns)
+    if parent is None:
+        return []
+    coordinate = ':'.join(parent.findtext('m:' + key, default='', namespaces=ns)
+                          for key in ('groupId', 'artifactId', 'version'))
+    if not all(re.fullmatch(r'[A-Za-z0-9_.+-]+', part) for part in coordinate.split(':')):
+        raise ValueError('Unresolved or unsafe parent coordinate')
+    url = repository_url(dict(coordinate=coordinate, name='unused'), pom=True)
+    if any(item['url'] == url for item in evidence):
+        raise ValueError('Cyclic POM parent chain')
+    with urllib.request.urlopen(url, timeout=60) as response:
+        parent_data = response.read(LIMIT + 1)
+    if len(parent_data) > LIMIT:
+        raise ValueError('Oversized parent POM')
+    evidence.append(dict(url=url, sha256=digest(parent_data)))
+    return inherited_licences(parent_data, evidence, depth + 1)
+
+
 def embedded_notices(data):
     rows = []
     with zipfile.ZipFile(io.BytesIO(data)) as archive:
@@ -58,7 +85,7 @@ def embedded_notices(data):
             if member.file_size > LIMIT:
                 raise ValueError('Archive member exceeds audit limit')
             lower = member.filename.lower()
-            if not member.is_dir() and any(word in lower.rsplit('/', 1)[-1] for word in ('license', 'licence', 'notice', 'copying')):
+            if not member.is_dir() and re.fullmatch(r'(?:licen[sc]e|notice|copying|dependencies)(?:[._-].*)?', lower.rsplit('/', 1)[-1]) and not lower.endswith(('.class', '.java')):
                 rows.append(dict(path=member.filename, sha256=digest(archive.read(member)), size=member.file_size))
             elif member.filename == 'classes.jar':
                 rows.extend(dict(item, path='classes.jar!/' + item['path']) for item in embedded_notices(archive.read(member)))
@@ -102,6 +129,8 @@ def audit(inventory, output):
                     result['embedded_notices'] = embedded_notices(data)
                 else:
                     result['declared_licences'] = declarations(data)
+                    result['parent_pom_evidence'] = []
+                    result['effective_licences'] = inherited_licences(data, result['parent_pom_evidence'])
         except Exception as error:
             result['error'] = str(error)
         return result

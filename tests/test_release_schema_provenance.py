@@ -13,6 +13,7 @@ class HistoricalSchemaTest(unittest.TestCase):
     def test_fixtures_are_exact_creates_from_each_frozen_historical_schema(self):
         rows = json.loads((ROOT / 'qualification/release/schema-provenance.json').read_text())
         self.assertEqual([1, 2, 3, 4, 5], [r['version'] for r in rows])
+        rows.append(json.loads((ROOT / 'qualification/release/import-schema-provenance.json').read_text()))
         for row in rows:
             data = subprocess.check_output(['git', 'show', row['commit'] + ':' + row['source_path']], cwd=ROOT)
             self.assertEqual(row['source_sha256'], hashlib.sha256(data).hexdigest())

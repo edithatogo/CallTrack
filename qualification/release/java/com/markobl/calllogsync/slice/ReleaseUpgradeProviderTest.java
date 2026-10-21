@@ -111,6 +111,89 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
         db.insertOrThrow("outbox", null, row);
     }
 
+    private void seedHistoricalImport() throws Exception {
+        String name = account() + "-imports.db";
+        assertFalse(context().getDatabasePath(name).exists());
+        try (SQLiteDatabase db = context().openOrCreateDatabase(name, 0, null);
+                BufferedReader reader =
+                        new BufferedReader(
+                                new InputStreamReader(
+                                        InstrumentationRegistry.getInstrumentation()
+                                                .getContext()
+                                                .getAssets()
+                                                .open("import-schema-1.sql"),
+                                        "UTF-8"))) {
+            String sql;
+            while ((sql = reader.readLine()) != null) db.execSQL(sql);
+            db.setVersion(1);
+            for (String phase : new String[] {"CONFIRMED", "CANCELLED"}) {
+                String id = account() + "/import/" + phase;
+                org.json.JSONObject body = new org.json.JSONObject();
+                body.put("version", 1);
+                body.put("id", id);
+                body.put("calendar", calendar());
+                body.put("timezone", "UTC");
+                body.put("from", 0);
+                body.put("to", 2000);
+                body.put("incoming", true);
+                body.put("outgoing", true);
+                body.put("missed", true);
+                body.put("phase", phase);
+                body.put("revision", 3);
+                body.put("count", 2);
+                body.put("processed", 0);
+                body.put("saved", 1);
+                body.put("review", 0);
+                body.put("stopped", org.json.JSONObject.NULL);
+                body.put("namespace", "fixture");
+                body.put("upper", 1);
+                body.put("upperBinding", "upper");
+                body.put("last", 1);
+                body.put("lastBinding", "last");
+                ContentValues session = new ContentValues();
+                session.put("id", id);
+                session.put("revision", 3);
+                session.put("body", body.toString());
+                db.insertOrThrow("sessions", null, session);
+                for (int index = 0; index < 2; index++) {
+                    ContentValues row = new ContentValues();
+                    row.put("session", id);
+                    row.put("source_id", index);
+                    row.put("source_key", "fixture/" + index);
+                    row.put("binding", "binding/" + index);
+                    db.insertOrThrow("candidates", null, row);
+                }
+            }
+        }
+    }
+
+    @Test
+    public void importMigrationPreservesProgressAndCancelledSession() {
+        try (SqliteImportStore imports =
+                new SqliteImportStore(context(), account() + "-imports.db")) {
+            assertEquals(2, imports.getReadableDatabase().getVersion());
+            for (String phase : new String[] {"CONFIRMED", "CANCELLED"}) {
+                String id = account() + "/import/" + phase;
+                HistoricalImport.Session saved = imports.get(id);
+                assertEquals(phase, saved.phase.name());
+                assertEquals(3, saved.revision);
+                assertEquals(2, saved.count);
+                assertEquals(1, saved.saved);
+                assertEquals(0, saved.review);
+                assertEquals(0, saved.processedId);
+                assertEquals(calendar(), saved.calendar);
+                assertEquals("fixture", saved.checkpoint.namespace);
+                java.util.List<HistoricalImport.Candidate> candidates =
+                        imports.candidates(id, -1, 4);
+                assertEquals(2, candidates.size());
+                for (HistoricalImport.Candidate candidate : candidates)
+                    assertNull(candidate.outcome);
+                assertEquals(3, imports.get(id).revision);
+            }
+        }
+        assertEquals(14, events(calendar()));
+    }
+
     @Test
     public void seedHistoricalSchemasAndProviderState() throws Exception {
         assertFalse(preferences().contains("calendar"));
@@ -194,6 +277,7 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
             db.execSQL("INSERT INTO sentinel VALUES ('must survive unsupported downgrade')");
             db.setVersion(7);
         }
+        seedHistoricalImport();
         assertEquals(14, events(destination));
     }
 

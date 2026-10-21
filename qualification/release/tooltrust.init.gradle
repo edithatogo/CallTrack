@@ -9,6 +9,11 @@ gradle.projectsEvaluated {
                 def config = app.configurations.findByName(name)
                 if (config != null && config.canBeResolved) configs.add(config)
             }
+            [root, app].each { project ->
+                project.configurations.findAll { it.canBeResolved && it.name.toLowerCase() =~ /(lint|compiler|aapt|desugar)/ }.each { config ->
+                    if (!configs.contains(config)) configs.add(config)
+                }
+            }
             def rows = configs.collectMany { config ->
                 config.resolvedConfiguration.resolvedArtifacts.collect { a ->
                     [configuration: config.name, coordinate:a.moduleVersion.id.toString(), name:a.file.name,
