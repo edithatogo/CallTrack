@@ -145,10 +145,16 @@ they are not counted as newly executed here.
 |---|---|
 | Production identity/signing | Permanent package/name/icon, custodian/recovery, then authorised production signing and certificate continuity; pending by user choice |
 | Licence/conveyance | Resolve retained asset/branding rights and exact source/notices for the selected conveyance; no publication clearance inferred |
-| Tool/platform reproduction | Independent environment/contributor and hosted CI, Linux execution and JDK bundle-resource-seal qualification; no whole-host trust claim |
+| Tool/platform reproduction | Independent environment/contributor and hosted CI, Linux execution; isolated JDK bundle seal qualified on2026-10-22 (linked below), original Homebrew defect retained; no whole-host trust claim |
 | Supported production upgrades | Real supported release baselines/data and permanent-certificate routes; synthetic local schema/provider acceptance is not that claim |
 | Wider acceptance | Minimum/intermediate Android/OEM/manual accessibility, physical calls and real account/cloud readback where claimed |
 | Operations/distribution | Seven actual observation days, reporting/channel outcomes and separately authorised publication; none claimed |
 
 Track5 remains active. No production key, phone installation, cloud consent,
 external message, upload or computer restart occurred.
+
+## Isolated JDK follow-up — 2026-10-22
+
+[Isolated vendor-signed JDK qualification](isolated-jdk-qualification-20261022.md)
+resolves the resource-seal blocker for that explicit alternate build path. It does
+not repair Homebrew or complete independent/live/production acceptance.
