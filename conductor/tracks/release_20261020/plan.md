@@ -129,3 +129,13 @@ key generation, cloud consent, physical testing or elapsed observation is claime
 - [x] Task: Prepare exact-source/licence/notices candidate with all63 published dependency source/POM archives and embedded APK notices —5a3a3e4; assets-source-evidence-20261022.json,643-member archive, four real CLI rejection cases and full readback/repeatability pass.
 - [x] Task: Qualify two clean unsigned builds and a source-only archive reconstruction outside Git; review and apply corrections —115 JVM tests per build, zero lint errors,126 host tests; review-assets-source-20261022.md; evidence/review1384c58. Original production/native/external gates retained.
 - [ ] Task: Complete signed/channel corresponding-source delivery, permanent identity/signing, independent/platform/native and live/operational acceptance before full M4/archive. Published source JARs are not proof of complete upstream dependency rebuilding.
+
+
+## Independent Linux build continuation — 2026-10-22
+
+- [x] Task: Discover safe separate environments and prepare a cold Linux runner/CI recipe —9464408; exact Git source, digest-pinned JDK image, fresh SDK/Gradle directories, no host cache/source mounts.
+- [x] Task: Diagnose initial cold verification failure; canonically audit three metadata files and preserve all736 old entries —9464408;739 entries, no runtime version change or trust exception.
+- [x] Task: Requalify two Mac builds and a separate native Linux physical host, including tests/lint/source/runtime/artifact readback — linux-reproduction-evidence-20261022.json; identical unsigned APK,115 JVM tests per build,131 Python tests on both systems; source/notices bundle refreshed.
+- [x] Task: Review/apply fixes and prepare exact-candidate manual GitHub workflow — review-linux-reproduction-20261022.md; evidence/review 484a8dd; actionlint and Linux execution of build/tooling commands pass. Final reporting fixture corrected;131 host tests and160 Conductor documents pass.
+- [ ] Task: Execute and read back hosted CI after the repository choice is authorised; source workflow preparation is not a provider run.
+- [ ] Task: Finish original signing/identity, signed source conveyance, Android/platform/native, cloud and operational gates before M4/archive.
