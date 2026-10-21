@@ -188,10 +188,10 @@ def qualify(serial):
         if 'package:' + package in command('shell', 'pm', 'list', 'packages', package).splitlines():
             raise RuntimeError('Refusing to replace existing package ' + package)
     try:
-        environment = EmulatorEnvironment(command)
+        receipt['sdk'] = command('shell', 'getprop', 'ro.build.version.sdk')
+        environment = EmulatorEnvironment(command, sdk=receipt['sdk'])
         receipt['emulator_original'] = environment.snapshot().copy()
         receipt['android'] = command('shell', 'getprop', 'ro.build.version.release')
-        receipt['sdk'] = command('shell', 'getprop', 'ro.build.version.sdk')
         if receipt['sdk'] == '26' and command('shell', 'id', '-u') != '0':
             raise RuntimeError('Select temporary userdebug adb root for API26 call fixtures first')
         for package, apk in zip((PACKAGE, TEST_PACKAGE), apks):

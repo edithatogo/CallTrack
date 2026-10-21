@@ -4,24 +4,25 @@ import time
 
 
 class EmulatorEnvironment:
-    def __init__(self, command, settle_timeout=10, poll_seconds=0.2):
+    def __init__(self, command, settle_timeout=10, poll_seconds=0.2, sdk=None):
         self.command = command
         self.original = None
         self.changed = False
         self.settle_timeout = settle_timeout
         self.poll_seconds = poll_seconds
-        self.legacy_network = False
+        self.legacy_network = sdk == '26'
 
     def snapshot(self):
         run = self.command
-        airplane = run('shell', 'cmd', 'connectivity', 'airplane-mode')
-        if airplane == 'No shell command implementation.':
-            self.legacy_network = True
+        if self.legacy_network:
             value = run('shell', 'settings', 'get', 'global', 'airplane_mode_on')
             airplane = {'0': 'disabled', '1': 'enabled'}.get(value, value)
-            wifi = run('shell', 'dumpsys', 'wifi').splitlines()[0].replace('Wi-Fi', 'Wifi')
+            lines = run('shell', 'dumpsys', 'wifi').splitlines()
+            wifi = lines[0].replace('Wi-Fi', 'Wifi') if lines else ''
         else:
-            wifi = run('shell', 'cmd', 'wifi', 'status').splitlines()[0]
+            airplane = run('shell', 'cmd', 'connectivity', 'airplane-mode')
+            lines = run('shell', 'cmd', 'wifi', 'status').splitlines()
+            wifi = lines[0] if lines else ''
         mobile = run('shell', 'settings', 'get', 'global', 'mobile_data')
         stay = run('shell', 'settings', 'get', 'global', 'stay_on_while_plugged_in')
         battery = run('shell', 'dumpsys', 'battery')

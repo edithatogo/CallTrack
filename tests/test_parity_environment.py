@@ -64,7 +64,7 @@ class EnvironmentSafety(unittest.TestCase):
             if args[:3] == ('shell', 'am', 'broadcast'):
                 return 'Broadcast completed: result=0'
             return original(*args)
-        self.environment.command = legacy
+        self.environment = EmulatorEnvironment(legacy, settle_timeout=0, sdk='26')
         before = self.environment.snapshot().copy()
         self.assertTrue(self.environment.legacy_network)
         self.environment.offline()
