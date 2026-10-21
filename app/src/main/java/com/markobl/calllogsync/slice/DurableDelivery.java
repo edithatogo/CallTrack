@@ -229,6 +229,16 @@ public final class DurableDelivery {
         this.sink = sink;
     }
 
+    /**
+     * Receipt state for counting transitions only; it does not establish current event existence.
+     */
+    boolean previouslyConfirmed(String key, long calendar) {
+        synchronized (DELIVERY_LOCK) {
+            Intent prior = store.get(key, calendar);
+            return prior != null && prior.state == State.CONFIRMED;
+        }
+    }
+
     public Result deliver(
             CallRecord call, long calendar, String timezone, BooleanSupplier allowed) {
         return deliver(call, calendar, timezone, null, allowed);

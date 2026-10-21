@@ -36,6 +36,8 @@ public final class ScanDelivery {
     }
 
     public static final class Batch {
+        // Delivered counts newly confirmed receipts, including recovered effects, not rechecks
+        // of an already confirmed receipt and not necessarily newly inserted calendar events.
         public final int handled, delivered, excluded, review;
         public final boolean complete;
         public final DurableDelivery.Result stopped;
@@ -105,13 +107,14 @@ public final class ScanDelivery {
                         throw new PagedCalls.SourceChanged();
                     if (!policy.includes(call)) excluded++;
                     else {
+                        boolean wasConfirmed = delivery.previouslyConfirmed(call.key(), calendar);
                         DurableDelivery.Result result =
                                 delivery.deliver(call, calendar, timezone, operation, allowed);
                         switch (result) {
                             case SAVED:
                             case RECOVERED:
                             case ALREADY_LOGGED:
-                                delivered++;
+                                if (!wasConfirmed) delivered++;
                                 break;
                             case REVIEW_REQUIRED:
                             case SOURCE_CHANGED:
