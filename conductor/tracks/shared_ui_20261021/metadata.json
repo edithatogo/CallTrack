@@ -1,0 +1,16 @@
+{
+  "track_id": "shared_ui_20261021",
+  "type": "research-led-development",
+  "status": "new",
+  "milestone": "M8",
+  "created_at": "2026-10-21",
+  "updated_at": "2026-10-21",
+  "depends_on": [
+    "macos_companion_20261021"
+  ],
+  "requirements": "R17, R24, R26",
+  "track_number": 17,
+  "execution_stage": 6,
+  "implementation_status": "pending",
+  "production_adopted": false
+}

@@ -1,4 +1,9 @@
-# CallTrack successor roadmap — draft
+# CallTrack successor roadmap
+
+Current implementation order: [approved future architecture sequence](future-architecture.md),
+2026-10-21. Kotlin → release → Android Compose → KMP → macOS companion → shared UI
+→ Rust decision → consolidated qualification → **iOS last**. The sections below
+retain milestone/research history and do not override this order.
 
 Date: 2026-10-20. Planning authorised by user. Working direction: evaluate AndroidCallLogSync for a GPL-compatible fork, restore useful CallTrack capabilities, then migrate incrementally to Kotlin. Jetpack Compose, Kotlin Multiplatform (KMP) and Compose Multiplatform remain conditional stages, as requested.
 

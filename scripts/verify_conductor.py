@@ -13,14 +13,45 @@ import subprocess
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def verify_future_sequence(conductor, tracks, locations):
+    sequence = json.loads((conductor / 'future-sequence.json').read_text())
+    expected = ['kotlin_20261020', 'release_20261020', 'compose_app_20261021',
+                'shared_core_20261021', 'macos_companion_20261021', 'shared_ui_20261021',
+                'rust_component_20261021', 'cross_platform_20261021', 'ios_companion_20261021']
+    stages = sequence['stages']
+    assert sequence['schema_version'] == 1 and sequence['ios_last'] is True, 'Invalid execution sequence'
+    assert [entry['stage'] for entry in stages] == list(range(1, 10)), 'Invalid execution sequence'
+    assert [entry['track_id'] for entry in stages] == expected, 'Invalid execution sequence'
+    resolved = []
+    for entry in stages:
+        track_id = entry['track_id']
+        assert track_id in tracks, f'Missing execution sequence track: {track_id}'
+        track = tracks[track_id]
+        deferred = track.get('implementation_status') == 'deferred'
+        if deferred:
+            record = track.get('deferral', {})
+            assert all(isinstance(record.get(key), str) and record[key].strip()
+                       for key in ('reason', 'consequences', 'reconsideration_trigger')), 'Deferral decision missing rationale'
+            assert (locations[track_id] / 'deferral.md').is_file(), 'Deferral decision missing document'
+        if entry['stage'] == 9:
+            assert set(expected[:-1]) <= set(track['depends_on']), 'iOS execution sequence prerequisites missing'
+            if track['status'] in ('in_progress', 'completed') and not deferred:
+                assert all(resolved), 'iOS must remain last until all earlier stages pass or have justified deferrals'
+        elif entry['stage'] > 2 and track['status'] in ('in_progress', 'completed') and not deferred:
+            assert all(resolved), f'Unresolved earlier execution sequence stages: {track_id}'
+        resolved.append(track['status'] == 'completed' or deferred)
+
+
 def verify(private_sources=False):
     conductor = ROOT / 'conductor'
     tracks = {}
+    locations = {}
     for area in ('tracks', 'archive'):
         for metadata in (conductor / area).glob('*/metadata.json'):
             data = json.loads(metadata.read_text())
             assert data['track_id'] not in tracks, f'Duplicate track: {metadata}'
             tracks[data['track_id']] = data
+            locations[data['track_id']] = metadata.parent
             for name in ('index.md', 'spec.md', 'plan.md'):
                 assert (metadata.parent / name).exists(), (metadata, name)
     def walk(track_id, path):
@@ -30,6 +61,7 @@ def verify(private_sources=False):
             walk(dependency, path + [track_id])
     for track_id in tracks:
         walk(track_id, [])
+    verify_future_sequence(conductor, tracks, locations)
     documents = list(conductor.rglob('*.md'))
     for document in documents:
         for link in re.findall(r'\]\(([^)]+)\)', document.read_text()):

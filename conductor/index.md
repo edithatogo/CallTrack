@@ -7,6 +7,7 @@
 - [Tech Stack](tech-stack.md)
 - [Requirements inventory](requirements.md)
 - [Roadmap](roadmap.md)
+- [Approved future implementation sequence](future-architecture.md)
 
 ## Workflow
 

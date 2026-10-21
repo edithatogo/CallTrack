@@ -53,6 +53,30 @@ class VerificationFailures(unittest.TestCase):
         with self.assertRaisesRegex(AssertionError, 'Prerequisite cycle'):
             self.run_verifier()
 
+    def test_ios_cannot_start_before_earlier_stages(self):
+        path = self.root / 'conductor/tracks/ios_companion_20261021/metadata.json'
+        data = json.loads(path.read_text())
+        data['status'] = 'in_progress'
+        path.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'iOS must remain last'):
+            self.run_verifier()
+
+    def test_ios_reordering_is_rejected(self):
+        path = self.root / 'conductor/future-sequence.json'
+        data = json.loads(path.read_text())
+        data['stages'][7], data['stages'][8] = data['stages'][8], data['stages'][7]
+        path.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'execution sequence'):
+            self.run_verifier()
+
+    def test_deferral_without_record_is_not_acceptance(self):
+        path = self.root / 'conductor/tracks/kotlin_20261020/metadata.json'
+        data = json.loads(path.read_text())
+        data['implementation_status'] = 'deferred'
+        path.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'Deferral decision missing'):
+            self.run_verifier()
+
     def test_duplicate_scenario_id_fails(self):
         path = self.baseline / 'fixtures.json'
         data = json.loads(path.read_text())
