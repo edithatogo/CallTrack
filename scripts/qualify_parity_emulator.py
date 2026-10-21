@@ -19,7 +19,9 @@ TEST_PACKAGE = PACKAGE + '.test'
 from parity_targets import AVD, is_dedicated_avd
 
 
-def qualify(serial):
+def qualify(serial, suite="store"):
+    if suite not in ("store", "source-identity"):
+        raise ValueError("Unknown native suite")
     if not re.fullmatch(r'emulator-\d+', serial):
         raise RuntimeError('Parity emulator harness refuses a physical-device serial')
     evidence = ROOT / '.local/parity-evidence'
@@ -36,7 +38,7 @@ def qualify(serial):
                                             'dump', 'badging', str(apk)], text=True)
         if "package: name='" + package + "'" not in identity:
             raise RuntimeError('Unexpected APK identity')
-    receipt = {'fixture_token': uuid.uuid4().hex, 'phase': 'store', 'steps': [],
+    receipt = {'fixture_token': uuid.uuid4().hex, 'phase': suite, 'steps': [],
                'artifacts': build['artifacts'], 'inputs': build['inputs']}
     attempted = []
 
@@ -72,46 +74,51 @@ def qualify(serial):
             attempted.append(package)
             if 'Success' not in command('install', str(apk)):
                 raise RuntimeError('Install not confirmed')
-        check('WorkStatusStoreTest', 'uncertainCommitIsHiddenAcrossStoreInstancesUntilSuccessfulPublication')
-        check('AutomaticSettingsTest', 'openingRecoveryDoesNotCreateReceiptsOrEnableLogging')
-        check('HistoricalImportStoreTest', 'sessionHistoryPagesNewestFirstWithoutLosingOlderSessions')
-        check('AutomaticSettingsTest', 'openingImportsDoesNotCreatePreviewOrConfirmWithoutAccess')
-        check('WorkStatusStoreTest', 'publicationPersistsFailureCountAndRejectsOldActivationAfterReopen')
-        check('WorkStatusStoreTest', 'legacyStatusWithoutCounterRemainsReadableAndUnknownCodesAreSanitised')
-        check('AutomaticSettingsTest', 'openingSettingsDoesNotEnableOrSelectDestinationWithoutAccess')
-        check('AutomaticWorkTest', 'absentActivationExecutesWithoutCallCalendarPermission')
-        check('AutomaticWorkTest', 'staleGenerationExecutesWithoutOpeningProviders')
-        check('AutomaticWorkTest', 'promptAndPeriodicRequestsPersistWithoutNetworkConstraint')
-        check('HistoricalImportStoreTest', 'schemaOneMigrationPreservesAggregateProgressWithoutInventingOutcomes')
-        check('HistoricalImportStoreTest', 'failedOutcomeProgressCommitRollsBackBothRecords')
-        check('HistoricalImportStoreTest', 'frozenPreviewAndPartialDeliverySurviveReopenAndRepeatWithoutDuplicate')
-        check('HistoricalImportStoreTest', 'failedCandidateAppendRollsBackPreviewAndStaleRevisionIsRejected')
-        check('ActivationStoreTest', 'activationAndPauseCommitToDiskAndRejectOldGeneration')
-        check('ActivationStoreTest', 'malformedOrFutureSettingsCannotBecomeEnabled')
-        check('ActivationStoreTest', 'falseCommitAfterCacheMutationBlocksAllActivationAdapters')
-        check('ActivationStoreTest', 'thrownCommitAfterCacheMutationBlocksAllActivationAdapters')
-        check('WorkStatusStoreTest', 'thrownCommitIsHiddenAcrossStoreInstancesUntilSuccessfulPublication')
-        check('CalendarSliceTest', 'syntheticCursorMapsPresentationWithoutPersonalQuery')
-        check('CalendarSliceTest', 'syntheticCursorRetainsNullAndExtendedPresentation')
-        check('CalendarSliceTest', 'syntheticPagingUsesBoundedQueriesAndPreservesEveryRow')
-        for method in ('preservesV1ReceiptsAndCreatesLegacyBindings',
-                       'outboxCommitsInflightAndPurgesConfirmedPayloadAcrossReopen',
-                       'rejectsOutboxWriteInsideAnUncommittedTransaction',
-                       'kotlinMappingRecognisesPreservedJavaReceiptWithoutReinsert',
-                       'preservesV2PendingRowsWithoutInventingOperationOwnership',
-                       'operationIdentitySurvivesReopenAndPayloadPurge',
-                       'preservesV3OwnershipWithoutInferringSourceFactsFromPayload',
-                       'sourceFactsSurviveReopenAndPayloadPurgeWithNullPresentation',
-                       'frozenCheckpointPersistsAndRejectsRegressionOrRebinding',
-                       'preservesV4FactsAndCreatesEmptyCheckpointStore',
-                       'rolloverPreservesProcessedAnchorAndRejectsStalePublication',
-                       'pendingRecoveryQueryIsBoundedAndOwnerDestinationScoped',
-                       'deliveryCountsIncludeLateLegacyWithoutDoubleCountingBoundReceipt',
-                       'recoveryPagingIncludesLegacyAndRemainsStableWhenStatesChange',
-                       'explicitReapprovalPersistsFreshOwnerAndSuppressionClearsReadyPayload',
-                       'payloadStorageAgeSurvivesTransitionsAndExpiryPreservesRecoveryMetadata',
-                       'preservesV5PendingPayloadAndCheckpointWithExplicitMigrationGrace'):
-            check('ParityStoreTest', method)
+        if suite == 'source-identity':
+            check('SourceNamespaceStoreTest', 'falseIdentityCommitCannotBeReusedFromCache')
+            check('SourceNamespaceStoreTest', 'thrownIdentityCommitCannotBeReusedFromCache')
+            check('SourceNamespaceStoreTest', 'committedNamespaceIsReusedAcrossAdapters')
+        else:
+            check('WorkStatusStoreTest', 'uncertainCommitIsHiddenAcrossStoreInstancesUntilSuccessfulPublication')
+            check('AutomaticSettingsTest', 'openingRecoveryDoesNotCreateReceiptsOrEnableLogging')
+            check('HistoricalImportStoreTest', 'sessionHistoryPagesNewestFirstWithoutLosingOlderSessions')
+            check('AutomaticSettingsTest', 'openingImportsDoesNotCreatePreviewOrConfirmWithoutAccess')
+            check('WorkStatusStoreTest', 'publicationPersistsFailureCountAndRejectsOldActivationAfterReopen')
+            check('WorkStatusStoreTest', 'legacyStatusWithoutCounterRemainsReadableAndUnknownCodesAreSanitised')
+            check('AutomaticSettingsTest', 'openingSettingsDoesNotEnableOrSelectDestinationWithoutAccess')
+            check('AutomaticWorkTest', 'absentActivationExecutesWithoutCallCalendarPermission')
+            check('AutomaticWorkTest', 'staleGenerationExecutesWithoutOpeningProviders')
+            check('AutomaticWorkTest', 'promptAndPeriodicRequestsPersistWithoutNetworkConstraint')
+            check('HistoricalImportStoreTest', 'schemaOneMigrationPreservesAggregateProgressWithoutInventingOutcomes')
+            check('HistoricalImportStoreTest', 'failedOutcomeProgressCommitRollsBackBothRecords')
+            check('HistoricalImportStoreTest', 'frozenPreviewAndPartialDeliverySurviveReopenAndRepeatWithoutDuplicate')
+            check('HistoricalImportStoreTest', 'failedCandidateAppendRollsBackPreviewAndStaleRevisionIsRejected')
+            check('ActivationStoreTest', 'activationAndPauseCommitToDiskAndRejectOldGeneration')
+            check('ActivationStoreTest', 'malformedOrFutureSettingsCannotBecomeEnabled')
+            check('ActivationStoreTest', 'falseCommitAfterCacheMutationBlocksAllActivationAdapters')
+            check('ActivationStoreTest', 'thrownCommitAfterCacheMutationBlocksAllActivationAdapters')
+            check('WorkStatusStoreTest', 'thrownCommitIsHiddenAcrossStoreInstancesUntilSuccessfulPublication')
+            check('CalendarSliceTest', 'syntheticCursorMapsPresentationWithoutPersonalQuery')
+            check('CalendarSliceTest', 'syntheticCursorRetainsNullAndExtendedPresentation')
+            check('CalendarSliceTest', 'syntheticPagingUsesBoundedQueriesAndPreservesEveryRow')
+            for method in ('preservesV1ReceiptsAndCreatesLegacyBindings',
+                           'outboxCommitsInflightAndPurgesConfirmedPayloadAcrossReopen',
+                           'rejectsOutboxWriteInsideAnUncommittedTransaction',
+                           'kotlinMappingRecognisesPreservedJavaReceiptWithoutReinsert',
+                           'preservesV2PendingRowsWithoutInventingOperationOwnership',
+                           'operationIdentitySurvivesReopenAndPayloadPurge',
+                           'preservesV3OwnershipWithoutInferringSourceFactsFromPayload',
+                           'sourceFactsSurviveReopenAndPayloadPurgeWithNullPresentation',
+                           'frozenCheckpointPersistsAndRejectsRegressionOrRebinding',
+                           'preservesV4FactsAndCreatesEmptyCheckpointStore',
+                           'rolloverPreservesProcessedAnchorAndRejectsStalePublication',
+                           'pendingRecoveryQueryIsBoundedAndOwnerDestinationScoped',
+                           'deliveryCountsIncludeLateLegacyWithoutDoubleCountingBoundReceipt',
+                           'recoveryPagingIncludesLegacyAndRemainsStableWhenStatesChange',
+                           'explicitReapprovalPersistsFreshOwnerAndSuppressionClearsReadyPayload',
+                           'payloadStorageAgeSurvivesTransitionsAndExpiryPreservesRecoveryMetadata',
+                           'preservesV5PendingPayloadAndCheckpointWithExplicitMigrationGrace'):
+                check('ParityStoreTest', method)
         receipt['result'] = 'passed'
     except Exception as error:
         receipt['result'] = 'failed'
@@ -131,7 +138,7 @@ def qualify(serial):
         receipt['packages_removed'] = all(cleanup)
         if not receipt['packages_removed']:
             receipt['result'] = 'failed'
-        (evidence / 'store-device-receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
+        (evidence / (('store' if suite == 'store' else 'source-identity') + '-device-receipt.json')).write_text(json.dumps(receipt, indent=2) + '\n')
     print(json.dumps({k: receipt.get(k) for k in ('result', 'packages_removed', 'error')}))
     return 0 if receipt.get('result') == 'passed' else 1
 
@@ -139,4 +146,6 @@ def qualify(serial):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--serial', required=True)
-    raise SystemExit(qualify(parser.parse_args().serial))
+    parser.add_argument('--suite', choices=('store', 'source-identity'), default='store')
+    args = parser.parse_args()
+    raise SystemExit(qualify(args.serial, args.suite))

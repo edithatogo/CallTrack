@@ -31,13 +31,20 @@ public final class AndroidCallLogSource implements SliceEngine.CallSource, Paged
         this.context = context.getApplicationContext();
     }
 
+    // Protected by the static namespace monitor; never trust a cache after uncertain disk IO.
+    private static boolean namespaceCommitUncertain;
+
     private static synchronized String namespace(Context context) {
+        if (namespaceCommitUncertain)
+            throw new IllegalStateException("Source identity commit uncertain; restart required");
         SharedPreferences p = context.getSharedPreferences("slice", Context.MODE_PRIVATE);
         String id = p.getString("sourceNamespace", null);
         if (id == null) {
             id = "android-call-log/" + UUID.randomUUID();
+            namespaceCommitUncertain = true;
             if (!p.edit().putString("sourceNamespace", id).commit())
                 throw new IllegalStateException("Identity not persisted");
+            namespaceCommitUncertain = false;
         }
         return id;
     }

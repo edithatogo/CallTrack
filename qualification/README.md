@@ -171,3 +171,10 @@ absent test packages. Pass `--serial emulator-5582` only after guest health is r
 back. Launch uses `ANDROID_AVD_HOME=$PWD/.local/emulator-avds`, `-no-snapshot` and
 fresh writable files, with the original guest/storage left untouched. Recovery
 identity/config evidence is saved in `.local/parity-evidence/recovery-avd-identity.json`.
+
+For the isolated source-identity preferences fault suite, use
+`python3 scripts/qualify_parity_emulator.py --serial emulator-5582 --suite source-identity`.
+It runs three methods in separate instrumentation processes and writes
+`.local/parity-evidence/source-identity-device-receipt.json`; the default store suite
+continues to write its own store receipt. False/thrown identity outcomes deliberately
+latch for the app process, so this suite must not be collapsed into one shared process.

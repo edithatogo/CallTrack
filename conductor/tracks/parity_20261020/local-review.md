@@ -57,3 +57,14 @@ still pending. Exact red/green/source evidence: event-identity-local-evidence.js
 The [remaining acceptance ledger](remaining-acceptance.md) maps P01–P10 to existing
 evidence and current closure work, including positive rendered/telephony protocols.
 Final full-track review remains pending those results.
+
+## High — uncertain source namespace reused from cache (fixed and native-verified)
+
+AndroidCallLogSource previously threw on its first failed identity commit but then
+returned the cached UUID to another adapter. Native false-commit-after-cache-update
+regression reproduced that exact behavior. The process-wide synchronized namespace
+latch now blocks reuse after false or thrown writes; successful committed namespace
+reuse remains unchanged. Three native checks pass, with package cleanup. This
+protects source binding without changing IDs, schema or dependencies; app-process
+restart reloads disk state. See source-identity-evidence.json. Broader runtime
+regression is still pending on this latest APK.
