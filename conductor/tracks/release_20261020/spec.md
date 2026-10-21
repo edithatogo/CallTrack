@@ -1,6 +1,6 @@
 # Community distribution and release readiness
 
-Milestone: M4. Type: research-led development. Status: discovery and community preparation in progress; release candidate blocked on M3.
+Milestone: M4. Type: research-led development. Status: resumed after selected-emulator M3 acceptance; unsigned qualification in progress. Production identity/signing, upgrade and operational gates remain.
 
 ## Objective
 
