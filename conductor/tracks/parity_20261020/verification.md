@@ -721,3 +721,15 @@ Build passes110 JVM tests,0 failures/errors/skips;71 host tests pass. No new run
 dependency or schema change. Periodic/reopen recovery remains the fallback for
 unconfirmed/overloaded wakes. Full lifecycle/telephony/current-source acceptance
 and P01–P10 audit/review/handoff/archive remain required.
+
+## Lifecycle reboot observation and recovered cleanup
+
+The retry passes preparation, launcher recovery and expected held-insertion death,
+then aborts on wait-for-device45s before the intended180s boot loop. The guest
+continues booting, becomes responsive and completes boot without another restart.
+The retained cleanup fixture then passes; original power/network state is restored
+and verified, both packages removed. Original run stays failed; see
+lifecycle-reboot-observation-evidence.json and lifecycle-reboot-recovery-evidence.json.
+Removed the premature45s connection gate: expected offline observations now use
+the existing180s boot loop. Added pre-cleanup exit-info/meminfo for unexplained
+process exits.71 host tests pass. Full current-source acceptance remains pending.
