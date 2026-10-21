@@ -21,8 +21,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /** Test-only provider access. Old guests use shell CLI, never app write permission. */
 final class FixtureCallLog {
@@ -191,10 +189,19 @@ final class FixtureCallLog {
         assertTrue(args.length > 0);
         if (Build.VERSION.SDK_INT >= 29)
             return context.getContentResolver().delete(Calls.CONTENT_URI, selection, args);
+        int before;
+        try (Cursor rows = query(context, new String[] {Calls._ID}, selection, args, null)) {
+            before = rows.getCount();
+        }
         String output =
                 shell("content delete --uri content://call_log/calls" + where(selection, args));
-        Matcher match = Pattern.compile("Deleted (\\d+) rows\\.?").matcher(output);
-        assertTrue("Call fixture deletion unconfirmed", match.matches());
-        return Integer.parseInt(match.group(1));
+        assertFalse(
+                "Call fixture deletion failed",
+                output.contains("Error") || output.contains("Exception"));
+        // API26's CLI is silent on successful deletion. Provider readback is the completion gate.
+        try (Cursor rows = query(context, new String[] {Calls._ID}, selection, args, null)) {
+            assertEquals("Owned call rows survived deletion", 0, rows.getCount());
+        }
+        return before;
     }
 }
