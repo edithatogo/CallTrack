@@ -26,6 +26,15 @@ def compare_artifacts(paths):
     return {'sha256': hashes, 'identical': hashes[0] == hashes[1]}
 
 
+def verify_unsigned(apk, sdk, env):
+    result = subprocess.run([str(sdk / 'build-tools/35.0.0/apksigner'), 'verify',
+                             '--print-certs', str(apk)], env=env, capture_output=True, text=True)
+    output = result.stdout + result.stderr
+    if result.returncode == 0 or 'ERROR: Missing META-INF/MANIFEST.MF' not in output:
+        raise RuntimeError('Expected unsigned APK; signature status is signed or indeterminate')
+    return dict(exit_code=result.returncode, output=output, unsigned_verified=True)
+
+
 def run(output, jdk, sdk):
     if subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT).strip():
         raise ValueError('Commit source changes before qualification')
@@ -59,6 +68,7 @@ def run(output, jdk, sdk):
             if subprocess.check_output(['git', 'status', '--porcelain'], cwd=checkout).strip():
                 raise RuntimeError('Build changed committed source checkout')
             apk = checkout / 'app/build/outputs/apk/release/app-release-unsigned.apk'
+            record['signature_check'] = verify_unsigned(apk, sdk, env)
             artifacts.append(apk)
             record['apk'] = str(apk)
             record['apk_sha256'] = digest(apk)

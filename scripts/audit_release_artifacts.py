@@ -11,6 +11,7 @@ import io
 import json
 from pathlib import Path
 import urllib.request
+from urllib.parse import urljoin, urlsplit
 import xml.etree.ElementTree as ET
 import zipfile
 
@@ -28,6 +29,18 @@ def repository_url(row, pom=False):
     if '/' in name or '..' in name:
         raise ValueError('Unsafe artifact filename')
     return base + group.replace('.', '/') + '/' + module + '/' + version + '/' + name
+
+
+def module_artifact_url(row, metadata):
+    files = [file for variant in metadata.get('variants', []) for file in variant.get('files', [])
+             if file.get('name') == row['name'] and file.get('sha256') == row['sha256']]
+    urls = {file['url'] for file in files}
+    if len(urls) != 1:
+        raise ValueError('Module metadata must uniquely bind artifact name and SHA256')
+    relative = urls.pop()
+    if urlsplit(relative).scheme or '/' in relative or '..' in relative:
+        raise ValueError('Unsafe module artifact URL')
+    return urljoin(repository_url(row), relative)
 
 
 def declarations(data):
@@ -62,8 +75,20 @@ def audit(inventory, output):
         number, row = item
         result = {key: row[key] for key in ('coordinate', 'name', 'sha256')}
         try:
+            artifact_url = repository_url(row)
+            group, module, version = row['coordinate'].split(':')
+            if row['name'] != module + '-' + version + Path(row['name']).suffix:
+                module_url = repository_url(row, pom=True)[:-4] + '.module'
+                with urllib.request.urlopen(module_url, timeout=60) as response:
+                    metadata = response.read(LIMIT + 1)
+                if len(metadata) > LIMIT:
+                    raise ValueError('Oversized module metadata')
+                (output / (str(number) + '-module')).write_bytes(metadata)
+                result['module_url'] = module_url
+                result['module_sha256'] = digest(metadata)
+                artifact_url = module_artifact_url(row, json.loads(metadata))
             for kind in ('artifact', 'pom'):
-                url = repository_url(row, pom=kind == 'pom')
+                url = artifact_url if kind == 'artifact' else repository_url(row, pom=True)
                 with urllib.request.urlopen(url, timeout=60) as response:
                     data = response.read(LIMIT + 1)
                     final_url = response.url

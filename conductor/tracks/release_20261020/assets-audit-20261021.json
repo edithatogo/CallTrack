@@ -1,0 +1,145 @@
+{
+  "scope": "Source hash comparison only; upstream GPL declaration is not separate artwork/translation rights clearance",
+  "upstream_revision": "aaa56443a294aa61bad48b620427e53f9521c5fe",
+  "assets": [
+    {
+      "path": "app/src/main/ic_launcher-playstore.png",
+      "sha256": "6c2a7ea9feb47526705c68f30c1d27cc56d767c3e060c77ad4570cd1b3020c4b",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": true
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_launcher_background.xml",
+      "sha256": "f6be98e2584ff88e9fbeb38e0552ccf1f7f6f068be06ce63b55d3450c83100c4",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": true
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_launcher_foreground.xml",
+      "sha256": "df028a62eb821dd967adcbf035c2603789668ccb5a12afba1e83f875147caa34",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": true
+    },
+    {
+      "path": "app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "sha256": "46aef39e5993c8278c744bb9e8f58eb06ba663416fbaf0b954ae189c63b065a7",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": true
+    },
+    {
+      "path": "app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml",
+      "sha256": "46aef39e5993c8278c744bb9e8f58eb06ba663416fbaf0b954ae189c63b065a7",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": true
+    },
+    {
+      "path": "app/src/main/res/mipmap-hdpi/ic_launcher.png",
+      "sha256": "b16071bcb0a76bb7bfdc1e8e46e98ca29f62da76ff72c3a29d0116197daa3f00",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": true
+    },
+    {
+      "path": "app/src/main/res/mipmap-hdpi/ic_launcher_round.png",
+      "sha256": "60223cff074b54fd5ab20028d4599751ebb0711bd1ddc34758eb88b53fe5c34e",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": true
+    },
+    {
+      "path": "app/src/main/res/mipmap-mdpi/ic_launcher.png",
+      "sha256": "6952a9674eb946026ad97d08670d69a830cdbb38933cd892b66e08ff097c21f0",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": true
+    },
+    {
+      "path": "app/src/main/res/mipmap-mdpi/ic_launcher_round.png",
+      "sha256": "700517327eb6f68fd38b80fe717c9d20abe9f3a7892fd08301ec0cf1442aa352",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": true
+    },
+    {
+      "path": "app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+      "sha256": "970858b1ef2339a64e42544dc59b4afc4663798a4d19c9644bce699dbed359d8",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": true
+    },
+    {
+      "path": "app/src/main/res/mipmap-xhdpi/ic_launcher_round.png",
+      "sha256": "14fe841513ec15e1d169f0ec3ccf1d340100445fe6c0fef0a0b2bd39367e1f3c",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": true
+    },
+    {
+      "path": "app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+      "sha256": "964c0447021d2af0829905286a6374825eb19a4cdba1f1f153b0d98ec934e49e",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": true
+    },
+    {
+      "path": "app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png",
+      "sha256": "d8335f3bc152e97dee312e767f06b7092da3aae41af45f3d285134d9017fd797",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": true
+    },
+    {
+      "path": "app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+      "sha256": "998527c39e08e23e29d4ef276347578c2a2a10c1a416eb78b07c12ddc924c97f",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": true
+    },
+    {
+      "path": "app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png",
+      "sha256": "1faa0725c0f93a19fd12a4ef4a6a51f359947ba3bfeea7bfbbdd4802cd6b33b4",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": true
+    },
+    {
+      "path": "app/src/main/res/values-de/strings.xml",
+      "sha256": "f529873bfcedb6a83f8048efca801774586195c11c8883519ec57c748d0a1e23",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": false
+    },
+    {
+      "path": "app/src/main/res/values-night/themes.xml",
+      "sha256": "4f9605a8df95f285e11ca91ad885737d40aa686a595e32a08b28d16035175e13",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": true
+    },
+    {
+      "path": "app/src/main/res/values/colors.xml",
+      "sha256": "b5626527d503417f0d8e5b1e08f338de7b31173bf0e122815f03e64932adbd88",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": true
+    },
+    {
+      "path": "app/src/main/res/values/ids.xml",
+      "sha256": "76ae646e01454331bf3b431b846fee5da3811f1cc5f0693935e75e3423cff742",
+      "upstream_path_present": false,
+      "unchanged_from_audited_upstream": false
+    },
+    {
+      "path": "app/src/main/res/values/strings.xml",
+      "sha256": "a79849e154412a63fe862877034d6adba082e6df162c5c67049c746ccb9d3dd5",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": false
+    },
+    {
+      "path": "app/src/main/res/values/themes.xml",
+      "sha256": "980b1c1f279d4011fedcf3caaa92a9660a27fd3da8bc5f8d7ed476086fd7ee08",
+      "upstream_path_present": true,
+      "unchanged_from_audited_upstream": true
+    },
+    {
+      "path": "app/src/main/res/xml/slice_backup_rules.xml",
+      "sha256": "80be325e44eb49bec54794399e7de6b4d274513a3ebce30584889d06372f1a0a",
+      "upstream_path_present": false,
+      "unchanged_from_audited_upstream": false
+    },
+    {
+      "path": "app/src/main/res/xml/slice_extraction_rules.xml",
+      "sha256": "cb029b35db0e976c087100424e16e14a6256b46962398887520e51508c3b5842",
+      "upstream_path_present": false,
+      "unchanged_from_audited_upstream": false
+    }
+  ],
+  "asset_rights_cleared": false
+}
