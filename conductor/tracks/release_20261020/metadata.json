@@ -12,7 +12,7 @@
   "implementation_status": "unsigned-development-artifacts-qualified-production-gates-pending",
   "release_ready": false,
   "implementation_commit": "6b353f4",
-  "review_commit": "fee1f27",
+  "review_commit": "95d3851",
   "review_status": "passed-for-isolated-jdk-local-scope",
   "unsigned_candidate_revision": "5578bf56c7a664947324d45d4dcc8c3dd3d08c87",
   "unsigned_kotlin_candidate_qualified": true,
@@ -37,5 +37,6 @@
   "licence_audit_status": "declarations-and-notices-prepared-conveyance-rights-pending",
   "jdk_resource_seal_qualification_scope": "isolated-Temurin17.0.20.1+1-macos-arm64-explicit-build-path",
   "homebrew_jdk_bundle_resource_seal_qualified": false,
-  "isolated_jdk_evidence": "isolated-jdk-evidence-20261022.json"
+  "isolated_jdk_evidence": "isolated-jdk-evidence-20261022.json",
+  "prior_local_trust_schema_review_commit": "fee1f27"
 }

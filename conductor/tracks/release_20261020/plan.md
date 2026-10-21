@@ -115,3 +115,9 @@ key generation, cloud consent, physical testing or elapsed observation is claime
 - [ ] Task: Complete the retained production/independent/platform/licence-conveyance/operational gates before full M4 and archive.
 
 - [x] Task: Apply licence/tool-trust and schema/provider review fixes — fee1f27; local acceptance only, original full-M4 gates retained.
+
+## Isolated JDK continuation — 2026-10-22
+
+- [x] Task: Qualify an isolated publisher-signed JDK17 archive without restart, global install changes or ad-hoc re-signing — isolated-jdk-evidence-20261022.json;459 archive files, strict resource/publisher verification and real tamper rejection pass.
+- [x] Task: Rebuild frozen5578bf5 twice under the isolated JDK; verify unchanged installed tools and review evidence —115 JVM tests per build, zero lint errors, exact prior APK match;121 host tests. Review: review-isolated-jdk-20261022.md; implementation/review evidence95d3851.
+- [ ] Task: Complete independent-host/platform, production identity/signing, rights/conveyance and live/operational gates before full M4 and archive.
