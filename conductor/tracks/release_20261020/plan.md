@@ -148,3 +148,11 @@ key generation, cloud consent, physical testing or elapsed observation is claime
 - [x] Task: Review, fix and rerun affected checks — runtime fixes6f3381c, final fixture hardeningbd8c2e9, evidence/review fa7b944; protected-cache round-trip/worker regression and cleanup pass; API26 ordinary ADB privilege restored and both new guests stopped. Original external/manual gates retained.
 
 - [ ] Task: Refreeze the current runtime fixes into new unsigned artifacts/source-notices bundle and independently reproduce that exact candidate;9464408 remains the prior qualified release/source snapshot. Hosted execution awaits repository authority; original identity/signing, physical/OEM/manual, remote and operational gates remain before M4/archive.
+
+
+## First-release baseline and final local candidate —2026-10-22
+
+- [~] Task: Define fresh-install-first support, empty issued-predecessor set and immutable future upgrade baseline; preserve development identity and production custody gates.
+- [ ] Task: Freeze current minimum-platform/accessibility fixes into matching unsigned builds and refreshed source/notices; reproduce exact candidate on the separate Linux host.
+- [ ] Task: Qualify the exact release payload using an existing-development-key copy on dedicated emulators; prove initial denied/unconfigured launch and historical schema/provider forward upgrade preservation.
+- [ ] Task: Review/fix tools and evidence, run host/Conductor checks and record remaining production/physical/cloud/operational gates without archiving M4.

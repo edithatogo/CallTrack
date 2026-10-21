@@ -101,3 +101,5 @@ The current app fixes require a new release freeze/source bundle and independent
 reproduction;9464408 remains the previously qualified unsigned artifact. Physical/
 OEM/manual speech/contrast, cloud, production-signing and actual observation gates
 remain. Track5 is active.
+
+- [First-release installation and supported-upgrade baseline](first-release-baseline.md)

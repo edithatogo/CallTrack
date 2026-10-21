@@ -4,6 +4,8 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+import json
+import zipfile
 from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import qualify_release_upgrade as upgrade
@@ -60,3 +62,39 @@ class UpgradeSafetyTest(unittest.TestCase):
                 self.assertEqual(before, upgrade.qualification_inputs(fixture))
                 (fixture / 'assets/schema.sql').write_text('changed actual input')
                 self.assertNotEqual(before, upgrade.qualification_inputs(fixture))
+
+    def test_frozen_release_rejects_wrong_revision_and_modified_artifact(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            apk = root / 'candidate.apk'
+            apk.write_bytes(b'unsigned')
+            record = dict(apk=str(apk), apk_sha256=upgrade.sha(apk), exit_code=0,
+                          signature_check=dict(unsigned_verified=True))
+            receipt = root / 'receipt.json'
+            data = dict(success=True, signed=False, revision='frozen', builds=[record, record])
+            receipt.write_text(json.dumps(data))
+            with self.assertRaisesRegex(RuntimeError, 'Matching frozen'):
+                upgrade.frozen_release_apk(receipt, 'different', root, {})
+            with patch('qualify_release_build.verify_unsigned') as verify:
+                self.assertEqual(apk, upgrade.frozen_release_apk(receipt, 'frozen', root, {}))
+                self.assertEqual(2, verify.call_count)
+                apk.write_bytes(b'changed')
+                with self.assertRaisesRegex(RuntimeError, 'artifact changed'):
+                    upgrade.frozen_release_apk(receipt, 'frozen', root, {})
+
+    def test_signing_cannot_change_or_remove_payload_or_add_unexpected_entries(self):
+        with tempfile.TemporaryDirectory() as directory:
+            before, after = [Path(directory) / name for name in ('unsigned.apk', 'signed.apk')]
+            def write(path, entries):
+                with zipfile.ZipFile(path, 'w') as archive:
+                    for name, value in entries.items():
+                        archive.writestr(name, value)
+            write(before, {'classes.dex': b'code', 'META-INF/app-metadata.properties': b'pinned'})
+            original = {'classes.dex': b'code', 'META-INF/app-metadata.properties': b'pinned'}
+            write(after, dict(original, **{'META-INF/ANDROIDD.SF': b'signature'}))
+            upgrade.require_identical_payload(before, after)
+            for entries in ({'classes.dex': b'changed'}, {'classes.dex': b'code'},
+                            dict(original, **{'assets/unexpected': b'extra'})):
+                write(after, entries)
+                with self.assertRaises(RuntimeError):
+                    upgrade.require_identical_payload(before, after)
