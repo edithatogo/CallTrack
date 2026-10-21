@@ -760,3 +760,16 @@ completed PNG inspected: no stale stop message. See imports-ui-evidence.json.
 The earlier timeout and launch ANR remain historical, not silently relabelled as
 failing feedback assertions; this run did not reproduce either. Recovery UI and
 final-source regression/P01–P10 review remain pending.
+
+## Rendered recovery checkpoint
+
+Recovery UI passes six native methods on the dedicated API36 guest, with10 PNG/
+accessibility-tree pairs. Actual touches prove permission restoration alone does
+not approve insertion; preview cancellation creates no event; explicit approval
+creates one verified event and clears payload. Existing-effect check works with
+WRITE_CALENDAR denied. Human edit survives, deletion is not recreated, suppression
+is explicit/cancellable and keeps receipt identity; explicit retention ages a
+fixture payload and removes it while preserving metadata. Cleanup, package removal
+and environment restoration pass. See recovery-ui-evidence.json. Queued approval
+withdrawal across leaving/returning remains an open review candidate; final-source
+regression/full P01–P10 audit and archive remain pending.
