@@ -64,3 +64,15 @@ acceptance: schema6/import2,110 JVM/73 host tests and89 successful native invoca
 plus one expected process kill. Resume the original remaining gates above; do not
 repeat completed discovery or infer physical/cloud/release acceptance. This handoff
 does not mark this track complete or waive its original prerequisites.
+
+## Approved architecture execution — 2026-10-21
+
+The user authorised all active-code Kotlin conversion as stage1 of the
+[future sequence](../../future-architecture.md), before remaining release work.
+Original M4/full-M5 operational acceptance remains gated.
+
+- [~] Task: Refresh47 Java-file inventory (33 active/14 inherited) and preserve pre-conversion baseline/APKs.
+- [ ] Task: Convert stable models/policy, then orchestration, adapters/stores, scheduling and Views Activities in verified batches.
+- [ ] Task: Audit manifest/resource/reflection reachability; remove only proven obsolete code/dependencies, record remaining exceptions.
+- [ ] Task: Verify source-bound mixed-language/Java interop, in-place update and final full native matrix; retire stale javac fallback.
+- [ ] Task: Review/fix and hand off preserving remaining M4/operational gates.

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "ios_last": true,
+  "stages": [
+    {
+      "stage": 1,
+      "track_id": "kotlin_20261020"
+    },
+    {
+      "stage": 2,
+      "track_id": "release_20261020"
+    },
+    {
+      "stage": 3,
+      "track_id": "compose_app_20261021"
+    },
+    {
+      "stage": 4,
+      "track_id": "shared_core_20261021"
+    },
+    {
+      "stage": 5,
+      "track_id": "macos_companion_20261021"
+    },
+    {
+      "stage": 6,
+      "track_id": "shared_ui_20261021"
+    },
+    {
+      "stage": 7,
+      "track_id": "rust_component_20261021"
+    },
+    {
+      "stage": 8,
+      "track_id": "cross_platform_20261021"
+    },
+    {
+      "stage": 9,
+      "track_id": "ios_companion_20261021"
+    }
+  ]
+}
