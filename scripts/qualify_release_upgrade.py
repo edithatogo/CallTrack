@@ -28,7 +28,9 @@ def require_rejection(result, reason):
         raise RuntimeError('Expected controlled rejection: ' + reason)
 
 
-def cleanup_owned_packages(adb, attempted):
+def cleanup_owned_packages(adb, attempted, provider_cleanup_verified=True):
+    if not provider_cleanup_verified:
+        return ["Provider cleanup unverified; owned packages retained for recovery"]
     errors = []
     for package in reversed(attempted):
         try:
@@ -301,7 +303,7 @@ gradle.beforeProject { project ->
             except Exception as error:
                 errors.append('Provider cleanup unverified: ' + str(error))
                 receipt['provider_fixture_removed'] = False
-        errors.extend(cleanup_owned_packages(adb, attempted))
+        errors.extend(cleanup_owned_packages(adb, attempted, not errors))
         clean = not errors
         if errors:
             receipt['cleanup_errors'] = errors

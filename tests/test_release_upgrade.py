@@ -98,3 +98,9 @@ class UpgradeSafetyTest(unittest.TestCase):
                 write(after, entries)
                 with self.assertRaises(RuntimeError):
                     upgrade.require_identical_payload(before, after)
+
+    def test_unverified_provider_cleanup_retains_recovery_packages(self):
+        command = unittest.mock.Mock()
+        errors = upgrade.cleanup_owned_packages(command, [upgrade.PACKAGE, upgrade.TEST_PACKAGE], False)
+        self.assertEqual(['Provider cleanup unverified; owned packages retained for recovery'], errors)
+        command.assert_not_called()
