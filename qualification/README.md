@@ -154,3 +154,20 @@ The fallback excludes SchedulingCommitTest, Android adapters and instrumentation
 Its successful receipt must never authorise an APK install; native harnesses continue
 to require the full source-bound Android build. On storage restoration, use the normal
 build and native commands above before claiming Android acceptance.
+
+### Isolated recovery AVD without a host restart
+
+Track4 also permits the exact dedicated identity
+`calltrack-parity-api36-recovery-20261021`, created from the same API36 Google APIs
+ARM64 image with fresh writable storage under `.local/emulator-avds/`. It is
+independent of `calltrack-parity-api36-20261020`; never launch another instance
+against the old AVD while its stuck process remains. The recovery guest uses console
+port5582 and ADB serial `emulator-5582`, within the emulator's documented port range.
+No physical phone or arbitrary emulator becomes authorized through this exception.
+
+The four Track4 harnesses share an exact AVD allowlist in `scripts/parity_targets.py`.
+They still require qemu identity, completed boot, source-bound build/APK hashes and
+absent test packages. Pass `--serial emulator-5582` only after guest health is read
+back. Launch uses `ANDROID_AVD_HOME=$PWD/.local/emulator-avds`, `-no-snapshot` and
+fresh writable files, with the original guest/storage left untouched. Recovery
+identity/config evidence is saved in `.local/parity-evidence/recovery-avd-identity.json`.
