@@ -536,3 +536,16 @@ pending. User directed local work while PortableSSD is disconnected; no further
 hardware permission is requested. Resume sequence is in local-review.md.
 
 - `72d352c`: local activation-fault and scheduling-order review fixes,103 JVM/53 host checks, prepared native fault tests; Android/native qualification pending.
+
+
+## Local durable identity review checkpoint
+
+Two test-first faulty-port regressions showed matching payload/calendar could
+confirm a wrong or invalid event ID. DurableDelivery now checks valid identity and
+exact readback ID, matching the recovery contract.105 local JVM tests pass; no
+Android/native execution is inferred. See event-identity-local-evidence.json and
+local-review.md. P01–P10 closure work and positive UI/telephony protocols are mapped
+in [remaining acceptance](remaining-acceptance.md). Hardware-dependent gates and
+final full-track review/archive remain open.
+
+- `aa0802b`: exact event-ID verification, two faulty-port regressions,105 JVM/53 host tests and P01–P10 remaining acceptance ledger; native qualification pending.
