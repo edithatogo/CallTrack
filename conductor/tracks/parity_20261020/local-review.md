@@ -126,3 +126,28 @@ See recovery-withdrawal-red-evidence.json and recovery-ui-evidence.json.
 Full Android build passes56s;70 host tests and Conductor validation pass.
 Final-source store/provider/worker/lifecycle/telephony/settings/import regression
 and full P01–P10 review/handoff/archive remain outstanding.
+
+## Final-pass wake deadline review candidate
+
+AutomaticWakeReceiver sets an8-second deadline; reconcileCommitted first acquires
+the delivery monitor through requests/control.reconcile, before awaitCommitted
+checks remaining time. A contended monitor may exceed the advertised wake budget.
+Existing scheduling tests exercise enqueue futures, not lock acquisition. This
+needs a bounded held-lock regression and disposition before final review closure;
+no native broadcast timeout is claimed from inspection alone.
+
+## Final worker observation failure
+
+Provider8/8 passes on daf794a. The worker suite fails at its60-second observation
+window in the first prompt catch-up; cleanup/packages pass. Receipt:
+final-worker-timeout-evidence.json. Original failure does not retain scheduler
+state or live receipt counts. Added nonpersonal timeout state/attempt/count
+diagnostics before retry; observation window and product code are unchanged.
+
+### Worker diagnostic disposition
+
+The unchanged60s diagnostic run reports RUNNING, attempt1,61 verified/1 pending/
+0 review before cleanup. This is concrete progress near the expected63 events;
+retain final-worker-progress-evidence.json. Observation is extended to120s, without
+changing exact delivery/idempotency/filter/pause assertions or product code.
+No exact prompt-delivery deadline is adopted. Native rerun remains required.
