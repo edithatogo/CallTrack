@@ -256,3 +256,19 @@ provides a separate software environment, but still shares this physical compute
 It does not establish a second physical host, hosted CI or independent contributor
 execution. A prepared workflow is not a hosted run: retain GitHub job/run/artifact
 readback only after an authorised repository upload and workflow execution.
+
+
+## First-release baseline
+
+The [installation and supported-upgrade policy](conductor/tracks/release_20261020/first-release-baseline.md)
+selects fresh installation for the first public release, with no issued predecessor
+and no in-place migration claim from other packages or unpublished development
+builds. The development identity remains unchanged while permanent identity/key
+custody is pending. A version label alone never identifies a frozen candidate.
+
+To bind emulator fresh-install and forward-compatibility tests to the exact unsigned
+release payload, add `--release-build-receipt MATCHING-BUILDS/receipt.json` to
+`scripts/qualify_release_upgrade.py --provider-schema`. The existing development
+key signs a local test copy only; all original APK entries must remain identical.
+The probe checks fresh state and the actual launcher before synthetic10→11 upgrade
+acceptance. The11 overlay is separately hashed and is not the frozen10 candidate.

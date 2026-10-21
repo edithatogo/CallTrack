@@ -37,6 +37,29 @@ public class KotlinPackageUpdateTest {
     }
 
     @Test
+    public void freshInstallIsUnconfiguredAndDenied() {
+        SharedPreferences prefs = context().getSharedPreferences("slice", Context.MODE_PRIVATE);
+        assertFalse(prefs.contains("calendar"));
+        assertFalse(prefs.contains("kotlinUpdateFixture"));
+        assertNull(new AndroidActivationStore(context()).get());
+        for (String permission :
+                new String[] {
+                    "READ_CALL_LOG",
+                    "READ_PHONE_STATE",
+                    "READ_CALENDAR",
+                    "WRITE_CALENDAR",
+                    "WRITE_CALL_LOG",
+                    "INTERNET"
+                }) {
+            assertEquals(
+                    android.content.pm.PackageManager.PERMISSION_DENIED,
+                    context().checkSelfPermission("android.permission." + permission));
+        }
+        assertFalse(context().getDatabasePath("calltrack-ledger.db").exists());
+        assertFalse(context().getDatabasePath("calltrack-imports.db").exists());
+    }
+
+    @Test
     public void seedJavaEraState() {
         SharedPreferences prefs = context().getSharedPreferences("slice", Context.MODE_PRIVATE);
         assertFalse(prefs.contains("kotlinUpdateFixture"));
