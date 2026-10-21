@@ -55,7 +55,7 @@ class AutomaticDelivery(
                         val result =
                             delivery!!.resume(key, settings.calendar, settings.operation()) {
                                 permitted(worker, running)
-                            }!!
+                            }
                         when (result) {
                             DurableDelivery.Result.SAVED,
                             DurableDelivery.Result.RECOVERED,

@@ -11,7 +11,7 @@ class ManualDelivery(
             val call = source!!.latest()
             if (call == null) SliceEngine.Result.NO_CALL
             else
-                when (delivery!!.deliver(call, calendar, timezone) { true }!!) {
+                when (delivery!!.deliver(call, calendar, timezone) { true }) {
                     DurableDelivery.Result.SOURCE_CHANGED,
                     DurableDelivery.Result.PAUSED,
                     DurableDelivery.Result.REVIEW_REQUIRED -> SliceEngine.Result.REVIEW_REQUIRED

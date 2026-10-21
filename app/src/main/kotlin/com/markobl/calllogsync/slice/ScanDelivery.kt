@@ -59,11 +59,10 @@ class ScanDelivery(
             try {
                 if (!allowed.asBoolean)
                     return Batch(0, 0, 0, 0, false, DurableDelivery.Result.PAUSED)
-                var checkpoint = progress!!.get(operation)
-                if (checkpoint == null) {
-                    checkpoint = PagedCalls.capture(source)
-                    progress.put(operation, checkpoint)
-                }
+                val storage = progress!!
+                var checkpoint =
+                    storage.get(operation)
+                        ?: PagedCalls.capture(source).also { storage.put(operation, it) }
                 val rows = PagedCalls.read(source, checkpoint, limit)
                 for (call in rows) {
                     if (!allowed.asBoolean)
@@ -86,8 +85,7 @@ class ScanDelivery(
                     if (!policy.includes(call)) excluded++
                     else {
                         val wasConfirmed = delivery!!.previouslyConfirmed(call.key(), calendar)
-                        val result =
-                            delivery.deliver(call, calendar, timezone, operation, allowed)!!
+                        val result = delivery.deliver(call, calendar, timezone, operation, allowed)
                         when (result) {
                             DurableDelivery.Result.SAVED,
                             DurableDelivery.Result.RECOVERED,
@@ -98,8 +96,8 @@ class ScanDelivery(
                                 return Batch(handled, delivered, excluded, review, false, result)
                         }
                     }
-                    checkpoint = checkpoint!!.advance(call)
-                    progress.put(operation, checkpoint)
+                    checkpoint = checkpoint.advance(call)
+                    storage.put(operation, checkpoint)
                     handled++
                 }
                 Batch(
@@ -107,7 +105,7 @@ class ScanDelivery(
                     delivered,
                     excluded,
                     review,
-                    checkpoint!!.lastId == checkpoint.upperId,
+                    checkpoint.lastId == checkpoint.upperId,
                     null,
                 )
             } catch (changed: PagedCalls.SourceChanged) {

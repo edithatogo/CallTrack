@@ -55,7 +55,7 @@ class ActivationControl(store: Store?) {
                 missed == other.missed
     }
 
-    private val store: Store = java.util.Objects.requireNonNull(store)!!
+    private val store: Store = store ?: throw NullPointerException()
 
     fun current(): Settings? = synchronized(DurableDelivery.DELIVERY_LOCK) { store.get() }
 
