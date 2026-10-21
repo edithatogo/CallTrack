@@ -164,16 +164,24 @@ public class PositiveUiTest {
                 android.view.accessibility.AccessibilityNodeInfo node = ui.shown(anchor, true);
                 assertNotNull("Anchor must be reachable by scrolling", node);
                 assertTrue("Anchor must expose keyboard focus", node.isFocusable());
-                assertTrue(
-                        node.performAction(
-                                android.view.accessibility.AccessibilityNodeInfo.ACTION_FOCUS));
+                instrumentation.sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_TAB);
                 ui.await(
                         () -> {
-                            android.view.accessibility.AccessibilityNodeInfo current =
-                                    ui.find(anchor, true);
-                            return current != null && current.isFocused();
+                            android.view.accessibility.AccessibilityNodeInfo root =
+                                    ui.automation.getRootInActiveWindow();
+                            if (root == null) return false;
+                            android.view.accessibility.AccessibilityNodeInfo focused =
+                                    root.findFocus(
+                                            android.view.accessibility.AccessibilityNodeInfo
+                                                    .FOCUS_INPUT);
+                            return focused != null
+                                    && focused.isFocusable()
+                                    && focused.isVisibleToUser()
+                                    && context()
+                                            .getPackageName()
+                                            .contentEquals(focused.getPackageName());
                         },
-                        "Focus not exposed " + anchor);
+                        "Keyboard Tab did not expose visible application focus " + anchor);
                 ui.capture("accessibility-" + i);
             } finally {
                 finish(instrumentation, activity);
