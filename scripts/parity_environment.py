@@ -23,7 +23,8 @@ class EmulatorEnvironment:
         awake = re.search(r'mWakefulness=(\w+)', power)
         flags = dict(re.findall(r'(AC|USB|Wireless|Dock) powered: (true|false)', battery))
         if (airplane not in ('enabled', 'disabled') or wifi not in ('Wifi is enabled', 'Wifi is disabled')
-                or mobile not in ('0', '1') or not stay.isdigit() or len(flags) != 4
+                or mobile not in ('0', '1') or not stay.isdigit()
+                or not {'AC', 'USB', 'Wireless'} <= flags.keys()
                 or 'UPDATES STOPPED' in battery or deep != 'ACTIVE'
                 or awake is None or awake[1] not in ('Awake', 'Asleep')):
             raise RuntimeError('Unqualified emulator power/network baseline; no setting changed')

@@ -49,6 +49,16 @@ class EnvironmentSafety(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'baseline'): self.environment.snapshot()
         self.assertIsNone(self.environment.original)
 
+    def test_older_battery_service_without_dock_flag_is_qualified(self):
+        original = self.command
+        def old_battery(*args):
+            value = original(*args)
+            return value.replace('\nDock powered: false', '') if args == ('shell', 'dumpsys', 'battery') else value
+        self.environment.command = old_battery
+        self.assertEqual(3, len(self.environment.snapshot()['power_flags']))
+        self.environment.doze()
+        self.assertTrue(self.environment.restore()['verified'])
+
     def test_offline_and_doze_restore_original_settings(self):
         original = self.environment.snapshot().copy()
         self.environment.offline()
