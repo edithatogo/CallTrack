@@ -19,9 +19,10 @@ not by the reused development version label alone.
 A fresh installation must have no selected calendar, activation policy, receipts
 or import sessions. Call-log/phone/calendar access starts denied, automatic logging
 is unconfigured, and opening the launcher must not select a destination, request
-permissions automatically or create a delivery ledger/import database. User action
-precedes permission grants, destination choice and activation. Framework-owned
-WorkManager storage is allowed; it is not a delivery receipt.
+permissions automatically or create receipts, queued deliveries, scan cursors or
+import sessions. Empty application databases created for maintenance and
+framework-owned WorkManager storage are allowed. User action
+precedes permission grants, destination choice and activation. Database existence alone is not a delivery receipt.
 
 ## Supported upgrade contract
 

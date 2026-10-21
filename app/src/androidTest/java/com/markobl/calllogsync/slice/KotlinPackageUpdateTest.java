@@ -55,8 +55,26 @@ public class KotlinPackageUpdateTest {
                     android.content.pm.PackageManager.PERMISSION_DENIED,
                     context().checkSelfPermission("android.permission." + permission));
         }
-        assertFalse(context().getDatabasePath("calltrack-ledger.db").exists());
-        assertFalse(context().getDatabasePath("calltrack-imports.db").exists());
+        if (context().getDatabasePath("calltrack-ledger.db").exists()) {
+            try (SqliteLedger ledger = new SqliteLedger(context())) {
+                for (String table : new String[] {"receipts", "outbox", "scan_cursors"}) {
+                    assertEquals(
+                            0,
+                            android.database.DatabaseUtils.queryNumEntries(
+                                    ledger.getReadableDatabase(), table));
+                }
+            }
+        }
+        if (context().getDatabasePath("calltrack-imports.db").exists()) {
+            try (SqliteImportStore imports = new SqliteImportStore(context())) {
+                for (String table : new String[] {"sessions", "candidates"}) {
+                    assertEquals(
+                            0,
+                            android.database.DatabaseUtils.queryNumEntries(
+                                    imports.getReadableDatabase(), table));
+                }
+            }
+        }
     }
 
     @Test
