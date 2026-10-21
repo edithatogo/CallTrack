@@ -103,3 +103,39 @@ class EmulatorEnvironment:
         if not errors:
             self.changed = False
         return {'verified': not errors, 'changed': True, 'errors': errors}
+
+
+class EmulatorDisplayEnvironment:
+    """Snapshot only screen wakefulness for UI tests that do not change radios/power."""
+    def __init__(self, command):
+        self.command = command
+        self.original = None
+        self.changed = False
+
+    def snapshot(self):
+        power = self.command('shell', 'dumpsys', 'power')
+        awake = re.search(r'mWakefulness=(\w+)', power)
+        if awake is None or awake[1] not in ('Awake', 'Asleep'):
+            raise RuntimeError('Unqualified emulator display baseline; no setting changed')
+        self.original = {'awake': awake[1]}
+        return self.original
+
+    def restore(self):
+        if not self.changed:
+            return {'verified': True, 'changed': False}
+        old = self.original
+        errors = []
+        try:
+            self.command('shell', 'input', 'keyevent',
+                         'KEYCODE_WAKEUP' if old['awake'] == 'Awake' else 'KEYCODE_SLEEP')
+            deadline = time.monotonic() + 10
+            while self.snapshot() != old:
+                if time.monotonic() >= deadline:
+                    raise RuntimeError('Restored display differs from its snapshot')
+                time.sleep(0.2)
+        except Exception as error:
+            errors.append(str(error))
+        self.original = old
+        if not errors:
+            self.changed = False
+        return {'verified': not errors, 'changed': True, 'errors': errors}

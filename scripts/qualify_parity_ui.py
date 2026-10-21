@@ -10,7 +10,7 @@ import argparse
 import hashlib
 import json
 import re
-from parity_environment import EmulatorEnvironment
+from parity_environment import EmulatorDisplayEnvironment as EmulatorEnvironment
 from pathlib import Path
 import subprocess
 import uuid
@@ -23,10 +23,10 @@ TEST_CLASS = 'com.markobl.calllogsync.slice.PositiveUiTest'
 
 
 def qualify(serial, suite="settings"):
-    if suite not in ("settings", "imports", "recovery"):
+    if suite not in ("settings", "imports", "recovery", "accessibility"):
         raise ValueError("Unknown UI suite")
     test_class = {"settings": TEST_CLASS, "imports": "com.markobl.calllogsync.slice.ImportUiTest",
-                  "recovery": "com.markobl.calllogsync.slice.RecoveryUiTest"}[suite]
+                  "recovery": "com.markobl.calllogsync.slice.RecoveryUiTest", "accessibility": TEST_CLASS}[suite]
     if not re.fullmatch(r'emulator-\d+', serial):
         raise RuntimeError('Provider harness refuses a physical-device serial')
     evidence = ROOT / '.local/slice-evidence'
@@ -123,7 +123,10 @@ def qualify(serial, suite="settings"):
         for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
             command('shell', 'pm', 'grant', PACKAGE, 'android.permission.' + permission)
         fixture_possible = True
-        if suite == 'settings':
+        if suite == 'accessibility':
+            ui_attempted = True
+            check('renderedAccessibilityLabelsTargetsAndKeyboardFocus')
+        elif suite == 'settings':
             check('prepareCalendarWithoutCallAccess')
             for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
                 command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.' + permission)
@@ -206,6 +209,6 @@ def qualify(serial, suite="settings"):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--serial', required=True)
-    parser.add_argument('--suite', choices=('settings', 'imports', 'recovery'), default='settings')
+    parser.add_argument('--suite', choices=('settings', 'imports', 'recovery', 'accessibility'), default='settings')
     args = parser.parse_args()
     raise SystemExit(qualify(args.serial, args.suite))

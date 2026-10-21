@@ -3,16 +3,32 @@ package com.markobl.calllogsync.slice
 import android.content.res.Configuration
 import android.os.Build
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowInsets
 import android.view.WindowInsetsController
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Spinner
 
 /** Native content remains readable under system bars, cutouts and the IME. */
 internal class ActivityInsets private constructor() {
     companion object {
+        private fun ensureTouchTargets(view: View) {
+            if (view is Button || view is Spinner || view is EditText) {
+                val minimum = kotlin.math.ceil(48 * view.resources.displayMetrics.density).toInt()
+                view.minimumHeight = maxOf(view.minimumHeight, minimum)
+                view.minimumWidth = maxOf(view.minimumWidth, minimum)
+            }
+            if (view is ViewGroup) {
+                for (index in 0 until view.childCount) ensureTouchTargets(view.getChildAt(index))
+            }
+        }
+
         @JvmStatic
         @Suppress("DEPRECATION")
         fun apply(root: View?) {
-            val left = root!!.paddingLeft
+            ensureTouchTargets(root!!)
+            val left = root.paddingLeft
             val top = root.paddingTop
             val right = root.paddingRight
             val bottom = root.paddingBottom

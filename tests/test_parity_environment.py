@@ -4,7 +4,7 @@ from pathlib import Path
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from parity_environment import EmulatorEnvironment
+from parity_environment import EmulatorEnvironment, EmulatorDisplayEnvironment
 
 
 class EnvironmentSafety(unittest.TestCase):
@@ -114,3 +114,30 @@ class EnvironmentSafety(unittest.TestCase):
         self.environment.poll_seconds = 0.001
         self.assertTrue(self.environment.restore()['verified'])
         self.assertGreaterEqual(len(reads), 2)
+
+
+class DisplayEnvironment(unittest.TestCase):
+    def test_display_only_restore_uses_no_network_commands(self):
+        calls = []
+        state = {'awake': 'Asleep'}
+        def command(*args):
+            calls.append(args)
+            if args == ('shell', 'dumpsys', 'power'):
+                return 'mWakefulness=' + state['awake']
+            if args[:3] == ('shell', 'input', 'keyevent'):
+                state['awake'] = 'Asleep' if args[-1] == 'KEYCODE_SLEEP' else 'Awake'
+                return ''
+            raise AssertionError(args)
+        env = EmulatorDisplayEnvironment(command)
+        old = env.snapshot().copy()
+        env.changed = True
+        state['awake'] = 'Awake'
+        self.assertTrue(env.restore()['verified'])
+        self.assertEqual(old, env.snapshot())
+        self.assertFalse(any('connectivity' in args or 'wifi' in args for args in calls))
+
+    def test_unknown_display_state_is_refused(self):
+        env = EmulatorDisplayEnvironment(lambda *args: 'mWakefulness=Dreaming')
+        with self.assertRaisesRegex(RuntimeError, 'display baseline'):
+            env.snapshot()
+        self.assertFalse(env.changed)
