@@ -65,6 +65,27 @@ class EnvironmentSafety(unittest.TestCase):
         self.fail = None
         self.assertTrue(self.environment.restore()['verified'])
 
+    def test_reboot_requires_complete_snapshot(self):
+        with self.assertRaisesRegex(RuntimeError, 'Snapshot'):
+            self.environment.reboot()
+        self.assertFalse(self.calls)
+
+    def test_uncertain_reboot_restores_original_awake_state(self):
+        original = self.environment.snapshot().copy()
+        original_command = self.environment.command
+        def uncertain_reboot(*args):
+            if args == ('reboot',):
+                self.values['awake'] = 'Asleep'
+                raise RuntimeError('Injected uncertain reboot')
+            return original_command(*args)
+        self.environment.command = uncertain_reboot
+        with self.assertRaisesRegex(RuntimeError, 'uncertain'):
+            self.environment.reboot()
+        self.assertTrue(self.environment.changed)
+        self.assertTrue(self.environment.restore()['verified'])
+        self.assertEqual(original, self.environment.snapshot())
+        self.assertIn(('shell', 'input', 'keyevent', 'KEYCODE_WAKEUP'), self.calls)
+
     def test_failed_restore_continues_other_actions_and_retains_retry_snapshot(self):
         original = self.environment.snapshot().copy()
         self.environment.doze()

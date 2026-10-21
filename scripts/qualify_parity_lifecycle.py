@@ -193,7 +193,7 @@ def qualify(serial):
         check('verifyExpectedDeliveryAndReceipt')
         check('prepareNextCallWithoutWake')
         before_boot = command('shell', 'cat', '/proc/sys/kernel/random/boot_id')
-        command('reboot')
+        environment.reboot()
         # Offline ADB is expected during reboot; include connection recovery in the boot budget.
         boot_deadline = time.monotonic() + 180
         while time.monotonic() < boot_deadline:
