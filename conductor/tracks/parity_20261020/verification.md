@@ -650,3 +650,18 @@ read-only existing-effect checks, explicit READY approval/cancellation/withdrawa
 edited/deleted review/suppression/retention UI, final-source regression and complete
 P01–P10 review/fixes/archive. Earlier provider/worker/lifecycle/telephony receipts
 remain separately source-bound before this presentation-only fix.
+
+## Rendered import acceptance checkpoint
+
+The expanded import UI suite passes five native methods on the API36 recovery
+guest. Actual touches cover edited date boundaries, read-only preview, confirmation
+cancellation, cancellation while the keyboard remains visible, explicit import
+and duplicate-free repetition. A persisted 120-item import is stopped by the user
+at two saved items, reopened and explicitly resumed to120 saved/0 review; native
+readback shows123 events including the earlier three. Tagged fixtures, packages
+and emulator settings were cleaned/restored. See imports-ui-evidence.json for
+source/APK binding and ten PNG/tree pairs. The completed screenshot was inspected.
+
+The original native failure exposed keyboard-obscured controls; API30+ inset
+padding now includes the IME. This is separate from recovery UI acceptance, which
+remains pending, along with final-source regression and the P01–P10 full review.

@@ -722,3 +722,22 @@ P01–P10 review/fixes/archive. Earlier provider/worker/lifecycle/telephony rece
 remain separately source-bound before this presentation-only fix.
 
 - `1c4c76c`: native-red/green system-inset fix, rendered settings/permissions/filter/activation/pause/reopen/restoration acceptance, five native methods/19 screenshots/cleanup;108 JVM and67 host tests. Positive import/recovery journeys remain open.
+
+## Rendered import acceptance checkpoint
+
+The expanded import UI suite passes five native methods on the API36 recovery
+guest. Actual touches cover edited date boundaries, read-only preview, confirmation
+cancellation, cancellation while the keyboard remains visible, explicit import
+and duplicate-free repetition. A persisted 120-item import is stopped by the user
+at two saved items, reopened and explicitly resumed to120 saved/0 review; native
+readback shows123 events including the earlier three. Tagged fixtures, packages
+and emulator settings were cleaned/restored. See imports-ui-evidence.json for
+source/APK binding and ten PNG/tree pairs. The completed screenshot was inspected.
+
+The original native failure exposed keyboard-obscured controls; API30+ inset
+padding now includes the IME. This is separate from recovery UI acceptance, which
+remains pending, along with final-source regression and the P01–P10 full review.
+
+Visual review qualification: the completed import screenshot retains stale stop
+feedback. Import UI data/touch checks passed, but full UI acceptance remains open
+until that finding is fixed and rerun; see local-review.md.

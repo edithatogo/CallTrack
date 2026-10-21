@@ -29,12 +29,18 @@ final class RenderedUi {
         context = instrumentation.getTargetContext();
         automation = instrumentation.getUiAutomation();
         AccessibilityServiceInfo info = automation.getServiceInfo();
-        info.flags |= AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS;
+        info.flags |=
+                AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS
+                        | AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS;
         automation.setServiceInfo(info);
     }
 
     void await(BooleanSupplier condition, String message) {
-        long end = SystemClock.elapsedRealtime() + 20000;
+        await(condition, message, 20000);
+    }
+
+    void await(BooleanSupplier condition, String message, long timeoutMillis) {
+        long end = SystemClock.elapsedRealtime() + timeoutMillis;
         do {
             if (condition.getAsBoolean()) return;
             SystemClock.sleep(100);
@@ -54,7 +60,8 @@ final class RenderedUi {
                         : node.getText() == null ? null : node.getText().toString();
         if (node.isVisibleToUser()
                 && actual != null
-                && (id ? actual.endsWith(":id/" + value) : value.equals(actual))) return node;
+                && (id ? actual.endsWith(":id/" + value) : value.equalsIgnoreCase(actual)))
+            return node;
         for (int i = 0; i < node.getChildCount(); i++) {
             AccessibilityNodeInfo found = find(node.getChild(i), value, id);
             if (found != null) return found;
@@ -89,6 +96,33 @@ final class RenderedUi {
         return null;
     }
 
+    void setTextId(String id, String value) {
+        tapId(id);
+        AccessibilityNodeInfo node = shown(id, true);
+        assertNotNull(node);
+        android.os.Bundle text = new android.os.Bundle();
+        text.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, value);
+        assertTrue(node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, text));
+        await(
+                () -> find(id, true) != null && value.contentEquals(find(id, true).getText()),
+                "Edited text did not persist: " + id);
+    }
+
+    boolean keyboardVisible() {
+        for (android.view.accessibility.AccessibilityWindowInfo window : automation.getWindows())
+            if (window.getType()
+                    == android.view.accessibility.AccessibilityWindowInfo.TYPE_INPUT_METHOD)
+                return true;
+        return false;
+    }
+
+    void revealId(String id) {
+        await(() -> shown(id, true) != null, "Visible field missing: " + id);
+        AccessibilityNodeInfo node = shown(id, true);
+        node.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SHOW_ON_SCREEN.getId());
+        settle();
+    }
+
     void tapId(String id) {
         tap(id, true);
     }
@@ -97,7 +131,15 @@ final class RenderedUi {
         tap(text, false);
     }
 
+    void tapIdWhileBusy(String id) {
+        tap(id, true, false);
+    }
+
     private void tap(String value, boolean id) {
+        tap(value, id, true);
+    }
+
+    private void tap(String value, boolean id, boolean waitForIdle) {
         final AccessibilityNodeInfo[] found = new AccessibilityNodeInfo[1];
         await(
                 () -> {
@@ -105,7 +147,8 @@ final class RenderedUi {
                     return found[0] != null && found[0].isEnabled();
                 },
                 "Visible enabled control missing: " + value);
-        settle();
+        if (waitForIdle) settle();
+        else SystemClock.sleep(50); // A user can stop work while its progress keeps changing.
         found[0] = shown(value, id);
         assertNotNull("Control disappeared before touch", found[0]);
         String packageName = String.valueOf(found[0].getPackageName());

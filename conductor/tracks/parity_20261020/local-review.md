@@ -77,3 +77,14 @@ insets and readable icon appearance to the four Views screens. Native geometry
 checks across all four pass; settings interactions and reviewed screenshots pass.
 No dependency, storage or scheduling behavior changed. Legacy API26–29 and night
 appearance are compiled, not native-qualified here. See settings-ui-evidence.json.
+
+## Open rendered import feedback finding
+
+The expanded import suite passes its data/touch assertions, but visual inspection
+of import-resumed-complete.png shows the stale “The run stopped” feedback below
+Session complete/120 verified/0 review. HistoricalImportActivity.perform sets
+import_blocked when stopped is non-null and does not clear feedback after later
+success. Treat full positive import UI acceptance as incomplete until a native
+regression checks the final feedback, the stale message is cleared and the
+source-bound suite is rerun. This finding does not contradict the verified123
+events or fixture cleanup.
