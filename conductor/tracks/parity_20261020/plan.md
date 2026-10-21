@@ -569,3 +569,26 @@ restart may be needed to clear the stuck process. After it clears, revalidate th
 AVD/storage/guest before installing the exact verified APKs. Store/fault/provider/
 worker/lifecycle, protected call-end and positive UI acceptance plus final full-track
 review/archive remain open. Earlier disconnected-storage limits are historical.
+
+
+## No-host-restart recovery and native fault acceptance
+
+Created a fresh dedicated API36 Google APIs ARM64 AVD named
+calltrack-parity-api36-recovery-20261021 with independent writable storage. Original
+PID60763/AVD remain untouched; recovery uses supported console5582/ADB5583 ports.
+Initial5590 launch was stopped cleanly after help confirmed the supported range.
+First boot432461ms included active ART/graphics compilation; responsive console,
+qemu identity and sys.boot_completed=1 were verified before source-bound install.
+
+All39 native store/control/fault checks pass on the unchanged successful108-test
+Android build, including false/thrown activation cache mutations and thrown status
+commit/retry accounting. Both packages removed.55 host checks and Conductor link
+validation pass. Exact source/APK/native output/AVD/tool evidence is recorded in
+recovery-store-evidence.json; harness target support is a3267ce. The shared exact
+allowlist still refuses physical devices, unrelated AVDs and stale builds.
+
+The computer-restart blocker is bypassed, not falsely reported as cleared: the old
+process remains stuck. Broader provider/worker/lifecycle, protected telephony and
+positive rendered acceptance plus full review/archive remain open. A source-namespace
+commit-uncertainty candidate was noticed during read-only review; reproduce it with
+native preferences faults before deciding whether another fix is required.
