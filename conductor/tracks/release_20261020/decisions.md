@@ -132,3 +132,33 @@ This is local candidate preparation. Published dependency source JARs plus POMs
 are not a qualification of each upstream build system or binary-from-source
 reproduction. Final source-conveyance/channel access, signed-artifact binding,
 permanent identity and operational acceptance remain explicit release gates.
+
+
+## RD06 — Native minimum/intermediate acceptance and bounded test adapters (2026-10-22)
+
+Retain minSDK26, native Views and existing SQLite ledgers. Explicit Closeable
+interfaces repair Kotlin scoped use against older platform helpers without
+changing schemas, IDs, ownership or adding a persistence framework. Preserve larger
+existing control dimensions and enforce48dp minima alongside the current Views.
+Keep Compose/KMP adoption with their sequenced successor tracks.
+
+Use existing AndroidX instrumentation and public SDK/provider tools for the added
+matrix. API29 shell delegation cannot be assumed on Android8. Select a test-only
+userdebug provider seeder with explicit fixture privilege, token-scoped data,
+quoted arguments, bounded output and exact readback. App call-log write permission
+remains denied, verified by an actual round-trip. Fixture scripts are removed;
+ordinary ADB privilege is restored after testing. No privileged app dependency or
+new runtime library is adopted. Root recovery validates emulator identity/API and
+occurs only after observed boot recovery; foreign/modern targets are refused.
+
+The adapter is test-only tooling tied to this SDK/image contract. Reassess/retire
+it when the minimum rises to29 or a maintained test facility supplies the required
+legacy provisioning/readback without app permission expansion. Raising the product
+minimum, adding app write permission or adopting a new database/UI framework is
+not required to solve this demonstrated compatibility gap. Published SDK image
+licences were already accepted; no SDK redistribution/source conveyance is added.
+
+Separate host/JVM, actual provider/UI, remote and operational evidence. Refuse
+focused guest ANRs and reused per-run receipt paths. Retain failed probes and
+scoped cleanup readback. App changes require a new release freeze/reproduction;
+local emulator completion cannot close original M4 or physical/cloud/signing gates.

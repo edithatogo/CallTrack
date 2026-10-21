@@ -72,3 +72,14 @@ ownership and readiness; never reuse recorded process IDs or blindly remove data
    selected emulator acceptance are complete; this does not waive original gates.
 3. Continue successor Tracks14–20 in the [approved sequence](../../future-architecture.md).
    No prerequisite deferrals were invented; iOS remains last.
+
+
+## Minimum-platform follow-up — 2026-10-22
+
+Track5's [extended emulator matrix](../release_20261020/emulator-matrix-qualification-20261022.md)
+found and fixed an API26 Kotlin use/SQLiteOpenHelper interface mismatch at6f3381c.
+Both helpers explicitly implement Closeable; schemas, identities, receipts and
+existing Views remain. Selected API26/API33 native worker/UI/lifecycle/upgrade
+cases pass alongside115 JVM fixtures. Historical API36 receipts retain their
+original source binding. The current application fixes require release refreezing
+and independent reproduction; original M4-linked/full-M5 gates remain open.
