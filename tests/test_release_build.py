@@ -61,3 +61,18 @@ class RunnerSafetyTest(unittest.TestCase):
             self.assertFalse(receipt['success'])
             self.assertFalse(receipt['release_ready'])
             self.assertEqual('clone fault', receipt['error'])
+
+
+class UnsignedSignatureTest(unittest.TestCase):
+    def test_signed_or_unrelated_tool_failure_is_not_unsigned_evidence(self):
+        import subprocess
+        for code, output in ((0, 'Verified'), (1, 'Java runtime unavailable'), (1, 'DOES NOT VERIFY: digest mismatch')):
+            with patch.object(release.subprocess, 'run', return_value=subprocess.CompletedProcess([], code, output, '')):
+                with self.assertRaisesRegex(RuntimeError, 'signed or indeterminate'):
+                    release.verify_unsigned(Path('app.apk'), Path('sdk'), {})
+
+    def test_expected_missing_manifest_is_recorded(self):
+        import subprocess
+        result = subprocess.CompletedProcess([], 1, '', 'DOES NOT VERIFY\nERROR: Missing META-INF/MANIFEST.MF')
+        with patch.object(release.subprocess, 'run', return_value=result):
+            self.assertTrue(release.verify_unsigned(Path('app.apk'), Path('sdk'), {})['unsigned_verified'])

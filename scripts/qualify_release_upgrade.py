@@ -10,6 +10,7 @@ from pathlib import Path
 import re
 import subprocess
 import uuid
+import tempfile
 
 from parity_health import require_healthy_boot
 from parity_targets import is_dedicated_avd
@@ -111,6 +112,13 @@ def qualify(serial, output):
             raise RuntimeError('Development/instrumentation certificate mismatch')
         receipt.update(artifacts={str(p): sha(p) for p in (original, candidate, tests)},
                        signer_sha256=certs[0], versions=[10, 11], build_log_sha256=sha(output / 'build.log'))
+        # Building can take minutes: recheck ownership and guest health before mutation.
+        if adb('shell', 'getprop', 'ro.kernel.qemu') != '1' or not is_dedicated_avd(adb('emu', 'avd', 'name')):
+            raise RuntimeError('Dedicated emulator changed during build')
+        require_healthy_boot(adb)
+        for package in (PACKAGE, TEST_PACKAGE):
+            if 'package:' + package in adb('shell', 'pm', 'list', 'packages', package).splitlines():
+                raise RuntimeError('Refusing an installation created during build')
         for apk, package in ((original, PACKAGE), (tests, TEST_PACKAGE)):
             attempted.append(package)
             if 'Success' not in adb('install', str(apk)):
@@ -119,9 +127,37 @@ def qualify(serial, output):
         adb('shell', 'am', 'force-stop', PACKAGE)
         if 'Success' not in adb('install', '-r', str(candidate)):
             raise RuntimeError('Upgrade unconfirmed')
+        if not re.search(r'\bversionCode=11\b', adb('shell', 'dumpsys', 'package', PACKAGE)):
+            raise RuntimeError('Installed increasing version unverified')
         native('verifyPersistedState')
         adb('install', '-r', str(original), reject='INSTALL_FAILED_VERSION_DOWNGRADE')
         native('verifyPersistedState')
+        # A one-day disposable fixture certificate tests rejection, never production custody.
+        with tempfile.TemporaryDirectory(prefix='calltrack-test-key-', dir=output) as temporary:
+            fixture_key = Path(temporary) / 'fixture.keystore'
+            fixture_apk = Path(temporary) / 'wrong-certificate.apk'
+            fixture_env = dict(env, CALLTRACK_FIXTURE_PASSWORD='disposable-fixture-only')
+            subprocess.run([str(JDK / 'bin/keytool'), '-genkeypair', '-alias', 'fixture',
+                            '-dname', 'CN=Disposable Calltrack Test Only', '-keyalg', 'RSA',
+                            '-validity', '1', '-keystore', str(fixture_key),
+                            '-storepass:env', 'CALLTRACK_FIXTURE_PASSWORD',
+                            '-keypass:env', 'CALLTRACK_FIXTURE_PASSWORD'], env=fixture_env,
+                           capture_output=True, text=True, check=True)
+            subprocess.run([str(sdk / 'build-tools/35.0.0/apksigner'), 'sign',
+                            '--ks', str(fixture_key), '--ks-key-alias', 'fixture',
+                            '--ks-pass', 'env:CALLTRACK_FIXTURE_PASSWORD',
+                            '--key-pass', 'env:CALLTRACK_FIXTURE_PASSWORD',
+                            '--out', str(fixture_apk), str(candidate)], env=fixture_env,
+                           capture_output=True, text=True, check=True)
+            wrong_signature = subprocess.check_output([str(sdk / 'build-tools/35.0.0/apksigner'),
+                'verify', '--print-certs', str(fixture_apk)], env=env, text=True)
+            wrong_certs = re.findall(r'Signer #\d+ certificate SHA-256 digest: ([a-f0-9]{64})', wrong_signature)
+            if len(wrong_certs) != 1 or wrong_certs[0] == certs[0]:
+                raise RuntimeError('Different verified fixture signer required')
+            receipt['rejected_fixture_signer_sha256'] = wrong_certs[0]
+            adb('install', '-r', str(fixture_apk), reject='INSTALL_FAILED_UPDATE_INCOMPATIBLE')
+            native('verifyPersistedState')
+        receipt['disposable_fixture_key_removed'] = not Path(temporary).exists()
         receipt['result'] = 'passed'
     except Exception as error:
         receipt['error'] = str(error)

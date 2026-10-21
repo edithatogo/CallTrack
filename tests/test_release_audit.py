@@ -26,3 +26,11 @@ class AuditTest(unittest.TestCase):
         with zipfile.ZipFile(aar, 'w') as archive:
             archive.writestr('classes.jar', jar.getvalue())
         self.assertEqual([dict(path='classes.jar!/META-INF/LICENSE', sha256=audit.digest(b'notice'), size=6)], audit.embedded_notices(aar.getvalue()))
+
+    def test_module_metadata_binds_renamed_artifact_to_hash(self):
+        row = dict(coordinate='androidx.room:room-runtime-android:2.7.0', name='room-runtime-release.aar', sha256='a' * 64)
+        metadata = {'variants': [{'files': [dict(name=row['name'], sha256=row['sha256'], url='room-runtime-android-2.7.0.aar')]}]}
+        self.assertTrue(audit.module_artifact_url(row, metadata).endswith('/room-runtime-android-2.7.0.aar'))
+        metadata['variants'][0]['files'][0]['sha256'] = 'b' * 64
+        with self.assertRaisesRegex(ValueError, 'uniquely bind'):
+            audit.module_artifact_url(row, metadata)

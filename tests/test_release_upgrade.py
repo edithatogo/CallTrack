@@ -20,3 +20,9 @@ class UpgradeSafetyTest(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, 'controlled rejection'):
                 upgrade.require_rejection(subprocess.CompletedProcess([], code, '', error), 'INSTALL_FAILED_VERSION_DOWNGRADE')
         upgrade.require_rejection(subprocess.CompletedProcess([], 1, '', 'Failure [INSTALL_FAILED_VERSION_DOWNGRADE]'), 'INSTALL_FAILED_VERSION_DOWNGRADE')
+
+    def test_wrong_certificate_failure_is_distinct_from_downgrade(self):
+        result = subprocess.CompletedProcess([], 1, '', 'Failure [INSTALL_FAILED_UPDATE_INCOMPATIBLE]')
+        upgrade.require_rejection(result, 'INSTALL_FAILED_UPDATE_INCOMPATIBLE')
+        with self.assertRaises(RuntimeError):
+            upgrade.require_rejection(result, 'INSTALL_FAILED_VERSION_DOWNGRADE')
