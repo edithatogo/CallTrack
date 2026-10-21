@@ -183,7 +183,12 @@ final class RenderedUi {
         AccessibilityNodeInfo root = automation.getRootInActiveWindow();
         if (root == null
                 || root.getPackageName() == null
-                || !root.getPackageName().toString().contains("permissioncontroller")) return null;
+                || !(root.getPackageName().toString().contains("permissioncontroller")
+                        || root.getPackageName()
+                                .toString()
+                                .equals("com.google.android.packageinstaller")
+                        || root.getPackageName().toString().equals("com.android.packageinstaller")))
+            return null;
         AccessibilityNodeInfo message = find("permission_message", true);
         return message == null || message.getText() == null ? "" : message.getText().toString();
     }

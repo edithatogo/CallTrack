@@ -59,6 +59,15 @@ class UiSafety(unittest.TestCase):
         with patch.object(device, 'ROOT', self.root), patch.object(device, 'inputs', return_value={}), patch.object(device.subprocess, 'check_output', side_effect=identities), patch.object(device.subprocess, 'run', side_effect=self.command), patch.object(device, 'EmulatorEnvironment', return_value=environment):
             return device.qualify('emulator-5582', suite)
 
+    def test_accessibility_suite_retains_screenshots_and_cleanup(self):
+        self.assertEqual(0, self.run_fixture('accessibility'))
+        calls = ' '.join(' '.join(args) for args in self.calls)
+        self.assertIn('renderedAccessibilityLabelsTargetsAndKeyboardFocus', calls)
+        self.assertIn('cleanupFixture', calls)
+        receipt = json.loads((self.root / '.local/slice-evidence/parity-ui-accessibility-receipt.json').read_text())
+        self.assertTrue(receipt['packages_removed'])
+        self.assertTrue(receipt['fixture_cleanup_verified'])
+
     def test_physical_target_refused_before_tools(self):
         with patch.object(device.subprocess, 'run') as run:
             with self.assertRaisesRegex(RuntimeError, 'physical-device'):
