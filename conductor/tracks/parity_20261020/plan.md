@@ -838,3 +838,13 @@ lifecycle-reboot-observation-evidence.json and lifecycle-reboot-recovery-evidenc
 Removed the premature45s connection gate: expected offline observations now use
 the existing180s boot loop. Added pre-cleanup exit-info/meminfo for unexplained
 process exits.71 host tests pass. Full current-source acceptance remains pending.
+
+## Frozen-build closure audit in progress
+
+closure-audit.md maps every P01–P10 clause to implementation, tests and remaining
+proof. Current-source static review covers delivery/source/import/persistence,
+policy/status, manifest, screen callbacks and CI/tooling boundaries. No additional
+confirmed production issue in these inspected paths. Matrix session70804 remains
+authoritative for runtime progress; final receipt inspection and complete review/
+handoff/archive are still open. No plan completion checkbox is inferred from
+this interim review.

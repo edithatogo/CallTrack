@@ -9,3 +9,5 @@
 - [Decisions](decisions.md)
 - [Verification in progress](verification.md)
 - [Foundation evidence](foundation-evidence.json)
+
+- [Closure audit in progress](closure-audit.md)
