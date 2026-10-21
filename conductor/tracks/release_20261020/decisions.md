@@ -71,3 +71,32 @@ configurations. Track4 dependency changes make a speculative lock snapshot costl
 No lock, verification metadata or new plugin is introduced here; candidate promotion
 requires them or an explicit reviewed equivalent with all resolved artifacts pinned
 and verified. Preserve recovery copies of approved dependency evidence.
+
+## RD04 — Audited strict verification as the local pinning equivalent (2026-10-21)
+
+Retain Gradle's native verification rather than add an SBOM/licence/runtime plugin
+or a second dependency resolver. Initial generated XML was a prototype: compare
+all entries with fresh official repository files and the completed canonical
+binary audit before promotion.736 artifact/POM/module entries pass; ordinary
+builds now enforce them. Metadata verification remains enabled, signatures are
+not asserted, and no broad trusted-artifact exception is configured. Real wrong
+AGP checksum and missing-entry failures prove rejection in an isolated checkout.
+
+This is the reviewed equivalent to speculative per-configuration lockfiles for
+the qualified scopes: allowed component versions, artifacts and repository metadata
+are immutable without an explicit policy update. It does not claim a universal
+graph lock, vulnerability scan, independent publisher signature or unobserved
+platform coverage. Native Gradle8.13 interfaces are actually exercised; no new
+production dependency is added. Future new tasks/platform classifiers require
+source/licence refresh, origin checks, strict build and native acceptance where
+material. Do not disable verification as recovery; preserve the failed receipt
+and resolve the exact missing/changed input.
+
+Selected macOS build scopes pass; a canonical Linux aapt2 download prepares CI
+without claiming its execution. The duplicate prototype XML is retired; one
+canonical root policy remains. Current app source/native Views/SQLite schemas and
+versions remain unchanged. Publication, permanent signing and original M4 gates
+remain separate. Archive-based tool evidence is read-only; global tools and licence
+acceptances are not changed. The JDK payload comparison reproduces Homebrew
+relocation/signature allocation and records its remaining bundle resource-seal
+failure rather than silently claiming full resource-signature validity.

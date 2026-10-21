@@ -81,3 +81,12 @@ Device mode accepts only the dedicated emulator; it installs a separate no-data
 fixture app and verifies cleanup. It is not a way to try Compose against personal
 calls/calendars. Production UI adoption remains a separate behavioural/accessibility
 gate; research archive status must not be read as a migrated working screen.
+
+## Dependency trust changes
+
+Ordinary builds enforce `gradle/verification-metadata.xml`, including repository
+metadata. Unknown or altered entries fail closed. See the
+[qualified trust procedure](qualification/release/trust/README.md) before changing
+dependencies or regenerating checksums. A cache-generated checksum is not approval.
+The current evidence covers selected macOS scopes; hosted/Linux execution remains
+an independent qualification gate.

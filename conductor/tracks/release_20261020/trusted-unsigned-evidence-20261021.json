@@ -1,0 +1,72 @@
+{
+  "scope": "unsigned-same-host-development-identity",
+  "candidate_revision": "5578bf56c7a664947324d45d4dcc8c3dd3d08c87",
+  "policy_sha256": "ae3bf77c222e937c7a5d3b76b2e569cdcbc0e8b02e1a72878361370e62a1e4f0",
+  "builds": [
+    {
+      "apk_sha256": "b5ba573be2d79e0b4edd9a1c858ac578347f972ddb3e12704185543d7a47a283",
+      "jvm": {
+        "tests": 115,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "lint": {
+        "Hint": 2,
+        "Warning": 69,
+        "Error": 0,
+        "Fatal": 0
+      },
+      "signature": {
+        "exit_code": 1,
+        "output": "DOES NOT VERIFY\nERROR: Missing META-INF/MANIFEST.MF\n",
+        "unsigned_verified": true
+      },
+      "log_sha256": "376763e4415a1c0f9baf0f0f0a1f502101c74b575121f578073565a31ec58876"
+    },
+    {
+      "apk_sha256": "b5ba573be2d79e0b4edd9a1c858ac578347f972ddb3e12704185543d7a47a283",
+      "jvm": {
+        "tests": 115,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "lint": {
+        "Hint": 2,
+        "Warning": 69,
+        "Error": 0,
+        "Fatal": 0
+      },
+      "signature": {
+        "exit_code": 1,
+        "output": "DOES NOT VERIFY\nERROR: Missing META-INF/MANIFEST.MF\n",
+        "unsigned_verified": true
+      },
+      "log_sha256": "cb1248186495437640c6186d8829fac8f3a4f50031e41d327c1af0c2727eb7fc"
+    }
+  ],
+  "comparison": {
+    "sha256": [
+      "b5ba573be2d79e0b4edd9a1c858ac578347f972ddb3e12704185543d7a47a283",
+      "b5ba573be2d79e0b4edd9a1c858ac578347f972ddb3e12704185543d7a47a283"
+    ],
+    "identical": true
+  },
+  "elapsed_seconds": 379.5,
+  "receipt_sha256": "311f1c7da10476663e911e5a54e02bbeadc4e52442d1d4f820a956e606b94a44",
+  "source_archive_sha256": "ca76d14a8efbbcb7ae9a435bb2632b0ab7c991c9451b6eef18743a04b8251151",
+  "comparison_with_previous_candidate": {
+    "compared_to": "787ae35",
+    "changed_entries": [
+      "META-INF/version-control-info.textproto"
+    ],
+    "runtime_zip_payloads_unchanged": true,
+    "exception": "Expected exact Git revision metadata; retained in APK, never stripped"
+  },
+  "independent_environment_reproduction": false,
+  "shared_dependency_cache": true,
+  "production_signed": false,
+  "release_ready": false,
+  "success": true
+}

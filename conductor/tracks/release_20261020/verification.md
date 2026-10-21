@@ -1,6 +1,22 @@
 # Verification and readiness boundary
 
-## Current local continuation — 2026-10-21
+## Current trust and schema/provider continuation — 2026-10-21
+
+See [current qualification](licence-tool-upgrade-qualification-20261021.md) and
+[current review](review-licence-tool-upgrade-20261021.md). Native fixture scope
+passes15 invocations with provider/package/key cleanup; source-pinned ledger1–5→6
+and import1→2 are qualified on the dedicated emulator.736 independently compared
+binary/POM/module trust entries now fail closed in ordinary builds, with actual
+wrong/missing-entry negative tests.239 unique artifact binaries match repositories.
+The toolchain's payload-origin checks pass with an explicit unqualified JDK bundle
+resource seal.121 host tests and current document verification pass.
+
+Two fresh clean5578bf5 unsigned builds match,115 JVM tests each,zero lint errors,
+69 warnings/two hints. Production signing, independent/hosted reproduction, complete
+source/asset conveyance, supported real release baselines, physical/cloud and
+operational acceptance remain pending. No full-M4/archive claim follows.
+
+## Earlier local continuation — 2026-10-21
 
 See [local qualification handoff](local-qualification-20261021.md),
 [repository audit](canonical-runtime-audit-20261021.json),

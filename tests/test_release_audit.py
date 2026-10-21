@@ -68,3 +68,25 @@ class AuditTest(unittest.TestCase):
             archive.writestr('META-INF/NOTICE.txt', 'real notice')
         rows = audit.embedded_notices(data.getvalue())
         self.assertEqual(['META-INF/NOTICE.txt'], [r['path'] for r in rows])
+
+    def test_recursive_classes_jars_do_not_expand_without_a_depth_bound(self):
+        data = io.BytesIO()
+        with zipfile.ZipFile(data, 'w') as archive:
+            archive.writestr('LICENSE', 'text')
+        for _ in range(2):
+            nested = io.BytesIO()
+            with zipfile.ZipFile(nested, 'w') as archive:
+                archive.writestr('classes.jar', data.getvalue())
+            data = nested
+        with self.assertRaisesRegex(ValueError, 'nested classes.jar'):
+            audit.embedded_notices(data.getvalue())
+
+    def test_insecure_origin_and_redirect_are_rejected(self):
+        with patch.object(audit.urllib.request, 'urlopen') as request:
+            with self.assertRaisesRegex(ValueError, 'HTTPS'):
+                audit.read_publication('http://example.test/artifact')
+            request.assert_not_called()
+        response = io.BytesIO(b'untrusted redirect'); response.url = 'http://example.test/artifact'
+        with patch.object(audit.urllib.request, 'urlopen', return_value=response):
+            with self.assertRaisesRegex(ValueError, 'Insecure'):
+                audit.read_publication('https://example.test/artifact')

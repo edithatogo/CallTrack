@@ -19,6 +19,18 @@ import zipfile
 LIMIT = 64 * 1024 * 1024
 
 
+def read_publication(url):
+    if not url.startswith('https://'):
+        raise ValueError('HTTPS publication required')
+    with urllib.request.urlopen(url, timeout=60) as response:
+        if not getattr(response, 'url', url).startswith('https://'):
+            raise ValueError('Insecure publication redirect')
+        data = response.read(LIMIT + 1)
+    if len(data) > LIMIT:
+        raise ValueError('Oversized publication')
+    return data
+
+
 def digest(data):
     return hashlib.sha256(data).hexdigest()
 
@@ -70,17 +82,18 @@ def inherited_licences(data, evidence, depth=0):
     url = repository_url(dict(coordinate=coordinate, name='unused'), pom=True)
     if any(item['url'] == url for item in evidence):
         raise ValueError('Cyclic POM parent chain')
-    with urllib.request.urlopen(url, timeout=60) as response:
-        parent_data = response.read(LIMIT + 1)
-    if len(parent_data) > LIMIT:
-        raise ValueError('Oversized parent POM')
+    parent_data = read_publication(url)
     evidence.append(dict(url=url, sha256=digest(parent_data)))
     return inherited_licences(parent_data, evidence, depth + 1)
 
 
-def embedded_notices(data):
+def embedded_notices(data, depth=0):
+    if depth > 1:
+        raise ValueError('Unexpected nested classes.jar depth')
     rows = []
     with zipfile.ZipFile(io.BytesIO(data)) as archive:
+        if len(archive.infolist()) > 100000 or sum(m.file_size for m in archive.infolist()) > 512 * 1024 * 1024:
+            raise ValueError('Archive exceeds audit expansion bounds')
         for member in archive.infolist():
             if member.file_size > LIMIT:
                 raise ValueError('Archive member exceeds audit limit')
@@ -88,7 +101,7 @@ def embedded_notices(data):
             if not member.is_dir() and re.fullmatch(r'(?:licen[sc]e|notice|copying|dependencies)(?:[._-].*)?', lower.rsplit('/', 1)[-1]) and not lower.endswith(('.class', '.java')):
                 rows.append(dict(path=member.filename, sha256=digest(archive.read(member)), size=member.file_size))
             elif member.filename == 'classes.jar':
-                rows.extend(dict(item, path='classes.jar!/' + item['path']) for item in embedded_notices(archive.read(member)))
+                rows.extend(dict(item, path='classes.jar!/' + item['path']) for item in embedded_notices(archive.read(member), depth + 1))
     return rows
 
 
@@ -106,21 +119,14 @@ def audit(inventory, output):
             group, module, version = row['coordinate'].split(':')
             if not row['name'].startswith(module + '-' + version):
                 module_url = repository_url(row, pom=True)[:-4] + '.module'
-                with urllib.request.urlopen(module_url, timeout=60) as response:
-                    metadata = response.read(LIMIT + 1)
-                if len(metadata) > LIMIT:
-                    raise ValueError('Oversized module metadata')
+                metadata = read_publication(module_url)
                 (output / (str(number) + '-module')).write_bytes(metadata)
                 result['module_url'] = module_url
                 result['module_sha256'] = digest(metadata)
                 artifact_url = module_artifact_url(row, json.loads(metadata))
             for kind in ('artifact', 'pom'):
                 url = artifact_url if kind == 'artifact' else repository_url(row, pom=True)
-                with urllib.request.urlopen(url, timeout=60) as response:
-                    data = response.read(LIMIT + 1)
-                    final_url = response.url
-                if len(data) > LIMIT or not final_url.startswith('https://'):
-                    raise ValueError('Oversized response or insecure redirect')
+                data = read_publication(url)
                 (output / (str(number) + '-' + kind)).write_bytes(data)
                 result[kind + '_url'] = url
                 result[kind + '_sha256'] = digest(data)

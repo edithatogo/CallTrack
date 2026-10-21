@@ -1,4 +1,7 @@
-# Track5 local release qualification — 2026-10-21
+# Track5 earlier local release checkpoint — 2026-10-21
+
+Superseded for current trust/schema/provider scope by the
+[latest qualification](licence-tool-upgrade-qualification-20261021.md); retained as history.
 
 Full M4 is incomplete. The selected development identity and unsigned production
 configuration remain unchanged. Local preparation is not production approval.
