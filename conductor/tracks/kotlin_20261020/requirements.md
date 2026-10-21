@@ -20,7 +20,7 @@ public distribution, signing or user-consent surface is implied.
 
 K01–K05 pilot evidence remains historical. K06 active conversion/removal is
 implemented:36 Kotlin files plus one justified nullable-label Java bridge. K03/K06
-private-state preserving update and selected native suites pass after dependency
-review; final lifecycle/telephony/settings/recovery acceptance remains blocked by
-guest startup ANRs/provider availability. K07 still requires original release/supported operational evidence; code
+private-state preserving update and the full selected native matrix pass after
+dependency review and emulator recovery (115 JVM/92 host tests;89 successful native
+invocations plus one expected termination). K07 still requires original release/supported operational evidence; code
 conversion alone does not close M5. See the approved future implementation sequence.

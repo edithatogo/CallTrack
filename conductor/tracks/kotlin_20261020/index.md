@@ -15,6 +15,10 @@
 
 - [Active migration handoff](active-migration-handoff.md)
 - [Active migration evidence](active-migration-evidence.json)
-- [Active migration review](review-active-migration-20261021.md)
+- [Initial migration review](review-active-migration-20261021.md)
 - [Legacy removal audit](legacy-removal-audit.json)
 - [Current runtime inventory](runtime-artifacts-20261021.json)
+
+- [Emulator recovery and launch runbook](emulator-recovery-20261021.md)
+- [Emulator recovery review (current)](review-emulator-recovery-20261021.md)
+- [Initial partial acceptance evidence](partial-migration-evidence-20261021.json)

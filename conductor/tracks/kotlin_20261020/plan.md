@@ -74,10 +74,22 @@ Original M4/full-M5 operational acceptance remains gated.
 - [x] Task: Refresh47 Java-file inventory (33 active/14 inherited) and preserve pre-conversion baseline/APKs — c7c3d91, migration-inventory-20261021.json.
 - [x] Task: Convert stable models/policy, then orchestration, adapters/stores, scheduling and Views Activities in verified batches — e7126a2 through f467a4d;36 production Kotlin files, one Java nullable-label bridge.
 - [x] Task: Audit manifest/resource/reflection reachability; remove only proven obsolete code/dependencies, record remaining exceptions — b30540d, legacy-removal-audit.json; three consumed transitive versions retained by review constraints.
-- [~] Task: Verify source-bound mixed-language/Java interop, in-place update and final full native matrix; retire stale javac fallback —115 JVM contracts pass; five native suites plus import UI/private update pass; full lifecycle retry fails on guest startup ANRs/phone service; remaining native acceptance pending.
-- [x] Task: Review/fix and hand off preserving remaining M4/operational gates —51c43f0/cae25f9, review-active-migration-20261021.md and active-migration-handoff.md; native acceptance remains blocked, no archive.
+- [x] Task: Verify source-bound mixed-language/Java interop, in-place update and final full native matrix; retire stale javac fallback —115 JVM/92 host tests;89 successful native invocations plus one expected termination; private replacement two tests;826ccaf and active-migration-evidence.json. Original production/operational gates remain open.
+- [x] Task: Review/fix and hand off preserving remaining M4/operational gates —51c43f0/cae25f9, review-active-migration-20261021.md and active-migration-handoff.md; initial native blocker subsequently resolved by826ccaf and the recovery resumption below; original full gates still prevent archive.
 
 Current continuation handoff: active-migration-handoff.md and active-migration-evidence.json.
-Code conversion/removal is implemented; full final native matrix and original
-M4/full-M5 remain open. Do not restart the completed conversion or call the whole
+Code conversion/removal is implemented; the original M4/full-M5 gates remain open. The final selected native matrix is now accepted. Do not restart the completed conversion or call the whole
 roadmap complete.
+
+## Emulator recovery and remaining acceptance — resumed2026-10-21
+
+User authorised diagnosis/repair without restarting the computer, remaining native
+acceptance, review and fixes. App source/APKs stay frozen unless an app defect is
+established. Preserve failed evidence and guest/user-data boundaries.
+
+- [x] Task: Diagnose guest startup ANRs, phone/provider availability and emulator infrastructure; preserve diagnostics before cleanup.
+- [x] Task: Apply and verify the smallest emulator/tooling repair, retaining a reproducible qualified launch recipe.
+- [x] Task: Run full lifecycle, telephony, settings and recovery acceptance with exact source/APK readback and cleanup.
+- [x] Task: Review/fix recovery tooling and evidence; update handoff without waiving original M4/full-M5 gates.
+
+Recovery fix826ccaf; emulator-recovery-20261021.md, review-emulator-recovery-20261021.md and current active-migration-evidence.json record acceptance and residual gates. No computer restart or app-source change.

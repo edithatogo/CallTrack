@@ -155,8 +155,8 @@ or dependency is promoted by this acceptance.
 
 R14/R26 active conversion is implemented with36 Kotlin files, one nullable-label
 Java bridge and documented inherited-code removal. [Current evidence](tracks/kotlin_20261020/active-migration-evidence.json)
-qualifies115 JVM/89 host tests, selected native suites and private-state replacement;
-full native lifecycle/telephony/settings/recovery and original release/operational
-acceptance remain pending. R13/R27 now have [current unsigned candidate evidence](tracks/release_20261020/unsigned-kotlin-evidence-20261021.json),
+qualifies115 JVM/92 host tests, the full selected native matrix (89 successful
+invocations plus one expected termination) and private-state replacement. Original
+release/operational acceptance remains pending. R13/R27 now have [current unsigned candidate evidence](tracks/release_20261020/unsigned-kotlin-evidence-20261021.json),
 not a production release. Future capabilities remain implementation successors
 in the approved iOS-last sequence, with no invented prerequisite deferrals.

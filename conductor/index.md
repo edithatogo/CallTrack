@@ -38,8 +38,9 @@ binding; fixtures/packages are removed and original environment restored.
 source-matched candidate, upgrade, signing/distribution and operational gates.
 [Track6 Kotlin migration](tracks/kotlin_20261020/index.md) now has36 production Kotlin files and one documented Java nullable-label
 bridge after33 active conversions and14 unreachable inherited-file removals.
-Code review/fixes are recorded; final native acceptance is blocked by guest startup
-ANRs/provider availability. See the [current handoff](tracks/kotlin_20261020/active-migration-handoff.md).
+Code review/fixes and emulator recovery are recorded; the final selected API36
+matrix passes89 successful native invocations plus one expected termination, with
+115 JVM/92 host tests and verified cleanup. See the [current handoff](tracks/kotlin_20261020/active-migration-handoff.md).
 M4-linked full acceptance remains open. Native providers/Views/SQLite remain selected. Research Tracks7–13 do not
 adopt production Compose/KMP/shared UI/direct cloud connectors/Rust or establish
 second-platform runtime parity.

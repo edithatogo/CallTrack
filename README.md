@@ -96,7 +96,10 @@ Views until real screen behaviour and manual accessibility are qualified.
 
 ## Parity acceptance and recovery
 
-Current evidence and remaining boundaries are in the [Track4 handoff](conductor/archive/parity_20261020/handoff.md).
+Historical parity evidence is in the [Track4 handoff](conductor/archive/parity_20261020/handoff.md).
+The [current Kotlin handoff](conductor/tracks/kotlin_20261020/active-migration-handoff.md)
+and [qualified recovery recipe](conductor/tracks/kotlin_20261020/emulator-recovery-20261021.md)
+record the new guest and current acceptance.
 The parity harnesses require a disposable dedicated emulator, matching current
 build/APK receipts and absent development packages. They refuse physical targets
 and unrelated AVD names. Review the explicit target allowlist in
@@ -112,7 +115,8 @@ On uncertain cleanup retain instrumentation and the original fixture token.
 Computer restart is not an unblock option.
 
 Current Kotlin continuation: [implementation and acceptance handoff](conductor/tracks/kotlin_20261020/active-migration-handoff.md).
-115 JVM/89 host tests and selected native suites pass; guest startup ANRs/phone
-service availability block the full final emulator matrix. Two clean same-host
-unsigned release builds match. This is not production release or completion of
+115 JVM/92 host tests and the full selected emulator matrix pass (89 successful
+native invocations plus one expected termination). Emulator recovery used a fresh
+dedicated guest and scoped helper cleanup without restarting the computer. Two clean
+same-host unsigned release builds match. This is not production release or completion of
 the Compose/KMP/macOS/Rust/iOS roadmap.
