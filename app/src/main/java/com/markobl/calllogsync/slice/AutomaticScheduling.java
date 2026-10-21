@@ -20,22 +20,20 @@ public final class AutomaticScheduling {
             boolean incoming,
             boolean outgoing,
             boolean missed) {
-        ActivationControl.Settings settings =
-                new ActivationControl(new AndroidActivationStore(context))
-                        .activate(
-                                calendar,
-                                timezone,
-                                System.currentTimeMillis(),
-                                incoming,
-                                outgoing,
-                                missed);
-        schedule(context, settings);
-        return settings;
+        return control(context)
+                .activate(
+                        calendar, timezone, System.currentTimeMillis(), incoming, outgoing, missed);
     }
 
     public static void pause(Context context) {
-        new ActivationControl(new AndroidActivationStore(context)).pause();
-        WorkManager.getInstance(context).cancelAllWorkByTag(TAG);
+        control(context).pause();
+    }
+
+    private static AutomaticScheduleControl control(Context context) {
+        return new AutomaticScheduleControl(
+                new ActivationControl(new AndroidActivationStore(context)),
+                settings -> schedule(context, settings),
+                () -> WorkManager.getInstance(context).cancelAllWorkByTag(TAG));
     }
 
     public static void reconcile(Context context) {
@@ -43,11 +41,7 @@ public final class AutomaticScheduling {
     }
 
     private static java.util.concurrent.Future<?>[] requests(Context context) {
-        ActivationControl.Settings settings =
-                new ActivationControl(new AndroidActivationStore(context)).current();
-        return settings != null && settings.enabled
-                ? schedule(context, settings)
-                : new java.util.concurrent.Future<?>[0];
+        return control(context).reconcile();
     }
 
     static void reconcileCommitted(Context context, long deadlineNanos)

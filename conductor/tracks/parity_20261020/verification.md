@@ -452,3 +452,25 @@ are included in lifecycle-evidence.json alongside the11 lifecycle checks and the
 expected process termination. All97 JVM/50 host tests pass; lint0 errors/32 warnings/
 5 hints. No fixture packages or changed emulator settings remain. Full Track4 review
 and archive are not complete while the explicit remaining gates above are open.
+
+
+## Local activation fault and scheduling review checkpoint
+
+Two local review findings are fixed: thrown activation commit uncertainty now blocks
+reads/writes process-wide, and policy publication plus scheduling/cancellation
+requests share DELIVERY_LOCK to prevent stale ordering across callers. Four guard
+and three coordination contracts pass; the old policies fail one and two behavioural
+regressions respectively.103 pure JVM tests and53 host tests pass. See
+[local review](local-review.md) and local-fault-evidence.json for exact scope, sources
+and red/green results. No schema/dependency/permission changes.
+
+Three native fault methods are prepared and added to the39-method store harness:
+false/thrown activation commits after actual cache mutation and thrown status commit
+followed by successful retry. Android adapters/new instrumentation are not compiled
+or run. The JVM fallback excludes SchedulingCommitTest, uses retained Kotlin classes
+with unchanged source hashes, and is not full Gradle/lint/APK/native qualification.
+
+Android build, native counter/fault/worker/lifecycle regression, protected call-end
+wake, positive rendered UI and final full-track acceptance/review/archive remain
+pending. User directed local work while PortableSSD is disconnected; no further
+hardware permission is requested. Resume sequence is in local-review.md.
