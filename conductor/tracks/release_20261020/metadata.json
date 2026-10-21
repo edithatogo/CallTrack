@@ -4,13 +4,14 @@
   "status": "in_progress",
   "milestone": "M4",
   "created_at": "2026-10-20",
-  "updated_at": "2026-10-20",
+  "updated_at": "2026-10-21",
   "depends_on": [
     "parity_20261020"
   ],
   "requirements": "R13, R27",
-  "implementation_status": "community-preparation-reviewed-release-acceptance-pending",
+  "implementation_status": "unsigned-development-artifacts-qualified-production-gates-pending",
   "release_ready": false,
-  "implementation_commit": "4754d72",
-  "review_commit": "7a7d180"
+  "implementation_commit": "6b353f4",
+  "review_commit": "66593c3",
+  "review_status": "passed-with-fixes-for-unsigned-scope"
 }
