@@ -12,7 +12,7 @@
   "implementation_status": "final-local-unsigned-candidate-and-fresh-install-baseline-qualified-production-gates-pending",
   "release_ready": false,
   "implementation_commit": "6b353f4",
-  "review_commit": "fa7b944898fa619481dd1512e7cd459bb46df42c",
+  "review_commit": "76c5f64bd02365c3b14c03d823364d06943b6341",
   "review_status": "passed-with-fixes-for-final-local-first-release-candidate",
   "unsigned_candidate_revision": "15998ba887e76ea223a6a8ba3430dd640330ed99",
   "unsigned_kotlin_candidate_qualified": true,
@@ -93,5 +93,6 @@
   "final_candidate_production_app_inputs_match_extended_matrix": true,
   "production_upgrade_requirement": "No issued predecessor before first release; retain first issued signed artifact and qualify actual first-to-second upgrade before second release",
   "prior_linux_reproduction_evidence": "linux-reproduction-evidence-20261022.json",
-  "final_local_candidate_implementation_commit": "15998ba887e76ea223a6a8ba3430dd640330ed99"
+  "final_local_candidate_implementation_commit": "15998ba887e76ea223a6a8ba3430dd640330ed99",
+  "prior_extended_emulator_review_commit": "fa7b944898fa619481dd1512e7cd459bb46df42c"
 }
