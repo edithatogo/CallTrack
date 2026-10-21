@@ -111,6 +111,9 @@ def qualify(serial, suite="settings", receipt_dir=None):
         if 'package:' + package in command('shell', 'pm', 'list', 'packages', package).splitlines():
             raise RuntimeError('Refusing to replace existing package ' + package)
     try:
+        window = command('shell', 'dumpsys', 'window')
+        if re.search(r'mCurrentFocus=.*Application Not Responding:', window):
+            raise RuntimeError('Dedicated emulator has an ANR; repair guest before rendered acceptance')
         environment = EmulatorEnvironment(command)
         receipt['emulator_original'] = environment.snapshot().copy()
         environment.changed = True
