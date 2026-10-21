@@ -51,13 +51,25 @@ class UiSafety(unittest.TestCase):
             output = b'\x89PNG\r\n\x1a\n' + b'0' * 100 if args[-1].endswith('.png') else b'visible fixture controls'
         return subprocess.CompletedProcess(command, 0, output, b'' if isinstance(output, bytes) else '')
 
-    def run_fixture(self, suite="settings"):
+    def run_fixture(self, suite="settings", receipt_dir=None):
         identities = ["package: name='" + p + "'" for p in (device.PACKAGE, device.TEST_PACKAGE)]
         environment = Mock()
         environment.snapshot.return_value = {'awake': 'Awake'}
         environment.restore.return_value = {'verified': True}
         with patch.object(device, 'ROOT', self.root), patch.object(device, 'inputs', return_value={}), patch.object(device.subprocess, 'check_output', side_effect=identities), patch.object(device.subprocess, 'run', side_effect=self.command), patch.object(device, 'EmulatorEnvironment', return_value=environment):
-            return device.qualify('emulator-5582', suite)
+            return device.qualify('emulator-5582', suite, receipt_dir)
+
+    def test_matrix_receipt_isolated_and_cannot_overwrite_a_prior_run(self):
+        output = self.root / 'matrix' / 'first'
+        self.assertEqual(0, self.run_fixture('accessibility', output))
+        receipt = output / 'parity-ui-accessibility-receipt.json'
+        original = receipt.read_bytes()
+        self.assertFalse((self.root / '.local/slice-evidence/parity-ui-accessibility-receipt.json').exists())
+        self.calls.clear()
+        with self.assertRaises(FileExistsError):
+            self.run_fixture('accessibility', output)
+        self.assertFalse(self.calls)
+        self.assertEqual(original, receipt.read_bytes())
 
     def test_accessibility_suite_retains_screenshots_and_cleanup(self):
         self.assertEqual(0, self.run_fixture('accessibility'))
