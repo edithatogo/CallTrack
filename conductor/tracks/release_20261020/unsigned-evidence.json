@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-21",
+  "revision": "6b353f40858a38e53cc1a1cc8a71feb95af77f55",
+  "scope": "unsigned development artifact qualification only",
+  "user_decision": "Retain development identity; production signing pending",
+  "application_id": "org.calltrack.community.dev",
+  "version_code": 10,
+  "version_name": "0.1.0-dev",
+  "apk_sha256": "c8b0c01926ace1916f251b0b739ace25ae70bb15d91de001c19f8225c2a13508",
+  "two_clean_checkouts_identical": true,
+  "independent_environment_reproduction": false,
+  "shared_host_and_dependency_cache": true,
+  "signed": false,
+  "release_ready": false,
+  "native_release_acceptance_run": false,
+  "suites": [
+    {
+      "checkout": 1,
+      "jvm": {
+        "tests": 110,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "lint": {
+        "Hint": 5,
+        "Warning": 32
+      }
+    },
+    {
+      "checkout": 2,
+      "jvm": {
+        "tests": 110,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "lint": {
+        "Hint": 5,
+        "Warning": 32
+      }
+    }
+  ],
+  "host_tests": 78,
+  "implementation_commit": "6b353f4",
+  "review_fixes_commit": "66593c3",
+  "raw_evidence": {
+    ".local/release-evidence/unsigned-20261021/receipt.json": "f28246d5c7dc5b5b2cbd378494129a79f63fef5e34f7278cc4f95e0039fdc5b0",
+    ".local/release-evidence/unsigned-20261021/toolchain.json": "809a8f3e2dbc765ac05855a8419dc5379cd3c34895a56756abe5c6336f4b8f24",
+    ".local/release-evidence/unsigned-20261021/build-1.log": "ecbbcb7c971654f9b1cc5af5c198952392687c3dad42bf5481aa0da77ea5bb9e",
+    ".local/release-evidence/unsigned-20261021/build-2.log": "445751e192cbf31483526f154d4c1c90e973ed094efb1876367e78e1d54b6981",
+    ".local/release-evidence/unsigned-20261021/signature-inspection-1.log": "1413af210d1627fde4f14e31934eb5d9d031684e4f7a5c3371a74b3bdeb8764c",
+    ".local/release-evidence/unsigned-20261021/runtime-artifacts.json": "0a57a33b31297ae46ee71867f179290622a8d675664dd8402e497949791ec7b3"
+  },
+  "open_gates": [
+    "permanent identity and key custody; signed candidate",
+    "independent-environment reproduction",
+    "artifact and asset licences plus trusted dependency verification",
+    "signed upgrade/wrong-key/recovery acceptance",
+    "hosted contributor CI and reporting/distribution route",
+    "physical/cloud/wider-device/manual accessibility acceptance where claimed",
+    "seven actual observation days on authorised real devices"
+  ],
+  "runtime_artifact_count": 89
+}

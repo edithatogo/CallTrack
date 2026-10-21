@@ -66,8 +66,16 @@ does not mark this track complete or waive its original prerequisites.
 
 ## Resumed execution — 2026-10-21
 
-- [~] Task: Qualify unsigned release build from two isolated clean committed-source checkouts; preserve exact source, tools, graph and artifact evidence. Same-host comparison is not independent-environment reproduction.
-- [ ] Task: Review candidate tooling and results; retain identity/signing, upgrade and operational gates until observed.
+- [x] Task: Qualify unsigned release build from two isolated clean committed-source checkouts — 6b353f4; unsigned-evidence.json: identical APKs,110 JVM tests each,zero lint errors. Same-host comparison is not independent-environment reproduction.
+- [x] Task: Review candidate tooling and results — review-20261021.md; fixes66593c3,78 host tests. Original identity/signing, upgrade and operational gates retained.
 
 Track4 M3 selected-emulator handoff is available. No production signing, key
 generation, publication or physical-call testing is implied by this resumption.
+
+User selected retaining the development identity and unsigned qualification only;
+production signing remains pending. Native release/upgrade acceptance was not run.
+Runtime graph inventory now includes89 artifact hashes and cached POM declarations,
+with one missing POM licence declaration; this is not licence clearance or trusted
+verification. Both clean builds used candidate6b353f4; later changes are tooling
+tests/docs only and app/build inputs remain identical. Track remains active; no
+archive or complete-M4 claim. See unsigned-evidence.json and review-20261021.md.
