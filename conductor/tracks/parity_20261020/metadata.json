@@ -9,7 +9,7 @@
     "calendar_slice_20261020"
   ],
   "requirements": "R01\u2013R11, R23, R27",
-  "implementation_status": "native-qualified-owned-source-facts-foundation-full-parity-in-progress",
-  "implementation_commit": "9fc2466",
-  "ledger_schema": 4
+  "implementation_status": "rendered-settings-import-recovery-qualified-final-source-regression-and-review-pending",
+  "implementation_commit": "daf794a",
+  "ledger_schema": 6
 }
