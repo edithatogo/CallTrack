@@ -474,3 +474,14 @@ Android build, native counter/fault/worker/lifecycle regression, protected call-
 wake, positive rendered UI and final full-track acceptance/review/archive remain
 pending. User directed local work while PortableSSD is disconnected; no further
 hardware permission is requested. Resume sequence is in local-review.md.
+
+
+## Local durable identity review checkpoint
+
+Two test-first faulty-port regressions showed matching payload/calendar could
+confirm a wrong or invalid event ID. DurableDelivery now checks valid identity and
+exact readback ID, matching the recovery contract.105 local JVM tests pass; no
+Android/native execution is inferred. See event-identity-local-evidence.json and
+local-review.md. P01–P10 closure work and positive UI/telephony protocols are mapped
+in [remaining acceptance](remaining-acceptance.md). Hardware-dependent gates and
+final full-track review/archive remain open.

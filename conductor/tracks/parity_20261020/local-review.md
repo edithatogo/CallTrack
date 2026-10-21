@@ -41,3 +41,19 @@ Native harness now includes false/thrown activation commits and thrown status pu
 3. Run the store/fault harness (39 methods), then applicable worker/lifecycle/provider regression. Verify counter correction in native recovery and scoped cleanup.
 4. Qualify protected emulator call-end wake and positive rendered settings, destination/permission, import and recovery confirmations/cancellation. Existing negative UI checks do not satisfy these flows.
 5. Reconcile every P01–P10 gate, finish full-track review/fixes and handoff, then archive. Physical calls, cloud sync and release remain separate pending outcomes.
+
+## Durable event identity follow-up
+
+Review of HistoricalImport/PagedCalls and the durable effect boundary found an
+inconsistent event identity check: ReceiptRecovery required exact IDs, while
+DurableDelivery accepted matching calendar/fingerprint from a wrong-ID readback or
+an invalid-ID marker result. Two fault-port regressions returned SAVED/RECOVERED
+before the fix. Verification now requires a valid event ID and exact requested-ID
+readback; mismatches retain the known ID, become REVIEW and never reinsert.105 local
+JVM tests pass. This is hostile/faulty-port proof, not evidence that Android's actual
+CalendarContract adapter produced a wrong ID. Native current-source regression is
+still pending. Exact red/green/source evidence: event-identity-local-evidence.json.
+
+The [remaining acceptance ledger](remaining-acceptance.md) maps P01–P10 to existing
+evidence and current closure work, including positive rendered/telephony protocols.
+Final full-track review remains pending those results.

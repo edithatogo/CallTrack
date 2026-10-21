@@ -368,4 +368,56 @@ public class DurableDeliveryTest {
         assertEquals(1, sink.inserts);
         assertEquals(Integer.valueOf(2), store.get(restricted.key(), 7).facts.presentation);
     }
+
+    @Test
+    public void matchingPayloadReturnedForWrongEventIdCannotConfirmReceipt() {
+        Store store = new Store();
+        SliceTest.Sink sink =
+                new SliceTest.Sink() {
+                    @Override
+                    public SliceEngine.StoredEvent read(long id) {
+                        SliceEngine.StoredEvent actual = super.read(id);
+                        return new SliceEngine.StoredEvent(id + 100, actual.calendar, actual.event);
+                    }
+                };
+        DurableDelivery engine = delivery(store, sink);
+        assertEquals(
+                DurableDelivery.Result.REVIEW_REQUIRED,
+                engine.deliver(call(), 7, "UTC", () -> true));
+        DurableDelivery.Intent intent = store.get(call().key(), 7);
+        assertEquals(DurableDelivery.State.REVIEW, intent.state);
+        assertEquals(1, intent.eventId);
+        assertEquals(1, sink.inserts);
+        assertEquals(
+                DurableDelivery.Result.REVIEW_REQUIRED,
+                engine.deliver(call(), 7, "UTC", () -> true));
+        assertEquals(1, sink.inserts);
+    }
+
+    @Test
+    public void markerMatchWithInvalidEventIdCannotBecomeAConfirmedReceipt() {
+        Store store = new Store();
+        store.crashAfter = DurableDelivery.State.IN_FLIGHT;
+        SliceTest.Sink sink =
+                new SliceTest.Sink() {
+                    @Override
+                    public List<SliceEngine.StoredEvent> find(long calendar, String marker) {
+                        return Collections.singletonList(
+                                new SliceEngine.StoredEvent(
+                                        -1, calendar, CallEvent.from(call(), "UTC")));
+                    }
+
+                    @Override
+                    public SliceEngine.StoredEvent read(long id) {
+                        return new SliceEngine.StoredEvent(id, 7, CallEvent.from(call(), "UTC"));
+                    }
+                };
+        DurableDelivery engine = delivery(store, sink);
+        assertThrows(Crash.class, () -> engine.deliver(call(), 7, "UTC", () -> true));
+        assertEquals(
+                DurableDelivery.Result.REVIEW_REQUIRED,
+                engine.deliver(call(), 7, "UTC", () -> true));
+        assertEquals(DurableDelivery.State.REVIEW, store.get(call().key(), 7).state);
+        assertEquals(0, sink.inserts);
+    }
 }
