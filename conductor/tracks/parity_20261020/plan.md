@@ -624,3 +624,27 @@ cover durable boundaries, edits/deletion, import/recovery, real tagged-source
 paging/filtering/activation/repeat-work/revocation; they do not qualify protected
 telephony wake or rendered positive UI. Lifecycle regression is running separately
 on emulator-5582. Full Track4 review/archive remains open.
+
+
+## Latest recovery guest lifecycle acceptance
+
+The source-identity-fixed APK passes11 lifecycle checks plus one deliberately killed
+held insertion. Reopen, receiver-isolated Activity resume, real process death after
+provider insertion/before returned-ID persistence, actual guest reboot/background
+recovery before verifier startup, offline and forced Doze recovery pass. Six unique
+effects/receipts are verified. Settings restoration, tagged fixture removal and
+both package removals pass. Exact source/APK/output/tool binding is in
+recovery-lifecycle-evidence.json. Guest reboot took78674ms; this is not a Mac restart.
+
+Published delivered snapshots for event totals1–6 are0,1,0,0,1,1. Repeated work can
+publish a later zero; these snapshots do not isolate the recovered receipt's original
+worker counter. None reproduces the earlier inflated2; exact transition-count
+semantics are proven by local regressions, with native unique effects separately
+verified. Do not call these snapshots a native count of newly inserted events.
+
+Latest-APK provider8/8, worker5/5 and lifecycle11+expected termination pass. The
+39-store run remains separately bound to its earlier APK, with3 namespace fault
+checks on the latest APK. Reconcile applicable store regression after final source
+freeze. Protected call-end wake, positive rendered UI, full P01–P10 audit/review/fixes
+and archive remain required. The recovery guest is ready for those next tests; the
+original stuck guest is still isolated and untouched.
