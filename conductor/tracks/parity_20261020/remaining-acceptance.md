@@ -60,3 +60,11 @@ process is non-responsive and survives TERM/KILL in UEs state. Do not launch ano
 instance against its AVD while it remains live. Native/UI gates above are unchanged;
 new instrumentation is compiled but unexecuted. A Mac restart may be needed before
 the dedicated guest can be qualified again.
+
+## Recovery contingency now qualified
+
+The independently named recovery AVD on emulator-5582 boots and responds without a
+host restart. All39 store/fault checks pass and both packages are removed. See
+recovery-store-evidence.json. The old guest is still stuck; do not touch its writable
+files or reuse its ports. Steps1–3 now have this bounded evidence. Broader current-
+source runtime acceptance and the source-identity review candidate remain pending.
