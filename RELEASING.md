@@ -284,3 +284,13 @@ and emulator harnesses remain emulator-only. Qualify app→Android provider→ex
 sync adapter→the exact remote account/calendar; a connector-created event or a
 calendar visible only in Outlook is insufficient. Current physical/remote results
 remain pending until actual participation and readback occur.
+
+
+## Seven-day operational follow-through
+
+Use the [observation protocol](conductor/tracks/release_20261020/seven-day-observation.md)
+and private cohort/day journal. The daily follow-up checks prerequisites first;
+only actual qualified physical use starts the clock. Unknown observations remain
+unknown. Seven scheduler runs are not seven accepted days, and final review/fixes
+must use the actual candidate's outcomes. One active calendar is supported per
+installation; each operational route claim needs its own accounted window.

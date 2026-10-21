@@ -182,3 +182,17 @@ Physical preparation review: review-physical-preparation-20261022.md.144 host te
 and167-document/20-track/25-scenario Conductor checks pass. Repeated discovery
 still exposes only emulators. Required device, participation and account-calendar
 answers remain pending; no physical/remote acceptance or observation time is claimed.
+
+
+## Seven-day operational observation —2026-10-22
+
+- [x] Task: Recheck physical prerequisites and prepare private cohort/day journal with unknown outcome counts and no start date; seven-day-observation.md. Only emulators visible; no elapsed observation claimed.
+- [x] Task: Configure daily thread follow-up with prerequisite checks and evidence-only accounting; never equate runs/time with accepted use —calltrack-seven-day-observation, active daily09:00 local; native create/view and saved configuration verified.
+- [ ] Task: Complete selected physical/remote baselines, confirm observation scope and participant readiness, verify actual installation and start an explicit cohort/window.
+- [ ] Task: Observe at least168 real elapsed hours with seven accounted daily intervals; preserve denominators, delays, conditions, gaps and findings without fabricated zeros.
+- [ ] Task: Perform final outcome review, apply findings and repeat affected acceptance/new observation where required; retain independent release gates.
+
+Observation preparation review: review-observation-preparation-20261022.md;144
+host tests and169-document/20-track/25-scenario Conductor checks pass. Readback
+confirms one active daily09:00 AEST heartbeat, null observation dates, seven pending
+intervals and zero accepted days/hours. Final runtime review is not yet performed.
