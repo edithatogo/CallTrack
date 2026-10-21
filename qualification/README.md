@@ -178,3 +178,17 @@ It runs three methods in separate instrumentation processes and writes
 `.local/parity-evidence/source-identity-device-receipt.json`; the default store suite
 continues to write its own store receipt. False/thrown identity outcomes deliberately
 latch for the app process, so this suite must not be collapsed into one shared process.
+
+### Protected emulator call-end acceptance
+
+Run `python3 scripts/qualify_parity_telephony.py --serial emulator-5582` only on the
+qualified dedicated guest with matching build/APKs and absent fixture packages.
+It requires an empty source provider and idle Android radio, creates one fictional
+incoming call, observes actual Android RINGING/IDLE and a background event/status
+before verifier startup, then verifies receipt identity and duplicate prevention.
+The modem simulator's console `gsm list` can omit a live Android call; it is not an
+idle or cleanup proof. Actual telephony registry state and exact source-row readback
+are gates. Failure cleanup cancels only the known fixture number, waits for its
+processed row and preserves cleanup instrumentation if termination/cleanup is unknown.
+The receipt is `.local/slice-evidence/parity-telephony-receipt.json`. Physical phones,
+existing calls and unrelated AVDs are refused; this tests no outgoing real calls.

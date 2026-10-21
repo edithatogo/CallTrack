@@ -580,3 +580,37 @@ checks on the latest APK. Reconcile applicable store regression after final sour
 freeze. Protected call-end wake, positive rendered UI, full P01–P10 audit/review/fixes
 and archive remain required. The recovery guest is ready for those next tests; the
 original stuck guest is still isolated and untouched.
+
+
+## Protected emulator telephony call-end acceptance
+
+TelephonyProviderTest uses no source-row insertion: it starts from an empty call
+provider and token-owned LOCAL calendar, enables committed policy and explicitly
+cancels all initial work to terminal state before the host simulates one fictional
+inbound call (+12025550109). Android registry RINGING then IDLE is observed. Before
+any verifier instrumentation or Activity launch, a unique event and fresh completed
+status appear. Broadcast history at the recorded call-end wall time proves system
+uid1000 delivered IDLE PHONE_STATE to AutomaticWakeReceiver (two permitted variants;
+privileged variants are correctly denied). Actual missed-call row141, zero talk
+time, matching durable receipt/fingerprint/ID and repeat catch-up without duplicate
+pass. Source→verified observations14273ms and21219ms (second includes explicit repeat
+catch-up) are not insertion timestamps or deadlines. Five native fixture/acceptance/
+cleanup methods pass; exact fixture call/calendar/events and both packages removed.
+
+The first console acknowledged call creation but gsm list omitted the real ringing
+call. Its original console-only cleanup claim was insufficient. Radio diagnosis
+found RINGING; explicit cancel ended it and produced the exact fixture row140. A
+scoped ID/date/number deletion followed by three empty provider readbacks and actual
+radio IDLE proves corrected cleanup. An initial deletion-output assertion expected
+a message that this content tool does not print; deletion itself had succeeded and
+readback proved absence. The harness now uses actual Android call state, cancels
+the fixture regardless of the misleading console list, and requires a processed
+exact fixture row before failure cleanup. Unknown termination preserves cleanup
+code. Host regression covers hidden console calls, uncertain creation, existing
+call refusal and cleanup ordering;61 host tests pass.
+
+Exact source/APK/native/broadcast proof, red and explicit cleanup correction are in
+telephony-evidence.json. No product behavior changed in this slice. This qualifies
+one supported incoming missed-call path, not answered/outgoing physical telephony
+or cloud sync. Remaining major gates: positive rendered settings/permission/import/
+recovery journeys, final-source regression and full P01–P10 review/fixes/archive.
