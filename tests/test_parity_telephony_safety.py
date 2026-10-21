@@ -27,6 +27,7 @@ class TelephonySafety(unittest.TestCase):
             artifacts[relative] = device.hashlib.sha256(b'fixture').hexdigest()
         (evidence / 'build-receipt.json').write_text(json.dumps({'exit_code': 0, 'inputs_unchanged': True, 'inputs': {}, 'artifacts': artifacts}))
         self.calls = []
+        self.phone_available = True
         self.active = False
         self.creation_timeout = False
         self.cancel_failure = False
@@ -38,6 +39,8 @@ class TelephonySafety(unittest.TestCase):
         output, code = '', 0
         if args == ['shell', 'getprop', 'ro.kernel.qemu'] or args == ['shell', 'getprop', 'sys.boot_completed']:
             output = '1'
+        elif args == ['shell', 'service', 'check', 'phone']:
+            output = 'Service phone: found' if self.phone_available else 'Service phone: not found'
         elif args == ['emu', 'avd', 'name']:
             output = RECOVERY_AVD + '\nOK'
         elif args[0] in ('install', 'uninstall'):
@@ -119,3 +122,9 @@ class TelephonySafety(unittest.TestCase):
         self.assertLess(end, effect)
         self.assertLess(effect, verify)
         self.assertFalse(self.active)
+
+    def test_missing_phone_service_refuses_fixture_installation(self):
+        self.phone_available = False
+        with self.assertRaisesRegex(RuntimeError, 'phone service'):
+            self.run_fixture()
+        self.assertFalse(any(args[0] == 'install' for args in self.calls))

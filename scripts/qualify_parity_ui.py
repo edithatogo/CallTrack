@@ -5,6 +5,7 @@ Requires selected device, matching build receipt and absent test packages. On na
 failure attempts scoped fixture recovery BEFORE uninstalling its cleanup code.
 """
 from parity_targets import is_dedicated_avd
+from parity_health import require_healthy_boot
 import argparse
 import hashlib
 import json
@@ -102,8 +103,7 @@ def qualify(serial, suite="settings"):
         raise RuntimeError('Not an emulator')
     if not is_dedicated_avd(command('emu', 'avd', 'name')):
         raise RuntimeError('Not the dedicated CallTrack AVD')
-    if command('shell', 'getprop', 'sys.boot_completed') != '1':
-        raise RuntimeError('Boot incomplete')
+    require_healthy_boot(command)
     for package in (PACKAGE, TEST_PACKAGE):
         if 'package:' + package in command('shell', 'pm', 'list', 'packages', package).splitlines():
             raise RuntimeError('Refusing to replace existing package ' + package)
