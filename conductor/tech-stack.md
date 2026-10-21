@@ -6,7 +6,7 @@ Reference only: AndroidCallLogSync is Java/XML, AndroidX/View Binding/WorkManage
 
 ## Direction
 
-Preserve useful upstream behaviour while proving a modern build. Kotlin is the planned migration language. Android call-log/calendar providers and native scheduling are initial integration candidates. Room, DataStore, coroutines/Flow, Ktor, serialization, Compose, KMP and Rust/UniFFI are candidates, not installed or selected production dependencies.
+Preserve useful upstream behaviour while proving a modern build. Kotlin is the planned migration language. Android call-log/calendar providers and native scheduling are initial integration candidates. App-owned Room, DataStore, coroutines/Flow, Ktor, serialization, Compose, KMP and Rust/UniFFI adoption remains conditional; transitive framework libraries and the bounded Kotlin pilot are recorded below.
 
 The completed build track selected the qualified JDK/Gradle/AGP/SDK baseline below. Kotlin, Compose and multiplatform tracks refresh compatibility and alternatives at activation. Platform APIs remain platform-specific; cross-platform code cannot confer call-history access.
 
@@ -40,8 +40,9 @@ and Java/Kotlin bytecode1.8. ktfmt0.59 is a checksum-pinned build-only formatter
 Existing Kotlin/coroutines transitives predated this migration; adding the compiler
 changes runtime resolution and requires recorded graph readback. No app-owned
 coroutine, Room, DataStore, Compose, KMP or Rust adoption occurs. Twenty-one Java
-production files remain, with explicit ownership and conversion/removal gates in
-the track. Mixed-language qualification and full M5 completion remain distinct.
+production files remained at the pilot checkpoint; Track4 subsequently enlarged
+the source set. Re-inventory it using the Track4 handoff before continuing the
+conversion/removal gates. Mixed-language qualification and full M5 completion remain distinct.
 
 ## Track7 Compose research outcome
 
@@ -62,9 +63,16 @@ runtime2.7.1 to2.12.0 for the bounded durable worker. Actual AAR metadata, debug
 build and disabled/stale plus positive CallLog/calendar native worker branches pass.
 Bounded filters, duplicate requests, permission revocation and latency are recorded
 in Track4 worker-provider-evidence.json. lifecycle-evidence.json adds bounded
-resume/process-death/reboot/offline/Doze proof and enqueue acknowledgement. Protected
-emulator call-end wake, rendered UI and full acceptance/review remain pending. Transitive Room2.7.0 and
+resume/process-death/reboot/offline/Doze proof and enqueue acknowledgement. The final selected API36 emulator matrix also passes protected call-end wake,
+rendered settings/import/recovery UI and full P01–P10 review; physical/cloud/release
+and wider-platform acceptance remain pending in the Track4 handoff. Transitive Room2.7.0 and
 coroutines1.9.0 are framework internals; app-owned ledgers remain SQLiteOpenHelper
 and no new app coroutine/Room API adoption occurs. No experimental WorkManager
 analytics or test helper dependency is added. See graph/licence/artifact inventory
 in work-dependency-report.json under Track4; no public release claim follows.
+
+Final Track4 review fixes add bounded wake admission, permanent withdrawal of
+queued recovery approval after pause, native system/cutout/IME padding and accurate
+import feedback. No new runtime dependency is introduced. Ledger schema6/import
+schema2 and source-bound110 JVM/73 host/89 successful native invocations plus one
+expected termination are recorded in [final evidence](tracks/parity_20261020/final-acceptance-evidence.json).

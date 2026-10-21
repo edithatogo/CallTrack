@@ -1,7 +1,7 @@
 {
   "track_id": "parity_20261020",
   "type": "research-led-development",
-  "status": "in_progress",
+  "status": "completed",
   "milestone": "M3",
   "created_at": "2026-10-20",
   "updated_at": "2026-10-21",
@@ -9,7 +9,23 @@
     "calendar_slice_20261020"
   ],
   "requirements": "R01\u2013R11, R23, R27",
-  "implementation_status": "rendered-settings-import-recovery-qualified-final-source-regression-and-review-pending",
-  "implementation_commit": "daf794a",
-  "ledger_schema": 6
+  "implementation_status": "accepted-api36-emulator-parity-development",
+  "implementation_commit": "974a66d",
+  "ledger_schema": 6,
+  "review_status": "passed-with-fixes",
+  "review_fix_commits": [
+    "2da53cc",
+    "72d352c",
+    "aa0802b",
+    "7d19775",
+    "1c4c76c",
+    "1422b6c",
+    "52b52cd",
+    "daf794a",
+    "974a66d",
+    "4cc00f8",
+    "088281b"
+  ],
+  "completed_at": "2026-10-21",
+  "import_schema": 2
 }

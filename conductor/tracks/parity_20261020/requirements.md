@@ -1,4 +1,4 @@
-# Track 4 concrete requirements — discovery revision 1
+# Track 4 concrete requirements — final emulator acceptance revision 2
 
 User steering: emulator acceptance for now; physical-call acceptance remains pending. Desired timing is prompt logging when Android permits, with durable recovery after delays. No fixed background deadline is promised.
 
@@ -18,3 +18,5 @@ User steering: emulator acceptance for now; physical-call acceptance remains pen
 Physical calls, real Outlook/Google remote delivery, production signing/store eligibility and long-term community observation are not represented by emulator results. These remain explicitly pending as requested; this does not defer the automatic logging/import/recovery implementation itself.
 
 Default extended call-type policy proposed for discovery: incoming/outgoing/missed supported and enabled independently; blocked/rejected/voicemail/answered-elsewhere/unknown types excluded from automatic output until explicitly specified. Preserve raw source fields; do not reinterpret blocked as missed. Multi-SIM identity is metadata, not an independent duplicate key.
+
+P01–P10 are reconciled in [closure audit](closure-audit.md) and [final review](final-review.md). This records development acceptance without claiming the explicitly deferred physical/cloud/release outcomes.

@@ -1,6 +1,6 @@
 # Parity and durable synchronisation
 
-Milestone: M3. Type: research-led development. Status: discovery in progress; concrete acceptance and outbox design being refined.
+Milestone: M3. Type: research-led development. Status: implemented and accepted for the selected API36 emulator scope; production/physical/cloud gates remain with the handoff.
 
 ## Objective
 

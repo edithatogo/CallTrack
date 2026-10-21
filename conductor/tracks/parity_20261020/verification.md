@@ -1,4 +1,16 @@
-# Track 4 verification — in progress
+# Track 4 verification — final emulator acceptance
+
+## Final authoritative checkpoint — 2026-10-21
+
+The selected emulator implementation/acceptance and review pass. See
+[final acceptance](final-acceptance-evidence.json), [closure audit](closure-audit.md),
+[final review](final-review.md) and [handoff](handoff.md). All confirmed findings,
+including reboot failure restoration088281b, are fixed. Historical failures and
+previous pending checkpoints below are retained; they do not override this final
+scoped result. Physical/cloud/release and wider-platform gates remain pending in
+the handoff. Archive follows final link/registry validation.
+
+## Preserved chronological record
 
 ## Foundation checkpoint
 

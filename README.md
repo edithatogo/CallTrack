@@ -3,21 +3,27 @@
 A GPL-3.0 development fork of AndroidCallLogSync, working toward a maintainable
 CallTrack successor. See [source provenance](NOTICE.md) and [Conductor roadmap](conductor/roadmap.md).
 
-The current slice is manual: choose a visible writable device calendar, grant the
-requested permissions, then explicitly log the latest call. The event uses cached
-caller identity when available, exact timestamps, private/free defaults and no
-reminders. Restricted numbers remain private. Known insert IDs are retained even if readback fails; receipt presence alone is not
-success. A zero-duration call has a one-minute
-visual marker and describes its actual zero duration. Calendar providers may sync
-these events to their accounts. Launching or granting access never reads a call.
+The development app now supports automatic call-to-calendar logging: choose a
+visible writable device calendar, grant call/calendar access, select incoming,
+outgoing and missed calls independently, and enable logging from now. Pause stops
+automatic insertion; calls during a pause require a separately previewed and
+confirmed historical import. The explicit latest-call action remains available.
 
-This is a development app (`org.calltrack.community.dev`), not a parity release.
-Automatic logging, historical import, settings parity, complete localisation,
-release signing and distribution remain later tracks. No direct network permission
-is present; calendar account software controls remote sync. Success here means
-local provider readback, not remote account acceptance. Existing event changes or
-missing receipts/events require review rather than automatic replacement. No review
-UI is implemented yet; inspect the calendar and retain the ledger for investigation.
+Events preserve exact source instants, caller presentation and actual duration,
+with private/free defaults and no reminders. Zero-duration calls use an explained
+one-minute visual marker. Durable receipts prevent blind retry after uncertain
+insertion and preserve edited/deleted events. Settings, import progress and
+explicit recovery/reapproval/suppression/retention controls are implemented.
+Opening the app reconciles a previously enabled policy; granting permission alone
+does not enable logging or approve insertion.
+
+This remains a development app (`org.calltrack.community.dev`), not a public parity
+release. [Track4 acceptance](conductor/tracks/parity_20261020/final-review.md) passes
+on the dedicated API36 emulator:110 JVM/73 host tests and89 successful native
+invocations plus one expected process termination. Physical calls, cloud/provider
+sync, wider Android/OEM/accessibility qualification, production signing and
+operational observation remain pending. No INTERNET permission is present;
+calendar account software controls remote sync.
 
 ## Build and verify
 
@@ -84,3 +90,20 @@ reporting channel. Track4 acceptance and signing/distribution gates remain open.
 [Compose research](prototypes/compose/README.md) is an isolated synthetic app, not
 part of this working application's build or runtime. Its research decision retains
 Views until real screen behaviour and manual accessibility are qualified.
+
+## Parity acceptance and recovery
+
+Current evidence and remaining boundaries are in the [Track4 handoff](conductor/tracks/parity_20261020/handoff.md).
+The parity harnesses require a disposable dedicated emulator, matching current
+build/APK receipts and absent development packages. They refuse physical targets
+and unrelated AVD names. Review the explicit target allowlist in
+`scripts/parity_targets.py`; do not replace it with a wildcard.
+
+Use `qualify_parity_emulator.py` for store/source-identity/wake-budget suites,
+`qualify_parity_provider.py`, `qualify_parity_worker.py`,
+`qualify_parity_lifecycle.py`, `qualify_parity_telephony.py`, and
+`qualify_parity_ui.py --suite settings|imports|recovery`, each with an explicitly
+selected `--serial`. Lifecycle changes only the guest's power/network state and
+reboots the guest; scoped cleanup/restoration and package removal must be verified.
+On uncertain cleanup retain instrumentation and the original fixture token.
+Computer restart is not an unblock option.
