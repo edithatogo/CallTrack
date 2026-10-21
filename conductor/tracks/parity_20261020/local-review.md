@@ -111,3 +111,18 @@ completed PNG inspected: no stale stop message. See imports-ui-evidence.json.
 The earlier timeout and launch ANR remain historical, not silently relabelled as
 failing feedback assertions; this run did not reproduce either. Recovery UI and
 final-source regression/P01–P10 review remain pending.
+
+## Queued recovery approval withdrawal — native red/green
+
+Native fault reproduced READY expected/CONFIRMED actual after real confirmation,
+Home, return to same Activity and release of a held executor. The old resumed
+boolean revived stale consent. approvalSession now changes onPause; each positive
+confirmation captures its own token and the delivery supplier requires that token
+as well as resumed. Already-crossed effects remain tracked, not falsely undone.
+The final suite passes7 native methods including withdrawal, fresh permission/
+preview/cancel/approve, read-only check, edit/deletion/suppression and retention.
+Cleanup/packages/environment restored; actual preview dialog PNG inspected.
+See recovery-withdrawal-red-evidence.json and recovery-ui-evidence.json.
+Full Android build passes56s;70 host tests and Conductor validation pass.
+Final-source store/provider/worker/lifecycle/telephony/settings/import regression
+and full P01–P10 review/handoff/archive remain outstanding.
