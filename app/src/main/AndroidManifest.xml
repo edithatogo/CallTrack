@@ -25,25 +25,7 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.markobl.calllogsync.AutostartReceiver"
-            android:enabled="false"
-            android:exported="false">
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
-                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
-                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
-            </intent-filter>
-        </receiver>
 
-        <activity
-            android:name="com.markobl.calllogsync.MainActivity"
-            android:exported="false"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.CallHistory.NoActionBar">
-
-        </activity>
         <activity android:name=".slice.ReceiptRecoveryActivity" android:exported="false" />
         <activity android:name=".slice.HistoricalImportActivity" android:exported="false" />
         <activity android:name=".slice.AutomaticSettingsActivity" android:exported="false" />

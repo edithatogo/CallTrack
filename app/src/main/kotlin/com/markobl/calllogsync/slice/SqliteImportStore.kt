@@ -371,7 +371,7 @@ class SqliteImportStore(context: Context?, name: String?) :
 
         private fun decode(body: String?): HistoricalImport.Session {
             try {
-                val j = JSONObject(body)
+                val j = JSONObject(body!!)
                 if (j.getInt("version") != 1)
                     throw IllegalStateException("Import document migration required")
                 return HistoricalImport.Session(

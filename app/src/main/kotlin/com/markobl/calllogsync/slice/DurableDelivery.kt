@@ -1,6 +1,5 @@
 package com.markobl.calllogsync.slice
 
-import java.util.Objects
 import java.util.function.BooleanSupplier
 
 /** Every store write commits before returning; one process lock guards provider effects. */
@@ -89,9 +88,9 @@ class DurableDelivery(private val store: Store?, private val sink: SliceEngine.C
         @JvmField val operation: Operation?,
         @JvmField val facts: SourceFacts?,
     ) {
-        @JvmField val state: State = Objects.requireNonNull(state)!!
-        @JvmField val key: String = Objects.requireNonNull(key)!!
-        @JvmField val fingerprint: String = Objects.requireNonNull(fingerprint)!!
+        @JvmField val state: State = state ?: throw NullPointerException()
+        @JvmField val key: String = key ?: throw NullPointerException()
+        @JvmField val fingerprint: String = fingerprint ?: throw NullPointerException()
 
         constructor(
             state: State?,

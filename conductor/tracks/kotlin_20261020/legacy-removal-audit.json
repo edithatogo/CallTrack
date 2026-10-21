@@ -1,0 +1,131 @@
+{
+  "date": "2026-10-21",
+  "scope": "source/resource/manifest reachability audit, pending packaged/native acceptance",
+  "legacy_java_files": 14,
+  "external_source_references": [],
+  "removed_files": [
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/AutostartReceiver.java",
+      "sha256": "dcde4455f71c3ab517669f5509b312c7a16cd13f764db316775728ba1a3e0b68"
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/Config.java",
+      "sha256": "23b4ae821c36f0d2ad7337632fd6114b87dbc06aa3ecc15a30518b28dccc8b5d"
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/LogFragment.java",
+      "sha256": "da8f4dd5c34e8c1b9d9d49cd59c9b34ed2b6ca03ffa5a705a3456e9e0047843e"
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/LogItem.java",
+      "sha256": "68643c3bed8b66762670818d6fb5109b79beb7889dd4590b35d2799c5dcaaf69"
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/LogItemRecyclerViewAdapter.java",
+      "sha256": "05bac90526e208fc934a584f5dd789e8f3e05790f0fcf2d1073fb07f421f966a"
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/MainActivity.java",
+      "sha256": "19cc6dac6aad7aee47808cad2fc111b637fb211d75ced388331945e9fe88a417"
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/MainFragment.java",
+      "sha256": "d732616ea2addd65cd827a32c0b22da7994cc3dbb2b8576a1c7618679115d58c"
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/RandomString.java",
+      "sha256": "0c0c55e069467e4e1cd992d59fe5c53a9f79772e8170b7e84d6579358a540e82"
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/SettingsFragment.java",
+      "sha256": "b8b32207904584b98b81cdbd9a4a883229c27a751a2ff29c20b8d1adbb98c873"
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/Sync.java",
+      "sha256": "a2f73bd10b399c05d5cf917d58315b3cecd63e681fd3b9158e180e7ea8df8ff8"
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/SyncResult.java",
+      "sha256": "2b6b0b55afad7ba0d87f1aa84b3220628f286a61c546efbe90b1d3a55d6201d0"
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/SyncResultRunner.java",
+      "sha256": "137928ce06ce2c665ec0a77318ef064a73a8860ce1d45669e142b34e47e7bd20"
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/SyncResultType.java",
+      "sha256": "391f8230adfac1f720c6d900f9b2a7929171a8b99bbb9d17f3aa35b89f7ec88b"
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/SyncWorker.java",
+      "sha256": "4aa71769dc3120b5cc9b5cf5fdeafe934464ff29e857e71ec4c35b38f9224e72"
+    },
+    {
+      "path": "app/src/main/res/layout/fragment_main.xml",
+      "sha256": "3e3679f42d62dcfc024f4aa88f03675fc9614afacbb6500311197373082eb277"
+    },
+    {
+      "path": "app/src/main/res/layout/content_main.xml",
+      "sha256": "b596321376c0b85d0c20d8884e3b2909637fa1099657a69e5d2acb6b21ff20dc"
+    },
+    {
+      "path": "app/src/main/res/layout/fragment_log.xml",
+      "sha256": "b722ecda3fac88300a6c359f4dbeada398c4ebe95ea05cbd02409fc8d461eaca"
+    },
+    {
+      "path": "app/src/main/res/layout/activity_main.xml",
+      "sha256": "0454d85b72af882024079b0b75dd9e6ea0710c7376219ed1046809268172842c"
+    },
+    {
+      "path": "app/src/main/res/layout/fragment_log_list.xml",
+      "sha256": "27a258eb62759be1cf49b9873e6c4da0d9c5cba27cfd682e05fd9d4acc501fad"
+    },
+    {
+      "path": "app/src/main/res/menu/menu_main.xml",
+      "sha256": "75f9b9aa83e69b60177476890e9fc41975041964f82068ba9a70fb5e14fce590"
+    },
+    {
+      "path": "app/src/main/res/navigation/nav_graph.xml",
+      "sha256": "520ad7c2979f3d433de3992d888305cae5ec5ff38f7b01cec86d1d17844246fd"
+    },
+    {
+      "path": "app/src/main/res/xml/root_preferences.xml",
+      "sha256": "320bb6b10712cad231fd6bdf70fca957da148329c8221c5c24b7069c5e1c12f7"
+    },
+    {
+      "path": "app/src/main/res/values-w600dp/dimens.xml",
+      "sha256": "3efd84816b428a7af7ee473c70d6be22017b2358c33bb7a91fdf04f518cc7573"
+    },
+    {
+      "path": "app/src/main/res/values-land/dimens.xml",
+      "sha256": "3efd84816b428a7af7ee473c70d6be22017b2358c33bb7a91fdf04f518cc7573"
+    },
+    {
+      "path": "app/src/main/res/values/dimens.xml",
+      "sha256": "e54b8f556d2d62ef5fc86d5b8cae1acc1be53e43fa70ece6300d60a84cf0b6c6"
+    },
+    {
+      "path": "app/src/main/res/values-w1240dp/dimens.xml",
+      "sha256": "d6887b19bf9d21f1cbd6b05226bc25079c1cfa455ab30e9cf66f46cc1837db70"
+    }
+  ],
+  "removed_direct_dependencies": [
+    "androidx.constraintlayout:constraintlayout:2.1.3",
+    "androidx.navigation:navigation-fragment:2.4.1",
+    "androidx.navigation:navigation-ui:2.4.1",
+    "androidx.legacy:legacy-support-v4:1.0.0",
+    "androidx.recyclerview:recyclerview:1.2.1",
+    "androidx.preference:preference:1.2.0",
+    "com.google.code.gson:gson:2.9.0"
+  ],
+  "retained_dependencies_reason": "Material/AppCompat supply current native themes; Fragment and lifecycle overrides remain compatibility constraints until graph/build readback proves removal safe.",
+  "surviving_entrypoints": [
+    "CalendarSliceActivity",
+    "AutomaticSettingsActivity",
+    "HistoricalImportActivity",
+    "ReceiptRecoveryActivity",
+    "AutomaticWakeReceiver"
+  ],
+  "retained_java_exception": "NullableCalendarLabel preserves nullable Java toString; Kotlin Any.toString cannot express it.",
+  "limits": "No production legacy installation/upgrade claim. Old activity was unexported and receiver disabled; current development identity never advertised old HTTP sync. Do not clear old prefs/data; no key/version/schema change."
+}
