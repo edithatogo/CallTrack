@@ -16,7 +16,7 @@ from run_slice_build import inputs
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = 'org.calltrack.community.dev'
 TEST_PACKAGE = PACKAGE + '.test'
-AVD = 'calltrack-parity-api36-20261020'
+from parity_targets import AVD, is_dedicated_avd
 
 
 def qualify(serial):
@@ -51,7 +51,7 @@ def qualify(serial):
 
     if command('shell', 'getprop', 'ro.kernel.qemu') != '1':
         raise RuntimeError('Selected target is not a verified emulator')
-    if AVD not in command('emu', 'avd', 'name').splitlines():
+    if not is_dedicated_avd(command('emu', 'avd', 'name')):
         raise RuntimeError('Selected emulator is not the dedicated CallTrack AVD')
     if command('shell', 'getprop', 'sys.boot_completed') != '1':
         raise RuntimeError('Emulator has not completed boot')

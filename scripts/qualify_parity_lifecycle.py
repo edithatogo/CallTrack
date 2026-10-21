@@ -4,6 +4,7 @@
 Requires selected device, matching build receipt and absent test packages. On native
 failure attempts scoped fixture recovery BEFORE uninstalling its cleanup code.
 """
+from parity_targets import is_dedicated_avd
 import argparse
 import hashlib
 import json
@@ -156,7 +157,7 @@ def qualify(serial):
 
     if command('shell', 'getprop', 'ro.kernel.qemu') != '1':
         raise RuntimeError('Not an emulator')
-    if 'calltrack-parity-api36-20261020' not in command('emu', 'avd', 'name').splitlines():
+    if not is_dedicated_avd(command('emu', 'avd', 'name')):
         raise RuntimeError('Not the dedicated CallTrack AVD')
     if command('shell', 'getprop', 'sys.boot_completed') != '1':
         raise RuntimeError('Boot incomplete')
