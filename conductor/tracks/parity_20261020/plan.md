@@ -592,3 +592,23 @@ process remains stuck. Broader provider/worker/lifecycle, protected telephony an
 positive rendered acceptance plus full review/archive remain open. A source-namespace
 commit-uncertainty candidate was noticed during read-only review; reproduce it with
 native preferences faults before deciding whether another fix is required.
+
+
+## Native source-identity uncertainty review fix
+
+A real SharedPreferences proxy committed its cache then reported a false identity
+write. Native red showed the next AndroidCallLogSource adapter reused the cached
+namespace despite uncertain persistence; both packages were removed. The source
+namespace monitor now latches before writing and refuses reads after false/thrown
+outcomes until app-process restart (not computer restart). Existing committed IDs
+and schema remain unchanged. Native false/thrown and successful-reuse checks all
+pass on the source-bound latest APK; packages removed.108 JVM/55 host tests and full
+debug/test APK/lint pass (0 errors,32 warnings,5 hints). Exact red/green/source/APK
+evidence is in source-identity-evidence.json. The prior39 native store suite remains
+separately bound to the pre-identity-fix APK; do not merge those into a claim that42
+checks ran on one APK. Wider current-APK provider/worker/lifecycle acceptance is
+next; protected telephony, positive UI and final full-track review/archive remain.
+
+- `a3267ce`: exact isolated AVD target support; `a8eedb2`:39 native store/fault checks with cleanup on recovery guest.
+
+- `7d19775`: native-red/green source-identity uncertainty fix;3 native checks/cleanup and108 JVM/55 host tests. Latest APK provider regression8/8 with fixture/package cleanup passes; recovery-provider-evidence.json. Positive worker/lifecycle follow.
