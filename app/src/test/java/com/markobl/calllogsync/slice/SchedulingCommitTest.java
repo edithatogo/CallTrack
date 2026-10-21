@@ -50,6 +50,13 @@ public class SchedulingCommitTest {
     }
 
     @Test
+    public void expiredBudgetCannotReportEvenAnEmptyEnqueueAsAcknowledged() {
+        assertThrows(
+                TimeoutException.class,
+                () -> AutomaticScheduling.awaitCommitted(new Future<?>[0], System.nanoTime() - 1));
+    }
+
+    @Test
     public void neverAcknowledgedEnqueueHasABoundedBroadcastBudget() {
         assertThrows(
                 TimeoutException.class,

@@ -41,9 +41,15 @@ final class AutomaticScheduleControl {
     }
 
     Future<?>[] reconcile() {
+        return reconcile(() -> true);
+    }
+
+    Future<?>[] reconcile(java.util.function.BooleanSupplier permitted) {
+        if (!permitted.getAsBoolean()) return new Future<?>[0];
         synchronized (DurableDelivery.DELIVERY_LOCK) {
+            if (!permitted.getAsBoolean()) return new Future<?>[0];
             ActivationControl.Settings settings = activation.current();
-            return settings != null && settings.enabled
+            return settings != null && settings.enabled && permitted.getAsBoolean()
                     ? schedule.apply(settings)
                     : new Future<?>[0];
         }
