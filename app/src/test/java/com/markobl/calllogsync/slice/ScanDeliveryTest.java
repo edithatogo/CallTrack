@@ -64,7 +64,9 @@ public class ScanDeliveryTest {
                 () -> scan.run(op, policy(), 7, "UTC", 4, () -> true));
         assertEquals(1, sink.inserts);
         assertEquals(-1, progress.value.lastId);
-        assertTrue(scan.run(op, policy(), 7, "UTC", 4, () -> true).complete);
+        ScanDelivery.Batch replay = scan.run(op, policy(), 7, "UTC", 4, () -> true);
+        assertTrue(replay.complete);
+        assertEquals(0, replay.delivered);
         assertEquals(1, sink.inserts);
     }
 
@@ -142,5 +144,35 @@ public class ScanDeliveryTest {
         assertEquals(DurableDelivery.Result.SOURCE_CHANGED, result.stopped);
         assertEquals(0, sink.inserts);
         assertEquals(-1, progress.value.lastId);
+    }
+
+    @Test
+    public void knownAttemptBecomingConfirmedCountsEvenWithoutAnotherInsert() {
+        CallRecord call = PagedCallsTest.row(1, 1);
+        PagedCallsTest.Source source = new PagedCallsTest.Source();
+        source.rows.put(1L, call);
+        SliceTest.Sink sink = new SliceTest.Sink();
+        CallEvent event = CallEvent.from(call, "UTC");
+        long id = sink.insert(7, event);
+        DurableDelivery.Operation op = new DurableDelivery.Operation("automatic", 1);
+        DurableDeliveryTest.Store store = new DurableDeliveryTest.Store();
+        store.put(
+                new DurableDelivery.Intent(
+                        DurableDelivery.State.ATTEMPTED,
+                        call.key(),
+                        7,
+                        CallIdentity.signature(call),
+                        event.marker,
+                        event.fingerprint(),
+                        id,
+                        event,
+                        op,
+                        DurableDelivery.SourceFacts.from(call)));
+        ScanDelivery.Batch batch =
+                new ScanDelivery(source, new Progress(), new DurableDelivery(store, sink))
+                        .run(op, policy(), 7, "UTC", 4, () -> true);
+        assertEquals(1, batch.delivered);
+        assertEquals(DurableDelivery.State.CONFIRMED, store.get(call.key(), 7).state);
+        assertEquals(1, sink.inserts);
     }
 }

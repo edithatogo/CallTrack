@@ -144,4 +144,49 @@ public class AutomaticDeliveryTest {
         assertEquals(-1, progress.value.lastId);
         assertEquals(DurableDelivery.State.READY, receipts.get(source.rows.get(1L).key(), 7).state);
     }
+
+    @Test
+    public void recoveryAndFollowingScanCountOneNewlyConfirmedReceipt() {
+        ActivationControl control = new ActivationControl(new ActivationControlTest.Store());
+        ActivationControl.Settings settings = control.activate(7, "UTC", 1000, true, true, true);
+        CallRecord call = PagedCallsTest.row(1, 1);
+        DurableDeliveryTest.Store store = new DurableDeliveryTest.Store();
+        SliceTest.Sink sink = new SliceTest.Sink();
+        CallEvent event = CallEvent.from(call, "UTC");
+        sink.insert(7, event);
+        store.put(
+                new DurableDelivery.Intent(
+                        DurableDelivery.State.IN_FLIGHT,
+                        call.key(),
+                        7,
+                        CallIdentity.signature(call),
+                        event.marker,
+                        event.fingerprint(),
+                        -1,
+                        event,
+                        settings.operation(),
+                        DurableDelivery.SourceFacts.from(call)));
+        Progress progress =
+                new Progress() {
+                    @Override
+                    public java.util.List<String> pending(
+                            DurableDelivery.Operation op, long calendar, int limit) {
+                        return store.get(call.key(), calendar).state
+                                        == DurableDelivery.State.IN_FLIGHT
+                                ? java.util.Collections.singletonList(call.key())
+                                : java.util.Collections.emptyList();
+                    }
+                };
+        PagedCallsTest.Source source = new PagedCallsTest.Source();
+        source.rows.put(1L, call);
+        AutomaticDelivery runner =
+                new AutomaticDelivery(control, source, progress, new DurableDelivery(store, sink));
+        ScanDelivery.Batch recovery = runner.run(settings, 4);
+        ScanDelivery.Batch scan = runner.run(settings, 4);
+        assertEquals(1, recovery.delivered);
+        assertTrue(scan.complete);
+        assertEquals(0, scan.delivered);
+        assertEquals(1, recovery.delivered + scan.delivered);
+        assertEquals(1, sink.inserts);
+    }
 }
