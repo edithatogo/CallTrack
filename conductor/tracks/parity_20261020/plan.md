@@ -741,3 +741,12 @@ remains pending, along with final-source regression and the P01–P10 full revie
 Visual review qualification: the completed import screenshot retains stale stop
 feedback. Import UI data/touch checks passed, but full UI acceptance remains open
 until that finding is fixed and rerun; see local-review.md.
+
+## Completion-feedback follow-up
+
+- [~] Native final-feedback assertion and successful-result feedback reset.
+  Full Android build passes (72s, unchanged inputs);69 host tests and Conductor
+  validation pass. Native reruns before the fix failed at active63/120 timeout
+  and Activity-launch/input-dispatch ANR respectively, not at the new assertion.
+  Both cleaned/restored. Fixed-source native acceptance is running; no completion
+  claim. See local-review.md and .local/parity-evidence/import-feedback-* files.
