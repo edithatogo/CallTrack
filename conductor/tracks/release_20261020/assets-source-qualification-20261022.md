@@ -105,3 +105,12 @@ Raw download/source/build/bundle/fault receipts remain excluded under
 `.local/release-evidence/asset-source-inputs-20261022/`,
 `.local/release-evidence/asset-source-builds-20261022/` and
 `.local/release-evidence/asset-source-bundle-20261022/`.
+
+
+## Cold-build successor — 2026-10-22
+
+[Independent Linux qualification](linux-reproduction-qualification-20261022.md)
+adds three canonically verified metadata checksums after a real cold-cache failure,
+then freezes9464408. The exact source/notices bundle is refreshed for that commit;
+its runtime APK payload is unchanged except Git provenance. This report and its
+5a3a3e4 archive remain historical, not relabelled as the new artifact.

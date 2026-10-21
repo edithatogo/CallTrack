@@ -12,7 +12,20 @@
 - [Preparation evidence](preparation-evidence.json)
 - [Resolved dependency report](dependency-report.json)
 
-## Asset/source/notices checkpoint — 2026-10-22
+## Independent Linux build checkpoint — 2026-10-22
+
+- [Current independent-build qualification](linux-reproduction-qualification-20261022.md)
+- [Cross-host/source/artifact evidence](linux-reproduction-evidence-20261022.json)
+- [Current review](review-linux-reproduction-20261022.md)
+
+The9464408 candidate reproduces exactly on a separate native Linux host with no
+Mac tool/cache mounts and fresh SDK/Gradle downloads.115 JVM tests per Mac/Linux
+build and131 Python tests on both systems pass. The cold run exposed three missing
+metadata checksums;739 entries are now enforced without changing old hashes or
+runtime dependencies. The source/notices bundle is refreshed. Hosted GitHub CI
+is prepared but awaits the repository choice; original full-M4 gates stay open.
+
+## Earlier asset/source/notices checkpoint — 2026-10-22
 
 - [Current qualification](assets-source-qualification-20261022.md)
 - [Source/artifact evidence](assets-source-evidence-20261022.json)
