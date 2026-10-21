@@ -67,3 +67,15 @@ provider/calendar persistence test, physical call or remote account acceptance.
 Remaining21 Java files and M4/full-M5 upgrade/recovery gates stay open. Restoring
 Java code/build settings is a development code rollback only; no installed-user
 app downgrade or data reset was performed.
+
+## Active-code continuation — 2026-10-21
+
+The dated pilot above remains historical. Current33 active conversions, one Java
+exception and removal audit are documented in [handoff](active-migration-handoff.md),
+[evidence](active-migration-evidence.json) and [review](review-active-migration-20261021.md).
+115 JVM/89 host tests pass. Five native suites (56 invocations), standalone import
+UI (five) and private update (two) pass separately; the final matrix is not accepted
+because lifecycle/provider/startup ANRs block remaining qualification. Two clean
+unsigned builds pass115 tests each and match byte-for-byte on this host/cache.
+Manual recovery proves fixture/package absence and recorded environment restoration;
+phone service remains unavailable. Full M4/M5 and later frameworks stay pending.
