@@ -9,7 +9,10 @@ the root app workspace for Track 3. The new manual slice replaces the launcher,
 disables legacy boot entry, removes network permission and adds local-provider
 source/mapping/calendar/ledger adapters and tests. Preparation scripts
 apply documented build-only changes to a separate copy and add our qualification
-tests. The upstream GPL notice is preserved in both source copies. LICENSE contains
+tests. Track6 translates active code to Kotlin, retains a Java bridge for nullable
+calendar-label interoperability and removes unreachable inherited HTTP/UI code.
+The upstream provenance remains here and in the retained reference; licence and
+asset audit remains a release gate. LICENSE contains
 the GPL version 3 text. No original CallTrack APK implementation is incorporated.
 
 Existing CallTrack APKs and extracted implementation remain private evidence. A

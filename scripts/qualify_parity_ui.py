@@ -50,8 +50,19 @@ def qualify(serial, suite="settings"):
     environment = None
 
     def command(*args):
-        result = subprocess.run([str(ROOT / '.local/android-sdk/platform-tools/adb'), '-s', serial, *args],
-                                capture_output=True, text=True, timeout=180)
+        # A rendered resume includes setup, stop/reopen and a bounded 150-second
+        # completion wait. Leave time for its own failure/capture/cleanup to report.
+        timeout = 300 if 'instrument' in args else 180
+        try:
+            result = subprocess.run([str(ROOT / '.local/android-sdk/platform-tools/adb'), '-s', serial, *args],
+                                    capture_output=True, text=True, timeout=timeout)
+        except subprocess.TimeoutExpired as error:
+            def decoded(value):
+                return value.decode(errors='replace') if isinstance(value, bytes) else (value or '')
+            receipt['steps'].append({'args': list(args), 'timed_out': True,
+                                     'timeout_seconds': timeout,
+                                     'output': decoded(error.stdout) + decoded(error.stderr)})
+            raise
         receipt['steps'].append({'args': list(args), 'exit_code': result.returncode,
                                  'output': result.stdout + result.stderr})
         if result.returncode:

@@ -103,3 +103,25 @@ provider/cloud or operational gates. Roll back code only before promotion if a
 contract fails; preserve data/receipts and never clear app data or downgrade a
 user installation. Further26 active Java/14 inherited files remain work, not
 permanent justified exceptions. See current evidence when recorded.
+
+## Active-code continuation — 2026-10-21
+
+The approved stage1 converted33 active Java classes in preserving batches,
+retaining existing Views/executors/SQLite/WorkManager and golden identities.
+There are36 production Kotlin files and one deliberate Java exception:
+NullableCalendarLabel preserves the old nullable Choice.toString ABI, which
+Kotlin Any.toString cannot represent. Remove only with an explicit consumer
+contract change and parity evidence. Package-private helpers widen to public JVM
+visibility for unmangled Java interop; no component export or external SDK is added.
+
+Reachability audit retired14 inherited Java files,12 resources and seven unused
+direct dependencies. Material/AppCompat still consume ConstraintLayout, RecyclerView
+and Transition; review found their removal accidentally lowered selected versions.
+Gradle constraints retain qualified2.1.3/1.2.1/1.4.1 respectively without restoring
+unused API declarations. Reassess/remove constraints when those consumers retire.
+This is dependency preservation, not an ecosystem upgrade or licence clearance.
+
+The retained-javac fallback is retired; source-bound Kotlin APKs are mandatory.
+The private-state same-version debug replacement proves only selected private data
+preservation. Production identity/signing, increasing-version upgrades, cloud and
+physical/operational acceptance retain separate release gates.

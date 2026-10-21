@@ -103,6 +103,23 @@ class UiSafety(unittest.TestCase):
         self.assertEqual('recovery', receipt['suite'])
         self.assertTrue(receipt['fixture_cleanup_verified'])
 
+    def test_timed_out_instrumentation_retains_partial_diagnostics(self):
+        original = self.command
+        def timeout(command, **kwargs):
+            if 'renderedExplicitHistoryResumeCompletesPartialWork' in ' '.join(command):
+                self.assertEqual(300, kwargs['timeout'])
+                raise subprocess.TimeoutExpired(command, 300, output=b'partial native progress', stderr=b'diagnostic')
+            return original(command, **kwargs)
+        self.command = timeout
+        self.assertEqual(1, self.run_fixture('imports'))
+        receipt = json.loads((self.root / '.local/slice-evidence/parity-ui-imports-receipt.json').read_text())
+        timed = [step for step in receipt['steps'] if step.get('timed_out')]
+        self.assertEqual(1, len(timed))
+        self.assertIn('partial native progress', timed[0]['output'])
+        self.assertIn('diagnostic', timed[0]['output'])
+        self.assertTrue(receipt['fixture_cleanup_verified'])
+        self.assertTrue(receipt['packages_removed'])
+
     def test_unknown_suite_refused_before_tools(self):
         with patch.object(device.subprocess, 'run') as run:
             with self.assertRaisesRegex(ValueError, 'Unknown UI suite'):
