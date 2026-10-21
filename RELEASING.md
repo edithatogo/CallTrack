@@ -232,3 +232,27 @@ This prepares a source-conveyance candidate. Final signed-artifact binding and
 actual source delivery/download through the chosen channel remain required when
 that conveyance is authorised; no publication or permanent trademark decision is
 implied. Retain previous source/artifact evidence rather than relabelling it.
+
+
+## Cold Linux reproduction
+
+The manual `.github/workflows/release-reproduction.yml` workflow builds an exact
+candidate using the digest-pinned Temurin17 Linux image, new SDK downloads and a
+new Gradle user home. It uses separate tooling and candidate checkouts and uploads
+only the unsigned APK and evidence. No cache restore, signing credential, device,
+cloud-account integration or SDK licence acceptance command is configured.
+The SDK terms must already be authorised for the builder; package origins/sizes,
+Google checksums and reviewed SHA256 values are in
+`qualification/release/linux-sdk-inputs.json`.
+
+Use `scripts/qualify_linux_build.py --help` for a direct Linux runner. Its output
+directory must not exist; a dirty/wrong candidate, reused output, wrong SDK origin,
+archive traversal, changed checksum or differing APK fails closed. Retain failures
+and audit newly requested dependency metadata against canonical origins; never
+turn off verification or blindly generate checksums to obtain a green build.
+
+A Docker/Linux guest with no host mounts and fresh SDK/JDK/Gradle dependencies
+provides a separate software environment, but still shares this physical computer.
+It does not establish a second physical host, hosted CI or independent contributor
+execution. A prepared workflow is not a hosted run: retain GitHub job/run/artifact
+readback only after an authorised repository upload and workflow execution.
