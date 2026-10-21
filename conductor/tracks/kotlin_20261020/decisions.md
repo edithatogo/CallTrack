@@ -67,3 +67,39 @@ and five native methods, source-bound packaging, unsigned release and dependency
 readback. Retain Kotlin2.3.21 and ktfmt0.59 for these three components. This adopts
 the bounded development implementation, not all suggested libraries or full M5.
 See [verification](verification.md); compiler and app/runtime graphs remain distinct.
+
+## K03 — Expand stabilized model/policy migration (2026-10-21)
+
+The user approved the iOS-last implementation sequence and all active-code Kotlin
+migration. M3 selected-emulator contracts are stable; M4 signing/operational gates
+remain. Convert CallRecord, DeliveryCounts, ImportRange, PayloadRetention, WorkStatus,
+AutomaticWorkPolicy and ActivationCommitGuard without changing persistence or
+controllers. Seven components join the existing three Kotlin models.
+
+Retain the qualified compiler/formatter and native APIs. No runtime/build dependency
+is added or updated. Libraries cannot replace these product-specific validation,
+state and latch policies without a semantic change. Room/DataStore/coroutines
+remain deferred; combining takeover with language conversion is unjustified.
+
+Java fields/static entry points/overloads and nullable inputs remain explicit.
+CallRecord validates null IDs before asserting nonnull stored fields; raw nullable
+presentation is distinct from legacy absent presentation. WorkStatus preserves
+stale-generation early return and saturating failure counts. ActivationCommitGuard
+retains JVM synchronized methods and fail-closed latching before a throwing write.
+Its Kotlin internal class is public in bytecode (Kotlin has no Java package-private
+type visibility); methods retain unmangled names for existing package Java callers.
+This intentional visibility widening is not an exported Android component or a
+new external SDK contract, and does not bypass any operation/permission authority.
+
+The retained-class javac fallback is retired: once models move, compiling only
+remaining Java against old implementation classes cannot qualify Kotlin changes.
+Use Gradle mixed-source tests; preserve historical receipts without relabelling.
+
+Acceptance: freeze Java golden/interop contracts first, then the same JVM suite,
+full debug/test/release packaging/lint, native store regressions and actual
+same-version development package replacement of private synthetic state. This
+last fixture is separately named/bounded and cannot satisfy production-version,
+provider/cloud or operational gates. Roll back code only before promotion if a
+contract fails; preserve data/receipts and never clear app data or downgrade a
+user installation. Further26 active Java/14 inherited files remain work, not
+permanent justified exceptions. See current evidence when recorded.

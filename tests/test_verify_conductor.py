@@ -77,6 +77,32 @@ class VerificationFailures(unittest.TestCase):
         with self.assertRaisesRegex(AssertionError, 'Deferral decision missing'):
             self.run_verifier()
 
+    def test_compose_cannot_start_before_kotlin_and_release_dispositions(self):
+        path = self.root / 'conductor/tracks/compose_app_20261021/metadata.json'
+        data = json.loads(path.read_text())
+        data['status'] = 'in_progress'
+        path.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
+            self.run_verifier()
+
+    def test_ios_can_start_after_explicit_documented_earlier_deferrals(self):
+        sequence = json.loads((self.root / 'conductor/future-sequence.json').read_text())
+        for entry in sequence['stages'][:-1]:
+            folder = self.root / 'conductor/tracks' / entry['track_id']
+            path = folder / 'metadata.json'
+            data = json.loads(path.read_text())
+            data['implementation_status'] = 'deferred'
+            data['deferral'] = {'reason': 'Synthetic policy fixture',
+                                'consequences': 'No capability accepted',
+                                'reconsideration_trigger': 'Reopen before support claim'}
+            path.write_text(json.dumps(data))
+            (folder / 'deferral.md').write_text('Synthetic justified deferral; no capability accepted.')
+        path = self.root / 'conductor/tracks/ios_companion_20261021/metadata.json'
+        data = json.loads(path.read_text())
+        data['status'] = 'in_progress'
+        path.write_text(json.dumps(data))
+        self.run_verifier()
+
     def test_duplicate_scenario_id_fails(self):
         path = self.baseline / 'fixtures.json'
         data = json.loads(path.read_text())
