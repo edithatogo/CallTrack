@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-21",
+  "scope": "unsigned-same-host-development-identity",
+  "candidate_revision": "787ae35b8a8da829641222f0e755fa3c4664aa11",
+  "app_source_commit": "51c43f0",
+  "success": true,
+  "same_host": true,
+  "shared_dependency_cache": true,
+  "independent_environment_reproduction": false,
+  "signed": false,
+  "release_ready": false,
+  "comparison": {
+    "sha256": [
+      "117909cbb95f70faac43c905ad6957daf746fa7713027786cb794b3f3b8945c4",
+      "117909cbb95f70faac43c905ad6957daf746fa7713027786cb794b3f3b8945c4"
+    ],
+    "identical": true
+  },
+  "builds": [
+    {
+      "exit_code": 0,
+      "log_sha256": "16918550417e505bac7571c00cebb36e87744131a91acd88f9255d3590880afa",
+      "apk_sha256": "117909cbb95f70faac43c905ad6957daf746fa7713027786cb794b3f3b8945c4",
+      "jvm_tests": 115,
+      "lint_errors": 0,
+      "lint_warnings": 69
+    },
+    {
+      "exit_code": 0,
+      "log_sha256": "7a539b29b2b7cdba0a1fc196234336031f3e62ba2edce6232315278b36d6e800",
+      "apk_sha256": "117909cbb95f70faac43c905ad6957daf746fa7713027786cb794b3f3b8945c4",
+      "jvm_tests": 115,
+      "lint_errors": 0,
+      "lint_warnings": 69
+    }
+  ],
+  "raw_receipt": {
+    "path": ".local/release-evidence/kotlin-final-20261021/receipt.json",
+    "sha256": "d079fd36dc2f6306d818184f096f3128270607f14b55987c34d95c7c0b443d48"
+  },
+  "limits": [
+    "No production identity or signing/key custody decision",
+    "No independent-host or hosted workflow outcome",
+    "No licence/asset or trusted checksum clearance",
+    "No production supported-version upgrade or physical/cloud/operational acceptance"
+  ],
+  "runtime_inventory": "../kotlin_20261020/runtime-artifacts-20261021.json"
+}

@@ -79,3 +79,16 @@ with one missing POM licence declaration; this is not licence clearance or trust
 verification. Both clean builds used candidate6b353f4; later changes are tooling
 tests/docs only and app/build inputs remain identical. Track remains active; no
 archive or complete-M4 claim. See unsigned-evidence.json and review-20261021.md.
+
+## Kotlin continuation candidate — 2026-10-21
+
+- [x] Task: Requalify two isolated clean unsigned release builds after active Kotlin migration and transitive-version correction — candidate787ae35, unsigned-kotlin-evidence-20261021.json;115 JVM tests each,zero lint errors,identical APKs.
+- [ ] Task: Close the original production identity/signing, licence/trust, independent reproduction, supported upgrade and operational gates before full M4.
+
+The new candidate supersedes the earlier6b353f4 artifact claim for current app
+inputs; old evidence remains historical. All68 retained runtime artifacts match
+the prior inventory. Seven unused direct declarations are retired while three
+still-consumed transitive versions are preserved by compatibility constraints.
+Cached artifact/POM continuity is not licence clearance or independent trust.
+The user's development-identity/unsigned scope remains in force. No publication,
+key generation, cloud consent, physical testing or elapsed observation is claimed.

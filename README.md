@@ -110,3 +110,9 @@ selected `--serial`. Lifecycle changes only the guest's power/network state and
 reboots the guest; scoped cleanup/restoration and package removal must be verified.
 On uncertain cleanup retain instrumentation and the original fixture token.
 Computer restart is not an unblock option.
+
+Current Kotlin continuation: [implementation and acceptance handoff](conductor/tracks/kotlin_20261020/active-migration-handoff.md).
+115 JVM/89 host tests and selected native suites pass; guest startup ANRs/phone
+service availability block the full final emulator matrix. Two clean same-host
+unsigned release builds match. This is not production release or completion of
+the Compose/KMP/macOS/Rust/iOS roadmap.

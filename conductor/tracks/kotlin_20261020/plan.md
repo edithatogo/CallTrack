@@ -74,5 +74,10 @@ Original M4/full-M5 operational acceptance remains gated.
 - [x] Task: Refresh47 Java-file inventory (33 active/14 inherited) and preserve pre-conversion baseline/APKs — c7c3d91, migration-inventory-20261021.json.
 - [x] Task: Convert stable models/policy, then orchestration, adapters/stores, scheduling and Views Activities in verified batches — e7126a2 through f467a4d;36 production Kotlin files, one Java nullable-label bridge.
 - [x] Task: Audit manifest/resource/reflection reachability; remove only proven obsolete code/dependencies, record remaining exceptions — b30540d, legacy-removal-audit.json; three consumed transitive versions retained by review constraints.
-- [~] Task: Verify source-bound mixed-language/Java interop, in-place update and final full native matrix; retire stale javac fallback —115 JVM contracts pass; final native requalification pending review dependency correction.
-- [ ] Task: Review/fix and hand off preserving remaining M4/operational gates.
+- [~] Task: Verify source-bound mixed-language/Java interop, in-place update and final full native matrix; retire stale javac fallback —115 JVM contracts pass; five native suites plus import UI/private update pass; full lifecycle retry fails on guest startup ANRs/phone service; remaining native acceptance pending.
+- [x] Task: Review/fix and hand off preserving remaining M4/operational gates —51c43f0/cae25f9, review-active-migration-20261021.md and active-migration-handoff.md; native acceptance remains blocked, no archive.
+
+Current continuation handoff: active-migration-handoff.md and active-migration-evidence.json.
+Code conversion/removal is implemented; full final native matrix and original
+M4/full-M5 remain open. Do not restart the completed conversion or call the whole
+roadmap complete.
