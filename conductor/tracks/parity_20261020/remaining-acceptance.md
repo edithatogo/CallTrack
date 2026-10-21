@@ -78,3 +78,12 @@ store39/39 receipt is version-bound separately. Main next work: protected call-e
 and positive rendered flows, followed by final-source regression/review and closure.
 The no-host-restart recovery contingency is operational; do not treat the original
 stuck guest as responsive.
+
+## Protected telephony gate now has bounded proof
+
+One emulator-generated incoming missed call progresses through actual Android
+RINGING→IDLE, system-delivered PHONE_STATE to the app receiver, background work,
+real call row/event and unique receipt before verifier startup. Five native checks,
+repeat catch-up and exact cleanup pass; see telephony-evidence.json. Outgoing and
+answered telephony remain unclaimed. Next: positive rendered UI journeys and final
+regression/review; emulator proof does not replace pending physical/cloud gates.
