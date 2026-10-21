@@ -11,8 +11,9 @@ source/mapping/calendar/ledger adapters and tests. Preparation scripts
 apply documented build-only changes to a separate copy and add our qualification
 tests. Track6 translates active code to Kotlin, retains a Java bridge for nullable
 calendar-label interoperability and removes unreachable inherited HTTP/UI code.
-The upstream provenance remains here and in the retained reference; licence and
-asset audit remains a release gate. LICENSE contains
+The upstream provenance remains here and in the retained reference; current asset replacement and source/notices packaging are recorded in
+[ASSET_PROVENANCE.md](ASSET_PROVENANCE.md) and
+[the bundle procedure](qualification/release/BUNDLE_README.txt). LICENSE contains
 the GPL version 3 text. No original CallTrack APK implementation is incorporated.
 
 Existing CallTrack APKs and extracted implementation remain private evidence. A
@@ -23,4 +24,14 @@ They are not public releases or replacements for the original developer's app.
 
 Runtime dependency declarations and retained licence text are inventoried in
 [third-party notices](THIRD_PARTY_NOTICES.md); build-only tool evidence remains
-separate. Publication and inherited-asset rights gates remain open.
+separate. The inherited launcher/store artwork and unused endpoint translations have been
+removed. Replacement development artwork is original geometric vector source
+under GPLv3. This does not select a permanent production trademark or release name.
+Publication, signing and channel acceptance remain pending.
+
+The checked-in Gradle wrapper bootstrap is a build tool under Apache2.0. Its
+licence and conservative distribution notice are retained in
+`qualification/release/licences/Gradle-wrapper-LICENSE.txt` and
+`qualification/release/licences/Gradle-wrapper-NOTICE.txt`; it is not an APK runtime
+library. These texts are pinned to the Gradle7.0.2 reference associated with the
+audited shared bootstrap hash; no precise bootstrap version is inferred from it.
