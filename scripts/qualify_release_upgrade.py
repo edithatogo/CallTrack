@@ -39,7 +39,7 @@ def cleanup_owned_packages(adb, attempted):
     return errors
 
 
-def qualify(serial, output):
+def qualify(serial, output, provider_schema=False):
     if not re.fullmatch(r'emulator-\d+', serial):
         raise RuntimeError('Release upgrade probe refuses physical-device serials')
     if subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT).strip():
@@ -56,14 +56,21 @@ def qualify(serial, output):
     for apk in (original, tests):
         if current['artifacts'].get(str(apk.relative_to(ROOT))) != sha(apk):
             raise RuntimeError('Development artifact hash mismatch')
+    qualification = ROOT / 'qualification/release'
+    fixture_inputs = {str(p.relative_to(ROOT)): sha(p) for p in sorted(qualification.rglob('*')) if p.is_file()} if provider_schema else {}
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     output.mkdir(parents=True, exist_ok=False)
     sdk = (ROOT / '.local/android-sdk').resolve()
-    env = dict(os.environ, JAVA_HOME=str(JDK), ANDROID_HOME=str(sdk))
+    env = dict(os.environ, JAVA_HOME=str(JDK), ANDROID_HOME=str(sdk),
+               CALLTRACK_RELEASE_QUALIFICATION=str(qualification))
     receipt = dict(scope='development-key-release-mode-version-increase-private-state-only',
                    revision=revision, inputs=current['inputs'], token=uuid.uuid4().hex,
                    production_signed=False, release_ready=False, result='failed', steps=[])
+    receipt['qualification_inputs'] = fixture_inputs
+    if provider_schema:
+        receipt['scope'] = 'development-key-release-mode-historical-schema-provider-upgrade'
     attempted = []
+    provider_attempted = False
 
     def adb(*args, reject=None):
         result = subprocess.run([str(sdk / 'platform-tools/adb'), '-s', serial, *args],
@@ -76,12 +83,15 @@ def qualify(serial, output):
             raise RuntimeError('ADB failed: ' + ' '.join(args))
         return result.stdout.strip()
 
-    def native(method):
+    def native(method, class_name="KotlinPackageUpdateTest"):
         result = adb('shell', 'am', 'instrument', '-w', '-r', '-e', 'fixtureToken', receipt['token'],
-                     '-e', 'class', 'com.markobl.calllogsync.slice.KotlinPackageUpdateTest#' + method,
+                     '-e', 'class', 'com.markobl.calllogsync.slice.' + class_name + '#' + method,
                      TEST_PACKAGE + '/androidx.test.runner.AndroidJUnitRunner')
         if 'OK (1 test)' not in result or 'FAILURES' in result or 'INSTRUMENTATION_FAILED' in result:
             raise RuntimeError('Private-state verification failed: ' + method)
+
+    def provider(method):
+        native(method, 'ReleaseUpgradeProviderTest')
 
     try:
         if adb('shell', 'getprop', 'ro.kernel.qemu') != '1' or not is_dedicated_avd(adb('emu', 'avd', 'name')):
@@ -103,13 +113,29 @@ def qualify(serial, output):
     }
 }
 """)
+        if provider_schema:
+            overlay.write_text(overlay.read_text() + """
+gradle.beforeProject { project ->
+    project.plugins.withId('com.android.application') {
+        project.androidComponents.finalizeDsl { android ->
+            def directory = System.getenv('CALLTRACK_RELEASE_QUALIFICATION')
+            android.sourceSets.androidTest.java.srcDir(directory + '/java')
+            android.sourceSets.androidTest.assets.srcDir(directory + '/assets')
+        }
+    }
+}
+""")
         receipt['overlay_sha256'] = sha(overlay)
         with (output / 'build.log').open('w') as log:
             subprocess.run(['sh', 'gradlew', '--no-daemon', '--console=plain', '-I', str(overlay),
-                            ':app:assembleRelease'], cwd=checkout, env=env, stdout=log,
+                            *([':app:assembleRelease', ':app:assembleDebugAndroidTest'] if provider_schema else [':app:assembleRelease'])], cwd=checkout, env=env, stdout=log,
                            stderr=subprocess.STDOUT, check=True)
         if subprocess.check_output(['git', 'status', '--porcelain'], cwd=checkout).strip():
             raise RuntimeError('Build modified committed source')
+        if provider_schema:
+            if fixture_inputs != {str(p.relative_to(ROOT)): sha(p) for p in sorted(qualification.rglob('*')) if p.is_file()}:
+                raise RuntimeError('Qualification inputs changed during build')
+            tests = checkout / 'app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk'
         candidate = checkout / 'app/build/outputs/apk/release/app-release.apk'
         certs = []
         for apk, package, version in ((original, PACKAGE, 10), (candidate, PACKAGE, 11), (tests, TEST_PACKAGE, None)):
@@ -137,12 +163,21 @@ def qualify(serial, output):
             if 'Success' not in adb('install', str(apk)):
                 raise RuntimeError('Install unconfirmed')
         native('seedJavaEraState')
+        if provider_schema:
+            provider_attempted = True
+            for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
+                adb('shell', 'pm', 'grant', PACKAGE, 'android.permission.' + permission)
+            provider('seedHistoricalSchemasAndProviderState')
         adb('shell', 'am', 'force-stop', PACKAGE)
         if 'Success' not in adb('install', '-r', str(candidate)):
             raise RuntimeError('Upgrade unconfirmed')
         if not re.search(r'\bversionCode=11\b', adb('shell', 'dumpsys', 'package', PACKAGE)):
             raise RuntimeError('Installed increasing version unverified')
         native('verifyPersistedState')
+        if provider_schema:
+            provider('migrateAndRecoverWithoutChangingHumanEvents')
+            provider('migrationFailureRollsBackThenRetries')
+            provider('unsupportedNewerSchemaIsPreserved')
         adb('install', '-r', str(original), reject='INSTALL_FAILED_VERSION_DOWNGRADE')
         native('verifyPersistedState')
         # A one-day disposable fixture certificate tests rejection, never production custody.
@@ -171,12 +206,32 @@ def qualify(serial, output):
             adb('install', '-r', str(fixture_apk), reject='INSTALL_FAILED_UPDATE_INCOMPATIBLE')
             native('verifyPersistedState')
         receipt['disposable_fixture_key_removed'] = not Path(temporary).exists()
+        if provider_schema:
+            for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
+                adb('shell', 'pm', 'revoke', PACKAGE, 'android.permission.' + permission)
+            provider('deniedPermissionCannotReplayAfterUpgrade')
+            for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
+                adb('shell', 'pm', 'grant', PACKAGE, 'android.permission.' + permission)
+            provider('migrateAndRecoverWithoutChangingHumanEvents')
+            provider('explicitPendingResumeIsExactlyOnce')
+            provider('cleanupFixture')
+            provider('removedDestinationCannotRetargetOrEraseReceipts')
         receipt['result'] = 'passed'
     except Exception as error:
         receipt['error'] = str(error)
         raise
     finally:
-        errors = cleanup_owned_packages(adb, attempted)
+        errors = []
+        if provider_attempted:
+            try:
+                for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
+                    adb('shell', 'pm', 'grant', PACKAGE, 'android.permission.' + permission)
+                provider('cleanupFixture')
+                receipt['provider_fixture_removed'] = True
+            except Exception as error:
+                errors.append('Provider cleanup unverified: ' + str(error))
+                receipt['provider_fixture_removed'] = False
+        errors.extend(cleanup_owned_packages(adb, attempted))
         clean = not errors
         if errors:
             receipt['cleanup_errors'] = errors
@@ -193,5 +248,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--serial', required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--provider-schema', action='store_true', help='Use synthetic source-pinned schemas and LOCAL provider fixtures')
     args = parser.parse_args()
-    print(json.dumps(qualify(args.serial, args.output.resolve()), indent=2))
+    print(json.dumps(qualify(args.serial, args.output.resolve(), args.provider_schema), indent=2))

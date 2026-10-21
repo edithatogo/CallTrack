@@ -103,3 +103,9 @@ key generation, cloud consent, physical testing or elapsed observation is claime
 - [ ] Task: Complete original D01–D09 release gates; no archive or full-M4 completion from this local continuation.
 
 - [x] Task: Apply local qualification review fixes and commit current evidence — 94f8893; production/physical/cloud/operational gates remain pending.
+
+## Local licence/tool-trust and schema/provider continuation — 2026-10-21
+
+- [~] Task: Inventory and audit selected build-plugin/compile/test/lint dependencies, wrapper and SDK tool origins; preserve licences/notices and unresolved rights without production conveyance.
+- [~] Task: Qualify exact source-pinned schema1–5 fixtures across10→11 replacement with human-edited/deleted events, ambiguous insert recovery, paused/permission-loss/resume and migration rollback/newer-schema refusal.
+- [ ] Task: Review continuation, apply fixes and record source-bound local evidence; retain production signing, physical, cloud and operational gates.
