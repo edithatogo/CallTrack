@@ -76,3 +76,21 @@ queued recovery approval after pause, native system/cutout/IME padding and accur
 import feedback. No new runtime dependency is introduced. Ledger schema6/import
 schema2 and source-bound110 JVM/73 host/89 successful native invocations plus one
 expected termination are recorded in [final evidence](archive/parity_20261020/final-acceptance-evidence.json).
+
+## Current active-code Kotlin continuation — 2026-10-21
+
+The approved future sequence supersedes the bounded pilot scope above: all33
+active Java classes have Kotlin implementations (36 production Kotlin files
+including the three pilot components). One Java NullableCalendarLabel bridge
+preserves the nullable legacy toString ABI. Fourteen unreachable inherited Java
+files and12 obsolete resources are retired; see Track6 legacy-removal-audit.json.
+Existing native Views, SQLiteOpenHelper, executors and WorkManager remain.
+Schema6/import2, namespaces/signatures and development identity are preserved.
+No app-owned Compose/KMP/macOS/Rust/iOS implementation is yet qualified.
+
+Seven unused direct dependency declarations are removed. Three still-consumed
+Material/AppCompat transitives retain previously qualified versions through
+Gradle constraints: ConstraintLayout2.1.3, RecyclerView1.2.1, Transition1.4.1.
+These are compatibility constraints, with retirement tied to their native consumers,
+not adoption of new UI features. Final source-matched native/release review remains
+tracked in Track6; original full-M5/release operational gates stay open.

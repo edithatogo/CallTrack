@@ -9,9 +9,17 @@ R14/R26, refined 2026-10-20. Original whole-track acceptance remains unchanged.
 | K03 | Preserve data compatibility | No schema/signature/namespace/version changes; preserving SQLite/emulator regression at new source-bound APK; no app-data clearing |
 | K04 | Preserve verification integrity | Harness hashes include every Kotlin source; CI checks Kotlin style and does not depend on private APK/reference inputs |
 | K05 | Document responsibility takeover | Compare native/owned/library/deferral; each new tool/dependency has role, promotion/removal and rollback evidence |
-| K06 | Finish app-owned Java migration | Map all remaining21 Java files; convert stabilized active code and remove/retain justified legacy exceptions after parity; test same data/contracts |
+| K06 | Finish app-owned Java migration | Refresh the dated21-file pilot inventory to47 (33 active/14 inherited); convert stabilized active code and remove/retain justified legacy exceptions after parity; test same data/contracts |
 | K07 | Full M5 handoff | M4 prerequisite, supported preserving update/recovery evidence, no unqualified operational claims; record residual Java exceptions and next Compose/KMP inputs |
 
 K01–K05 can have bounded local/native evidence while K06/K07 remain open. The user
 has authorised emulator tests; physical-call acceptance remains pending. No new
 public distribution, signing or user-consent surface is implied.
+
+## Current continuation status
+
+K01–K05 pilot evidence remains historical. K06 active conversion/removal is
+implemented:36 Kotlin files plus one justified nullable-label Java bridge. K03/K06
+final native and preserving-update acceptance are being rerun after dependency
+review. K07 still requires original release/supported operational evidence; code
+conversion alone does not close M5. See the approved future implementation sequence.
