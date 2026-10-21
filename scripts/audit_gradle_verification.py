@@ -10,10 +10,8 @@ import hashlib
 import json
 from pathlib import Path
 import re
-import urllib.error
-import urllib.request
 import xml.etree.ElementTree as ET
-from audit_release_artifacts import repository_url, LIMIT
+from audit_release_artifacts import repository_url, read_publication
 
 
 def rows(data):
@@ -68,10 +66,7 @@ def audit(metadata, canonical, output):
         proof['downloads'] = []
         for attempt, url in enumerate(urls):
             try:
-                with urllib.request.urlopen(url, timeout=60) as response:
-                    content = response.read(LIMIT + 1)
-                if len(content) > LIMIT:
-                    raise ValueError('Response exceeds audit bound')
+                content = read_publication(url)
                 actual = hashlib.sha256(content).hexdigest()
                 (output / f'{index}-{attempt}').write_bytes(content)
                 proof['downloads'].append(dict(url=url, sha256=actual))

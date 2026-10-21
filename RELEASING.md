@@ -97,6 +97,25 @@ nonzero. Repository agreement is not independently signed provenance, verificati
 of build plugins/SDK/tools, a complete SBOM or legal clearance. Current results and
 remaining licence/asset gates are in the Track5 local qualification handoff.
 
+## Qualified local trust and schema/provider upgrade continuation
+
+Ordinary builds now use the reviewed `gradle/verification-metadata.xml` allow-list,
+with binary and repository-metadata verification enabled. The policy is included
+in source-input receipts. See the [trust procedure](qualification/release/trust/README.md)
+and Track5 continuation evidence for canonical downloads and positive/negative
+Gradle tests. Independent-host/hosted execution and publisher signatures remain
+separate claims. The SDK/JDK comparison checks payloads against official archives;
+one JDK bundle resource-seal defect remains recorded, without changing global tools.
+
+Add `--provider-schema` to the development upgrade probe to include source-pinned
+ledger1–5→6 and import1→2 fixtures, human-edited/deleted LOCAL events, ambiguous
+insert recovery, permission loss, explicit resume, migration fault rollback and
+newer-schema preservation. Only Java/assets/schema-provenance fixture inputs are
+bound, so independent licence audit work does not invalidate a native build. The
+fixtures are synthetic historical database shapes, not published old APKs or real
+customer data. All test permissions and provider effects belong to disposable
+packages on the dedicated emulator; cleanup is mandatory.
+
 ## Signing and channels
 
 Choose key custodian, offline recovery copy/access procedure and channel policy

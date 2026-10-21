@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Version-increasing, existing-debug-key release-mode probe on the dedicated emulator.
 
-No production key, permanent identity, provider writes or release approval.
+Default scope is private state only; --provider-schema adds explicit synthetic LOCAL
+provider fixtures. No production key, permanent identity or release approval.
 """
 import argparse
 import json
@@ -94,7 +95,7 @@ def qualify(serial, output, provider_schema=False):
                      '-e', 'class', 'com.markobl.calllogsync.slice.' + class_name + '#' + method,
                      TEST_PACKAGE + '/androidx.test.runner.AndroidJUnitRunner')
         if 'OK (1 test)' not in result or 'FAILURES' in result or 'INSTRUMENTATION_FAILED' in result:
-            raise RuntimeError('Private-state verification failed: ' + method)
+            raise RuntimeError('Native release qualification failed: ' + method)
 
     def provider(method):
         native(method, 'ReleaseUpgradeProviderTest')

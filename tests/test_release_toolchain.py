@@ -88,3 +88,9 @@ class ToolTrustTest(unittest.TestCase):
         with patch.object(tools.subprocess, 'run', return_value=resource):
             with self.assertRaisesRegex(RuntimeError, 'Unexpected'):
                 tools.verify_jdk_signature(Path('copy'), 'Contents/Home/bin/java')
+
+    def test_truncated_macho_commands_fail_as_invalid_input(self):
+        import struct
+        malformed = struct.pack('<IiiIIIII', 0xfeedfacf, 0x100000c, 0, 6, 2, 0, 0, 0)
+        with self.assertRaisesRegex(ValueError, 'Truncated'):
+            tools.macho_payload(malformed)

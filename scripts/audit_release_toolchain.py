@@ -2,6 +2,7 @@
 """Read-only comparison against official Gradle/SDK/Homebrew archive evidence.
 
 Never installs tools, accepts licences or treats HTTPS checksums as independent signatures.
+Success qualifies payload-origin comparison only; JDK bundle-resource sealing is separate.
 """
 import argparse
 import hashlib
@@ -30,6 +31,8 @@ def fetch(url, path):
     if not url.startswith('https://'):
         raise ValueError('HTTPS required')
     with urllib.request.urlopen(url, timeout=120) as response, path.open('xb') as stream:
+        if not response.url.startswith('https://'):
+            raise ValueError('Insecure tool archive redirect')
         total = 0
         while block := response.read(1024 * 1024):
             total += len(block)
@@ -77,6 +80,8 @@ def macho_payload(data):
     signature = None
     linkedit = False
     for _ in range(count):
+        if offset + 8 > 32 + size:
+            raise ValueError('Truncated Mach-O command header')
         command, length = struct.unpack_from('<II', data, offset)
         if length < 8 or offset + length > 32 + size:
             raise ValueError('Invalid Mach-O command length')
@@ -91,6 +96,9 @@ def macho_payload(data):
             if length < 72 or linkedit:
                 raise ValueError('Invalid LINKEDIT command')
             linkedit = True
+            file_offset, file_size = struct.unpack_from('<QQ', data, offset + 40)
+            if file_offset + file_size != len(data):
+                raise ValueError('LINKEDIT allocation must cover exact file tail')
             normalized[offset + 48:offset + 56] = bytes(8)
         offset += length
     if signature is None or not linkedit or offset != 32 + size:
@@ -257,6 +265,8 @@ if __name__ == '__main__':
     parser.add_argument('--archives-from', type=Path, help='Reuse retained downloads; official checksums and every installed payload are rechecked')
     args = parser.parse_args()
     receipt = run(args.output.resolve(), args.archives_from.resolve() if args.archives_from else None)
-    print(json.dumps({k: v for k, v in receipt.items() if k not in ('sdk', 'jdk')}, indent=2))
+    summary = {k: v for k, v in receipt.items() if k not in ('sdk', 'jdk', 'gradle_distribution')}
+    summary['jdk_bundle_resource_seal_qualified'] = receipt.get('jdk', {}).get('bundle_resource_seal_qualified', False)
+    print(json.dumps(summary, indent=2))
     if not receipt['success']:
         raise SystemExit(1)

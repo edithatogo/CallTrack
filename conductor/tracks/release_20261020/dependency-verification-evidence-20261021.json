@@ -1,0 +1,54 @@
+{
+  "scope": "Independently check generated Gradle trust entries against canonical repository evidence.\n\nGeneration alone is not approval. Every checksum must match fresh repository bytes\nor an already completed source-bound canonical binary audit.\n",
+  "metadata_sha256": "ae3bf77c222e937c7a5d3b76b2e569cdcbc0e8b02e1a72878361370e62a1e4f0",
+  "canonical_audit_sha256": "9ecb54fdd7d0ddb8d1d8e2bf197b820245c7e2d3a7005d12c1dc94064e9488e9",
+  "entries": 736,
+  "all_entries_verified": true,
+  "independent_signatures": false,
+  "release_ready": false,
+  "receipt_sha256": "d5c21aa9596d2057fe3ca244979ab54d3d1589d517024085e773b9422516a5cd",
+  "binary_entries_reusing_canonical_evidence": 242,
+  "fresh_download_entries": 494,
+  "enforced_policy": "gradle/verification-metadata.xml",
+  "faults": {
+    "scope": "Real strict Gradle rejection of altered/missing AGP JAR trust entries in an isolated checkout; no cached binary modified",
+    "policy_sha256": "ae3bf77c222e937c7a5d3b76b2e569cdcbc0e8b02e1a72878361370e62a1e4f0",
+    "faults": [
+      {
+        "fault": "wrong-checksum",
+        "exit_code": 1,
+        "expected_rejection": true,
+        "log_sha256": "985562769eedfc667b89e21e3e1a0c4303e8a8b82fd001ee992a780deeabd871"
+      },
+      {
+        "fault": "missing-entry",
+        "exit_code": 1,
+        "expected_rejection": true,
+        "log_sha256": "7961a22d3accbb5e5b6afa1797315ae4567678ddf8f88a5faa48eabdafc251f7"
+      }
+    ],
+    "restored": true,
+    "passed": true
+  },
+  "strict_positive_log_sha256": "674a332b96b5227d5f8879b90c118bd5661fb2f9cf27f6f6bd7e9745f45d518d",
+  "linux_execution_qualified": false,
+  "unqualified_linux_downloads": [
+    {
+      "coordinate": "com.android.tools.build:aapt2:8.13.2-14304508",
+      "name": "aapt2-8.13.2-14304508-linux.jar",
+      "sha256": [
+        "839609d6d776d6dd60a02aa577d97193ce3e650cf1deaabf062321e23bbd6bf6"
+      ],
+      "downloads": [
+        {
+          "url": "https://dl.google.com/dl/android/maven2/com/android/tools/build/aapt2/8.13.2-14304508/aapt2-8.13.2-14304508-linux.jar",
+          "sha256": "839609d6d776d6dd60a02aa577d97193ce3e650cf1deaabf062321e23bbd6bf6"
+        }
+      ],
+      "matches": true
+    }
+  ],
+  "reviewed_audit_receipt_sha256": "d5c21aa9596d2057fe3ca244979ab54d3d1589d517024085e773b9422516a5cd",
+  "reviewed_auditor_sha256": "2c7ff8a4d48331ee85f0e49bf9f82946eddf0dadc1f19643150f35f03b1afe23",
+  "reviewed_https_reader_sha256": "7db02929ba2f90e1a0da183150713499d1bf7768e960e4e8d53dbf1d8269c3a8"
+}
