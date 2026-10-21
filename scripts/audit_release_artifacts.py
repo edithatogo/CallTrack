@@ -24,7 +24,7 @@ def digest(data):
 
 def repository_url(row, pom=False):
     group, module, version = row['coordinate'].split(':')
-    base = 'https://dl.google.com/dl/android/maven2/' if group.startswith('androidx.') or group == 'com.google.android.material' else 'https://repo.maven.apache.org/maven2/'
+    base = 'https://dl.google.com/dl/android/maven2/' if group.startswith(('androidx.', 'com.android.', 'com.google.testing.platform')) or group in ('com.android', 'com.google.android', 'com.google.android.material') else 'https://repo.maven.apache.org/maven2/'
     name = module + '-' + version + '.pom' if pom else row['name']
     if '/' in name or '..' in name:
         raise ValueError('Unsafe artifact filename')
@@ -77,7 +77,7 @@ def audit(inventory, output):
         try:
             artifact_url = repository_url(row)
             group, module, version = row['coordinate'].split(':')
-            if row['name'] != module + '-' + version + Path(row['name']).suffix:
+            if not row['name'].startswith(module + '-' + version):
                 module_url = repository_url(row, pom=True)[:-4] + '.module'
                 with urllib.request.urlopen(module_url, timeout=60) as response:
                     metadata = response.read(LIMIT + 1)
