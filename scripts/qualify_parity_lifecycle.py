@@ -194,7 +194,7 @@ def qualify(serial):
         check('prepareNextCallWithoutWake')
         before_boot = command('shell', 'cat', '/proc/sys/kernel/random/boot_id')
         command('reboot')
-        command('wait-for-device')
+        # Offline ADB is expected during reboot; include connection recovery in the boot budget.
         boot_deadline = time.monotonic() + 180
         while time.monotonic() < boot_deadline:
             try:
@@ -241,7 +241,9 @@ def qualify(serial):
         receipt['error'] = str(error)
         # Observe scheduler/permission/status state before cleanup changes the failed condition.
         if fixture_possible:
-            for args in [('shell', 'dumpsys', 'package', PACKAGE),
+            for args in [('shell', 'dumpsys', 'activity', 'exit-info', PACKAGE),
+                         ('shell', 'dumpsys', 'meminfo', PACKAGE),
+                         ('shell', 'dumpsys', 'package', PACKAGE),
                          ('shell', 'dumpsys', 'jobscheduler', PACKAGE),
                          ('shell', 'cmd', 'appops', 'get', PACKAGE, 'READ_CALL_LOG'),
                          ('exec-out', 'run-as', PACKAGE, 'cat', 'shared_prefs/slice.xml')]:
