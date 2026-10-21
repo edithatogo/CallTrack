@@ -159,6 +159,7 @@ public final class HistoricalImportActivity extends Activity {
                 });
         ScrollView scroll = new ScrollView(this);
         scroll.addView(layout);
+        ActivityInsets.apply(scroll);
         setContentView(scroll);
         buttons();
         loadCalendars(saved == null ? -1 : saved.getLong("calendar", -1));

@@ -122,6 +122,7 @@ public final class AutomaticSettingsActivity extends Activity {
         layout.addView(recovery);
         ScrollView scroll = new ScrollView(this);
         scroll.addView(layout);
+        ActivityInsets.apply(scroll);
         setContentView(scroll);
         buttons();
     }

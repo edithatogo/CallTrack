@@ -79,6 +79,7 @@ public final class ReceiptRecoveryActivity extends Activity {
                 });
         ScrollView scroll = new ScrollView(this);
         scroll.addView(layout);
+        ActivityInsets.apply(scroll);
         setContentView(scroll);
         load(null);
     }

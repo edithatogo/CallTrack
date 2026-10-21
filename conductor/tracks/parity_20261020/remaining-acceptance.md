@@ -87,3 +87,12 @@ real call row/event and unique receipt before verifier startup. Five native chec
 repeat catch-up and exact cleanup pass; see telephony-evidence.json. Outgoing and
 answered telephony remain unclaimed. Next: positive rendered UI journeys and final
 regression/review; emulator proof does not replace pending physical/cloud gates.
+
+## Rendered settings checkpoint
+
+The settings permission/filter/confirmation/pause/reopen/revocation/restoration
+journey passes through actual touches, with19 retained screenshots and state
+readback. System-bar geometry passes on all four screens after fixing native
+edge-to-edge overlap. See settings-ui-evidence.json. This is not positive import
+or recovery interaction acceptance; those journeys and final regression/review
+remain open.

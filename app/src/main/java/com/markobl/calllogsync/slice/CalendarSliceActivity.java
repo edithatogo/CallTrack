@@ -136,6 +136,7 @@ public final class CalendarSliceActivity extends Activity {
         layout.addView(automatic);
         ScrollView scroll = new ScrollView(this);
         scroll.addView(layout);
+        ActivityInsets.apply(scroll);
         setContentView(scroll);
     }
 

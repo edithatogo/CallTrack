@@ -68,3 +68,12 @@ reuse remains unchanged. Three native checks pass, with package cleanup. This
 protects source binding without changing IDs, schema or dependencies; app-process
 restart reloads disk state. See source-identity-evidence.json. Broader runtime
 regression is still pending on this latest APK.
+
+## High — enforced edge-to-edge system bars obscure content (fixed and native-verified)
+
+Real screenshots and a native geometry regression reproduced first content42px
+inside136px of system status/cutout space. Shared ActivityInsets applies actual
+insets and readable icon appearance to the four Views screens. Native geometry
+checks across all four pass; settings interactions and reviewed screenshots pass.
+No dependency, storage or scheduling behavior changed. Legacy API26–29 and night
+appearance are compiled, not native-qualified here. See settings-ui-evidence.json.
