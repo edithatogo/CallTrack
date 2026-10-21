@@ -1,0 +1,29 @@
+[
+  {
+    "package": "cmdline-tools;19.0",
+    "url": "https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip",
+    "size": 164760899,
+    "checksum_algorithm": "sha1",
+    "checksum": "5fdcc763663eefb86a5b8879697aa6088b041e70",
+    "licence": "android-sdk-license",
+    "sha256": "7ec965280a073311c339e571cd5de778b9975026cfcbe79f2b1cdcb1e15317ee"
+  },
+  {
+    "package": "platforms;android-36",
+    "url": "https://dl.google.com/android/repository/platform-36_r02.zip",
+    "size": 65878410,
+    "checksum_algorithm": "sha1",
+    "checksum": "2c1a80dd4d9f7d0e6dd336ec603d9b5c55a6f576",
+    "licence": "android-sdk-license",
+    "sha256": "37607369a28c5b640b3a7998868d45898ebcb777565a0e85f9acf36f29631d2e"
+  },
+  {
+    "package": "build-tools;35.0.0",
+    "url": "https://dl.google.com/android/repository/build-tools_r35_linux.zip",
+    "size": 61958799,
+    "checksum_algorithm": "sha1",
+    "checksum": "2cfaa0bbb2336e9ec18ed3ecea84fa2e2af607bc",
+    "licence": "android-sdk-license",
+    "sha256": "bd3a4966912eb8b30ed0d00b0cda6b6543b949d5ffe00bea54c04c81e1561d88"
+  }
+]

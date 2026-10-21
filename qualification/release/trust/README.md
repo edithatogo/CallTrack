@@ -2,7 +2,7 @@
 
 The canonical policy is `gradle/verification-metadata.xml`; the prototype copy was
 retired after qualification. Gradle enforces artifact and repository-metadata
-SHA256 checks in ordinary builds.736 entries were compared against fresh official
+SHA256 checks in ordinary builds. The original736 entries were compared against fresh official
 repository bytes or the completed239-artifact canonical binary audit before
 promotion. Generation from a cache was only a candidate, never the trust decision.
 
@@ -30,3 +30,16 @@ Track5 canonical build-tool audit as binary evidence and a new output directory.
 Keep all failed receipts. Use source-bound clean builds and applicable native tests
 after material changes. The Gradle file is also included in debug source receipts,
 so policy edits invalidate old native-build preflight receipts.
+
+
+## Cold Linux metadata extension — 2026-10-22
+
+A genuinely cold Linux resolution rejects three metadata files not requested by
+the earlier warm-cache macOS runs: Guava parent33.3.1-jre POM, JUnit BOM5.10.2
+module metadata and coroutines BOM1.8.0 POM. Each failed guest download matches a
+fresh canonical Maven Central HTTPS download. Add only those three SHA256 entries;
+all736 previous entries are unchanged, giving739 total. Metadata verification
+remains enabled, without trust exceptions or automatic checksum generation.
+These are metadata for already resolved build dependencies, not new app libraries.
+Initial failure and diagnostic overlay results remain distinct from final clean
+source/cold-cache acceptance. The subsequent Track5 Linux evidence owns the result.
