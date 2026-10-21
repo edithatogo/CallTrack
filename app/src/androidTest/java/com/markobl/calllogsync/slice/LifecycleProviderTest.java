@@ -2,7 +2,6 @@ package com.markobl.calllogsync.slice;
 
 import static org.junit.Assert.*;
 
-import android.Manifest;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -37,15 +36,7 @@ public class LifecycleProviderTest {
     }
 
     private void shellCalls(Runnable action) {
-        android.app.UiAutomation automation =
-                InstrumentationRegistry.getInstrumentation().getUiAutomation();
-        automation.adoptShellPermissionIdentity(
-                Manifest.permission.READ_CALL_LOG, Manifest.permission.WRITE_CALL_LOG);
-        try {
-            action.run();
-        } finally {
-            automation.dropShellPermissionIdentity();
-        }
+        FixtureCallLog.asShell(action);
     }
 
     private void seed() {
@@ -63,8 +54,7 @@ public class LifecycleProviderTest {
                     call.put(Calls.TYPE, Calls.INCOMING_TYPE);
                     call.put(Calls.NUMBER_PRESENTATION, Calls.PRESENTATION_ALLOWED);
                     call.put(Calls.PHONE_ACCOUNT_ID, tag());
-                    android.net.Uri uri =
-                            context().getContentResolver().insert(Calls.CONTENT_URI, call);
+                    android.net.Uri uri = FixtureCallLog.insert(context(), call);
                     assertNotNull(uri);
                     assertTrue(
                             state().edit()
@@ -86,14 +76,8 @@ public class LifecycleProviderTest {
         shellCalls(
                 () -> {
                     try (Cursor c =
-                            context()
-                                    .getContentResolver()
-                                    .query(
-                                            Calls.CONTENT_URI,
-                                            new String[] {Calls._ID},
-                                            null,
-                                            null,
-                                            null)) {
+                            FixtureCallLog.query(
+                                    context(), new String[] {Calls._ID}, null, null, null)) {
                         assertNotNull(c);
                         assertEquals("Dedicated empty call provider required", 0, c.getCount());
                     }
@@ -275,21 +259,15 @@ public class LifecycleProviderTest {
         manager.cancelUniqueWork(tag()).getResult().get(15, TimeUnit.SECONDS);
         shellCalls(
                 () -> {
-                    context()
-                            .getContentResolver()
-                            .delete(
-                                    Calls.CONTENT_URI,
-                                    Calls.PHONE_ACCOUNT_ID + "=?",
-                                    new String[] {tag()});
+                    FixtureCallLog.delete(
+                            context(), Calls.PHONE_ACCOUNT_ID + "=?", new String[] {tag()});
                     try (Cursor c =
-                            context()
-                                    .getContentResolver()
-                                    .query(
-                                            Calls.CONTENT_URI,
-                                            new String[] {Calls._ID},
-                                            Calls.PHONE_ACCOUNT_ID + "=?",
-                                            new String[] {tag()},
-                                            null)) {
+                            FixtureCallLog.query(
+                                    context(),
+                                    new String[] {Calls._ID},
+                                    Calls.PHONE_ACCOUNT_ID + "=?",
+                                    new String[] {tag()},
+                                    null)) {
                         assertNotNull(c);
                         assertEquals(0, c.getCount());
                     }
