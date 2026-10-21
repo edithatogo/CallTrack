@@ -58,7 +58,7 @@ be retired independently; no application data/code rollback is needed.
 
 ## Track4 development scheduling checkpoint
 
-[WORK-D01](tracks/parity_20261020/decisions.md) upgrades the existing WorkManager
+[WORK-D01](archive/parity_20261020/decisions.md) upgrades the existing WorkManager
 runtime2.7.1 to2.12.0 for the bounded durable worker. Actual AAR metadata, debug
 build and disabled/stale plus positive CallLog/calendar native worker branches pass.
 Bounded filters, duplicate requests, permission revocation and latency are recorded
@@ -75,4 +75,4 @@ Final Track4 review fixes add bounded wake admission, permanent withdrawal of
 queued recovery approval after pause, native system/cutout/IME padding and accurate
 import feedback. No new runtime dependency is introduced. Ledger schema6/import
 schema2 and source-bound110 JVM/73 host/89 successful native invocations plus one
-expected termination are recorded in [final evidence](tracks/parity_20261020/final-acceptance-evidence.json).
+expected termination are recorded in [final evidence](archive/parity_20261020/final-acceptance-evidence.json).

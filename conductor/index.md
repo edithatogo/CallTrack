@@ -27,9 +27,8 @@
 
 ## Current checkpoint
 
-Tracks1–3 and research Tracks7–13 are archived. Track4 is complete and reviewed,
-with archive pending final validation. The
-[Track4 parity implementation](tracks/parity_20261020/index.md) passes P01–P10 for
+Tracks1–4 and research Tracks7–13 are complete, reviewed and archived. The
+[Track4 parity implementation](archive/parity_20261020/index.md) passes P01–P10 for
 the selected API36 emulator scope with110 JVM/73 host tests and89 successful native
 invocations plus one expected process termination. All10 suites use source/APK
 binding; fixtures/packages are removed and original environment restored.
@@ -43,5 +42,5 @@ adopt production Compose/KMP/shared UI/direct cloud connectors/Rust or establish
 second-platform runtime parity.
 
 Physical calls, remote provider synchronization, wider Android/OEM/manual
-accessibility qualification and public release remain pending. See [Track4 handoff](tracks/parity_20261020/handoff.md)
+accessibility qualification and public release remain pending. See [Track4 handoff](archive/parity_20261020/handoff.md)
 and the [archive index](archive/index.md) for precise evidence boundaries.

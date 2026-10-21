@@ -3,7 +3,7 @@
 The frozen-build matrix and final review pass for the selected emulator scope.
 The eight-step goal is reconciled below. Earlier receipts remain historical and
 separately bound; current proof is final-acceptance-evidence.json. Archive and
-registry readback are the final administrative closure checks.
+registry readback are validated by the final repository checks.
 
 ## Requirement-to-proof map
 
@@ -124,4 +124,4 @@ production and wider-platform gates remain assigned there, rather than waived.
 | 5 lifecycle recovery | Passed:11 successful native invocations plus expected held-insertion process kill; force-stop/reopen, guest reboot, process death, offline/Doze and original environment restoration. |
 | 6 actual call-end trigger | Passed: one emulator incoming missed call; system uid1000 IDLE variants delivered to receiver; background unique effect/receipt observed before verifier. |
 | 7 rendered positive UI | Passed: settings5/import5/recovery7 and40 PNG/tree pairs; current final settings/import/reapproval/expiry frames inspected. |
-| 8 review/fixes/handoff/archive | Review, all confirmed fixes and handoff pass; archive/registry readback is the final administrative action. |
+| 8 review/fixes/handoff/archive | Passed: review/fixes/handoff complete; archived metadata and registry/link readback are verified by final repository checks. |

@@ -144,7 +144,7 @@ native ownership and defers adoption; host micro-timings alone do not justify Ru
 
 ## Track4 accepted emulator outcome — 2026-10-21
 
-R01–R11/R27 now have the selected development implementation and [P01–P10 proof](tracks/parity_20261020/closure-audit.md).
+R01–R11/R27 now have the selected development implementation and [P01–P10 proof](archive/parity_20261020/closure-audit.md).
 R19 is qualified for the native LOCAL route only; real account exposure/cloud
 readback remains pending. R23 has a read-only confidence/ambiguity prototype, not
 portable export/restore or automatic legacy adoption. Physical calls, release
