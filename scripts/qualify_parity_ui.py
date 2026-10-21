@@ -22,7 +22,7 @@ TEST_PACKAGE = PACKAGE + '.test'
 TEST_CLASS = 'com.markobl.calllogsync.slice.PositiveUiTest'
 
 
-def qualify(serial, suite="settings"):
+def qualify(serial, suite="settings", receipt_dir=None):
     if suite not in ("settings", "imports", "recovery", "accessibility"):
         raise ValueError("Unknown UI suite")
     test_class = {"settings": TEST_CLASS, "imports": "com.markobl.calllogsync.slice.ImportUiTest",
@@ -42,6 +42,9 @@ def qualify(serial, suite="settings"):
         identity = subprocess.check_output([str(aapt), 'dump', 'badging', str(apk)], text=True)
         if "package: name='" + package + "'" not in identity:
             raise RuntimeError('Unexpected APK identity')
+    if receipt_dir is not None:
+        receipt_dir = Path(receipt_dir)
+        receipt_dir.mkdir(parents=True, exist_ok=False)
     receipt = {'suite': suite, 'fixture_token': uuid.uuid4().hex, 'steps': [], 'artifacts': build['artifacts'], 'inputs': build['inputs']}
     installed = []
     fixture_possible = False
@@ -201,7 +204,7 @@ def qualify(serial, suite="settings"):
         if (not receipt['fixture_cleanup_verified'] or not receipt['packages_removed']
                 or not receipt.get('emulator_restored', {'verified': True})['verified']):
             receipt['result'] = 'failed'
-        (evidence / ('parity-ui-receipt.json' if suite == 'settings' else 'parity-ui-' + suite + '-receipt.json')).write_text(json.dumps(receipt, indent=2) + '\n')
+        ((receipt_dir or evidence) / ('parity-ui-receipt.json' if suite == 'settings' else 'parity-ui-' + suite + '-receipt.json')).write_text(json.dumps(receipt, indent=2) + '\n')
     print(json.dumps({k: receipt.get(k) for k in ('result', 'fixture_cleanup_verified', 'packages_removed', 'error')}))
     return 0 if receipt.get('result') == 'passed' else 1
 
@@ -210,5 +213,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--serial', required=True)
     parser.add_argument('--suite', choices=('settings', 'imports', 'recovery', 'accessibility'), default='settings')
+    parser.add_argument('--receipt-dir', type=Path, help='New per-run directory; refuse reuse to retain matrix evidence')
     args = parser.parse_args()
-    raise SystemExit(qualify(args.serial, args.suite))
+    raise SystemExit(qualify(args.serial, args.suite, args.receipt_dir))
