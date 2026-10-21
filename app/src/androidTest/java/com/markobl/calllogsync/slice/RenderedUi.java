@@ -155,8 +155,7 @@ final class RenderedUi {
         assertTrue(
                 "Refusing a control in an unexpected package: " + packageName,
                 packageName.equals(context.getPackageName())
-                        || value.startsWith("permission_")
-                                && packageName.contains("permissioncontroller"));
+                        || value.startsWith("permission_") && permissionPackage(packageName));
         Rect bounds = new Rect();
         found[0].getBoundsInScreen(bounds);
         assertFalse(bounds.isEmpty());
@@ -179,16 +178,19 @@ final class RenderedUi {
         SystemClock.sleep(250);
     }
 
+    private boolean permissionPackage(String owner) {
+        return owner.equals("com.google.android.permissioncontroller")
+                || owner.equals("com.android.permissioncontroller")
+                || android.os.Build.VERSION.SDK_INT < 29
+                        && (owner.equals("com.google.android.packageinstaller")
+                                || owner.equals("com.android.packageinstaller"));
+    }
+
     private String permissionMessage() {
         AccessibilityNodeInfo root = automation.getRootInActiveWindow();
         if (root == null
                 || root.getPackageName() == null
-                || !(root.getPackageName().toString().contains("permissioncontroller")
-                        || root.getPackageName()
-                                .toString()
-                                .equals("com.google.android.packageinstaller")
-                        || root.getPackageName().toString().equals("com.android.packageinstaller")))
-            return null;
+                || !permissionPackage(root.getPackageName().toString())) return null;
         AccessibilityNodeInfo message = find("permission_message", true);
         return message == null || message.getText() == null ? "" : message.getText().toString();
     }
