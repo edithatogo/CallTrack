@@ -665,3 +665,13 @@ source/APK binding and ten PNG/tree pairs. The completed screenshot was inspecte
 The original native failure exposed keyboard-obscured controls; API30+ inset
 padding now includes the IME. This is separate from recovery UI acceptance, which
 remains pending, along with final-source regression and the P01–P10 full review.
+
+## Fixed-source rendered import closure
+
+Commit52b52cd passes all five native import methods, including empty final
+feedback. User Stop at3 saved, explicit reopen/resume to120 saved/0 review,123
+real events including earlier3. Cleanup/packages/environment restored. Final
+completed PNG inspected: no stale stop message. See imports-ui-evidence.json.
+The earlier timeout and launch ANR remain historical, not silently relabelled as
+failing feedback assertions; this run did not reproduce either. Recovery UI and
+final-source regression/P01–P10 review remain pending.

@@ -101,3 +101,13 @@ import-feedback-native-red.json and import-feedback-extended-native.json under
 The original retained completed screenshot remains the direct visual defect proof.
 Applied minimal feedback reset after a successful result; native verification and
 ANR diagnosis remain open. No claim of completed import UI acceptance.
+
+## Fixed-source rendered import closure
+
+Commit52b52cd passes all five native import methods, including empty final
+feedback. User Stop at3 saved, explicit reopen/resume to120 saved/0 review,123
+real events including earlier3. Cleanup/packages/environment restored. Final
+completed PNG inspected: no stale stop message. See imports-ui-evidence.json.
+The earlier timeout and launch ANR remain historical, not silently relabelled as
+failing feedback assertions; this run did not reproduce either. Recovery UI and
+final-source regression/P01–P10 review remain pending.
