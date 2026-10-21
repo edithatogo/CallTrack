@@ -2,6 +2,9 @@ import io
 from pathlib import Path
 import sys
 import unittest
+import tempfile
+import json
+from unittest.mock import patch
 import zipfile
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import audit_release_artifacts as audit
@@ -34,3 +37,25 @@ class AuditTest(unittest.TestCase):
         metadata['variants'][0]['files'][0]['sha256'] = 'b' * 64
         with self.assertRaisesRegex(ValueError, 'uniquely bind'):
             audit.module_artifact_url(row, metadata)
+
+    def test_mismatch_retains_failed_receipt_and_existing_output_is_preserved(self):
+        data = io.BytesIO()
+        with zipfile.ZipFile(data, 'w') as archive:
+            archive.writestr('classes.txt', 'test')
+        def response(url, **kwargs):
+            stream = io.BytesIO(b'<project xmlns="http://maven.apache.org/POM/4.0.0"/>' if url.endswith('.pom') else data.getvalue())
+            stream.url = url
+            return stream
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': [dict(coordinate='org.test:test:1', name='test-1.jar', sha256='0' * 64)]}))
+            output = root / 'audit'
+            with patch.object(audit.urllib.request, 'urlopen', side_effect=response):
+                result = audit.audit(inventory, output)
+            self.assertFalse(result['all_repository_bytes_match'])
+            self.assertFalse(json.loads((output / 'receipt.json').read_text())['release_ready'])
+            before = (output / 'receipt.json').read_bytes()
+            with self.assertRaises(FileExistsError):
+                audit.audit(inventory, output)
+            self.assertEqual(before, (output / 'receipt.json').read_bytes())

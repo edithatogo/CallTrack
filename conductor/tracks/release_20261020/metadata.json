@@ -13,7 +13,16 @@
   "release_ready": false,
   "implementation_commit": "6b353f4",
   "review_commit": "66593c3",
-  "review_status": "passed-with-fixes-for-unsigned-scope",
+  "review_status": "passed-with-fixes-for-local-development-scope",
   "unsigned_candidate_revision": "787ae35b8a8da829641222f0e755fa3c4664aa11",
-  "unsigned_kotlin_candidate_qualified": true
+  "unsigned_kotlin_candidate_qualified": true,
+  "local_runtime_repository_audit": true,
+  "unique_runtime_artifact_count": 63,
+  "production_signing_qualified": false,
+  "independent_environment_reproduction": false,
+  "development_version_increase_qualified": true,
+  "development_wrong_key_rejection_qualified": true,
+  "production_upgrade_qualified": false,
+  "local_host_tests": 105,
+  "local_review": "review-local-qualification-20261021.md"
 }

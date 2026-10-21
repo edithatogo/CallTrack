@@ -26,6 +26,19 @@ def require_rejection(result, reason):
         raise RuntimeError('Expected controlled rejection: ' + reason)
 
 
+def cleanup_owned_packages(adb, attempted):
+    errors = []
+    for package in reversed(attempted):
+        try:
+            if 'Success' not in adb('uninstall', package):
+                raise RuntimeError('Uninstall unconfirmed')
+            if 'package:' + package in adb('shell', 'pm', 'list', 'packages', package).splitlines():
+                raise RuntimeError('Package still present')
+        except Exception as error:
+            errors.append(str(error))
+    return errors
+
+
 def qualify(serial, output):
     if not re.fullmatch(r'emulator-\d+', serial):
         raise RuntimeError('Release upgrade probe refuses physical-device serials')
@@ -163,16 +176,10 @@ def qualify(serial, output):
         receipt['error'] = str(error)
         raise
     finally:
-        clean = True
-        for package in reversed(attempted):
-            try:
-                if 'Success' not in adb('uninstall', package):
-                    raise RuntimeError('Uninstall unconfirmed')
-                if 'package:' + package in adb('shell', 'pm', 'list', 'packages', package).splitlines():
-                    raise RuntimeError('Package still present')
-            except Exception as error:
-                clean = False
-                receipt.setdefault('cleanup_errors', []).append(str(error))
+        errors = cleanup_owned_packages(adb, attempted)
+        clean = not errors
+        if errors:
+            receipt['cleanup_errors'] = errors
         receipt['packages_removed'] = bool(attempted) and clean
         if not clean:
             receipt['result'] = 'failed'

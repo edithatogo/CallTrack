@@ -1,6 +1,18 @@
 # Verification and readiness boundary
 
-## Current checkpoint — 2026-10-21
+## Current local continuation — 2026-10-21
+
+See [local qualification handoff](local-qualification-20261021.md),
+[repository audit](canonical-runtime-audit-20261021.json),
+[asset hash audit](assets-audit-20261021.json) and
+[artifact/source checks](local-artifact-checks-20261021.json).
+The current unsigned Kotlin candidate is787ae35, not the historical6b353f4 below.
+Two same-host builds match with115 JVM tests each and zero lint errors; their exact
+APKs are rechecked unsigned. The [new native upgrade/rejection evidence](development-upgrade-evidence-20261021.json)
+passes four instrumentation invocations with development signing, two controlled
+rejections, preserved private state and verified cleanup;105 host tests pass. Full D01–D09 and release_ready=false remain.
+
+## Historical unsigned checkpoint — 2026-10-21
 
 Unsigned development qualification and review pass: see [current review](review-20261021.md),
 [source/artifact evidence](unsigned-evidence.json) and [runtime inventory](runtime-artifacts-20261021.json).
