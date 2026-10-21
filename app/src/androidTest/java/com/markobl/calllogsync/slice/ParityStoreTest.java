@@ -12,6 +12,33 @@ import org.junit.Test;
 
 /** Own private fixture database only; no calls, calendars or device settings are changed. */
 public class ParityStoreTest {
+    /** Historical v4/v5 shape; DROP COLUMN is unavailable on older SQLite releases. */
+    private static void restorePreRetentionOutbox(SQLiteDatabase db) {
+        String columns =
+                "source,calendar,state,event,signature,marker,fingerprint,payload_title,payload_description,payload_start,payload_end,payload_timezone,operation_owner,operation_generation,source_start,source_seconds,source_type,source_presentation,source_presentation_supplied";
+        db.beginTransaction();
+        try {
+            db.execSQL("ALTER TABLE outbox RENAME TO outbox_v6");
+            // Exact outbox declaration from qualification/release/assets/release-schema-5.sql.
+            db.execSQL(
+                    "CREATE TABLE outbox (source TEXT NOT NULL, calendar INTEGER NOT NULL, state"
+                        + " TEXT NOT NULL, event INTEGER NOT NULL, signature TEXT, marker TEXT,"
+                        + " fingerprint TEXT NOT NULL, payload_title TEXT, payload_description"
+                        + " TEXT, payload_start INTEGER, payload_end INTEGER, payload_timezone"
+                        + " TEXT, operation_owner TEXT, operation_generation INTEGER NOT NULL"
+                        + " DEFAULT 0, source_start INTEGER, source_seconds INTEGER, source_type"
+                        + " INTEGER, source_presentation INTEGER, source_presentation_supplied"
+                        + " INTEGER, PRIMARY KEY(source,calendar))");
+            db.execSQL(
+                    "INSERT INTO outbox (" + columns + ") SELECT " + columns + " FROM outbox_v6");
+            db.execSQL("DROP TABLE outbox_v6");
+            db.execSQL("CREATE INDEX outbox_state ON outbox(calendar,state)");
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
     private static void expectFailure(Class<? extends Throwable> type, Runnable action) {
         try {
             action.run();
@@ -444,7 +471,7 @@ public class ParityStoreTest {
                                         new DurableDelivery.SourceFacts(123, 0, 3, null, true)));
                 SQLiteDatabase db = ledger.getWritableDatabase();
                 db.execSQL("DROP TABLE scan_cursors");
-                db.execSQL("ALTER TABLE outbox DROP COLUMN payload_saved_at");
+                restorePreRetentionOutbox(db);
                 db.setVersion(4);
             }
             try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
@@ -895,8 +922,7 @@ public class ParityStoreTest {
                 ledger.put("legacy", 7, new SliceEngine.Entry(99, "old-fingerprint"));
                 ledger.checkpoint(
                         operation, new PagedCalls.Checkpoint("fixture", 2, "upper", 1, "last"));
-                ledger.getWritableDatabase()
-                        .execSQL("ALTER TABLE outbox DROP COLUMN payload_saved_at");
+                restorePreRetentionOutbox(ledger.getWritableDatabase());
                 ledger.getWritableDatabase().setVersion(5);
             }
             long migrated = base + 100 * PayloadRetention.WINDOW_MILLIS;
