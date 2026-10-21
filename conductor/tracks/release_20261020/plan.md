@@ -139,3 +139,10 @@ key generation, cloud consent, physical testing or elapsed observation is claime
 - [x] Task: Review/apply fixes and prepare exact-candidate manual GitHub workflow — review-linux-reproduction-20261022.md; evidence/review 484a8dd; actionlint and Linux execution of build/tooling commands pass. Final reporting fixture corrected;131 host tests and160 Conductor documents pass.
 - [ ] Task: Execute and read back hosted CI after the repository choice is authorised; source workflow preparation is not a provider run.
 - [ ] Task: Finish original signing/identity, signed source conveyance, Android/platform/native, cloud and operational gates before M4/archive.
+
+
+## Extended emulator acceptance — 2026-10-22
+
+- [~] Task: Qualify exact dedicated API26 minimum and API33 intermediate images and source-bound builds; preserve existing emulator state.
+- [ ] Task: Run native store/provider, rendered settings/import/recovery, accessibility at normal/large text, lifecycle recovery and development-key schema/provider upgrades per version.
+- [ ] Task: Review, fix and rerun affected checks; retain physical-device, cloud, production-signing and operational gates separately.
