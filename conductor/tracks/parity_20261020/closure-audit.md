@@ -40,7 +40,7 @@ source/APK bound; they are not combined into a claim about the current build.
   Checked generation authority, false/thrown commit uncertainty, publication/order,
   bounded admission and acknowledgements, backlog/retry limits, sanitized status,
   failure counters and absence of caller fields in work input/output/logging.
-- Manifest: only call/phone-state/calendar/boot permissions; no network, contacts,
+- Source manifest: call/phone-state/calendar/boot permissions; no network, contacts,
   SMS or audio permission. Old boot receiver is disabled; old activity is not
   exported; new settings/import/recovery screens are not exported. Current
   launcher and protected system-wake actions remain deliberate entry points.
@@ -81,3 +81,21 @@ The old stuck guest's state is independent of the qualified recovery guest.
 Frozen matrix currently confirms store39, source-identity3, wake-budget1 and
 provider8 with cleanup; worker and later suites remain in flight. Final P01–P10
 closure, exact receipt inspection and screenshots remain unproven.
+
+## Packaged permission readback and remaining harness correction
+
+Actual debug APK aapt permissions include WorkManager normal WAKE_LOCK,
+ACCESS_NETWORK_STATE and FOREGROUND_SERVICE plus the app's signature receiver
+permission, beyond the root manifest's call/phone-state/calendar/boot declarations.
+No INTERNET, READ_CONTACTS, READ_SMS, RECORD_AUDIO or WRITE_CALL_LOG is present.
+This is packaged readback, not an inference from source declarations alone.
+
+The earlier failed reboot receipt reports emulator_restored verified/unchanged
+while ADB was offline, because reboot did not mark EmulatorEnvironment.changed.
+The recorded manual recovery subsequently verified original settings and cleanup;
+the current passing lifecycle run also has a verified doze_restore readback.
+Nevertheless the harness failure path must be corrected before final review closes:
+track reboot as an environment mutation before ADB dispatch, and add an uncertain-
+reboot regression that changes awake state, fails, then restores the original.
+Defer harness edits until the live frozen matrix completes; no current native
+proof or production source is to be changed underneath it.

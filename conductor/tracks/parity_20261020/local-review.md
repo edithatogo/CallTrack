@@ -191,3 +191,14 @@ lifecycle-reboot-observation-evidence.json and lifecycle-reboot-recovery-evidenc
 Removed the premature45s connection gate: expected offline observations now use
 the existing180s boot loop. Added pre-cleanup exit-info/meminfo for unexplained
 process exits.71 host tests pass. Full current-source acceptance remains pending.
+
+## Medium — reboot failure can skip environment readback (open harness finding)
+
+The failed reboot observation receipt records restoration verified/unchanged even
+with ADB offline, because the harness dispatches reboot outside the environment
+mutation owner. Later manual recovery verified cleanup/settings, and the current
+full native lifecycle pass verifies restoration after Doze, so no unverified
+recovery is being promoted to success. Before review closure, put reboot through
+EmulatorEnvironment with changed=True set before dispatch; test a reboot command
+that changes Awake→Asleep then raises, and require actual restore/readback.
+Wait until the live frozen matrix finishes before editing shared harness code.
