@@ -178,6 +178,7 @@ gradle.beforeProject { project ->
             provider('migrateAndRecoverWithoutChangingHumanEvents')
             provider('migrationFailureRollsBackThenRetries')
             provider('unsupportedNewerSchemaIsPreserved')
+            provider('importMigrationPreservesProgressAndCancelledSession')
         adb('install', '-r', str(original), reject='INSTALL_FAILED_VERSION_DOWNGRADE')
         native('verifyPersistedState')
         # A one-day disposable fixture certificate tests rejection, never production custody.

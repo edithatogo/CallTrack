@@ -59,3 +59,12 @@ class AuditTest(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 audit.audit(inventory, output)
             self.assertEqual(before, (output / 'receipt.json').read_bytes())
+
+    def test_classes_named_notice_are_not_licence_documents(self):
+        data = io.BytesIO()
+        with zipfile.ZipFile(data, 'w') as archive:
+            archive.writestr('org/example/UserNotice.class', 'not a legal notice')
+            archive.writestr('org/example/LICENSE.class', 'executable bytecode')
+            archive.writestr('META-INF/NOTICE.txt', 'real notice')
+        rows = audit.embedded_notices(data.getvalue())
+        self.assertEqual(['META-INF/NOTICE.txt'], [r['path'] for r in rows])
