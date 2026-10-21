@@ -614,3 +614,39 @@ telephony-evidence.json. No product behavior changed in this slice. This qualifi
 one supported incoming missed-call path, not answered/outgoing physical telephony
 or cloud sync. Remaining major gates: positive rendered settings/permission/import/
 recovery journeys, final-source regression and full P01–P10 review/fixes/archive.
+
+
+## Rendered settings and system-inset acceptance
+
+PositiveUiTest/RenderedUi use visible accessibility nodes and actual injected
+touches, never direct app click handlers. Five native methods pass: fixture setup,
+actual top-content/system-bar geometry across settings/manual/import/recovery,
+settings journey, calendar revocation/restoration and cleanup.19 PNG screenshots
+and matching accessibility trees are pulled with hashes before uninstall. The
+settings-enabled and recovery-geometry screenshots were visually inspected. Exact
+source/APK/native/artifact/tool/red binding is in settings-ui-evidence.json.
+
+Settings journey proves permission denial then grants, grants alone do not activate,
+fixture destination selection, each call filter, all-filters-off disabled enable,
+activation confirmation cancellation then acceptance, persisted selected policy,
+pause and reopen, and calendar permission revocation/restoration without enabling.
+All effects remain0 as expected for an empty source. Both packages/calendar fixture
+are removed; original emulator environment is verified restored.67 host tests and
+full108-JVM/APK/lint build pass.
+
+Native red found real Android16 edge-to-edge overlap: first content42px inside a
+136px system area. ActivityInsets applies system/cutout padding to all four native
+ScrollViews and selects readable day/night system icon appearance, without new
+dependencies or a UI framework change. The API26–29 branch/night appearance compile
+but are not runtime-qualified by this API36/day run. UI driver red also exposed
+accessibility preceding rendered permission frames; it now waits for idle/actual
+dialog progression and retries the same intended choice. A transient permission
+controller may restore one revoked permission automatically when its sibling is
+already granted; driver accepts verified restoration without inventing another
+Allow button. These driver failures were not reported as app acceptance passes.
+
+Remaining: positive historical preview/confirmation/cancel/progress/resume/repeat,
+read-only existing-effect checks, explicit READY approval/cancellation/withdrawal,
+edited/deleted review/suppression/retention UI, final-source regression and complete
+P01–P10 review/fixes/archive. Earlier provider/worker/lifecycle/telephony receipts
+remain separately source-bound before this presentation-only fix.

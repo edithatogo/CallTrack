@@ -192,3 +192,22 @@ are gates. Failure cleanup cancels only the known fixture number, waits for its
 processed row and preserves cleanup instrumentation if termination/cleanup is unknown.
 The receipt is `.local/slice-evidence/parity-telephony-receipt.json`. Physical phones,
 existing calls and unrelated AVDs are refused; this tests no outgoing real calls.
+
+### Rendered settings acceptance
+
+Run `python3 scripts/qualify_parity_ui.py --serial emulator-5582` against the matching
+build and dedicated guest. Native tests use visible accessibility selectors and
+injected touch events, wait for permission-dialog progression, and verify committed
+settings/provider effects. This is separate from constructing or testing controllers.
+The suite currently covers settings/permission/filter/confirmation/pause/reopen and
+restoration plus top-content geometry on all four Views screens. Positive import and
+recovery actions remain additional work.
+
+PNG screenshots and accessibility trees are written to private fixture files, then
+pulled to `.local/slice-evidence/ui-<fixture-token>/` before uninstall, with hashes in
+`parity-ui-receipt.json`. Names are unique across instrumentation processes. Missing
+or invalid screenshots preserve installed evidence/cleanup code instead of reporting
+success. The harness snapshots/restores the dedicated emulator environment and
+verifies token-owned calendar cleanup and both package removals. No physical phone,
+real caller data or cloud account is used. Native API36/day evidence does not establish
+older-platform/night-mode runtime parity.
