@@ -119,3 +119,6 @@ hosted/source/support/channel gates remain. Track5 stays active.
 
 - [Physical calls and account-calendar qualification procedure](physical-calendar-qualification.md) — prepared; selected physical device, participant and remote routes pending.
 - [Physical-route preparation review](review-physical-preparation-20261022.md) — prepared scope only; actual runtime acceptance remains pending.
+
+- [Seven-day operational observation](seven-day-observation.md) — prepared; start not set and zero accepted days.
+- [Observation preparation review](review-observation-preparation-20261022.md) — final runtime review remains pending actual seven-day evidence.

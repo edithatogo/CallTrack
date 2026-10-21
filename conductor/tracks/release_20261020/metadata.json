@@ -103,5 +103,15 @@
   "physical_calls_executed_this_continuation": 0,
   "remote_cases_executed_this_continuation": 0,
   "physical_route_preparation_review": "review-physical-preparation-20261022.md",
-  "physical_route_preparation_review_status": "prepared-scope-passed-actual-device-account-acceptance-pending"
+  "physical_route_preparation_review_status": "prepared-scope-passed-actual-device-account-acceptance-pending",
+  "observation_protocol": "seven-day-observation.md",
+  "observation_status": "awaiting-physical-route-and-usage-scope-prerequisites",
+  "observation_started_at": null,
+  "observation_completed_at": null,
+  "observation_accepted_days": 0,
+  "observation_accepted_hours": 0,
+  "observation_final_runtime_review_qualified": false,
+  "observation_automation_id": "calltrack-seven-day-observation",
+  "observation_followup_status": "daily-heartbeat-active-prerequisite-watch-only",
+  "observation_preparation_review": "review-observation-preparation-20261022.md"
 }
