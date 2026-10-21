@@ -1,6 +1,6 @@
 # Plan: Parity and durable synchronisation
 
-Track active: schema4 durable foundations have bounded JVM/native evidence. Paging, historical import, scheduling, UI/recovery and full parity acceptance remain required.
+Track active: schema6 implementation and rendered settings/import/recovery have bounded native evidence. Final-source regression, complete P01–P10 review, handoff and archive remain required. Historical checkboxes below await final evidence reconciliation.
 
 ## Phase 1: Discovery and mapping
 
@@ -788,3 +788,11 @@ See recovery-withdrawal-red-evidence.json and recovery-ui-evidence.json.
 Full Android build passes56s;70 host tests and Conductor validation pass.
 Final-source store/provider/worker/lifecycle/telephony/settings/import regression
 and full P01–P10 review/handoff/archive remain outstanding.
+
+## Final-source regression started
+
+On daf794a app/test inputs, store39/39 and source-identity3/3 native checks pass;
+both suites remove development packages. See final-store-evidence.json and
+final-source-identity-evidence.json. Earlier UI/settings/import/provider/worker/
+lifecycle/telephony evidence remains separately source-bound; final regression
+and full review are not yet complete. Metadata now correctly records schema6.
