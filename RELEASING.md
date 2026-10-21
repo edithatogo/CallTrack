@@ -196,3 +196,39 @@ Record actual channel readback and download verification only after an authorise
 publication. Keep previous artifacts/source and issued history; never replace a
 published binary silently. An archived planning/research track is not release
 approval or operational acceptance.
+
+## Current source/licence candidate bundle
+
+The asset replacement/provenance is in [ASSET_PROVENANCE.md](ASSET_PROVENANCE.md).
+The preferred editable vector sources and active English/German strings are tracked;
+uncertain inherited launcher/store artwork and unused endpoint strings are removed.
+The new development label does not choose a permanent release identity.
+
+After freezing the source and completing matching unsigned builds:
+
+```sh
+python3 scripts/prepare_release_bundle.py --fetch-sources .local/release-source-cache
+CALLTRACK_RUNTIME_OUT="$PWD/.local/release-runtime.json" \
+  sh gradlew --no-daemon --console=plain \
+  -I qualification/release/runtime-inventory.init.gradle releaseBundleRuntimeInventory
+python3 scripts/prepare_release_bundle.py --output .local/release-evidence/UNIQUE-SOURCE-BUNDLE \
+  --build-receipt .local/release-evidence/MATCHING-BUILDS/receipt.json \
+  --runtime-inventory .local/release-runtime.json --source-cache .local/release-source-cache
+```
+
+Use the explicitly qualified isolated JDK path through process-local JAVA_HOME,
+and the separately licensed SDK through ANDROID_HOME. No global setting changes.
+The bundle rejects dirty/mismatched source, changed runtime graphs, incomplete or
+modified source/POM inputs, missing APK notices and private/unsafe archive paths.
+It includes the Git snapshot, exact-source revision, build/qualification scripts,
+preferred vector sources, licences/notices and published source/POM material for
+all63 runtime coordinates. Every payload is hashed and read back after archiving;
+two independently written archive files must match. It never includes Git history,
+private `.local` inputs, signing keys, SDK/JDK archives or original CallTrack APKs.
+
+[Bundle contents and limitations](qualification/release/BUNDLE_README.txt) distinguish
+app rebuilds using audited binaries from unqualified upstream dependency rebuilds.
+This prepares a source-conveyance candidate. Final signed-artifact binding and
+actual source delivery/download through the chosen channel remain required when
+that conveyance is authorised; no publication or permanent trademark decision is
+implied. Retain previous source/artifact evidence rather than relabelling it.
