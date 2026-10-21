@@ -12,7 +12,17 @@
 - [Preparation evidence](preparation-evidence.json)
 - [Resolved dependency report](dependency-report.json)
 
-## Current licence/tool-trust and schema/provider checkpoint — 2026-10-21
+## Isolated JDK checkpoint — 2026-10-22
+
+- [Isolated JDK qualification](isolated-jdk-qualification-20261022.md)
+- [Evidence](isolated-jdk-evidence-20261022.json)
+- [Review](review-isolated-jdk-20261022.md)
+
+The isolated vendor-signed JDK resolves the resource-seal blocker for its explicit
+build path. The Homebrew installation remains unchanged and its known defect
+remains recorded. Original production and independent/live acceptance stay open.
+
+## Earlier licence/tool-trust and schema/provider checkpoint — 2026-10-21
 
 - [Current qualification and remaining gates](licence-tool-upgrade-qualification-20261021.md)
 - [Current review](review-licence-tool-upgrade-20261021.md)

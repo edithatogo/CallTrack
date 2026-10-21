@@ -38,8 +38,9 @@ binding; fixtures/packages are removed and original environment restored.
 audited dependency entries and qualifies239 canonical binary artifacts,15 native
 schema/provider upgrade invocations and two clean unsigned5578bf5 builds with115
 JVM tests each.121 host tests pass. It remains active for original production,
-independent/platform, licence-conveyance and operational gates; the JDK bundle
-resource-seal limit is explicit in the current handoff.
+independent/platform, licence-conveyance and operational gates; an [isolated vendor-signed JDK](tracks/release_20261020/isolated-jdk-qualification-20261022.md)
+now resolves the bundle-resource-seal blocker for that explicit build path; the
+existing Homebrew defect remains recorded.
 [Track6 Kotlin migration](tracks/kotlin_20261020/index.md) now has36 production Kotlin files and one documented Java nullable-label
 bridge after33 active conversions and14 unreachable inherited-file removals.
 Code review/fixes and emulator recovery are recorded; the final selected API36
