@@ -48,18 +48,66 @@ public final class AutomaticScheduling {
             throws java.util.concurrent.ExecutionException,
                     InterruptedException,
                     java.util.concurrent.TimeoutException {
-        awaitCommitted(requests(context), deadlineNanos);
+        remainingBudget(deadlineNanos);
+        java.util.concurrent.Future<?> admitted =
+                WakeAdmission.EXECUTOR.submit(
+                        () -> {
+                            awaitCommitted(
+                                    control(context)
+                                            .reconcile(
+                                                    () ->
+                                                            deadlineNanos - System.nanoTime() > 0
+                                                                    && !Thread.currentThread()
+                                                                            .isInterrupted()),
+                                    deadlineNanos);
+                            return null;
+                        });
+        try {
+            admitted.get(remainingBudget(deadlineNanos), TimeUnit.NANOSECONDS);
+        } finally {
+            if (!admitted.isDone()) admitted.cancel(true);
+            WakeAdmission.EXECUTOR.purge();
+        }
+    }
+
+    // One blocked admission plus one waiting request; later wakes fail unconfirmed rather
+    // than accumulating unbounded threads/requests. Periodic and reopen recovery remain active.
+    private static final class WakeAdmission {
+        static final java.util.concurrent.ThreadPoolExecutor EXECUTOR = create();
+
+        private static java.util.concurrent.ThreadPoolExecutor create() {
+            java.util.concurrent.ThreadPoolExecutor executor =
+                    new java.util.concurrent.ThreadPoolExecutor(
+                            1,
+                            1,
+                            30,
+                            TimeUnit.SECONDS,
+                            new java.util.concurrent.ArrayBlockingQueue<>(1),
+                            task -> {
+                                Thread thread = new Thread(task, "CallTrackWakeAdmission");
+                                thread.setDaemon(true);
+                                return thread;
+                            });
+            executor.allowCoreThreadTimeOut(true);
+            return executor;
+        }
+    }
+
+    private static long remainingBudget(long deadlineNanos)
+            throws java.util.concurrent.TimeoutException {
+        long remaining = deadlineNanos - System.nanoTime();
+        if (remaining <= 0)
+            throw new java.util.concurrent.TimeoutException("Wake enqueue unconfirmed");
+        return remaining;
     }
 
     static void awaitCommitted(java.util.concurrent.Future<?>[] operations, long deadlineNanos)
             throws java.util.concurrent.ExecutionException,
                     InterruptedException,
                     java.util.concurrent.TimeoutException {
+        remainingBudget(deadlineNanos);
         for (java.util.concurrent.Future<?> operation : operations) {
-            long remaining = deadlineNanos - System.nanoTime();
-            if (remaining <= 0)
-                throw new java.util.concurrent.TimeoutException("Wake enqueue unconfirmed");
-            operation.get(remaining, TimeUnit.NANOSECONDS);
+            operation.get(remainingBudget(deadlineNanos), TimeUnit.NANOSECONDS);
         }
     }
 

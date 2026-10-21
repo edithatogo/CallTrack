@@ -703,3 +703,21 @@ See recovery-withdrawal-red-evidence.json and recovery-ui-evidence.json.
 Full Android build passes56s;70 host tests and Conductor validation pass.
 Final-source store/provider/worker/lifecycle/telephony/settings/import regression
 and full P01–P10 review/handoff/archive remain outstanding.
+
+## Wake admission deadline — native red/green
+
+The held-lock native boundary test fails before the fix: a100ms scheduling budget
+cannot return even within1s while the delivery monitor remains held. No actual
+broadcast ANR is claimed. A bounded admission executor now permits one running
+and one queued request, rejecting overload as unconfirmed. The receiver caller
+waits only its remaining budget; timed-out tasks are cancelled/purged. Deadline/
+interruption permission is rechecked under the delivery lock before reading and
+scheduling policy, preventing expired admission from publishing later work.
+An expired budget cannot acknowledge an empty request list.
+
+Native held-lock test now passes while the monitor remains held; both red/green
+packages removed. See wake-budget-red-evidence.json and wake-budget-evidence.json.
+Build passes110 JVM tests,0 failures/errors/skips;71 host tests pass. No new runtime
+dependency or schema change. Periodic/reopen recovery remains the fallback for
+unconfirmed/overloaded wakes. Full lifecycle/telephony/current-source acceptance
+and P01–P10 audit/review/handoff/archive remain required.

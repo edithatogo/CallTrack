@@ -20,7 +20,7 @@ from parity_targets import AVD, is_dedicated_avd
 
 
 def qualify(serial, suite="store"):
-    if suite not in ("store", "source-identity"):
+    if suite not in ("store", "source-identity", "wake-budget"):
         raise ValueError("Unknown native suite")
     if not re.fullmatch(r'emulator-\d+', serial):
         raise RuntimeError('Parity emulator harness refuses a physical-device serial')
@@ -74,7 +74,9 @@ def qualify(serial, suite="store"):
             attempted.append(package)
             if 'Success' not in command('install', str(apk)):
                 raise RuntimeError('Install not confirmed')
-        if suite == 'source-identity':
+        if suite == 'wake-budget':
+            check('WakeBudgetTest', 'heldDeliveryLockCannotHoldWakePastDeadline')
+        elif suite == 'source-identity':
             check('SourceNamespaceStoreTest', 'falseIdentityCommitCannotBeReusedFromCache')
             check('SourceNamespaceStoreTest', 'thrownIdentityCommitCannotBeReusedFromCache')
             check('SourceNamespaceStoreTest', 'committedNamespaceIsReusedAcrossAdapters')
@@ -138,7 +140,7 @@ def qualify(serial, suite="store"):
         receipt['packages_removed'] = all(cleanup)
         if not receipt['packages_removed']:
             receipt['result'] = 'failed'
-        (evidence / (('store' if suite == 'store' else 'source-identity') + '-device-receipt.json')).write_text(json.dumps(receipt, indent=2) + '\n')
+        (evidence / (suite + '-device-receipt.json')).write_text(json.dumps(receipt, indent=2) + '\n')
     print(json.dumps({k: receipt.get(k) for k in ('result', 'packages_removed', 'error')}))
     return 0 if receipt.get('result') == 'passed' else 1
 
@@ -146,6 +148,6 @@ def qualify(serial, suite="store"):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--serial', required=True)
-    parser.add_argument('--suite', choices=('store', 'source-identity'), default='store')
+    parser.add_argument('--suite', choices=('store', 'source-identity', 'wake-budget'), default='store')
     args = parser.parse_args()
     raise SystemExit(qualify(args.serial, args.suite))

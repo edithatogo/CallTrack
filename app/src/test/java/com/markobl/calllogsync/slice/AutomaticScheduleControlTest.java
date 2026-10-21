@@ -77,6 +77,46 @@ public class AutomaticScheduleControlTest {
     }
 
     @Test
+    public void expiredWakeCannotScheduleAfterWaitingForDeliveryLock() throws Exception {
+        ActivationControl activation = new ActivationControl(new ActivationControlTest.Store());
+        activation.activate(7, "UTC", 1000, true, true, true);
+        java.util.concurrent.atomic.AtomicInteger scheduled =
+                new java.util.concurrent.atomic.AtomicInteger();
+        AtomicBoolean permitted = new AtomicBoolean(true);
+        AutomaticScheduleControl control =
+                new AutomaticScheduleControl(
+                        activation,
+                        settings -> {
+                            scheduled.incrementAndGet();
+                            return new Future<?>[0];
+                        },
+                        () -> {});
+        ExecutorService thread = Executors.newSingleThreadExecutor();
+        CountDownLatch started = new CountDownLatch(1);
+        Future<Future<?>[]> result;
+        try {
+            synchronized (DurableDelivery.DELIVERY_LOCK) {
+                result =
+                        thread.submit(
+                                () ->
+                                        control.reconcile(
+                                                () -> {
+                                                    boolean allowed = permitted.get();
+                                                    started.countDown();
+                                                    return allowed;
+                                                }));
+                assertTrue(started.await(1, TimeUnit.SECONDS));
+                permitted.set(false);
+            }
+            assertEquals(0, result.get(1, TimeUnit.SECONDS).length);
+            assertEquals(0, scheduled.get());
+            assertTrue(activation.current().enabled);
+        } finally {
+            thread.shutdownNow();
+        }
+    }
+
+    @Test
     public void pausedPolicyDoesNotScheduleAndSchedulingFailureRetainsCommittedPolicy() {
         ActivationControl activation = new ActivationControl(new ActivationControlTest.Store());
         AutomaticScheduleControl control =
