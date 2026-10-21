@@ -80,10 +80,13 @@ def qualify(serial, output):
         subprocess.run(['git', 'clone', '--quiet', '--no-hardlinks', '--no-checkout', str(ROOT), str(checkout)], check=True)
         subprocess.run(['git', 'checkout', '--quiet', '--detach', revision], cwd=checkout, check=True)
         overlay = output / 'version-probe.init.gradle'
-        overlay.write_text("""gradle.projectsEvaluated {
-    def android = gradle.rootProject.project(':app').extensions.getByName('android')
-    android.defaultConfig.versionCode = 11
-    android.buildTypes.release.signingConfig = android.signingConfigs.debug
+        overlay.write_text("""gradle.beforeProject { project ->
+    project.plugins.withId('com.android.application') {
+        project.androidComponents.finalizeDsl { android ->
+            android.defaultConfig.versionCode = 11
+            android.buildTypes.release.signingConfig = android.signingConfigs.debug
+        }
+    }
 }
 """)
         receipt['overlay_sha256'] = sha(overlay)

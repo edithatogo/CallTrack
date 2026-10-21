@@ -1,0 +1,99 @@
+#!/usr/bin/env python3
+"""Compare runtime inventory with fresh canonical HTTPS repository downloads.
+
+Repository byte agreement and POM declarations are evidence, not legal clearance,
+independent signatures, build-plugin verification or a complete SBOM.
+"""
+import argparse
+from concurrent.futures import ThreadPoolExecutor
+import hashlib
+import io
+import json
+from pathlib import Path
+import urllib.request
+import xml.etree.ElementTree as ET
+import zipfile
+
+LIMIT = 64 * 1024 * 1024
+
+
+def digest(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def repository_url(row, pom=False):
+    group, module, version = row['coordinate'].split(':')
+    base = 'https://dl.google.com/dl/android/maven2/' if group.startswith('androidx.') or group == 'com.google.android.material' else 'https://repo.maven.apache.org/maven2/'
+    name = module + '-' + version + '.pom' if pom else row['name']
+    if '/' in name or '..' in name:
+        raise ValueError('Unsafe artifact filename')
+    return base + group.replace('.', '/') + '/' + module + '/' + version + '/' + name
+
+
+def declarations(data):
+    root = ET.fromstring(data)
+    ns = {'m': 'http://maven.apache.org/POM/4.0.0'}
+    return [{key: node.findtext('m:' + key, default='', namespaces=ns)
+             for key in ('name', 'url', 'distribution')}
+            for node in root.findall('m:licenses/m:license', ns)]
+
+
+def embedded_notices(data):
+    rows = []
+    with zipfile.ZipFile(io.BytesIO(data)) as archive:
+        for member in archive.infolist():
+            if member.file_size > LIMIT:
+                raise ValueError('Archive member exceeds audit limit')
+            lower = member.filename.lower()
+            if not member.is_dir() and any(word in lower.rsplit('/', 1)[-1] for word in ('license', 'licence', 'notice', 'copying')):
+                rows.append(dict(path=member.filename, sha256=digest(archive.read(member)), size=member.file_size))
+            elif member.filename == 'classes.jar':
+                rows.extend(dict(item, path='classes.jar!/' + item['path']) for item in embedded_notices(archive.read(member)))
+    return rows
+
+
+def audit(inventory, output):
+    source = inventory.read_bytes()
+    rows = json.loads(source)['artifacts']
+    unique = {(r['coordinate'], r['name'], r['sha256']): r for r in rows}
+    output.mkdir(parents=True, exist_ok=False)
+
+    def check(item):
+        number, row = item
+        result = {key: row[key] for key in ('coordinate', 'name', 'sha256')}
+        try:
+            for kind in ('artifact', 'pom'):
+                url = repository_url(row, pom=kind == 'pom')
+                with urllib.request.urlopen(url, timeout=60) as response:
+                    data = response.read(LIMIT + 1)
+                    final_url = response.url
+                if len(data) > LIMIT or not final_url.startswith('https://'):
+                    raise ValueError('Oversized response or insecure redirect')
+                (output / (str(number) + '-' + kind)).write_bytes(data)
+                result[kind + '_url'] = url
+                result[kind + '_sha256'] = digest(data)
+                if kind == 'artifact':
+                    result['repository_bytes_match'] = digest(data) == row['sha256']
+                    result['embedded_notices'] = embedded_notices(data)
+                else:
+                    result['declared_licences'] = declarations(data)
+        except Exception as error:
+            result['error'] = str(error)
+        return result
+
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        results = list(pool.map(check, enumerate(unique.values())))
+    receipt = dict(scope=__doc__, inventory_sha256=digest(source), resolved_rows=len(rows),
+                   unique_artifacts=len(unique), artifacts=results,
+                   all_repository_bytes_match=all(r.get('repository_bytes_match') is True and 'error' not in r for r in results),
+                   licence_clearance=False, build_tool_trust=False, release_ready=False)
+    (output / 'receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
+    return receipt
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--inventory', type=Path, required=True)
+    parser.add_argument('--output', type=Path, required=True)
+    args = parser.parse_args()
+    print(json.dumps(audit(args.inventory, args.output), indent=2))
