@@ -9,8 +9,11 @@
     "release_20261020"
   ],
   "requirements": "R14, R26",
-  "implementation_status": "reviewed-qualified-Kotlin-pilot-full-migration-open",
-  "implementation_commit": "7cdd8d4",
+  "implementation_status": "active-code-migrated-final-native-review-pending",
+  "implementation_commit": "b30540d",
   "full_migration_accepted": false,
-  "review_commit": "491f936"
+  "review_commit": "491f936",
+  "active_code_migrated": true,
+  "production_kotlin_files": 36,
+  "production_java_exceptions": 1
 }

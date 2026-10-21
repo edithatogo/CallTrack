@@ -1,7 +1,7 @@
 # Contributing
 
-This is a development fork, with a working manual slice and unfinished automatic
-logging/import work. Check [Conductor](conductor/index.md) before proposing changes.
+This is a development fork with manual/automatic logging, historical import and
+recovery controls. Native acceptance is scoped to recorded emulator evidence. Check [Conductor](conductor/index.md) before proposing changes.
 The current package is disposable; there is no supported public release yet.
 
 ## Reproduce the development build
@@ -9,7 +9,8 @@ The current package is disposable; there is no supported public release yet.
 Use a fresh checkout of the exact commit being reviewed. Install an OpenJDK17
 runtime, Python3 standard library and Android SDK platform36/build-tools35.0.0.
 The wrapper pins Gradle8.13 and its distribution checksum; AGP is 8.13.2.
-The mixed-language slice pins Kotlin/KGP2.3.21 and targets Java8 bytecode.
+The Kotlin implementation retains one Java nullable-label bridge and Java interop
+tests, pins Kotlin/KGP2.3.21 and targets Java8 bytecode.
 Set JAVA_HOME and ANDROID_HOME to those installations. SDK licences must be accepted
 by the person operating the build environment. Run from the repository root:
 
@@ -46,12 +47,12 @@ The CI workflow is configured, but no hosted run has been observed in this proje
 For the dedicated parity emulator, use the source-bound build followed by:
 
 ```sh
-python3 scripts/qualify_parity_emulator.py --serial emulator-5580
+python3 scripts/qualify_parity_emulator.py --serial emulator-5582
 ```
 
 This requires the exact dedicated AVD described in Track4, and refuses physical or
-unrelated devices. Its current coverage is the store foundation, not automatic
-logging or call parity. Keep physical-call acceptance pending as directed by the
+unrelated devices. This command covers store contracts; provider, worker, lifecycle, telephony and
+rendered UI use separate harnesses in the [qualification instructions](qualification/README.md). Keep physical-call acceptance pending as directed by the
 user. The separate `qualify_slice_device.py` harness grants calendar permissions
 and creates a synthetic LOCAL calendar; run it only on an explicitly authorised
 test device. Follow its fixture recovery receipt if cleanup fails. Never target a

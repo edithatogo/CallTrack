@@ -71,8 +71,8 @@ The user authorised all active-code Kotlin conversion as stage1 of the
 [future sequence](../../future-architecture.md), before remaining release work.
 Original M4/full-M5 operational acceptance remains gated.
 
-- [~] Task: Refresh47 Java-file inventory (33 active/14 inherited) and preserve pre-conversion baseline/APKs.
-- [ ] Task: Convert stable models/policy, then orchestration, adapters/stores, scheduling and Views Activities in verified batches.
-- [ ] Task: Audit manifest/resource/reflection reachability; remove only proven obsolete code/dependencies, record remaining exceptions.
-- [ ] Task: Verify source-bound mixed-language/Java interop, in-place update and final full native matrix; retire stale javac fallback.
+- [x] Task: Refresh47 Java-file inventory (33 active/14 inherited) and preserve pre-conversion baseline/APKs — c7c3d91, migration-inventory-20261021.json.
+- [x] Task: Convert stable models/policy, then orchestration, adapters/stores, scheduling and Views Activities in verified batches — e7126a2 through f467a4d;36 production Kotlin files, one Java nullable-label bridge.
+- [x] Task: Audit manifest/resource/reflection reachability; remove only proven obsolete code/dependencies, record remaining exceptions — b30540d, legacy-removal-audit.json; three consumed transitive versions retained by review constraints.
+- [~] Task: Verify source-bound mixed-language/Java interop, in-place update and final full native matrix; retire stale javac fallback —115 JVM contracts pass; final native requalification pending review dependency correction.
 - [ ] Task: Review/fix and hand off preserving remaining M4/operational gates.
