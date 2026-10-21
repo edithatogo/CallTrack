@@ -36,6 +36,10 @@ final class FixtureCallLog {
                     "Legacy call fixture requires an emulator",
                     "1",
                     shell("getprop ro.kernel.qemu"));
+            assertEquals(
+                    "Legacy fixtures require explicit temporary adb root mode",
+                    "1",
+                    shell("getprop service.adb.root"));
             action.run();
             return;
         }
@@ -78,7 +82,7 @@ final class FixtureCallLog {
                             new ParcelFileDescriptor.AutoCloseInputStream(
                                     automation()
                                             .executeShellCommand(
-                                                    "sh " + script.getAbsolutePath()));
+                                                    "su 0 sh " + script.getAbsolutePath()));
                     ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
                 byte[] buffer = new byte[4096];
                 for (int read; (read = input.read(buffer)) != -1; ) {

@@ -24,6 +24,27 @@ TEST_PACKAGE = PACKAGE + '.test'
 TEST_CLASS = 'com.markobl.calllogsync.slice.LifecycleProviderTest'
 
 
+def ensure_legacy_fixture_root(command):
+    """Restore explicitly selected API26 fixture privilege after its real guest reboot."""
+    if (command('shell', 'getprop', 'ro.kernel.qemu') != '1'
+            or not is_dedicated_avd(command('emu', 'avd', 'name'))):
+        raise RuntimeError('Refusing fixture root outside a dedicated emulator')
+    if command('shell', 'id', '-u') == '0':
+        return False
+    output = command('root')
+    if 'cannot' in output.lower():
+        raise RuntimeError('Legacy userdebug fixture root unavailable')
+    deadline = time.monotonic() + 30
+    while time.monotonic() < deadline:
+        try:
+            if command('shell', 'id', '-u') == '0':
+                return True
+        except RuntimeError:
+            pass  # Only the owned guest's adbd is reconnecting.
+        time.sleep(0.25)
+    raise RuntimeError('Legacy fixture root readback timed out')
+
+
 def qualify(serial):
     if not re.fullmatch(r'emulator-\d+', serial):
         raise RuntimeError('Provider harness refuses a physical-device serial')
@@ -169,6 +190,8 @@ def qualify(serial):
         receipt['emulator_original'] = environment.snapshot().copy()
         receipt['android'] = command('shell', 'getprop', 'ro.build.version.release')
         receipt['sdk'] = command('shell', 'getprop', 'ro.build.version.sdk')
+        if receipt['sdk'] == '26' and command('shell', 'id', '-u') != '0':
+            raise RuntimeError('Select temporary userdebug adb root for API26 call fixtures first')
         for package, apk in zip((PACKAGE, TEST_PACKAGE), apks):
             # A timeout is an unknown outcome, not evidence that installation did not occur.
             installed.append(package)
@@ -209,6 +232,8 @@ def qualify(serial):
         receipt['reboot_verified'] = True
         receipt['boot_observation_window_seconds'] = 180
         wait_effect_and_status(timeout=180)  # No app launch or instrumentation before actual boot recovery.
+        if receipt['sdk'] == '26':
+            receipt['fixture_root_reacquired_after_observed_boot'] = ensure_legacy_fixture_root(command)
         check('verifyExpectedDeliveryAndReceipt')
         check('prepareNextCallWithoutWake')
         environment.offline()
