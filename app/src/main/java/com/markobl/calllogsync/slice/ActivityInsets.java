@@ -26,7 +26,8 @@ final class ActivityInsets {
                         android.graphics.Insets bars =
                                 insets.getInsets(
                                         WindowInsets.Type.systemBars()
-                                                | WindowInsets.Type.displayCutout());
+                                                | WindowInsets.Type.displayCutout()
+                                                | WindowInsets.Type.ime());
                         view.setPadding(
                                 left + bars.left,
                                 top + bars.top,

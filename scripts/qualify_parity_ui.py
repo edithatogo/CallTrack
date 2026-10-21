@@ -21,7 +21,10 @@ TEST_PACKAGE = PACKAGE + '.test'
 TEST_CLASS = 'com.markobl.calllogsync.slice.PositiveUiTest'
 
 
-def qualify(serial):
+def qualify(serial, suite="settings"):
+    if suite not in ("settings", "imports"):
+        raise ValueError("Unknown UI suite")
+    test_class = TEST_CLASS if suite == "settings" else "com.markobl.calllogsync.slice.ImportUiTest"
     if not re.fullmatch(r'emulator-\d+', serial):
         raise RuntimeError('Provider harness refuses a physical-device serial')
     evidence = ROOT / '.local/slice-evidence'
@@ -37,7 +40,7 @@ def qualify(serial):
         identity = subprocess.check_output([str(aapt), 'dump', 'badging', str(apk)], text=True)
         if "package: name='" + package + "'" not in identity:
             raise RuntimeError('Unexpected APK identity')
-    receipt = {'fixture_token': uuid.uuid4().hex, 'steps': [], 'artifacts': build['artifacts'], 'inputs': build['inputs']}
+    receipt = {'suite': suite, 'fixture_token': uuid.uuid4().hex, 'steps': [], 'artifacts': build['artifacts'], 'inputs': build['inputs']}
     installed = []
     fixture_possible = False
     fixture_clean = False
@@ -56,7 +59,7 @@ def qualify(serial):
 
     def check(method):
         output = command('shell', 'am', 'instrument', '-w', '-r', '-e', 'fixtureToken', receipt['fixture_token'],
-                         '-e', 'class', TEST_CLASS + '#' + method,
+                         '-e', 'class', test_class + '#' + method,
                          TEST_PACKAGE + '/androidx.test.runner.AndroidJUnitRunner')
         if 'OK (1 test)' not in output or 'FAILURES' in output or 'INSTRUMENTATION_FAILED' in output:
             raise RuntimeError('Native acceptance failed: ' + method)
@@ -108,14 +111,22 @@ def qualify(serial):
         for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
             command('shell', 'pm', 'grant', PACKAGE, 'android.permission.' + permission)
         fixture_possible = True
-        check('prepareCalendarWithoutCallAccess')
-        for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
-            command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.' + permission)
-        ui_attempted = True
-        check('renderedActivitiesRespectSystemBars')
-        check('renderedPermissionsFiltersConfirmPauseAndReopen')
-        command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.READ_CALENDAR')
-        check('revokedCalendarAndVisibleRestoreDoNotEnableLogging')
+        if suite == 'settings':
+            check('prepareCalendarWithoutCallAccess')
+            for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
+                command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.' + permission)
+            ui_attempted = True
+            check('renderedActivitiesRespectSystemBars')
+            check('renderedPermissionsFiltersConfirmPauseAndReopen')
+            command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.READ_CALENDAR')
+            check('revokedCalendarAndVisibleRestoreDoNotEnableLogging')
+        else:
+            check('prepareCalendarAndTaggedHistory')
+            command('shell', 'pm', 'grant', PACKAGE, 'android.permission.READ_CALL_LOG')
+            ui_attempted = True
+            check('renderedRangePreviewCancelConfirmAndRepeat')
+            check('preparePersistedPartialImport')
+            check('renderedExplicitHistoryResumeCompletesPartialWork')
         capture_ui()
         ui_captured = True
         check('cleanupFixture')
@@ -163,7 +174,7 @@ def qualify(serial):
         if (not receipt['fixture_cleanup_verified'] or not receipt['packages_removed']
                 or not receipt.get('emulator_restored', {'verified': True})['verified']):
             receipt['result'] = 'failed'
-        (evidence / 'parity-ui-receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
+        (evidence / ('parity-ui-receipt.json' if suite == 'settings' else 'parity-ui-imports-receipt.json')).write_text(json.dumps(receipt, indent=2) + '\n')
     print(json.dumps({k: receipt.get(k) for k in ('result', 'fixture_cleanup_verified', 'packages_removed', 'error')}))
     return 0 if receipt.get('result') == 'passed' else 1
 
@@ -171,4 +182,6 @@ def qualify(serial):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--serial', required=True)
-    raise SystemExit(qualify(parser.parse_args().serial))
+    parser.add_argument('--suite', choices=('settings', 'imports'), default='settings')
+    args = parser.parse_args()
+    raise SystemExit(qualify(args.serial, args.suite))

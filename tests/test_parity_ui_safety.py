@@ -48,13 +48,13 @@ class UiSafety(unittest.TestCase):
             output = b'\x89PNG\r\n\x1a\n' + b'0' * 100 if args[-1].endswith('.png') else b'visible fixture controls'
         return subprocess.CompletedProcess(command, 0, output, b'' if isinstance(output, bytes) else '')
 
-    def run_fixture(self):
+    def run_fixture(self, suite="settings"):
         identities = ["package: name='" + p + "'" for p in (device.PACKAGE, device.TEST_PACKAGE)]
         environment = Mock()
         environment.snapshot.return_value = {'awake': 'Awake'}
         environment.restore.return_value = {'verified': True}
         with patch.object(device, 'ROOT', self.root), patch.object(device, 'inputs', return_value={}), patch.object(device.subprocess, 'check_output', side_effect=identities), patch.object(device.subprocess, 'run', side_effect=self.command), patch.object(device, 'EmulatorEnvironment', return_value=environment):
-            return device.qualify('emulator-5582')
+            return device.qualify('emulator-5582', suite)
 
     def test_physical_target_refused_before_tools(self):
         with patch.object(device.subprocess, 'run') as run:
@@ -83,6 +83,20 @@ class UiSafety(unittest.TestCase):
         self.assertEqual(1, self.run_fixture())
         self.assertFalse((self.root / '.local/slice-evidence/escape.png').exists())
         self.assertFalse(any(c[0] == 'uninstall' for c in self.calls))
+
+    def test_import_suite_uses_its_own_class_and_receipt(self):
+        self.assertEqual(0, self.run_fixture('imports'))
+        methods = [' '.join(c) for c in self.calls if c[:3] == ['shell', 'am', 'instrument']]
+        self.assertTrue(all('ImportUiTest#' in method for method in methods))
+        receipt = json.loads((self.root / '.local/slice-evidence/parity-ui-imports-receipt.json').read_text())
+        self.assertEqual('imports', receipt['suite'])
+        self.assertTrue(receipt['fixture_cleanup_verified'])
+
+    def test_unknown_suite_refused_before_tools(self):
+        with patch.object(device.subprocess, 'run') as run:
+            with self.assertRaisesRegex(ValueError, 'Unknown UI suite'):
+                device.qualify('emulator-5582', 'arbitrary')
+            run.assert_not_called()
 
     def test_success_retains_binary_screenshot_hash_before_uninstall(self):
         self.assertEqual(0, self.run_fixture())
