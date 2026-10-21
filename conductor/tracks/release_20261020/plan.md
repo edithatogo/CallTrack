@@ -147,12 +147,19 @@ key generation, cloud consent, physical testing or elapsed observation is claime
 - [x] Task: Run native store/provider/worker, rendered settings/import/recovery, accessibility at normal/large text, lifecycle and simulated telephony plus development-key schema/provider upgrades —109 successful native invocations each on API26/API33,11 affected API36 checks, two expected terminations,134 screenshot/tree pairs;115 JVM/141 host tests.
 - [x] Task: Review, fix and rerun affected checks — runtime fixes6f3381c, final fixture hardeningbd8c2e9, evidence/review fa7b944; protected-cache round-trip/worker regression and cleanup pass; API26 ordinary ADB privilege restored and both new guests stopped. Original external/manual gates retained.
 
-- [ ] Task: Refreeze the current runtime fixes into new unsigned artifacts/source-notices bundle and independently reproduce that exact candidate;9464408 remains the prior qualified release/source snapshot. Hosted execution awaits repository authority; original identity/signing, physical/OEM/manual, remote and operational gates remain before M4/archive.
+- [x] Task: Refreeze the current runtime fixes into new unsigned artifacts/source-notices bundle and independently reproduce that exact candidate —15998ba; see final local candidate evidence below.9464408 retains its prior qualified release/source scope.
+- [ ] Task: Complete authorised hosted execution and original identity/signing, physical/OEM/manual, remote and operational gates before M4/archive; repository authority remains pending.
 
 
 ## First-release baseline and final local candidate —2026-10-22
 
-- [~] Task: Define fresh-install-first support, empty issued-predecessor set and immutable future upgrade baseline; preserve development identity and production custody gates.
-- [ ] Task: Freeze current minimum-platform/accessibility fixes into matching unsigned builds and refreshed source/notices; reproduce exact candidate on the separate Linux host.
-- [ ] Task: Qualify the exact release payload using an existing-development-key copy on dedicated emulators; prove initial denied/unconfigured launch and historical schema/provider forward upgrade preservation.
-- [ ] Task: Review/fix tools and evidence, run host/Conductor checks and record remaining production/physical/cloud/operational gates without archiving M4.
+- [x] Task: Define fresh-install-first support, empty issued-predecessor set and immutable future upgrade baseline; preserve development identity and production custody gates —29c6211,15998ba.
+- [x] Task: Freeze current minimum-platform/accessibility fixes into matching unsigned builds and refreshed source/notices; reproduce exact candidate on the separate Linux host —15998ba; first-release-candidate-evidence-20261022.json.
+- [x] Task: Qualify the exact release payload using an existing-development-key copy on dedicated emulators; prove initial denied/unconfigured launch and historical schema/provider forward upgrade preservation —15998ba;60 successful invocations across26/33/36,6 expected rejections,3 PNG/tree pairs; cleanup passes.
+- [x] Task: Review/fix tools and evidence, run host/Conductor checks and record remaining production/physical/cloud/operational gates without archiving M4 —a8c7f9f,15998ba; review-first-release-candidate-20261022.md;144 host tests on Mac/Linux; final document checkpoint recorded below.
+
+The final local candidate supersedes the pending runtime-refreeze action recorded
+under the extended emulator checkpoint:15998ba includes the fixes and is independently
+reproduced. Older artifacts/probes retain their original scope; full M4 is still
+open. First-release installation has no issued predecessor; production identity/
+signing and original physical/cloud/operational/conveyance gates are not waived.

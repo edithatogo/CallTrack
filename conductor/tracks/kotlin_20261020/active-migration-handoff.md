@@ -81,5 +81,14 @@ found and fixed an API26 Kotlin use/SQLiteOpenHelper interface mismatch at6f3381
 Both helpers explicitly implement Closeable; schemas, identities, receipts and
 existing Views remain. Selected API26/API33 native worker/UI/lifecycle/upgrade
 cases pass alongside115 JVM fixtures. Historical API36 receipts retain their
-original source binding. The current application fixes require release refreezing
+original source binding. At that checkpoint the application fixes required release refreezing
 and independent reproduction; original M4-linked/full-M5 gates remain open.
+
+
+The [final local release candidate](../release_20261020/first-release-candidate-qualification-20261022.md)
+now refreezes the runtime fixes at15998ba, matches two Mac builds against a separate
+fresh Linux build, refreshes source/notices and passes60 selected native candidate
+invocations across26/33/36. Production/build inputs still match the earlier
+extended development matrix. Historical statements above retain their dated scope;
+release refreezing is no longer the current blocker. Full M4/M5 production,
+physical/cloud and operational gates remain open.

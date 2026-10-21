@@ -1,0 +1,160 @@
+{
+  "candidate_revision": "15998ba887e76ea223a6a8ba3430dd640330ed99",
+  "scope": "local unsigned first-release candidate and development-lineage compatibility; no production release",
+  "application_id": "org.calltrack.community.dev",
+  "version_code": 10,
+  "version_name": "0.1.0-dev",
+  "schemas": {
+    "ledger": 6,
+    "imports": 2
+  },
+  "unsigned_apk_sha256": "89a548489035a6df8c464cc621e49dfbb0c9d6d16619bbe54f27f78e612d5f86",
+  "release_ready": false,
+  "production_signed": false,
+  "supported_issued_predecessors": [],
+  "public_installation_support_qualified": false,
+  "permanent_identity_selected": false,
+  "production_key_custody_selected": false,
+  "macos_builds": [
+    {
+      "apk_sha256": "89a548489035a6df8c464cc621e49dfbb0c9d6d16619bbe54f27f78e612d5f86",
+      "jvm": {
+        "tests": 115,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "lint": {
+        "Hint": 2,
+        "Warning": 23
+      }
+    },
+    {
+      "apk_sha256": "89a548489035a6df8c464cc621e49dfbb0c9d6d16619bbe54f27f78e612d5f86",
+      "jvm": {
+        "tests": 115,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "lint": {
+        "Hint": 2,
+        "Warning": 23
+      }
+    }
+  ],
+  "linux": {
+    "success": true,
+    "jvm": {
+      "tests": 115,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "lint": {
+      "Hint": 2,
+      "Warning": 23
+    },
+    "bitwise_match": true,
+    "fresh_sdk_and_gradle_home": true,
+    "separate_physical_host": true,
+    "hosted_ci": false,
+    "host_control_tests": 144,
+    "raw_runner_self_attests_physical_independence": false,
+    "container_id": "7947b7edcd776ecadb7463e572bf694693b401e01347ff83ff1e668ce1a6e6e2",
+    "container_stopped": true
+  },
+  "source_bundle": {
+    "sha256": "5c73dd887d29f0542721e11fe1caaa0b2cb45b68014653322bd6b5aa564dddd6",
+    "file_count": 658,
+    "tracked_source_files": 508,
+    "runtime_source_coordinates": 63,
+    "readback": true,
+    "repeatability": true,
+    "dependency_from_source_rebuild_qualified": false,
+    "public_conveyance_performed": false
+  },
+  "emulators": [
+    {
+      "api": 26,
+      "exact_signed_payload_sha256": "951fff78b9b77413c933e967519ac1c895cbac7135d5905115dfd32334588b9c",
+      "development_signer_sha256": "1fb724b184374c597a0289eacf573bb6c2fdf32e8a303067040783885107cd8c",
+      "next_version_fixture_apk_sha256": "3febd02a22cb422ea6a945143df548548258e422ee6506ab2274f92be0586b77",
+      "upgrade_and_fresh_native_invocations": 17,
+      "rendered_install_native_invocations": 3,
+      "expected_install_rejections": 2,
+      "screens": {
+        "launcher.xml": "c21ef0b8b09e38fceae4ddc1151caeec8b69e5fc65540a54dca4e1721a314c72",
+        "launcher.png": "a0b6764cfdfb71c259d5b3d879b34abeab73d5fa42b60422cf2b53b15ecf2559"
+      },
+      "fixture_removed": true,
+      "packages_removed": true
+    },
+    {
+      "api": 33,
+      "exact_signed_payload_sha256": "951fff78b9b77413c933e967519ac1c895cbac7135d5905115dfd32334588b9c",
+      "development_signer_sha256": "1fb724b184374c597a0289eacf573bb6c2fdf32e8a303067040783885107cd8c",
+      "next_version_fixture_apk_sha256": "99d970bd6acd728f31a4a49cdca7585326d70c2502658fdd49e49d59d4f95cfa",
+      "upgrade_and_fresh_native_invocations": 17,
+      "rendered_install_native_invocations": 3,
+      "expected_install_rejections": 2,
+      "screens": {
+        "launcher.xml": "af71ebc6a2fdc7b0db1d37af1222b68db3208aafe2dceb08f9bae51d43f12df7",
+        "launcher.png": "412b44baeeb13a7dfe46b8be6a48200f164e4be77c236ec0ca6b3130b8d410fa"
+      },
+      "fixture_removed": true,
+      "packages_removed": true
+    },
+    {
+      "api": 36,
+      "exact_signed_payload_sha256": "951fff78b9b77413c933e967519ac1c895cbac7135d5905115dfd32334588b9c",
+      "development_signer_sha256": "1fb724b184374c597a0289eacf573bb6c2fdf32e8a303067040783885107cd8c",
+      "next_version_fixture_apk_sha256": "c42c5b70e5500ad80c19c8075f3eb79eb6c936d9d9e8b0a11adbfa828188bdfd",
+      "upgrade_and_fresh_native_invocations": 17,
+      "rendered_install_native_invocations": 3,
+      "expected_install_rejections": 2,
+      "screens": {
+        "launcher.xml": "0c43826aa88b54c0e113c346e09388dd8cd6123f38de7832b0bf64a1f50671f3",
+        "launcher.png": "d14726a838fa0a7b21c0dcf8009cdf5c462674d508a9cd6c3a570762eeaea56d"
+      },
+      "fixture_removed": true,
+      "packages_removed": true
+    }
+  ],
+  "host_control_tests": 144,
+  "verification_policy_sha256": "7f381e1b92bcd31f060bd3c4b378067b2f7eafc1d073aff3f4b532428d602329",
+  "accepted_native_invocations": 60,
+  "expected_install_rejections": 6,
+  "rendered_png_xml_pairs": 3,
+  "runtime_inputs_match_extended_emulator_matrix": true,
+  "private_evidence": {
+    ".local/release-evidence/first-release-final-20261022/mac-builds/receipt.json": "9150ee86f4a010c890603ddc36728c02cbdf95ab290a215a985871863833ce12",
+    ".local/release-evidence/first-release-final-20261022/source-bundle/receipt.json": "c0c2206bbbd22e1b11d69986ab9633a5df2cb362a8d016d678249ee5ec392bac",
+    ".local/release-evidence/first-release-final-20261022/runtime-inventory.json": "74f7138b8d5ee827095aff1efa28009ff7043675fe77589faf74441d50c73c82",
+    ".local/release-evidence/first-release-final-20261022/separate-host-isolation.json": "fe26f5c011e0490f5d06d166c64825a5a5ca8e7efb336ef60ca89247b85c7d37",
+    ".local/release-evidence/first-release-final-20261022/independent-export/evidence/receipt.json": "deb55b22e84432ea97af89fd44b7f9ff5801c5b2c2f39b629cbc7f02433e3838",
+    ".local/release-evidence/first-release-final-20261022/separate-host-host-tests.log": "244f642e532158093f857d76ae57d48f558df27771f97d7538fead59856a0a78",
+    ".local/release-evidence/first-release-final-20261022/separate-host-final-cleanup.json": "deaebeda667669d7177f46f9afa70f4668c851be66a56d53c32988515b7edd71",
+    ".local/release-evidence/first-release-final-20261022/final-native-cleanup.json": "114c13cde6c59a852f843b7e2416e818824adcc1f57594d5c9aa75b62181a139",
+    ".local/release-evidence/first-release-final-20261022/rendered_install.py": "87653eac8e988b0a79d9e8c777d8f79eb11d5775c43ba0c2f267a8fd2d4c85a1",
+    ".local/release-evidence/first-release-final-20261022/native_controller.py": "80517ccc6f1b688e6391e3570bb19a94d3c0c520b7a44e71a58afaf60a62346a",
+    ".local/release-evidence/first-release-final-20261022/api26-exact-release/receipt.json": "f5c781bb85ca8cf5b8763f1befe40ddaf651b60feef70e94bfeea481f8335972",
+    ".local/release-evidence/first-release-final-20261022/api26-rendered-install/receipt.json": "37972ef8bdcbc29c89190559b627eba199ce3857f536011f5d39e04408b01aa1",
+    ".local/release-evidence/first-release-final-20261022/api33-exact-release/receipt.json": "82c24d0a2c577fda46736483b77d684f1556590425d10a4fcd7f6ccb89170697",
+    ".local/release-evidence/first-release-final-20261022/api33-rendered-install/receipt.json": "3cf62b5a21de72078e25162c5053d31e91bcba54a13ca6f5638349e35a09a28e",
+    ".local/release-evidence/first-release-final-20261022/api36-exact-release/receipt.json": "7d4c53bea2d6f9b55685f86ea7756dd3e4f139668e7f40fcab19e4f046221a4b",
+    ".local/release-evidence/first-release-final-20261022/api36-rendered-install/receipt.json": "025f1c9d9ef82c82aacc7eb90d26aea091429d12a27597a4dd124561af39d54a",
+    ".local/release-evidence/first-release-final-20261022/separate-host-preflight.log": "f2ec8e7e87eead7d87c38dc44ee3bef842de814022953571ac16ccd29d2613b0",
+    ".local/release-evidence/first-release-final-20261022/debug-build-receipt.json": "16582c3b6c20410f62152f46f088dc0bbc41db00b1989a1db1ffe8b9d8a55159",
+    ".local/release-evidence/first-release-final-20261022/linux-harvest.log": "c1c128a31db7ac11c4fc8683a9891d7c9de9adcf851d6960192457408ded93bf"
+  },
+  "retained_gates": [
+    "Permanent application identity and production signing-key custody/recovery",
+    "Production-signed artifact binding and affected identity/signing qualification",
+    "Physical/OEM/manual accessibility and real-call acceptance",
+    "Account-backed remote calendar outcomes where claimed",
+    "Seven actual observation days; zero claimed",
+    "Hosted CI/repository choice and authorised publication/source/support channels"
+  ],
+  "not_reexecuted_here": "Full229-invocation API26/API33/affected API36 development matrix retained separately; production app inputs unchanged, debug APK983892c6 remains separately bound. Source-only rebuild5a3 remains historical; current upstream dependency rebuilding unqualified."
+}
