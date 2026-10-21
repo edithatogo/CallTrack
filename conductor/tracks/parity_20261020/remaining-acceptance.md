@@ -51,3 +51,12 @@ receipt first; fallback JVM receipts cannot authorise installs. Execute the expa
 store harness, relevant provider/worker/lifecycle regression, then the positive
 telephony/UI cases. Reconcile this ledger and plan tasks with actual results; report
 remaining failures explicitly and retain the track active until final closure.
+
+## Latest build/guest status
+
+The reconnected full Android build passes108 JVM tests and both APKs compile; lint
+has0 errors/32 warnings/5 hints. See reconnected-build-evidence.json. The old emulator
+process is non-responsive and survives TERM/KILL in UEs state. Do not launch another
+instance against its AVD while it remains live. Native/UI gates above are unchanged;
+new instrumentation is compiled but unexecuted. A Mac restart may be needed before
+the dedicated guest can be qualified again.
