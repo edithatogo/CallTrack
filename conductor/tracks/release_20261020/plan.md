@@ -63,3 +63,11 @@ acceptance: schema6/import2,110 JVM/73 host tests and89 successful native invoca
 plus one expected process kill. Resume the original remaining gates above; do not
 repeat completed discovery or infer physical/cloud/release acceptance. This handoff
 does not mark this track complete or waive its original prerequisites.
+
+## Resumed execution — 2026-10-21
+
+- [~] Task: Qualify unsigned release build from two isolated clean committed-source checkouts; preserve exact source, tools, graph and artifact evidence. Same-host comparison is not independent-environment reproduction.
+- [ ] Task: Review candidate tooling and results; retain identity/signing, upgrade and operational gates until observed.
+
+Track4 M3 selected-emulator handoff is available. No production signing, key
+generation, publication or physical-call testing is implied by this resumption.
