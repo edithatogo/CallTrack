@@ -612,3 +612,15 @@ next; protected telephony, positive UI and final full-track review/archive remai
 - `a3267ce`: exact isolated AVD target support; `a8eedb2`:39 native store/fault checks with cleanup on recovery guest.
 
 - `7d19775`: native-red/green source-identity uncertainty fix;3 native checks/cleanup and108 JVM/55 host tests. Latest APK provider regression8/8 with fixture/package cleanup passes; recovery-provider-evidence.json. Positive worker/lifecycle follow.
+
+
+## Latest recovery guest delivery regression
+
+After the source-identity fix, the latest source-bound APK passes all8 real-calendar
+provider checks and all5 positive CallLog/WorkManager checks. Both harnesses verify
+fixture cleanup and package removal. Exact source/APK/native outputs/tool hashes
+are in recovery-provider-evidence.json and recovery-worker-evidence.json. These
+cover durable boundaries, edits/deletion, import/recovery, real tagged-source
+paging/filtering/activation/repeat-work/revocation; they do not qualify protected
+telephony wake or rendered positive UI. Lifecycle regression is running separately
+on emulator-5582. Full Track4 review/archive remains open.

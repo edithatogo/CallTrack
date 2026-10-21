@@ -544,3 +544,15 @@ evidence is in source-identity-evidence.json. The prior39 native store suite rem
 separately bound to the pre-identity-fix APK; do not merge those into a claim that42
 checks ran on one APK. Wider current-APK provider/worker/lifecycle acceptance is
 next; protected telephony, positive UI and final full-track review/archive remain.
+
+
+## Latest recovery guest delivery regression
+
+After the source-identity fix, the latest source-bound APK passes all8 real-calendar
+provider checks and all5 positive CallLog/WorkManager checks. Both harnesses verify
+fixture cleanup and package removal. Exact source/APK/native outputs/tool hashes
+are in recovery-provider-evidence.json and recovery-worker-evidence.json. These
+cover durable boundaries, edits/deletion, import/recovery, real tagged-source
+paging/filtering/activation/repeat-work/revocation; they do not qualify protected
+telephony wake or rendered positive UI. Lifecycle regression is running separately
+on emulator-5582. Full Track4 review/archive remains open.
