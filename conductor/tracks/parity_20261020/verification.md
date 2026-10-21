@@ -485,3 +485,23 @@ Android/native execution is inferred. See event-identity-local-evidence.json and
 local-review.md. P01–P10 closure work and positive UI/telephony protocols are mapped
 in [remaining acceptance](remaining-acceptance.md). Hardware-dependent gates and
 final full-track review/archive remain open.
+
+
+## Reconnected toolchain build checkpoint
+
+PortableSSD is mounted again and the qualified SDK/Gradle cache resolve. The full
+source-bound Gradle run passes108 JVM tests (0 failures/errors/skips), debug and
+Android-test APK assembly, and lint (0 errors,32 warnings,5 hints). Inputs remain
+unchanged throughout the build;53 host tests also pass. New activation/status fault
+instrumentation is now compiled, but not executed. Exact input/artifact digests,
+results and guest-health evidence are in reconnected-build-evidence.json.
+
+The existing dedicated emulator PID60763 is still present in UEs state. A bounded
+guest shell probe and the connected console greeting both time out. Sampling exits
+138 without a report; TERM and KILL leave the process present. ADB's device label
+is not guest-health proof. No replacement guest is launched against the same AVD,
+no AVD reset is performed and current fixture cleanup cannot be read back. A host
+restart may be needed to clear the stuck process. After it clears, revalidate the
+AVD/storage/guest before installing the exact verified APKs. Store/fault/provider/
+worker/lifecycle, protected call-end and positive UI acceptance plus final full-track
+review/archive remain open. Earlier disconnected-storage limits are historical.
