@@ -111,6 +111,15 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
         db.insertOrThrow("outbox", null, row);
     }
 
+    private String importId(String phase) {
+        return java.util
+                .UUID
+                .nameUUIDFromBytes(
+                        (account() + "/import/" + phase)
+                                .getBytes(java.nio.charset.StandardCharsets.UTF_8))
+                .toString();
+    }
+
     private void seedHistoricalImport() throws Exception {
         String name = account() + "-imports.db";
         assertFalse(context().getDatabasePath(name).exists());
@@ -127,7 +136,7 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
             while ((sql = reader.readLine()) != null) db.execSQL(sql);
             db.setVersion(1);
             for (String phase : new String[] {"CONFIRMED", "CANCELLED"}) {
-                String id = account() + "/import/" + phase;
+                String id = importId(phase);
                 org.json.JSONObject body = new org.json.JSONObject();
                 body.put("version", 1);
                 body.put("id", id);
@@ -173,7 +182,7 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
                 new SqliteImportStore(context(), account() + "-imports.db")) {
             assertEquals(2, imports.getReadableDatabase().getVersion());
             for (String phase : new String[] {"CONFIRMED", "CANCELLED"}) {
-                String id = account() + "/import/" + phase;
+                String id = importId(phase);
                 HistoricalImport.Session saved = imports.get(id);
                 assertEquals(phase, saved.phase.name());
                 assertEquals(3, saved.revision);

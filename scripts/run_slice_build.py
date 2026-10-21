@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def inputs():
     paths = [ROOT / p for p in ('build.gradle', 'settings.gradle', 'gradle.properties', 'gradlew')]
     paths += sorted((ROOT / 'gradle/wrapper').glob('*'))
+    paths += [p for p in (ROOT / 'gradle/verification-metadata.xml',) if p.is_file()]
     paths += [ROOT / 'app/build.gradle', ROOT / 'app/proguard-rules.pro']
     paths += sorted(p for p in (ROOT / 'app/src').rglob('*') if p.is_file())
     return {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
