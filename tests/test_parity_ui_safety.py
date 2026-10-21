@@ -92,6 +92,17 @@ class UiSafety(unittest.TestCase):
         self.assertEqual('imports', receipt['suite'])
         self.assertTrue(receipt['fixture_cleanup_verified'])
 
+    def test_recovery_suite_keeps_read_only_permission_boundary(self):
+        self.assertEqual(0, self.run_fixture('recovery'))
+        methods = [' '.join(c) for c in self.calls if c[:3] == ['shell', 'am', 'instrument']]
+        self.assertTrue(all('RecoveryUiTest#' in method for method in methods))
+        check_index = next(i for i,c in enumerate(self.calls) if 'renderedExistingCheckWithoutWriteAccess' in ' '.join(c))
+        self.assertEqual(['shell', 'pm', 'revoke', device.PACKAGE, 'android.permission.WRITE_CALENDAR'], self.calls[check_index-1])
+        self.assertEqual(['shell', 'pm', 'grant', device.PACKAGE, 'android.permission.WRITE_CALENDAR'], self.calls[check_index+1])
+        receipt = json.loads((self.root / '.local/slice-evidence/parity-ui-recovery-receipt.json').read_text())
+        self.assertEqual('recovery', receipt['suite'])
+        self.assertTrue(receipt['fixture_cleanup_verified'])
+
     def test_unknown_suite_refused_before_tools(self):
         with patch.object(device.subprocess, 'run') as run:
             with self.assertRaisesRegex(ValueError, 'Unknown UI suite'):

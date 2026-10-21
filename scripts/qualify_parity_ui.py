@@ -22,9 +22,10 @@ TEST_CLASS = 'com.markobl.calllogsync.slice.PositiveUiTest'
 
 
 def qualify(serial, suite="settings"):
-    if suite not in ("settings", "imports"):
+    if suite not in ("settings", "imports", "recovery"):
         raise ValueError("Unknown UI suite")
-    test_class = TEST_CLASS if suite == "settings" else "com.markobl.calllogsync.slice.ImportUiTest"
+    test_class = {"settings": TEST_CLASS, "imports": "com.markobl.calllogsync.slice.ImportUiTest",
+                  "recovery": "com.markobl.calllogsync.slice.RecoveryUiTest"}[suite]
     if not re.fullmatch(r'emulator-\d+', serial):
         raise RuntimeError('Provider harness refuses a physical-device serial')
     evidence = ROOT / '.local/slice-evidence'
@@ -120,13 +121,23 @@ def qualify(serial, suite="settings"):
             check('renderedPermissionsFiltersConfirmPauseAndReopen')
             command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.READ_CALENDAR')
             check('revokedCalendarAndVisibleRestoreDoNotEnableLogging')
-        else:
+        elif suite == 'imports':
             check('prepareCalendarAndTaggedHistory')
             command('shell', 'pm', 'grant', PACKAGE, 'android.permission.READ_CALL_LOG')
             ui_attempted = True
             check('renderedRangePreviewCancelConfirmAndRepeat')
             check('preparePersistedPartialImport')
             check('renderedExplicitHistoryResumeCompletesPartialWork')
+        else:
+            check('preparePendingWithoutCallAccess')
+            command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.WRITE_CALENDAR')
+            ui_attempted = True
+            check('renderedPermissionCancelAndExplicitReapproval')
+            command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.WRITE_CALENDAR')
+            check('renderedExistingCheckWithoutWriteAccess')
+            command('shell', 'pm', 'grant', PACKAGE, 'android.permission.WRITE_CALENDAR')
+            check('renderedEditDeletionAndSuppression')
+            check('renderedExplicitRetentionClearsOnlyExpiredPayload')
         capture_ui()
         ui_captured = True
         check('cleanupFixture')
@@ -174,7 +185,7 @@ def qualify(serial, suite="settings"):
         if (not receipt['fixture_cleanup_verified'] or not receipt['packages_removed']
                 or not receipt.get('emulator_restored', {'verified': True})['verified']):
             receipt['result'] = 'failed'
-        (evidence / ('parity-ui-receipt.json' if suite == 'settings' else 'parity-ui-imports-receipt.json')).write_text(json.dumps(receipt, indent=2) + '\n')
+        (evidence / ('parity-ui-receipt.json' if suite == 'settings' else 'parity-ui-' + suite + '-receipt.json')).write_text(json.dumps(receipt, indent=2) + '\n')
     print(json.dumps({k: receipt.get(k) for k in ('result', 'fixture_cleanup_verified', 'packages_removed', 'error')}))
     return 0 if receipt.get('result') == 'passed' else 1
 
@@ -182,6 +193,6 @@ def qualify(serial, suite="settings"):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--serial', required=True)
-    parser.add_argument('--suite', choices=('settings', 'imports'), default='settings')
+    parser.add_argument('--suite', choices=('settings', 'imports', 'recovery'), default='settings')
     args = parser.parse_args()
     raise SystemExit(qualify(args.serial, args.suite))
