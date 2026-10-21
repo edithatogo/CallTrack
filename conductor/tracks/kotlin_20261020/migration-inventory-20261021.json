@@ -1,0 +1,290 @@
+{
+  "checkpoint": "aa96e87 plus expanded Java contracts only",
+  "java_files": 47,
+  "active": 33,
+  "inherited": 14,
+  "files": [
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/AutostartReceiver.java",
+      "lines": 13,
+      "group": "inherited-reachability-audit",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/Config.java",
+      "lines": 118,
+      "group": "inherited-reachability-audit",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/LogFragment.java",
+      "lines": 72,
+      "group": "inherited-reachability-audit",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/LogItem.java",
+      "lines": 122,
+      "group": "inherited-reachability-audit",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/LogItemRecyclerViewAdapter.java",
+      "lines": 68,
+      "group": "inherited-reachability-audit",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/MainActivity.java",
+      "lines": 78,
+      "group": "inherited-reachability-audit",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/MainFragment.java",
+      "lines": 110,
+      "group": "inherited-reachability-audit",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/RandomString.java",
+      "lines": 18,
+      "group": "inherited-reachability-audit",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/SettingsFragment.java",
+      "lines": 319,
+      "group": "inherited-reachability-audit",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/Sync.java",
+      "lines": 207,
+      "group": "inherited-reachability-audit",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/SyncResult.java",
+      "lines": 76,
+      "group": "inherited-reachability-audit",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/SyncResultRunner.java",
+      "lines": 6,
+      "group": "inherited-reachability-audit",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/SyncResultType.java",
+      "lines": 8,
+      "group": "inherited-reachability-audit",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/SyncWorker.java",
+      "lines": 78,
+      "group": "inherited-reachability-audit",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/ActivationCommitGuard.java",
+      "lines": 23,
+      "group": "active",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/ActivationControl.java",
+      "lines": 120,
+      "group": "active",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/ActivityInsets.java",
+      "lines": 62,
+      "group": "active",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/AndroidActivationStore.java",
+      "lines": 68,
+      "group": "active",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/AndroidCalendarSink.java",
+      "lines": 207,
+      "group": "active",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/AndroidCallLogSource.java",
+      "lines": 174,
+      "group": "active",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/AndroidWorkStatusStore.java",
+      "lines": 75,
+      "group": "active",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/AutomaticDelivery.java",
+      "lines": 113,
+      "group": "active",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/AutomaticLogWorker.java",
+      "lines": 98,
+      "group": "active",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/AutomaticScheduleControl.java",
+      "lines": 57,
+      "group": "active",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/AutomaticScheduling.java",
+      "lines": 155,
+      "group": "active",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/AutomaticSettingsActivity.java",
+      "lines": 390,
+      "group": "active",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/AutomaticWakeReceiver.java",
+      "lines": 41,
+      "group": "active",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/AutomaticWorkPolicy.java",
+      "lines": 19,
+      "group": "active",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/CalendarSliceActivity.java",
+      "lines": 267,
+      "group": "active",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/CallRecord.java",
+      "lines": 137,
+      "group": "active",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/DeliveryCounts.java",
+      "lines": 15,
+      "group": "active",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/DurableDelivery.java",
+      "lines": 423,
+      "group": "active",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/HistoricalImport.java",
+      "lines": 442,
+      "group": "active",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/HistoricalImportActivity.java",
+      "lines": 582,
+      "group": "active",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/ImportRange.java",
+      "lines": 29,
+      "group": "active",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/LegacyEventMatcher.java",
+      "lines": 154,
+      "group": "active",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/ManualDelivery.java",
+      "lines": 49,
+      "group": "active",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/PagedCalls.java",
+      "lines": 162,
+      "group": "active",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/PayloadRetention.java",
+      "lines": 34,
+      "group": "active",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/ReadyReapproval.java",
+      "lines": 90,
+      "group": "active",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/ReceiptRecovery.java",
+      "lines": 97,
+      "group": "active",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/ReceiptRecoveryActivity.java",
+      "lines": 455,
+      "group": "active",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/ScanDelivery.java",
+      "lines": 161,
+      "group": "active",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/SliceEngine.java",
+      "lines": 131,
+      "group": "active",
+      "android_boundary": false
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/SqliteImportStore.java",
+      "lines": 398,
+      "group": "active",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/SqliteLedger.java",
+      "lines": 596,
+      "group": "active",
+      "android_boundary": true
+    },
+    {
+      "path": "app/src/main/java/com/markobl/calllogsync/slice/WorkStatus.java",
+      "lines": 72,
+      "group": "active",
+      "android_boundary": false
+    }
+  ]
+}
