@@ -19,6 +19,16 @@ def inputs():
     return {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
 
 
+
+def debug_artifacts():
+    # This runner builds debug and debug instrumentation only. A release APK
+    # may remain from an older invocation and has no provenance from these tasks.
+    base = ROOT / 'app/build/outputs/apk'
+    paths = sorted([*base.glob('debug/*.apk'), *base.glob('androidTest/debug/*.apk')])
+    return {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+            for p in paths}
+
+
 def run(jdk, sdk):
     evidence = ROOT / '.local/slice-evidence'
     evidence.mkdir(parents=True, exist_ok=True)
@@ -30,8 +40,7 @@ def run(jdk, sdk):
         result = subprocess.run(command, cwd=ROOT, env=dict(os.environ, JAVA_HOME=str(jdk),
                                  ANDROID_HOME=str(sdk)), stdout=stream, stderr=subprocess.STDOUT)
     unchanged = before == inputs()
-    artifacts = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
-                 for p in sorted((ROOT / 'app/build/outputs/apk').rglob('*.apk'))}
+    artifacts = debug_artifacts()
     receipt = {'exit_code': result.returncode, 'inputs_unchanged': unchanged, 'inputs': before,
                'artifacts': artifacts, 'command': command, 'jdk': str(jdk), 'sdk': str(sdk),
                'elapsed_seconds': round(time.monotonic() - start, 1)}
