@@ -120,6 +120,80 @@ public class RecoveryUiTest {
         assertEquals(0, fixture.events(calendar()));
     }
 
+    private Object field(Activity activity, String name) {
+        try {
+            java.lang.reflect.Field field = ReceiptRecoveryActivity.class.getDeclaredField(name);
+            field.setAccessible(true);
+            return field.get(activity);
+        } catch (ReflectiveOperationException failure) {
+            throw new AssertionError(failure);
+        }
+    }
+
+    @Test
+    public void leavingAndReturningWithdrawsQueuedApproval() throws Exception {
+        Instrumentation i = InstrumentationRegistry.getInstrumentation();
+        RenderedUi ui = new RenderedUi(i);
+        Activity activity = open(i);
+        java.util.concurrent.CountDownLatch entered = new java.util.concurrent.CountDownLatch(1);
+        java.util.concurrent.CountDownLatch release = new java.util.concurrent.CountDownLatch(1);
+        try {
+            ui.await(
+                    () -> ui.find(context().getString(R.string.reapproval_open), false) != null,
+                    "Pending reapproval control missing");
+            java.util.concurrent.ExecutorService executor =
+                    (java.util.concurrent.ExecutorService) field(activity, "executor");
+            // Hold only the executor: real UI confirmation is queued behind simulated delayed IO.
+            executor.execute(
+                    () -> {
+                        entered.countDown();
+                        try {
+                            release.await();
+                        } catch (InterruptedException interrupted) {
+                            Thread.currentThread().interrupt();
+                        }
+                    });
+            assertTrue(entered.await(10, java.util.concurrent.TimeUnit.SECONDS));
+            tap(ui, R.string.reapproval_open);
+            ui.tapId("button1");
+            assertTrue((Boolean) field(activity, "busy"));
+            assertTrue(
+                    ui.automation.performGlobalAction(
+                            android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME));
+            ui.await(() -> !(Boolean) field(activity, "resumed"), "Leaving did not pause activity");
+            i.runOnMainSync(
+                    () ->
+                            context()
+                                    .startActivity(
+                                            new Intent(context(), ReceiptRecoveryActivity.class)
+                                                    .addFlags(
+                                                            Intent.FLAG_ACTIVITY_NEW_TASK
+                                                                    | Intent
+                                                                            .FLAG_ACTIVITY_REORDER_TO_FRONT)));
+            ui.await(
+                    () -> (Boolean) field(activity, "resumed"),
+                    "Returning did not resume same activity");
+            release.countDown();
+            ui.await(() -> !(Boolean) field(activity, "busy"), "Queued action did not settle");
+            assertEquals(
+                    "Leaving must permanently withdraw the earlier queued approval",
+                    DurableDelivery.State.READY,
+                    saved("pending").state);
+            assertEquals(0, fixture.events(calendar()));
+            ui.capture("recovery-queued-approval-withdrawn-after-return");
+        } catch (Throwable failure) {
+            try {
+                ui.capture("withdrawal-failure");
+            } catch (Throwable capture) {
+                failure.addSuppressed(capture);
+            }
+            throw failure;
+        } finally {
+            release.countDown();
+            i.runOnMainSync(activity::finish);
+        }
+    }
+
     @Test
     public void renderedPermissionCancelAndExplicitReapproval() {
         journey(
@@ -137,6 +211,9 @@ public class RecoveryUiTest {
                     assertEquals(0, fixture.events(calendar()));
                     ui.capture("recovery-permission-is-not-approval");
                     tap(ui, R.string.reapproval_open);
+                    ui.await(
+                            () -> ui.find("button1", true) != null,
+                            "Reapproval preview dialog missing");
                     ui.capture("recovery-explicit-preview");
                     ui.tapId("button2");
                     assertEquals(DurableDelivery.State.READY, saved("pending").state);
@@ -144,6 +221,15 @@ public class RecoveryUiTest {
                     tap(ui, R.string.reapproval_open);
                     ui.tapId("button1");
                     awaitState(ui, DurableDelivery.State.CONFIRMED);
+                    ui.await(
+                            () ->
+                                    ui.find(
+                                                    context()
+                                                            .getString(
+                                                                    R.string.reapproval_verified),
+                                                    false)
+                                            != null,
+                            "Saved approval feedback missing");
                     assertEquals(1, fixture.events(calendar()));
                     assertNull(saved("pending").payload);
                     ui.capture("recovery-reapproved-verified");

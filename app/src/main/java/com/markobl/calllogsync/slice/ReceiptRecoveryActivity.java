@@ -27,6 +27,7 @@ public final class ReceiptRecoveryActivity extends Activity {
     private Button previous, more;
     private boolean busy;
     private volatile boolean resumed;
+    private volatile Object approvalSession = new Object();
     private long version;
 
     @Override
@@ -291,6 +292,7 @@ public final class ReceiptRecoveryActivity extends Activity {
     private void reapprove(DurableDelivery.Intent expected) {
         if (busy) return;
         busy = true;
+        final Object approvedSession = approvalSession;
         navigation();
         executor.execute(
                 () -> {
@@ -300,7 +302,12 @@ public final class ReceiptRecoveryActivity extends Activity {
                                 new ReadyReapproval(
                                                 ledger.outbox(),
                                                 new AndroidCalendarSink(getApplicationContext()))
-                                        .approve(expected, () -> resumed);
+                                        .approve(
+                                                expected,
+                                                () ->
+                                                        resumed
+                                                                && approvalSession
+                                                                        == approvedSession);
                     } catch (RuntimeException failed) {
                         result = DurableDelivery.Result.FAILED;
                     }
@@ -347,6 +354,8 @@ public final class ReceiptRecoveryActivity extends Activity {
     @Override
     public void onPause() {
         resumed = false;
+        // Returning to this screen cannot revive an earlier queued approval.
+        approvalSession = new Object();
         super.onPause();
     }
 

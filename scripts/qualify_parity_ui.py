@@ -130,6 +130,8 @@ def qualify(serial, suite="settings"):
             check('renderedExplicitHistoryResumeCompletesPartialWork')
         else:
             check('preparePendingWithoutCallAccess')
+            ui_attempted = True
+            check('leavingAndReturningWithdrawsQueuedApproval')
             command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.WRITE_CALENDAR')
             ui_attempted = True
             check('renderedPermissionCancelAndExplicitReapproval')
