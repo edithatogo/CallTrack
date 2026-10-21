@@ -163,3 +163,8 @@ under the extended emulator checkpoint:15998ba includes the fixes and is indepen
 reproduced. Older artifacts/probes retain their original scope; full M4 is still
 open. First-release installation has no issued predecessor; production identity/
 signing and original physical/cloud/operational/conveyance gates are not waived.
+
+- [x] Task: Commit reviewed candidate evidence and final document checkpoint —76c5f64bd02365c3b14c03d823364d06943b6341;
+  Mac/Linux144 host tests pass; current Conductor check165 documents/20 tracks/25
+  scenarios passes. Artifact freeze remains15998ba; evidence commits do not relabel
+  that APK/source bundle. Original M4 release gates remain pending.
