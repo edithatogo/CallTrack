@@ -1,6 +1,6 @@
 # Development data lifecycle
 
-Observed implementation as of 2026-10-20; this is not a published store privacy
+Observed implementation as of 2026-10-21; this is not a published store privacy
 policy or a claim that all planned retention controls exist. See the
 [release readiness track](conductor/tracks/release_20261020/index.md).
 
@@ -14,14 +14,32 @@ members. Private/free event flags do not encrypt content or revoke calendar acce
 | Location | Data and purpose | Retention/deletion behaviour now |
 |---|---|---|
 | Android call-log provider | Source call metadata | Owned by the system; this app does not delete source rows |
-| Private `slice` preferences | Random source namespace and selected calendar ID | Retained across restart; no in-app reset workflow |
-| Private `calltrack-ledger.db`, schema2 | Source/destination keys, event IDs, fingerprints and outbox state | Retained for duplicate prevention and recovery; no age-based expiry |
-| Outbox personal payload | Frozen event title/description/time data for interrupted delivery | DurableDelivery clears payload on confirmed/review/suppressed transitions; pending payload has no time-based expiry |
+| Private `slice` preferences | Random source namespace, selected calendar ID and versioned automatic activation settings (generation, enabled state, destination ID, timezone, start and type flags) | Retained across restart; no in-app reset workflow |
+| Private `calltrack-ledger.db`, schema6 | Source/destination keys, event IDs, fingerprints, outbox state, operation owner/generation and source instant/actual duration/raw type/presentation | Retained for duplicate prevention and recovery; no age-based expiry |
+| Outbox personal payload | Frozen event title/description/time data for interrupted delivery | DurableDelivery clears payload on confirmed/review/suppressed transitions; remaining payload expires seven days after storage, checked on access and in bounded maintenance batches; migration gives existing payloads of unknown age seven days from migration |
+| Private scan checkpoints | Operation owner/generation, source namespace, frozen upper and last processed IDs and hashed source bindings | Retained for recovery; no expiry or automatic cleanup yet; no caller names/numbers stored |
+| Private `calltrack-imports.db`, schema2 | Import ID, destination/timezone/range/type policy, phase/revision, counts, source checkpoints and candidate IDs/keys/hash bindings and per-candidate result codes | Retained across cancellation/completion for progress/review; no expiry or deletion UI yet. No names/numbers or rendered event payload stored in preview rows |
+| WorkManager private database and execution status | Work IDs/class names, activation generation, scheduling/retry metadata and nonpersonal result/timestamp/counts, per-attempt random status token and recorded failure count | Framework-managed work retention; latest status preferences retained until replaced/uninstall. No caller names/numbers in inputs/outputs; an uncertain status commit is hidden in-process until a successful publication or disk reload after restart |
 | Selected calendar provider | Title, description, start/end, timezone and app marker; name/number may be included | Remains after uninstall; calendar/provider controls cloud retention and deletion |
 | Local developer evidence | Toolchain paths, hashes, synthetic fixture receipts and test output | `.local` excluded from Git; no automated expiry implemented |
 
-The current launcher uses SliceEngine receipts, not the new DurableDelivery path.
-Schema1 receipts survive migration to schema2. Clearing an outbox payload is logical
+The manual latest-call action and automatic worker now share DurableDelivery receipts.
+Automatic settings require explicit activation; opening that settings screen can
+request recovery only for a previously enabled policy. Historical import controls now expose bounded preview/confirmation, saved sessions
+and stop/resume/cancel. Recovery controls can now check existing effects or suppress a receipt without
+calendar writes. A separate, explicit reapproval can insert an unchanged, never-attempted
+frozen event after showing its original data and destination; it uses fresh ownership
+and does not reactivate the original operation. Suppression clears the pending personal payload but retains source
+facts/keys/hashes and any event ID; it is not deletion of all personal metadata or
+of calendar data. Recovery includes a bounded expired-payload clearing action.
+An expired never-attempted receipt cannot insert automatically: a confirmed historical
+import must collect matching fresh source data. Inactivity, clock changes and Android
+background deferral can delay clearing; this is not a wall-clock erasure guarantee.
+Full positive native/provider/UI acceptance remains incomplete.
+Schema1–5 receipts and pending rows have preserving migration paths to schema6. Older source facts
+remain unknown; they are never inferred from event marker length. New source facts
+survive payload clearing and remain potentially sensitive; no age-based expiry is
+implemented for them or operation metadata. Clearing an outbox payload is logical
 removal from that row; it is not forensic erasure of SQLite pages/backups. Hashes and
 source/event identifiers remain potentially linkable metadata, not anonymized data.
 Legacy preferences/code remain packaged and need a release audit even though the
@@ -36,8 +54,8 @@ Revoking access prevents future permitted operations; it does not retract events
 already shared with the calendar. No automatic delete-all or remote erasure is
 implemented. Manually review the exact destination/provider copies before deletion.
 
-Before an alpha: implement and test pending-payload retention and user-visible
-recovery/deletion choices in Track4; verify source namespace/reset handling; audit
+Before an alpha: complete native retention/recovery and positive UI acceptance
+in Track4; verify source namespace/reset handling; audit
 merged release permissions and logging; explain calendar sharing before first write;
 verify actual backup/restore behaviour. Do not publish a policy promising those
 controls before their runtime evidence exists. Direct Graph/Google/CalDAV adapters

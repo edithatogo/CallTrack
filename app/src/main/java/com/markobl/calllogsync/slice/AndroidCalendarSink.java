@@ -37,6 +37,12 @@ public final class AndroidCalendarSink implements SliceEngine.CalendarSink {
         resolver = context.getContentResolver();
     }
 
+    private void readPermission() {
+        if (context.checkSelfPermission(Manifest.permission.READ_CALENDAR)
+                != PackageManager.PERMISSION_GRANTED)
+            throw new SecurityException("Calendar read permission required");
+    }
+
     private void permission() {
         if (context.checkSelfPermission(Manifest.permission.READ_CALENDAR)
                         != PackageManager.PERMISSION_GRANTED
@@ -67,6 +73,20 @@ public final class AndroidCalendarSink implements SliceEngine.CalendarSink {
                 result.add(new Choice(c.getLong(0), c.getString(1), c.getString(2)));
         }
         return result;
+    }
+
+    public String calendarLabel(long id) {
+        readPermission();
+        try (Cursor cursor =
+                resolver.query(
+                        ContentUris.withAppendedId(Calendars.CONTENT_URI, id),
+                        new String[] {Calendars.CALENDAR_DISPLAY_NAME},
+                        null,
+                        null,
+                        null)) {
+            if (cursor == null) throw new IllegalStateException("Calendar provider unavailable");
+            return cursor.moveToFirst() ? cursor.getString(0) : null;
+        }
     }
 
     @Override
@@ -146,7 +166,7 @@ public final class AndroidCalendarSink implements SliceEngine.CalendarSink {
 
     @Override
     public SliceEngine.StoredEvent read(long id) {
-        permission();
+        readPermission();
         try (Cursor c =
                 resolver.query(
                         ContentUris.withAppendedId(Events.CONTENT_URI, id),
@@ -161,7 +181,7 @@ public final class AndroidCalendarSink implements SliceEngine.CalendarSink {
 
     @Override
     public List<SliceEngine.StoredEvent> find(long calendar, String marker) {
-        permission();
+        readPermission();
         List<SliceEngine.StoredEvent> result = new ArrayList<>();
         try (Cursor c =
                 resolver.query(
@@ -178,7 +198,9 @@ public final class AndroidCalendarSink implements SliceEngine.CalendarSink {
                         new String[] {Long.toString(calendar), marker, context.getPackageName()},
                         null)) {
             if (c == null) throw new IllegalStateException("Event provider unavailable");
-            while (c.moveToNext()) result.add(stored(c));
+            // More than one marker match is ambiguous; never materialise an unbounded duplicate
+            // set.
+            while (result.size() < 2 && c.moveToNext()) result.add(stored(c));
         }
         return result;
     }

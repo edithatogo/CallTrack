@@ -33,6 +33,12 @@ class CallEvent(
             val source = call!!
             val person =
                 when {
+                    !source.identityAllowed && source.presentationSupplied ->
+                        when (source.numberPresentation) {
+                            2 -> "Private number"
+                            4 -> "Payphone"
+                            else -> "Unknown number"
+                        }
                     !source.identityAllowed -> "Private number"
                     present(source.name) -> source.name
                     present(source.number) -> source.number

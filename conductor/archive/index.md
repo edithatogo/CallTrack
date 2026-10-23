@@ -19,3 +19,5 @@
 - [iOS and desktop acquisition feasibility](platform_feasibility_20261020/index.md) — research completed, reviewed and archived2026-10-21. Conditional iOS default-dialer history corrects earlier assumptions; limited ordinary companion recommended. macOS SDK method signatures typecheck only; no native/iOS/calendar/dialer runtime acceptance.
 
 - [Rust and reusable component evaluation](rust_20261020/index.md) — research completed, reviewed with provenance fix and archived2026-10-21. Signature subset passes4 golden cases/3 Rust tests; host measurement favors trial, but full Java/FFI/native packaging/product benefit unproved. Retain Kotlin/native; production Rust deferred.
+
+- [Parity and durable synchronisation](parity_20261020/index.md) — implemented, reviewed with fixes and archived2026-10-21 for the selected API36 emulator scope.110 JVM/73 host tests,89 successful native invocations plus1 expected process termination across10 suites;40 screenshot/tree pairs and final cleanup/restoration readback. Physical/cloud/release/wider-platform gates remain in the handoff.

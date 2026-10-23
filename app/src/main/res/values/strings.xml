@@ -52,7 +52,7 @@
     <string name="batteryopt">Please disable battery optimization.</string>
     <string name="restrictopt">Please disable "Pause app activity if unused".</string>
 
-    <string name="slice_intro" translatable="false">CallTrack development slice. Choose a calendar, then explicitly log the latest call. Automatic logging is not enabled. Calendar providers may sync saved events to their accounts.</string>
+    <string name="slice_intro" translatable="false">CallTrack development slice. Choose a calendar, then explicitly log the latest call. Automatic logging starts only after you explicitly enable it in Automatic logging settings. Calendar providers may sync saved events to their accounts.</string>
     <string name="slice_calendar_access" translatable="false">Allow calendar access / refresh calendars</string>
     <string name="slice_choose" translatable="false">Choose a destination calendar</string>
     <string name="slice_log_latest" translatable="false">Log latest call</string>
@@ -61,7 +61,7 @@
     <string name="slice_no_calendars" translatable="false">No visible writable calendars are available. Configure one in your calendar app, then refresh.</string>
     <string name="slice_ready" translatable="false">Choose a calendar before logging a call.</string>
     <string name="slice_calendar_unavailable" translatable="false">The calendar is unavailable. Refresh and choose a destination; no fallback calendar is used.</string>
-    <string name="slice_tap_again" translatable="false">If access was granted, tap Log latest call again when ready. No call has been read automatically.</string>
+    <string name="slice_tap_again" translatable="false">If access was granted, tap Log latest call again for this manual action. Any previously enabled automatic policy can resume when access returns.</string>
     <string name="slice_saved" translatable="false">Event saved and read back successfully.</string>
     <string name="slice_already" translatable="false">This call is already logged in this calendar.</string>
     <string name="slice_recovered" translatable="false">Recovered an existing event without creating a duplicate.</string>
@@ -69,4 +69,106 @@
     <string name="slice_review" translatable="false">An existing event or source has changed. Review is required; no existing event was overwritten.</string>
     <string name="slice_invalid" translatable="false">The call contains invalid time or duration data.</string>
     <string name="slice_failed" translatable="false">The operation could not be verified. Retry can reconcile an existing event; check the calendar before further action.</string>
+
+    <string name="auto_open">Automatic logging settings</string>
+    <string name="auto_intro">Choose a calendar and call types, then enable logging from now. Draft changes do not alter an active policy until applied. Calls during a pause require a historical import. Calendar providers may sync events to their accounts. Phone-state access supports prompt call-end wakeups; periodic recovery still works without it.</string>
+    <string name="auto_access">Grant call/calendar access</string>
+    <string name="auto_incoming">Incoming calls</string>
+    <string name="auto_outgoing">Outgoing calls</string>
+    <string name="auto_missed">Missed calls</string>
+    <string name="auto_enable">Enable / apply from now</string>
+    <string name="auto_pause">Pause automatic logging</string>
+    <string name="auto_confirm">Start a new logging period from now with the selected calendar and call types? Existing calendar events remain unchanged. Earlier calls and paused work are not imported by enabling. Android can delay background work; reopen this screen to request recovery.</string>
+    <string name="auto_refresh">Refresh logging status</string>
+    <string name="auto_enabled">Automatic logging enabled. Active destination: %1$s</string>
+    <string name="auto_disabled">Automatic logging paused or not enabled.</string>
+    <string name="auto_destination_unavailable">Previously selected calendar unavailable</string>
+    <string name="auto_count_text">Across all destinations — pending: %1$d; previously verified: %2$d; review: %3$d; suppressed: %4$d. Previously verified events may have since changed or been deleted.</string>
+    <string name="auto_action_failed">The action could not be verified. Refresh status before retrying; existing events were not moved or deleted.</string>
+    <string name="auto_action_saved">Settings saved. Background delivery is separate; refresh status to check the latest result.</string>
+    <string name="auto_not_run">No completed background attempt is recorded for this logging period.</string>
+    <string name="auto_complete">Last background attempt finished its bounded scan. This does not confirm cloud synchronisation.</string>
+    <string name="auto_paused">Last background attempt stopped because it was paused or no longer current.</string>
+    <string name="auto_backlog">More pending work remains; recovery has been requested.</string>
+    <string name="auto_run_failed">Last background attempt failed. Pending receipts remain available for recovery.</string>
+    <string name="auto_failure_count">Recorded failed background attempts in this logging period: %1$d. Earlier attempts may be unavailable. This is not a count of failed calls.</string>
+    <string name="auto_unknown">The latest attempt status is unavailable. Refresh or request recovery.</string>
+
+    <string name="import_open">Historical imports</string>
+    <string name="import_intro">Preview a historical range before importing. Dates use %1$s and YYYY-MM-DD format. The end date is excluded. Previewing never writes calendar events. Closing or stopping a run leaves its saved session available to resume.</string>
+    <string name="import_from">Start date (inclusive, YYYY-MM-DD)</string>
+    <string name="import_to">End date (exclusive, YYYY-MM-DD)</string>
+    <string name="import_create">Create read-only preview</string>
+    <string name="import_none">No import session selected.</string>
+    <string name="import_continue">Continue selected preview / import</string>
+    <string name="import_confirm">Confirm historical import</string>
+    <string name="import_confirm_text">Import the frozen set of %1$d calls into %2$s? Range: %3$s. Current call data is checked before writing. Existing edited or deleted events are not recreated automatically. Some items may require review.</string>
+    <string name="import_stop">Stop this run; keep session</string>
+    <string name="import_stopping">Stopping at the next safe boundary. The session remains available to resume.</string>
+    <string name="import_cancel">Cancel remaining work</string>
+    <string name="import_cancel_text">Cancel all remaining work in this session? Current effects are preserved. A cancelled session cannot resume; use a new preview if needed.</string>
+    <string name="import_history">Saved import sessions</string>
+    <string name="import_newer">Newer sessions</string>
+    <string name="import_older">Older sessions</string>
+    <string name="import_invalid_range">Enter valid YYYY-MM-DD dates with an exclusive end after the start. Dates must exist in the selected timezone and be on or after the supported epoch.</string>
+    <string name="import_another">Create another preview? The previous session stays saved and stopped. You can select it from the saved sessions list.</string>
+    <string name="import_blocked">The run stopped and its result was saved. Check permissions, destination availability and review items before continuing. Progress was not guessed.</string>
+    <string name="import_progress">%1$s\n%2$s\nDestination: %3$s\nCall types: %4$s\nCandidates: %5$d; verified: %6$d; review: %7$d. Verified includes existing events checked during this import.</string>
+    <string name="import_building">Building preview — no calendar writes</string>
+    <string name="import_preview">Preview ready — confirmation required</string>
+    <string name="import_confirmed">Confirmed — resumable work remains</string>
+    <string name="import_complete">Session complete</string>
+    <string name="import_cancelled">Session cancelled</string>
+    <string name="import_review">Source changed — create a new preview</string>
+    <string name="import_empty_history">No saved sessions on this page.</string>
+    <string name="import_failed">This action could not be verified. Saved session progress and delivery receipts remain available. Refresh by selecting the saved session before retrying.</string>
+
+    <string name="auto_status_summary">%1$s\n%2$s</string>
+    <string name="import_history_item">%1$s — %2$s</string>
+    <string name="recovery_open">Delivery review and recovery</string>
+    <string name="recovery_intro">Review saved delivery records across all calendars. Times use the current device timezone. Checking only reads existing calendar events; it never creates or changes one. Suppression stops app retries and clears the pending personal payload while retaining duplicate protection. Calendar events remain untouched. Reapproval is a separate, explicitly confirmed action for never-attempted work.</string>
+    <string name="recovery_access">Allow calendar read access</string>
+    <string name="recovery_refresh">Refresh recent records</string>
+    <string name="recovery_previous">Previous records</string>
+    <string name="recovery_more">More records</string>
+    <string name="recovery_calendar_hidden">Saved calendar — allow read access to see its name</string>
+    <string name="recovery_calendar_unverified">Calendar name unavailable</string>
+    <string name="recovery_empty">No delivery records are available.</string>
+    <string name="recovery_source_unknown">Earlier source details unavailable</string>
+    <string name="recovery_call">Call</string>
+    <string name="recovery_source">%1$s — %2$s; actual duration: %3$d seconds</string>
+    <string name="recovery_item">%1$s\nCalendar: %2$s\n%3$s</string>
+    <string name="recovery_check">Check existing effect only</string>
+    <string name="recovery_suppress">Suppress further retries</string>
+    <string name="recovery_suppress_confirm">Suppress retries for this call in its saved calendar? Pending caller details will be cleared. Event identity and duplicate protection remain. No calendar event is deleted. This screen cannot undo suppression.</string>
+    <string name="recovery_open_event">Open recorded event in calendar app</string>
+    <string name="recovery_open_failed">A calendar app could not open this recorded event. It may be unavailable.</string>
+    <string name="recovery_ready">Pending — no insertion attempted</string>
+    <string name="recovery_inflight">Insertion outcome uncertain</string>
+    <string name="recovery_attempted">Event ID recorded — verification pending</string>
+    <string name="recovery_confirmed">Previously verified</string>
+    <string name="recovery_review">Needs review</string>
+    <string name="recovery_suppressed">Retries suppressed</string>
+    <string name="recovery_legacy">Earlier receipt — source identity not yet bound</string>
+    <string name="recovery_verified">Existing calendar content verified; no event was created.</string>
+    <string name="recovery_never_attempted">This intent was never attempted. Checking did not create an event. Resume its original active operation, use separate reapproval if offered, or suppress it.</string>
+    <string name="recovery_suppressed_result">Retries suppressed and pending personal payload cleared. Calendar events remain unchanged.</string>
+    <string name="recovery_permission">Calendar read access is required to check existing effects. No event was changed.</string>
+    <string name="recovery_review_result">The event is missing, changed or ambiguous. Review remains required; no event was recreated or overwritten.</string>
+    <string name="recovery_not_found">The selected record is no longer available. Refresh the list.</string>
+    <string name="recovery_failed">This check could not be verified. Existing receipts remain available; refresh before retrying.</string>
+
+    <string name="reapproval_open">Reapprove never-attempted insertion</string>
+    <string name="reapproval_preview">Create the original pending event in %1$s? This is a new, explicit insertion approval, separate from checking existing effects.\n\nTitle: %2$s\nDetails: %3$s\nStart: %4$s\nEnd: %5$s\n\nThe original pending operation stays inactive. If the record changes or an insertion has already been attempted, no new event will be created.</string>
+    <string name="reapproval_confirm">Approve this insertion</string>
+    <string name="reapproval_tap_again">Calendar read/write access is required. Permission changes do not confirm this insertion. Tap reapprove again to review the original event.</string>
+    <string name="reapproval_verified">The explicitly reapproved event was saved and verified. Its receipt prevents another automatic insertion.</string>
+    <string name="reapproval_changed">This record changed or an insertion may already have been attempted. Refresh and check the existing effect; no new insertion was approved.</string>
+    <string name="reapproval_paused">Insertion approval stopped before completion. Refresh the record before retrying; the pending intent remains tracked.</string>
+    <string name="reapproval_failed">The reapproved insertion could not be verified. Check its existing effect before another action; a calendar event may already exist.</string>
+
+    <string name="recovery_expired">Pending payload expired — no insertion attempted</string>
+    <string name="retention_policy">Pending personal event payloads expire after seven days from storage, checked on access and in bounded maintenance batches. Existing payloads of unknown age receive seven days from migration. Phone history dates do not determine this age. IDs, hashes, source facts and calendar events remain. Expired never-attempted work requires a confirmed import to collect fresh source data; it is never inserted automatically. Offline or inactive apps may defer clearing until their next check.</string>
+    <string name="retention_run">Clear expired pending payloads now</string>
+    <string name="retention_result">%1$d expired payloads cleared in this pass. More may remain. Receipt metadata and calendar events were retained.</string>
 </resources>

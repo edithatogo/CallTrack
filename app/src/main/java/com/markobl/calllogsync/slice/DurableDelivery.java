@@ -18,7 +18,8 @@ public final class DurableDelivery {
         CONFIRMED,
         REVIEW,
         SUPPRESSED,
-        LEGACY
+        LEGACY,
+        EXPIRED_READY
     }
 
     public enum Result {
@@ -41,11 +42,80 @@ public final class DurableDelivery {
         void put(Intent intent);
     }
 
+    /** Persisted activation/import identity. Generations are never reused after cancellation. */
+    public static final class Operation {
+        public final String owner;
+        public final long generation;
+
+        public Operation(String owner, long generation) {
+            if (owner == null || owner.isEmpty() || generation < 0)
+                throw new IllegalArgumentException("Invalid operation identity");
+            this.owner = owner;
+            this.generation = generation;
+        }
+    }
+
+    private static boolean sameOperation(Operation left, Operation right) {
+        return left == null
+                ? right == null
+                : right != null
+                        && left.owner.equals(right.owner)
+                        && left.generation == right.generation;
+    }
+
+    private static boolean pending(Intent intent) {
+        return intent.state == State.READY
+                || intent.state == State.IN_FLIGHT
+                || intent.state == State.ATTEMPTED;
+    }
+
+    /** Non-rendered source facts, retained when personal event payload is cleared. */
+    public static final class SourceFacts {
+        public final long start, seconds;
+        public final int type;
+        public final Integer presentation;
+        public final boolean presentationSupplied;
+
+        public SourceFacts(
+                long start,
+                long seconds,
+                int type,
+                Integer presentation,
+                boolean presentationSupplied) {
+            if (start < 0 || seconds < 0) throw new IllegalArgumentException("Invalid source time");
+            this.start = start;
+            this.seconds = seconds;
+            this.type = type;
+            this.presentation = presentation;
+            this.presentationSupplied = presentationSupplied;
+        }
+
+        static SourceFacts from(CallRecord call) {
+            return new SourceFacts(
+                    call.start,
+                    call.seconds,
+                    call.type,
+                    call.numberPresentation,
+                    call.presentationSupplied);
+        }
+
+        boolean agrees(CallRecord call) {
+            return start == call.start
+                    && seconds == call.seconds
+                    && type == call.type
+                    && (!presentationSupplied
+                            || !call.presentationSupplied
+                            || Objects.equals(presentation, call.numberPresentation));
+        }
+    }
+
     public static final class Intent {
         public final State state;
         public final String key, sourceSignature, marker, fingerprint;
         public final long calendar, eventId;
         public final CallEvent payload;
+        public final Operation operation;
+        public final SourceFacts facts;
 
         public Intent(
                 State state,
@@ -56,6 +126,54 @@ public final class DurableDelivery {
                 String fingerprint,
                 long eventId,
                 CallEvent payload) {
+            this(
+                    state,
+                    key,
+                    calendar,
+                    sourceSignature,
+                    marker,
+                    fingerprint,
+                    eventId,
+                    payload,
+                    null);
+        }
+
+        public Intent(
+                State state,
+                String key,
+                long calendar,
+                String sourceSignature,
+                String marker,
+                String fingerprint,
+                long eventId,
+                CallEvent payload,
+                Operation operation) {
+            this(
+                    state,
+                    key,
+                    calendar,
+                    sourceSignature,
+                    marker,
+                    fingerprint,
+                    eventId,
+                    payload,
+                    operation,
+                    null);
+        }
+
+        public Intent(
+                State state,
+                String key,
+                long calendar,
+                String sourceSignature,
+                String marker,
+                String fingerprint,
+                long eventId,
+                CallEvent payload,
+                Operation operation,
+                SourceFacts facts) {
+            this.facts = facts;
+            this.operation = operation;
             this.state = Objects.requireNonNull(state);
             this.key = Objects.requireNonNull(key);
             this.calendar = calendar;
@@ -69,16 +187,37 @@ public final class DurableDelivery {
         Intent state(State next, long id) {
             // Confirmed/review receipts need hashes and identity, not names/numbers in payload.
             CallEvent retained =
-                    next == State.CONFIRMED || next == State.REVIEW || next == State.SUPPRESSED
+                    next == State.CONFIRMED
+                                    || next == State.REVIEW
+                                    || next == State.SUPPRESSED
+                                    || next == State.EXPIRED_READY
                             ? null
                             : payload;
             return new Intent(
-                    next, key, calendar, sourceSignature, marker, fingerprint, id, retained);
+                    next,
+                    key,
+                    calendar,
+                    sourceSignature,
+                    marker,
+                    fingerprint,
+                    id,
+                    retained,
+                    operation,
+                    facts);
         }
 
         Intent bind(String signature) {
             return new Intent(
-                    state, key, calendar, signature, marker, fingerprint, eventId, payload);
+                    state,
+                    key,
+                    calendar,
+                    signature,
+                    marker,
+                    fingerprint,
+                    eventId,
+                    payload,
+                    operation,
+                    facts);
         }
     }
 
@@ -90,8 +229,27 @@ public final class DurableDelivery {
         this.sink = sink;
     }
 
+    /**
+     * Receipt state for counting transitions only; it does not establish current event existence.
+     */
+    boolean previouslyConfirmed(String key, long calendar) {
+        synchronized (DELIVERY_LOCK) {
+            Intent prior = store.get(key, calendar);
+            return prior != null && prior.state == State.CONFIRMED;
+        }
+    }
+
     public Result deliver(
             CallRecord call, long calendar, String timezone, BooleanSupplier allowed) {
+        return deliver(call, calendar, timezone, null, allowed);
+    }
+
+    public Result deliver(
+            CallRecord call,
+            long calendar,
+            String timezone,
+            Operation operation,
+            BooleanSupplier allowed) {
         synchronized (DELIVERY_LOCK) {
             try {
                 if (!allowed.getAsBoolean()) return Result.PAUSED;
@@ -109,8 +267,12 @@ public final class DurableDelivery {
                                     event.marker,
                                     event.fingerprint(),
                                     -1,
-                                    event);
+                                    event,
+                                    operation,
+                                    SourceFacts.from(call));
                     store.put(intent);
+                } else if (pending(intent) && !sameOperation(intent.operation, operation)) {
+                    return Result.PAUSED;
                 } else if (intent.sourceSignature == null) {
                     // A v1 receipt has no source signature: bind only if its original payload
                     // agrees.
@@ -118,7 +280,8 @@ public final class DurableDelivery {
                         return review(intent, Result.REVIEW_REQUIRED);
                     intent = intent.bind(signature);
                     store.put(intent);
-                } else if (!intent.sourceSignature.equals(signature)) {
+                } else if (!intent.sourceSignature.equals(signature)
+                        || intent.facts != null && !intent.facts.agrees(call)) {
                     return review(intent, Result.SOURCE_CHANGED);
                 }
                 return attempt(intent, allowed);
@@ -134,12 +297,18 @@ public final class DurableDelivery {
 
     /** Resume a committed payload even when the original call-log row no longer exists. */
     public Result resume(String key, long calendar, BooleanSupplier allowed) {
+        return resume(key, calendar, null, allowed);
+    }
+
+    public Result resume(String key, long calendar, Operation operation, BooleanSupplier allowed) {
         synchronized (DELIVERY_LOCK) {
             try {
                 if (!allowed.getAsBoolean()) return Result.PAUSED;
                 if (calendar < 0 || !sink.writable(calendar)) return Result.DESTINATION_UNAVAILABLE;
                 Intent intent = store.get(key, calendar);
-                return intent == null ? Result.NOTHING_PENDING : attempt(intent, allowed);
+                if (intent == null) return Result.NOTHING_PENDING;
+                if (!sameOperation(intent.operation, operation)) return Result.PAUSED;
+                return attempt(intent, allowed);
             } catch (SecurityException e) {
                 return Result.PERMISSION_REQUIRED;
             } catch (RuntimeException e) {
@@ -148,7 +317,57 @@ public final class DurableDelivery {
         }
     }
 
+    /**
+     * Only an explicitly confirmed historical import may collect a fresh payload for expired READY.
+     */
+    Result reapproveExpired(
+            CallRecord call,
+            long calendar,
+            String timezone,
+            Operation operation,
+            BooleanSupplier confirmed) {
+        synchronized (DELIVERY_LOCK) {
+            try {
+                if (!confirmed.getAsBoolean()) return Result.PAUSED;
+                if (operation == null || !operation.owner.startsWith("import/"))
+                    return Result.REVIEW_REQUIRED;
+                Intent prior = store.get(call.key(), calendar);
+                if (prior == null || prior.state != State.EXPIRED_READY || prior.eventId >= 0)
+                    return Result.REVIEW_REQUIRED;
+                String signature = CallIdentity.signature(call);
+                if (prior.sourceSignature == null
+                        || !prior.sourceSignature.equals(signature)
+                        || prior.facts != null && !prior.facts.agrees(call))
+                    return Result.SOURCE_CHANGED;
+                if (!sink.writable(calendar)) return Result.DESTINATION_UNAVAILABLE;
+                CallEvent event = CallEvent.from(call, timezone);
+                if (!confirmed.getAsBoolean()) return Result.PAUSED;
+                Intent refreshed =
+                        new Intent(
+                                State.READY,
+                                call.key(),
+                                calendar,
+                                signature,
+                                event.marker,
+                                event.fingerprint(),
+                                -1,
+                                event,
+                                operation,
+                                SourceFacts.from(call));
+                store.put(refreshed);
+                return attempt(refreshed, confirmed);
+            } catch (SecurityException denied) {
+                return Result.PERMISSION_REQUIRED;
+            } catch (ArithmeticException | IllegalArgumentException invalid) {
+                return Result.INVALID_CALL;
+            } catch (RuntimeException failed) {
+                return Result.FAILED;
+            }
+        }
+    }
+
     private Result attempt(Intent intent, BooleanSupplier allowed) {
+        if (intent.state == State.EXPIRED_READY) return Result.REVIEW_REQUIRED;
         if (intent.state == State.REVIEW || intent.state == State.SUPPRESSED)
             return Result.REVIEW_REQUIRED;
         if (intent.eventId >= 0) return verify(intent, false);
@@ -161,6 +380,9 @@ public final class DurableDelivery {
         // exceptions.
         intent = intent.state(State.IN_FLIGHT, -1);
         store.put(intent);
+        // Settings/cancel publication may occur during the durable write. The shared lock
+        // must also protect final pause publication in the coordinator.
+        if (!allowed.getAsBoolean()) return Result.PAUSED;
         long id = sink.insert(intent.calendar, intent.payload);
         if (id < 0) return review(intent, Result.REVIEW_REQUIRED);
         intent = intent.state(State.ATTEMPTED, id);
@@ -179,7 +401,8 @@ public final class DurableDelivery {
     }
 
     private Result verify(Intent intent, boolean inserted) {
-        if (!matches(sink.read(intent.eventId), intent))
+        SliceEngine.StoredEvent existing = sink.read(intent.eventId);
+        if (!matches(existing, intent) || existing.id != intent.eventId)
             return review(intent, Result.REVIEW_REQUIRED);
         store.put(intent.state(State.CONFIRMED, intent.eventId));
         return inserted ? Result.SAVED : Result.ALREADY_LOGGED;
@@ -187,6 +410,7 @@ public final class DurableDelivery {
 
     private boolean matches(SliceEngine.StoredEvent event, Intent intent) {
         return event != null
+                && event.id >= 0
                 && event.calendar == intent.calendar
                 && event.event != null
                 && intent.fingerprint.equals(event.event.fingerprint());

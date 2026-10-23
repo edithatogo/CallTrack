@@ -14,7 +14,7 @@ Source-matched release candidate, contributor instructions and recorded operatio
 
 ## Inputs and dependencies
 
-Prerequisites: [parity](../parity_20261020/index.md). Requirement references: R13, R27 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
+Prerequisites: [parity](../../archive/parity_20261020/index.md). Requirement references: R13, R27 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
 
 ## Required outputs
 

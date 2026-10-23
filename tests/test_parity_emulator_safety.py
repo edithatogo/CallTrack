@@ -23,6 +23,12 @@ class EmulatorSafety(unittest.TestCase):
             run.assert_not_called()
             identity.assert_not_called()
 
+    def test_wake_budget_suite_keeps_physical_target_gate(self):
+        with patch.object(EMU.subprocess, 'run') as run:
+            with self.assertRaisesRegex(RuntimeError, 'physical-device'):
+                EMU.qualify('physical-fixture-serial', 'wake-budget')
+            run.assert_not_called()
+
     def fixture(self, qemu, name):
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)

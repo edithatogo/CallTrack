@@ -2,6 +2,7 @@ package com.markobl.calllogsync.slice;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
@@ -13,7 +14,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/** Deliberately manual development slice; launch and permission grant never read calls. */
+/** Explicit manual action; previously enabled background policy is controlled independently. */
 public final class CalendarSliceActivity extends Activity {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private Spinner picker;
@@ -105,12 +106,13 @@ public final class CalendarSliceActivity extends Activity {
                                 try (SqliteLedger ledger =
                                         new SqliteLedger(getApplicationContext())) {
                                     result =
-                                            new SliceEngine(
+                                            new ManualDelivery(
                                                             new AndroidCallLogSource(
                                                                     getApplicationContext()),
-                                                            new AndroidCalendarSink(
-                                                                    getApplicationContext()),
-                                                            ledger,
+                                                            new DurableDelivery(
+                                                                    ledger.outbox(),
+                                                                    new AndroidCalendarSink(
+                                                                            getApplicationContext())),
                                                             TimeZone.getDefault().getID())
                                                     .run(destination);
                                 } catch (RuntimeException e) {
@@ -126,14 +128,34 @@ public final class CalendarSliceActivity extends Activity {
                                         });
                             });
                 });
+        Button automatic = new Button(this);
+        automatic.setId(R.id.open_automatic);
+        automatic.setText(R.string.auto_open);
+        automatic.setOnClickListener(
+                v -> startActivity(new Intent(this, AutomaticSettingsActivity.class)));
+        layout.addView(automatic);
         ScrollView scroll = new ScrollView(this);
         scroll.addView(layout);
+        ActivityInsets.apply(scroll);
         setContentView(scroll);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        executor.execute(
+                () -> {
+                    try {
+                        AutomaticScheduling.reconcile(getApplicationContext());
+                    } catch (RuntimeException unavailable) {
+                        /* Settings/status exposes unavailable persisted policy; opening cannot enable it. */
+                    }
+                    try (SqliteLedger ledger = new SqliteLedger(getApplicationContext())) {
+                        ledger.expirePayloads(50);
+                    } catch (RuntimeException unavailable) {
+                        /* Status/recovery exposes any storage problem. */
+                    }
+                });
         if (calendarAccess()) refresh();
         else {
             selected = -1;

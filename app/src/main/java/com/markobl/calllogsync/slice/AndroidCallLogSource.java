@@ -9,10 +9,12 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.CallLog.Calls;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-/** Invoked only by the manual UI action. Does not read contacts or historical rows. */
-public final class AndroidCallLogSource implements SliceEngine.CallSource {
+/** Call-only provider adapter. Queries occur only when explicitly requested by a coordinator. */
+public final class AndroidCallLogSource implements SliceEngine.CallSource, PagedCalls.Source {
     static final String[] PROJECTION = {
         Calls._ID,
         Calls.NUMBER,
@@ -29,13 +31,20 @@ public final class AndroidCallLogSource implements SliceEngine.CallSource {
         this.context = context.getApplicationContext();
     }
 
+    // Protected by the static namespace monitor; never trust a cache after uncertain disk IO.
+    private static boolean namespaceCommitUncertain;
+
     private static synchronized String namespace(Context context) {
+        if (namespaceCommitUncertain)
+            throw new IllegalStateException("Source identity commit uncertain; restart required");
         SharedPreferences p = context.getSharedPreferences("slice", Context.MODE_PRIVATE);
         String id = p.getString("sourceNamespace", null);
         if (id == null) {
             id = "android-call-log/" + UUID.randomUUID();
+            namespaceCommitUncertain = true;
             if (!p.edit().putString("sourceNamespace", id).commit())
                 throw new IllegalStateException("Identity not persisted");
+            namespaceCommitUncertain = false;
         }
         return id;
     }
@@ -67,8 +76,90 @@ public final class AndroidCallLogSource implements SliceEngine.CallSource {
         }
     }
 
+    @Override
+    public String namespace() {
+        return namespace(context);
+    }
+
+    @Override
+    public CallRecord upper() {
+        List<CallRecord> rows = bounded(null, null, false, 1);
+        return rows.isEmpty() ? null : rows.get(0);
+    }
+
+    @Override
+    public CallRecord at(long id) {
+        if (id < 0) throw new IllegalArgumentException("Invalid source ID");
+        List<CallRecord> rows =
+                bounded(Calls._ID + "=?", new String[] {Long.toString(id)}, true, 1);
+        return rows.isEmpty() ? null : rows.get(0);
+    }
+
+    @Override
+    public List<CallRecord> page(long after, long upper, int limit) {
+        if (after < -1 || upper < 0 || after >= upper || limit < 1 || limit > 500)
+            throw new IllegalArgumentException("Invalid source page");
+        return bounded(
+                Calls._ID + ">? AND " + Calls._ID + "<=?",
+                new String[] {Long.toString(after), Long.toString(upper)},
+                true,
+                limit);
+    }
+
+    static Bundle pageQuery(String selection, String[] args, boolean ascending, int limit) {
+        if (limit < 1 || limit > 500) throw new IllegalArgumentException("Invalid page limit");
+        Bundle query = new Bundle();
+        query.putStringArray(ContentResolver.QUERY_ARG_SORT_COLUMNS, new String[] {Calls._ID});
+        query.putInt(
+                ContentResolver.QUERY_ARG_SORT_DIRECTION,
+                ascending
+                        ? ContentResolver.QUERY_SORT_DIRECTION_ASCENDING
+                        : ContentResolver.QUERY_SORT_DIRECTION_DESCENDING);
+        query.putInt(ContentResolver.QUERY_ARG_LIMIT, limit);
+        if (selection != null) {
+            query.putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selection);
+            query.putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, args);
+        }
+        return query;
+    }
+
+    private List<CallRecord> bounded(
+            String selection, String[] args, boolean ascending, int limit) {
+        if (context.checkSelfPermission(Manifest.permission.READ_CALL_LOG)
+                != PackageManager.PERMISSION_GRANTED)
+            throw new SecurityException("Call-log permission required");
+        try (Cursor cursor =
+                context.getContentResolver()
+                        .query(
+                                Calls.CONTENT_URI
+                                        .buildUpon()
+                                        .appendQueryParameter(
+                                                Calls.LIMIT_PARAM_KEY, Integer.toString(limit))
+                                        .build(),
+                                PROJECTION,
+                                pageQuery(selection, args, ascending, limit),
+                                null)) {
+            if (cursor == null) throw new IllegalStateException("Call provider unavailable");
+            return pageRows(cursor, namespace(), limit);
+        }
+    }
+
+    static List<CallRecord> pageRows(Cursor cursor, String namespace, int limit) {
+        if (limit < 1 || limit > 500) throw new IllegalArgumentException("Invalid page limit");
+        List<CallRecord> rows = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            if (rows.size() == limit) throw new PagedCalls.SourceChanged();
+            rows.add(current(cursor, namespace));
+        }
+        return rows;
+    }
+
     static CallRecord first(Cursor c, String namespace) {
         if (!c.moveToFirst()) return null;
+        return current(c, namespace);
+    }
+
+    private static CallRecord current(Cursor c, String namespace) {
         return new CallRecord(
                 namespace,
                 c.getString(0),
@@ -77,7 +168,7 @@ public final class AndroidCallLogSource implements SliceEngine.CallSource {
                 c.getInt(2),
                 c.getString(5),
                 c.getString(1),
-                c.getInt(6) == Calls.PRESENTATION_ALLOWED,
+                c.isNull(6) ? (Integer) null : Integer.valueOf(c.getInt(6)),
                 c.getString(7));
     }
 }

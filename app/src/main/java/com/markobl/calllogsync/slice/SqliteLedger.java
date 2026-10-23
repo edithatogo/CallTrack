@@ -7,13 +7,27 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /** Durable receipt per source/destination. A writer transaction serializes concurrent instances. */
-public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.Ledger {
+public final class SqliteLedger extends SQLiteOpenHelper
+        implements SliceEngine.Ledger, AutomaticDelivery.Progress {
+    private final java.util.function.LongSupplier clock;
+
     public SqliteLedger(Context context) {
         this(context, "calltrack-ledger.db");
     }
 
     public SqliteLedger(Context context, String name) {
-        super(context, name, null, 2);
+        this(context, name, System::currentTimeMillis);
+    }
+
+    public SqliteLedger(Context context, String name, java.util.function.LongSupplier clock) {
+        super(context, name, null, 6);
+        this.clock = clock;
+    }
+
+    private long now() {
+        long time = clock.getAsLong();
+        if (time < 0) throw new IllegalStateException("Invalid storage clock");
+        return time;
     }
 
     @Override
@@ -23,16 +37,296 @@ public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.
                         + " INTEGER NOT NULL, fingerprint TEXT NOT NULL, PRIMARY"
                         + " KEY(source,calendar))");
         createOutbox(db);
+        createScans(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion != 1 || newVersion != 2)
+        if (newVersion != 6 || oldVersion < 1 || oldVersion > 5)
             throw new IllegalStateException("A preserving ledger migration is required");
-        createOutbox(db);
+        if (oldVersion == 1) {
+            createOutbox(db);
+            db.execSQL(
+                    "INSERT INTO outbox (source,calendar,state,event,fingerprint) SELECT"
+                            + " source,calendar,'LEGACY',event,fingerprint FROM receipts");
+        } else {
+            if (oldVersion == 2) {
+                // Existing pending rows remain unowned, never assigned to a new activation.
+                db.execSQL("ALTER TABLE outbox ADD COLUMN operation_owner TEXT");
+                db.execSQL(
+                        "ALTER TABLE outbox ADD COLUMN operation_generation INTEGER NOT NULL"
+                                + " DEFAULT 0");
+            }
+            if (oldVersion < 4) {
+                db.execSQL("ALTER TABLE outbox ADD COLUMN source_start INTEGER");
+                db.execSQL("ALTER TABLE outbox ADD COLUMN source_seconds INTEGER");
+                db.execSQL("ALTER TABLE outbox ADD COLUMN source_type INTEGER");
+                db.execSQL("ALTER TABLE outbox ADD COLUMN source_presentation INTEGER");
+                db.execSQL("ALTER TABLE outbox ADD COLUMN source_presentation_supplied INTEGER");
+            }
+        }
+        if (oldVersion < 5) createScans(db);
+        if (oldVersion != 1) db.execSQL("ALTER TABLE outbox ADD COLUMN payload_saved_at INTEGER");
+        ContentValues migrated = new ContentValues();
+        migrated.put("payload_saved_at", now());
+        db.update("outbox", migrated, "payload_title IS NOT NULL", null);
+    }
+
+    private static void createScans(SQLiteDatabase db) {
         db.execSQL(
-                "INSERT INTO outbox (source,calendar,state,event,fingerprint) SELECT"
-                        + " source,calendar,'LEGACY',event,fingerprint FROM receipts");
+                "CREATE TABLE scan_cursors (owner TEXT NOT NULL, generation INTEGER NOT NULL,"
+                        + " namespace TEXT NOT NULL, upper_id INTEGER NOT NULL, upper_binding TEXT,"
+                        + " last_id INTEGER NOT NULL, last_binding TEXT, PRIMARY"
+                        + " KEY(owner,generation))");
+    }
+
+    public static final class RecoveryCursor {
+        public final long started, calendar;
+        public final String key;
+
+        public RecoveryCursor(long started, String key, long calendar) {
+            if (started < -1 || key == null || key.isEmpty() || calendar < 0)
+                throw new IllegalArgumentException("Invalid receipt cursor");
+            this.started = started;
+            this.key = key;
+            this.calendar = calendar;
+        }
+    }
+
+    public static final class RecoveryItem {
+        public final RecoveryCursor cursor;
+        public final DurableDelivery.Intent intent;
+
+        RecoveryItem(RecoveryCursor cursor, DurableDelivery.Intent intent) {
+            this.cursor = cursor;
+            this.intent = intent;
+        }
+    }
+
+    /** Read-only bounded listing, including late legacy receipts not yet materialised in outbox. */
+    public java.util.List<RecoveryItem> recoveryPage(RecoveryCursor after, int limit) {
+        if (limit < 1 || limit > 50) throw new IllegalArgumentException("Invalid receipt page");
+        String rows =
+                "SELECT source,calendar,COALESCE(source_start,-1) AS started FROM outbox UNION ALL"
+                    + " SELECT r.source,r.calendar,-1 AS started FROM receipts r WHERE NOT EXISTS"
+                    + " (SELECT 1 FROM outbox o WHERE o.source=r.source AND o.calendar=r.calendar)";
+        String predicate =
+                after == null
+                        ? ""
+                        : " WHERE started<CAST(? AS INTEGER) OR (started=CAST(? AS INTEGER) AND"
+                                + " (source>? OR (source=? AND calendar>CAST(? AS INTEGER))))";
+        String[] args =
+                after == null
+                        ? new String[] {Integer.toString(limit)}
+                        : new String[] {
+                            Long.toString(after.started),
+                            Long.toString(after.started),
+                            after.key,
+                            after.key,
+                            Long.toString(after.calendar),
+                            Integer.toString(limit)
+                        };
+        java.util.List<RecoveryItem> items = new java.util.ArrayList<>();
+        try (Cursor cursor =
+                getReadableDatabase()
+                        .rawQuery(
+                                "SELECT source,calendar,started FROM ("
+                                        + rows
+                                        + ")"
+                                        + predicate
+                                        + " ORDER BY started DESC,source ASC,calendar ASC LIMIT ?",
+                                args)) {
+            while (cursor.moveToNext()) {
+                RecoveryCursor point =
+                        new RecoveryCursor(
+                                cursor.getLong(2), cursor.getString(0), cursor.getLong(1));
+                DurableDelivery.Intent intent = readIntent(point.key, point.calendar);
+                if (intent != null) items.add(new RecoveryItem(point, intent));
+            }
+        }
+        return java.util.Collections.unmodifiableList(items);
+    }
+
+    public DeliveryCounts counts() {
+        long pending = 0, verified = 0, review = 0, suppressed = 0;
+        try (Cursor cursor =
+                getReadableDatabase()
+                        .rawQuery(
+                                "SELECT state,COUNT(*) FROM (SELECT state FROM outbox UNION ALL"
+                                    + " SELECT 'LEGACY' AS state FROM receipts r WHERE NOT EXISTS"
+                                    + " (SELECT 1 FROM outbox o WHERE o.source=r.source AND"
+                                    + " o.calendar=r.calendar)) GROUP BY state",
+                                null)) {
+            while (cursor.moveToNext()) {
+                long count = cursor.getLong(1);
+                switch (DurableDelivery.State.valueOf(cursor.getString(0))) {
+                    case READY:
+                    case IN_FLIGHT:
+                    case ATTEMPTED:
+                        pending = Math.addExact(pending, count);
+                        break;
+                    case CONFIRMED:
+                        verified = Math.addExact(verified, count);
+                        break;
+                    case REVIEW:
+                    case LEGACY:
+                    case EXPIRED_READY:
+                        review = Math.addExact(review, count);
+                        break;
+                    case SUPPRESSED:
+                        suppressed = Math.addExact(suppressed, count);
+                        break;
+                }
+            }
+        }
+        return new DeliveryCounts(pending, verified, review, suppressed);
+    }
+
+    /** Bounded source-independent recovery, restricted to this owner/generation/destination. */
+    @Override
+    public java.util.List<String> pending(
+            DurableDelivery.Operation operation, long calendar, int limit) {
+        if (operation == null || calendar < 0 || limit < 1 || limit > 500)
+            throw new IllegalArgumentException("Invalid pending query");
+        java.util.List<String> keys = new java.util.ArrayList<>();
+        try (Cursor cursor =
+                getReadableDatabase()
+                        .query(
+                                "outbox",
+                                new String[] {"source"},
+                                "calendar=? AND operation_owner=? AND operation_generation=? AND"
+                                        + " state IN (?,?,?)",
+                                new String[] {
+                                    Long.toString(calendar),
+                                    operation.owner,
+                                    Long.toString(operation.generation),
+                                    "READY",
+                                    "IN_FLIGHT",
+                                    "ATTEMPTED"
+                                },
+                                null,
+                                null,
+                                "source ASC",
+                                Integer.toString(limit))) {
+            while (cursor.moveToNext()) keys.add(cursor.getString(0));
+        }
+        return java.util.Collections.unmodifiableList(keys);
+    }
+
+    @Override
+    public PagedCalls.Checkpoint get(DurableDelivery.Operation operation) {
+        return checkpoint(operation);
+    }
+
+    @Override
+    public void put(DurableDelivery.Operation operation, PagedCalls.Checkpoint checkpoint) {
+        checkpoint(operation, checkpoint);
+    }
+
+    public PagedCalls.Checkpoint checkpoint(DurableDelivery.Operation operation) {
+        if (operation == null) throw new IllegalArgumentException("Operation required");
+        try (Cursor cursor =
+                getReadableDatabase()
+                        .query(
+                                "scan_cursors",
+                                new String[] {
+                                    "namespace",
+                                    "upper_id",
+                                    "upper_binding",
+                                    "last_id",
+                                    "last_binding"
+                                },
+                                "owner=? AND generation=?",
+                                new String[] {operation.owner, Long.toString(operation.generation)},
+                                null,
+                                null,
+                                null)) {
+            return !cursor.moveToFirst()
+                    ? null
+                    : new PagedCalls.Checkpoint(
+                            cursor.getString(0),
+                            cursor.getLong(1),
+                            cursor.getString(2),
+                            cursor.getLong(3),
+                            cursor.getString(4));
+        }
+    }
+
+    /**
+     * Commit after handling a row, never in the provider-effect transaction. Snapshot is immutable.
+     */
+    public void checkpoint(DurableDelivery.Operation operation, PagedCalls.Checkpoint next) {
+        if (operation == null || next == null)
+            throw new IllegalArgumentException("Checkpoint required");
+        SQLiteDatabase db = getWritableDatabase();
+        if (db.inTransaction())
+            throw new IllegalStateException("Checkpoint must commit independently");
+        db.beginTransaction();
+        try {
+            PagedCalls.Checkpoint prior = checkpoint(operation);
+            if (prior != null
+                    && (!prior.namespace.equals(next.namespace)
+                            || prior.upperId != next.upperId
+                            || !java.util.Objects.equals(prior.upperBinding, next.upperBinding)
+                            || next.lastId < prior.lastId
+                            || next.lastId == prior.lastId
+                                    && !java.util.Objects.equals(
+                                            prior.lastBinding, next.lastBinding)))
+                throw new IllegalStateException("Frozen checkpoint cannot be reset or rebound");
+            ContentValues values = new ContentValues();
+            values.put("owner", operation.owner);
+            values.put("generation", operation.generation);
+            values.put("namespace", next.namespace);
+            values.put("upper_id", next.upperId);
+            values.put("upper_binding", next.upperBinding);
+            values.put("last_id", next.lastId);
+            values.put("last_binding", next.lastBinding);
+            if (db.insertWithOnConflict(
+                            "scan_cursors", null, values, SQLiteDatabase.CONFLICT_REPLACE)
+                    < 0) throw new IllegalStateException("Checkpoint not stored");
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    /** Compare and extend a completed snapshot without weakening normal progress writes. */
+    @Override
+    public void rollover(
+            DurableDelivery.Operation operation,
+            PagedCalls.Checkpoint expected,
+            PagedCalls.Checkpoint next) {
+        if (operation == null
+                || expected == null
+                || next == null
+                || expected.lastId != expected.upperId
+                || !expected.namespace.equals(next.namespace)
+                || next.upperId < expected.upperId
+                || next.lastId != expected.lastId
+                || !java.util.Objects.equals(next.lastBinding, expected.lastBinding)
+                || next.upperId == expected.upperId
+                        && !java.util.Objects.equals(next.upperBinding, expected.upperBinding))
+            throw new IllegalArgumentException("Invalid scan rollover");
+        SQLiteDatabase db = getWritableDatabase();
+        if (db.inTransaction())
+            throw new IllegalStateException("Rollover must commit independently");
+        db.beginTransaction();
+        try {
+            if (!PagedCalls.equal(checkpoint(operation), expected))
+                throw new IllegalStateException("Scan changed before rollover");
+            ContentValues values = new ContentValues();
+            values.put("upper_id", next.upperId);
+            values.put("upper_binding", next.upperBinding);
+            if (db.update(
+                            "scan_cursors",
+                            values,
+                            "owner=? AND generation=?",
+                            new String[] {operation.owner, Long.toString(operation.generation)})
+                    != 1) throw new IllegalStateException("Rollover not stored");
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
     }
 
     @Override
@@ -79,7 +373,10 @@ public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.
                 "CREATE TABLE outbox (source TEXT NOT NULL, calendar INTEGER NOT NULL, state TEXT"
                     + " NOT NULL, event INTEGER NOT NULL, signature TEXT, marker TEXT, fingerprint"
                     + " TEXT NOT NULL, payload_title TEXT, payload_description TEXT, payload_start"
-                    + " INTEGER, payload_end INTEGER, payload_timezone TEXT, PRIMARY"
+                    + " INTEGER, payload_end INTEGER, payload_timezone TEXT, operation_owner TEXT,"
+                    + " operation_generation INTEGER NOT NULL DEFAULT 0, source_start INTEGER,"
+                    + " source_seconds INTEGER, source_type INTEGER, source_presentation INTEGER,"
+                    + " source_presentation_supplied INTEGER, payload_saved_at INTEGER, PRIMARY"
                     + " KEY(source,calendar))");
         db.execSQL("CREATE INDEX outbox_state ON outbox(calendar,state)");
     }
@@ -99,7 +396,37 @@ public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.
         };
     }
 
+    public int expirePayloads(int limit) {
+        if (limit < 1 || limit > 500) throw new IllegalArgumentException("Invalid retention batch");
+        synchronized (DurableDelivery.DELIVERY_LOCK) {
+            long time = now();
+            if (time < PayloadRetention.WINDOW_MILLIS) return 0;
+            try (android.database.sqlite.SQLiteStatement statement =
+                    getWritableDatabase()
+                            .compileStatement(
+                                    "UPDATE outbox SET state=CASE WHEN state='READY' AND event<0"
+                                        + " THEN 'EXPIRED_READY' ELSE state END,"
+                                        + " payload_title=NULL,payload_description=NULL,payload_start=NULL,payload_end=NULL,payload_timezone=NULL,payload_saved_at=NULL"
+                                        + " WHERE rowid IN (SELECT rowid FROM outbox WHERE"
+                                        + " payload_title IS NOT NULL AND payload_saved_at<=? ORDER"
+                                        + " BY payload_saved_at ASC,source ASC,calendar ASC LIMIT"
+                                        + " ?)")) {
+                statement.bindLong(1, time - PayloadRetention.WINDOW_MILLIS);
+                statement.bindLong(2, limit);
+                return statement.executeUpdateDelete();
+            }
+        }
+    }
+
     private DurableDelivery.Intent readIntent(String key, long calendar) {
+        synchronized (DurableDelivery.DELIVERY_LOCK) {
+            return readIntentLocked(key, calendar);
+        }
+    }
+
+    private DurableDelivery.Intent readIntentLocked(String key, long calendar) {
+        DurableDelivery.Intent found = null;
+        Long savedAt = null;
         try (Cursor c =
                 getReadableDatabase()
                         .query(
@@ -114,7 +441,15 @@ public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.
                                     "payload_description",
                                     "payload_start",
                                     "payload_end",
-                                    "payload_timezone"
+                                    "payload_timezone",
+                                    "operation_owner",
+                                    "operation_generation",
+                                    "source_start",
+                                    "source_seconds",
+                                    "source_type",
+                                    "source_presentation",
+                                    "source_presentation_supplied",
+                                    "payload_saved_at"
                                 },
                                 "source=? AND calendar=?",
                                 new String[] {key, Long.toString(calendar)},
@@ -132,16 +467,40 @@ public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.
                                         c.getLong(8),
                                         c.getString(9),
                                         c.getString(3));
-                return new DurableDelivery.Intent(
-                        DurableDelivery.State.valueOf(c.getString(0)),
-                        key,
-                        calendar,
-                        c.getString(2),
-                        c.getString(3),
-                        c.getString(4),
-                        c.getLong(1),
-                        payload);
+                found =
+                        new DurableDelivery.Intent(
+                                DurableDelivery.State.valueOf(c.getString(0)),
+                                key,
+                                calendar,
+                                c.getString(2),
+                                c.getString(3),
+                                c.getString(4),
+                                c.getLong(1),
+                                payload,
+                                c.isNull(10)
+                                        ? null
+                                        : new DurableDelivery.Operation(
+                                                c.getString(10), c.getLong(11)),
+                                c.isNull(12)
+                                        ? null
+                                        : new DurableDelivery.SourceFacts(
+                                                c.getLong(12),
+                                                c.getLong(13),
+                                                c.getInt(14),
+                                                c.isNull(15) ? null : Integer.valueOf(c.getInt(15)),
+                                                c.getInt(16) != 0));
+                savedAt = c.isNull(17) ? null : c.getLong(17);
             }
+        }
+        if (found != null) {
+            if (found.payload != null && PayloadRetention.expired(savedAt, now())) {
+                synchronized (DurableDelivery.DELIVERY_LOCK) {
+                    DurableDelivery.Intent cleared = PayloadRetention.clear(found);
+                    writeIntent(cleared);
+                    return cleared;
+                }
+            }
+            return found;
         }
         // Preserve receipts even if an older retained entry point wrote after schema migration.
         SliceEngine.Entry prior = get(key, calendar);
@@ -162,32 +521,76 @@ public final class SqliteLedger extends SQLiteOpenHelper implements SliceEngine.
         SQLiteDatabase db = getWritableDatabase();
         if (db.inTransaction())
             throw new IllegalStateException("Outbox intent must commit before provider access");
-        ContentValues values = new ContentValues();
-        values.put("source", intent.key);
-        values.put("calendar", intent.calendar);
-        values.put("state", intent.state.name());
-        values.put("event", intent.eventId);
-        values.put("signature", intent.sourceSignature);
-        values.put("marker", intent.marker);
-        values.put("fingerprint", intent.fingerprint);
-        CallEvent payload = intent.payload;
-        if (payload != null) {
-            values.put("payload_title", payload.title);
-            values.put("payload_description", payload.description);
-            values.put("payload_start", payload.start);
-            values.put("payload_end", payload.end);
-            values.put("payload_timezone", payload.timezone);
-        } else {
-            for (String column :
-                    new String[] {
-                        "payload_title",
-                        "payload_description",
-                        "payload_start",
-                        "payload_end",
-                        "payload_timezone"
-                    }) values.putNull(column);
+        db.beginTransaction();
+        try {
+            Long savedAt = null;
+            if (intent.payload != null) {
+                try (Cursor prior =
+                        db.query(
+                                "outbox",
+                                new String[] {"payload_title", "payload_saved_at"},
+                                "source=? AND calendar=?",
+                                new String[] {intent.key, Long.toString(intent.calendar)},
+                                null,
+                                null,
+                                null)) {
+                    if (prior.moveToFirst() && !prior.isNull(0) && !prior.isNull(1))
+                        savedAt = prior.getLong(1);
+                }
+                if (savedAt == null) savedAt = now();
+            }
+            ContentValues values = new ContentValues();
+            values.put("payload_saved_at", savedAt);
+            values.put("source", intent.key);
+            values.put("calendar", intent.calendar);
+            values.put("state", intent.state.name());
+            values.put("event", intent.eventId);
+            values.put("signature", intent.sourceSignature);
+            values.put("marker", intent.marker);
+            values.put("fingerprint", intent.fingerprint);
+            values.put("operation_owner", intent.operation == null ? null : intent.operation.owner);
+            values.put(
+                    "operation_generation",
+                    intent.operation == null ? 0 : intent.operation.generation);
+            DurableDelivery.SourceFacts facts = intent.facts;
+            if (facts != null) {
+                values.put("source_start", facts.start);
+                values.put("source_seconds", facts.seconds);
+                values.put("source_type", facts.type);
+                values.put("source_presentation", facts.presentation);
+                values.put("source_presentation_supplied", facts.presentationSupplied ? 1 : 0);
+            } else {
+                for (String column :
+                        new String[] {
+                            "source_start",
+                            "source_seconds",
+                            "source_type",
+                            "source_presentation",
+                            "source_presentation_supplied"
+                        }) values.putNull(column);
+            }
+            CallEvent payload = intent.payload;
+            if (payload != null) {
+                values.put("payload_title", payload.title);
+                values.put("payload_description", payload.description);
+                values.put("payload_start", payload.start);
+                values.put("payload_end", payload.end);
+                values.put("payload_timezone", payload.timezone);
+            } else {
+                for (String column :
+                        new String[] {
+                            "payload_title",
+                            "payload_description",
+                            "payload_start",
+                            "payload_end",
+                            "payload_timezone"
+                        }) values.putNull(column);
+            }
+            if (db.insertWithOnConflict("outbox", null, values, SQLiteDatabase.CONFLICT_REPLACE)
+                    < 0) throw new IllegalStateException("Outbox write was not committed");
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
         }
-        if (db.insertWithOnConflict("outbox", null, values, SQLiteDatabase.CONFLICT_REPLACE) < 0)
-            throw new IllegalStateException("Outbox write was not committed");
     }
 }

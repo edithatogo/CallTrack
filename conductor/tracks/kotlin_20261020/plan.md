@@ -56,3 +56,11 @@ Compose handoff: [Track7 research](../../archive/compose_20261020/decisions.md) 
 and defers production integration. After stabilizing M3/M5, reopen its adoption
 gates rather than assume the isolated prototype migrated the real Activity. This
 is a handoff note, not a new Compose prerequisite for completing Kotlin work.
+
+## M3 acceptance handoff — 2026-10-21
+
+[Track4 handoff](../../archive/parity_20261020/handoff.md) now supplies selected API36 emulator
+acceptance: schema6/import2,110 JVM/73 host tests and89 successful native invocations
+plus one expected process kill. Resume the original remaining gates above; do not
+repeat completed discovery or infer physical/cloud/release acceptance. This handoff
+does not mark this track complete or waive its original prerequisites.
