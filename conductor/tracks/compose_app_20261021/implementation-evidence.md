@@ -30,6 +30,18 @@ documents, 21 tracks and 25 synthetic scenarios), and `git diff --check` passed.
 scope, review findings and remaining acceptance limits are recorded in
 [the import filters review](review-20261024-import-filters.md).
 
+## Historical import accessibility, large font and RTL — 2026-10-24
+
+The Compose filter test now verifies the date fields' accessible content
+descriptions, checkbox role and on state, and a minimum 48 dp row height under
+2x font scale and RTL layout direction. It also asserts the date fields and
+call-type control remain displayed. A first test attempt incorrectly called a
+Compose synchronization assertion from inside `runOnIdle`; moving the semantics
+read to the test thread fixed the test-harness misuse. The selected test then
+passed both filter component cases on the API36 emulator. This is Compose
+semantics and layout evidence, not a live TalkBack or Switch Access session.
+See [the accessibility review](review-20261024-import-accessibility.md).
+
 ## Change
 
 The automatic settings screen now renders its four read-only state/counts/action
