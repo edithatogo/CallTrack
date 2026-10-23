@@ -1,0 +1,68 @@
+[
+  {
+    "name": "block-buffer",
+    "version": "0.12.1",
+    "license": "MIT OR Apache-2.0",
+    "rust_version": "1.85"
+  },
+  {
+    "name": "calltrack-identity-experiment",
+    "version": "0.0.0",
+    "license": "GPL-3.0-only",
+    "rust_version": null
+  },
+  {
+    "name": "cfg-if",
+    "version": "1.0.5",
+    "license": "MIT OR Apache-2.0",
+    "rust_version": "1.32"
+  },
+  {
+    "name": "const-oid",
+    "version": "0.10.2",
+    "license": "Apache-2.0 OR MIT",
+    "rust_version": "1.85"
+  },
+  {
+    "name": "cpufeatures",
+    "version": "0.3.1",
+    "license": "MIT OR Apache-2.0",
+    "rust_version": "1.85"
+  },
+  {
+    "name": "crypto-common",
+    "version": "0.2.2",
+    "license": "MIT OR Apache-2.0",
+    "rust_version": "1.85"
+  },
+  {
+    "name": "digest",
+    "version": "0.11.3",
+    "license": "MIT OR Apache-2.0",
+    "rust_version": "1.85"
+  },
+  {
+    "name": "hybrid-array",
+    "version": "0.4.15",
+    "license": "MIT OR Apache-2.0",
+    "rust_version": "1.85"
+  },
+  {
+    "name": "libc",
+    "version": "0.2.191",
+    "license": "MIT OR Apache-2.0",
+    "rust_version": "1.65"
+  },
+  {
+    "name": "sha2",
+    "version": "0.11.1",
+    "license": "MIT OR Apache-2.0",
+    "rust_version": "1.88"
+  },
+  {
+    "name": "typenum",
+    "version": "1.20.1",
+    "license": "MIT OR Apache-2.0",
+    "rust_version": "1.41.0"
+  }
+]

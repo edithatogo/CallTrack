@@ -14,7 +14,7 @@ Adopt/retain/reject/defer decision based on contracts, packaging and material be
 
 ## Inputs and dependencies
 
-Prerequisites: [build](../../archive/build_20261020/index.md). Requirement references: R26 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
+Prerequisites: [build](../build_20261020/index.md). Requirement references: R26 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
 
 ## Required outputs
 
@@ -27,3 +27,13 @@ Adopt/retain/reject/defer decision based on contracts, packaging and material be
 ## Out of scope
 
 No automatic adoption of shortlisted technology, wholesale rewrite, paid service, unqualified platform parity or public release. Cross-track responsibilities remain with their owning tracks. A negative feasibility result or justified deferral is an acceptable research outcome.
+
+## Bounded experiment selected2026-10-21
+
+Compare a Rust SHA256 source-signature trial with the actual current Kotlin
+CallIdentity/Java CallRecord sources, using the four existing Java golden fixtures.
+Use standalone projects outside root settings. Measure warmed host-only signature
+throughput and record toolchains/input hashes; this excludes FFI/mobile/battery and
+cannot establish production advantage. Rust trial accepts valid Unicode strings
+and raw-type constructor semantics only; full Java UTF-16/null/legacy API parity
+must not be inferred. No production integration or UniFFI adoption is selected.

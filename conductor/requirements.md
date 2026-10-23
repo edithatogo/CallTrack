@@ -134,3 +134,10 @@ matrix distinguishing ordinary manual/import companions, conditional iOS26+ defa
 dialer history and Windows history APIs. A macOS EventKit signature probe typechecks
 without runtime API calls. PLAT-D01 recommends a limited native companion experiment
 and defers implementation; no iOS/device/calendar runtime qualification is established.
+
+## Track13 Rust evaluation outcome
+
+R26 has [X01–X10](archive/rust_20261020/requirements.md) and an isolated Rust/JVM
+source-signature experiment. Four golden cases match, but full Java/UTF-16/legacy
+contracts, FFI and native packaging remain unqualified. RUST-D01 retains Kotlin/
+native ownership and defers adoption; host micro-timings alone do not justify Rust.
