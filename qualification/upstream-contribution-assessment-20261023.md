@@ -3,8 +3,8 @@
 ## Actual repositories and scope
 
 The CallTrack working repository is source-derived from AndroidCallLogSync but
-was initialised with independent Git history; it has no configured remote.
-It was not previously a GitHub fork. The user requested actual upstream PRs.
+was initialised with independent Git history. It was not previously a GitHub
+fork. The user requested actual upstream PRs.
 A verified GitHub fork now exists at
 [edithatogo/AndroidCallLogSync](https://github.com/edithatogo/AndroidCallLogSync),
 whose parent is MarkoBL/AndroidCallLogSync. Its contribution checkout is private
@@ -16,8 +16,10 @@ HTTP endpoint, including its JSON/header contract. This successor instead uses
 selected-calendar delivery, its own receipts/recovery/UI and development identity.
 The new Python/Conductor helpers do not exist in upstream. Replacing the upstream
 product with the successor, or labelling the Python/JDK/Conductor changes as
-portable upstream app features, would misrepresent their scope. Those changes
-need a selected successor repository for review; no such target is selected yet.
+portable upstream app features, would misrepresent their scope. The user selected
+a separate private successor repository,
+[edithatogo/CallTrack](https://github.com/edithatogo/CallTrack), which now has
+seventeen stacked draft PRs for the project's feature and research stages.
 
 ## Opened upstream PR
 
@@ -37,4 +39,8 @@ No Android build/native device acceptance is claimed for this configuration fix.
 The PR's state/base/head/commit/single-file diff were read back and it is attached
 to this chat. The fork/PR contain upstream code and the checksum fix; no CallTrack
 private journal, observation evidence, APK, account or device data was pushed.
-No PR has been opened for the independent Python/JDK/Conductor feature set.
+The independent Python/JDK/Conductor feature set is
+[CallTrack#17](https://github.com/edithatogo/CallTrack/pull/17). Hosted Actions
+jobs in that private repository have not run: GitHub reports an account
+billing/spending-limit failure before assigning a runner. Local Mac and isolated
+Linux qualification are recorded in Track21; neither substitutes for hosted CI.

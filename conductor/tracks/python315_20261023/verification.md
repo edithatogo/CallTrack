@@ -120,10 +120,18 @@ and read back as exited. Original release containers and devices were untouched.
 Private `final-mac.json`, `final-linux-receipt.json`, logs and final container-state
 readback remain under `.local/dependency-refresh-20261023/linux-python315/`.
 
-The user's request for actual PRs exposed the previously unpublished successor
-history. The original-upstream fork and checksum PR now exist, but they do not
-supply a hosted target for the separate calendar application/Python tooling. A
-successor-target question is pending after explaining the product difference.
-No further hosted Python acceptance or successor PR publication can be performed
-without that selection. Track remains in_progress; the durable goal is blocked
-on that repeatedly verified external prerequisite, rather than marked complete.
+The user selected a separate private CallTrack successor repository under
+`edithatogo`. The repository exists and its seventeen stacked feature/research
+PRs are open as drafts. Python/toolchain work is [successor PR #17](https://github.com/edithatogo/CallTrack/pull/17),
+based on the final candidate preparation branch. The original-upstream checksum
+PR remains separately open as MarkoBL/AndroidCallLogSync#3.
+
+GitHub dispatched push and pull_request workflows for #17, but every job
+completed before a runner was assigned (`runner_id=0`, no steps or logs). Exact
+check-run annotation: "The job was not started because recent account payments
+have failed or your spending limit needs to be increased. Please check the
+'Billing & plans' section in your settings." Actions are enabled on the private
+repository. This is an account billing/spending-limit gate, not a Python or test
+failure. Actual hosted CI remains unqualified; the local Mac and independent
+Linux 152-test qualification above is retained. Track and durable goal remain
+blocked for hosted acceptance, not complete.
