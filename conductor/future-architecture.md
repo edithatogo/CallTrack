@@ -23,12 +23,16 @@ work. Track6's metadata prerequisite on release denotes its original full-track
 acceptance, not a prohibition on the user-approved local Kotlin conversion.
 No dependency cycle is introduced to make Track5 depend on full Track6 acceptance.
 Later stages start after prerequisites pass or have an explicit justified deferral.
-iOS implementation starts last, after dispositions for every earlier stage.
+iOS implementation starts last, after dispositions for every earlier stage. A
+track-local scoped prerequisite record may permit preparatory research while
+iOS remains active in Conductor, but that research is not a stage disposition
+and cannot authorize app implementation or resolve any earlier stage.
 A deferral records reason, evidence, consequences and reconsideration trigger in
 track-local deferral.md, metadata implementation_status=deferred and metadata
 deferral fields reason, consequences and reconsideration_trigger. It never
 qualifies deferred capabilities or waives signing/publication/device authority.
-The verifier rejects active/completed iOS while any earlier stage lacks a disposition.
+The verifier rejects unscoped active/completed iOS while any earlier stage lacks
+a disposition, and rejects completion under a scoped prerequisite record.
 
 ## Architecture and dependency rules
 

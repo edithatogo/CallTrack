@@ -45,6 +45,13 @@ class VerificationFailures(unittest.TestCase):
         data.pop('prerequisite_deferral_document', None)
         path.write_text(json.dumps(data))
 
+    def reset_track20_gate(self):
+        path = self.root / 'conductor/tracks/ios_companion_20261021/metadata.json'
+        data = json.loads(path.read_text())
+        data['status'] = 'new'
+        data.pop('prerequisite_deferral_document', None)
+        path.write_text(json.dumps(data))
+
     def test_current_documents_pass(self):
         self.run_verifier()
 
@@ -62,6 +69,7 @@ class VerificationFailures(unittest.TestCase):
             self.run_verifier()
 
     def test_ios_cannot_start_before_earlier_stages(self):
+        self.reset_track20_gate()
         path = self.root / 'conductor/tracks/ios_companion_20261021/metadata.json'
         data = json.loads(path.read_text())
         data['status'] = 'in_progress'
@@ -257,6 +265,7 @@ class VerificationFailures(unittest.TestCase):
             self.run_verifier()
 
     def test_scoped_track19_evidence_reconciliation_does_not_unlock_ios(self):
+        self.reset_track20_gate()
         cross_platform = self.root / 'conductor/tracks/cross_platform_20261021'
         path = cross_platform / 'metadata.json'
         data = json.loads(path.read_text())
@@ -282,6 +291,7 @@ class VerificationFailures(unittest.TestCase):
             self.run_verifier()
 
     def test_ios_can_start_after_explicit_documented_earlier_deferrals(self):
+        self.reset_track20_gate()
         sequence = json.loads((self.root / 'conductor/future-sequence.json').read_text())
         for entry in sequence['stages'][:-1]:
             folder = self.root / 'conductor/tracks' / entry['track_id']
@@ -298,6 +308,29 @@ class VerificationFailures(unittest.TestCase):
         data['status'] = 'in_progress'
         path.write_text(json.dumps(data))
         self.run_verifier()
+
+    def test_scoped_ios_research_does_not_resolve_earlier_stages_or_complete_track(self):
+        ios = self.root / 'conductor/tracks/ios_companion_20261021'
+        path = ios / 'metadata.json'
+        data = json.loads(path.read_text())
+        data['status'] = 'in_progress'
+        data['prerequisite_deferral_document'] = 'prerequisite-deferral.md'
+        path.write_text(json.dumps(data))
+        (ios / 'prerequisite-deferral.md').write_text(
+            'Synthetic research-only iOS readiness scope; no app implementation.'
+        )
+        self.run_verifier()
+
+        data.pop('prerequisite_deferral_document')
+        path.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'iOS must remain last'):
+            self.run_verifier()
+
+        data['prerequisite_deferral_document'] = 'prerequisite-deferral.md'
+        data['status'] = 'completed'
+        path.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'cannot complete the track'):
+            self.run_verifier()
 
     def test_duplicate_scenario_id_fails(self):
         path = self.baseline / 'fixtures.json'
