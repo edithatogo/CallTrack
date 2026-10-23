@@ -1,6 +1,6 @@
 # CallTrack and FOSS capability mapping
 
-Milestone: M0. Type: research-led development. Status: planned discovery; implementation scope provisional.
+Milestone: M0. Type: research-led development. Status: static mapping complete; review findings fixed.
 
 ## Objective
 
@@ -27,3 +27,7 @@ Traceable baseline and acceptance specification; unverified behaviour remains la
 ## Out of scope
 
 No automatic adoption of shortlisted technology, wholesale rewrite, paid service, unqualified platform parity or public release. Cross-track responsibilities remain with their owning tracks. A negative feasibility result or justified deferral is an acceptable research outcome.
+
+## Execution clarification
+
+This is a mapping/documentation track. Its conditional application implementation phase is not activated: no app/library/data migration is selected here. Complete that phase by documenting disposition and verifying evidence. Runtime tests and actual dependency adoption remain downstream work, not undisclosed unfinished tasks in this track.

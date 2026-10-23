@@ -1,6 +1,6 @@
 # Fork feasibility and build qualification
 
-Milestone: M1. Type: research-led development. Status: planned discovery; implementation scope provisional.
+Milestone: M1. Type: research-led development. Status: build/tooling qualification implemented; review fixes and final artifact/device evidence verified.
 
 ## Objective
 
@@ -14,7 +14,7 @@ Reproducible build, bounded device evidence and documented fork decision.
 
 ## Inputs and dependencies
 
-Prerequisites: [baseline](../baseline_20261020/index.md). Requirement references: R08, R13, R26 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
+Prerequisites: [baseline](../../archive/baseline_20261020/index.md). Requirement references: R08, R13, R26 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
 
 ## Required outputs
 
@@ -27,3 +27,7 @@ Reproducible build, bounded device evidence and documented fork decision. Resear
 ## Out of scope
 
 No automatic adoption of shortlisted technology, wholesale rewrite, paid service, unqualified platform parity or public release. Cross-track responsibilities remain with their owning tracks. A negative feasibility result or justified deferral is an acceptable research outcome.
+
+## Selected implementation
+
+Qualify pinned upstream plus a mechanically prepared target36 fork, using the documented compatible toolchains. Add reproducibility receipts, source/package guards and zero-row native permission tests. No permanent public package, production signing, real call-data migration, Kotlin/UI rewrite or hosted CI execution is needed for this track's bounded exit criteria. Actual application parity remains assigned to its owning tracks.

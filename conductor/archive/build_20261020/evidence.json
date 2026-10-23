@@ -1,0 +1,618 @@
+{
+  "status": "verified",
+  "source_revision": "aaa56443a294aa61bad48b620427e53f9521c5fe",
+  "source_reference_unchanged": true,
+  "scope": "development build and zero-row Android provider qualification; no real call capture/calendar acceptance",
+  "upstream_first": {
+    "upstream_apk_sha256": "5ff724ca00e22f4b694f4d28b4dcc41ea3d8e42abde71f4d9aa2f1d6a6896ea4",
+    "lint_errors": 0,
+    "lint_warnings": 25,
+    "warnings": [
+      "FragmentTagUsage",
+      "RedundantLabel",
+      "GradleDependency",
+      "GradleDependency",
+      "GradleDependency",
+      "GradleDependency",
+      "GradleDependency",
+      "GradleDependency",
+      "GradleDependency",
+      "GradleDependency",
+      "GradleDependency",
+      "GradleDependency",
+      "GradleDependency",
+      "SpUsage",
+      "Typos",
+      "PluralsCandidate",
+      "UnsafeProtectedBroadcastReceiver",
+      "ObsoleteSdkInt",
+      "ObsoleteSdkInt",
+      "ObsoleteSdkInt",
+      "ObsoleteSdkInt",
+      "UnusedResources",
+      "UnusedResources",
+      "UnusedResources",
+      "UnusedResources"
+    ]
+  },
+  "upstream_clean_build": {
+    "variant": "upstream",
+    "clean": true,
+    "exit_code": 0,
+    "elapsed_seconds": 160.5,
+    "command": [
+      "sh",
+      "/Users/doughnut/Documents/calltrack/.local/AndroidCallLogSync/gradlew",
+      "-p",
+      "/Users/doughnut/Documents/calltrack/.local/AndroidCallLogSync",
+      "--no-daemon",
+      "--console=plain",
+      "clean",
+      ":app:assembleDebug",
+      ":app:testDebugUnitTest",
+      ":app:lintDebug"
+    ],
+    "jdk": "/opt/homebrew/Cellar/openjdk@11/11.0.32.1/libexec/openjdk.jdk/Contents/Home",
+    "sdk": "/Volumes/PortableSSD/cache/calltrack-sdk-20261020",
+    "log": ".local/build-evidence/upstream-clean-verification.log",
+    "artifacts": [
+      {
+        "path": ".local/AndroidCallLogSync/app/build/outputs/apk/debug/app-debug.apk",
+        "sha256": "5ff724ca00e22f4b694f4d28b4dcc41ea3d8e42abde71f4d9aa2f1d6a6896ea4"
+      }
+    ]
+  },
+  "modern_final_clean_build": {
+    "variant": "modern",
+    "clean": true,
+    "exit_code": 0,
+    "elapsed_seconds": 480.8,
+    "command": [
+      "sh",
+      "/Users/doughnut/Documents/calltrack/.local/modern-qualification/gradlew",
+      "-p",
+      "/Users/doughnut/Documents/calltrack/.local/modern-qualification",
+      "--no-daemon",
+      "--console=plain",
+      "-Dqualification.sources=/Users/doughnut/Documents/calltrack/qualification/src/androidTest/java",
+      "clean",
+      ":app:assembleDebug",
+      ":app:assembleDebugAndroidTest",
+      ":app:testDebugUnitTest",
+      ":app:lintDebug"
+    ],
+    "jdk": "/opt/homebrew/Cellar/openjdk@17/17.0.20.1/libexec/openjdk.jdk/Contents/Home",
+    "sdk": "/Volumes/PortableSSD/cache/calltrack-sdk-20261020",
+    "log": ".local/build-evidence/modern-clean-verification.log",
+    "artifacts": [
+      {
+        "path": ".local/modern-qualification/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+        "sha256": "26b8b230cf7beb25290d607ef8abdad92cc86e6e1ec3871a5ec0c1fb043588a9"
+      },
+      {
+        "path": ".local/modern-qualification/app/build/outputs/apk/debug/app-debug.apk",
+        "sha256": "127e77667f53c4025d44695cd99de12f261ec49bd4adcce45e40970b82d08cef"
+      }
+    ]
+  },
+  "modern_final_repeat_build": {
+    "variant": "modern",
+    "clean": false,
+    "exit_code": 0,
+    "elapsed_seconds": 349.1,
+    "command": [
+      "sh",
+      "/Users/doughnut/Documents/calltrack/.local/modern-qualification/gradlew",
+      "-p",
+      "/Users/doughnut/Documents/calltrack/.local/modern-qualification",
+      "--no-daemon",
+      "--console=plain",
+      "-Dqualification.sources=/Users/doughnut/Documents/calltrack/qualification/src/androidTest/java",
+      ":app:assembleDebug",
+      ":app:assembleDebugAndroidTest",
+      ":app:testDebugUnitTest",
+      ":app:lintDebug",
+      ":app:dependencies",
+      "--configuration",
+      "debugRuntimeClasspath"
+    ],
+    "jdk": "/opt/homebrew/Cellar/openjdk@17/17.0.20.1/libexec/openjdk.jdk/Contents/Home",
+    "sdk": "/Volumes/PortableSSD/cache/calltrack-sdk-20261020",
+    "log": ".local/build-evidence/modern-verification.log",
+    "artifacts": [
+      {
+        "path": ".local/modern-qualification/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+        "sha256": "26b8b230cf7beb25290d607ef8abdad92cc86e6e1ec3871a5ec0c1fb043588a9"
+      },
+      {
+        "path": ".local/modern-qualification/app/build/outputs/apk/debug/app-debug.apk",
+        "sha256": "127e77667f53c4025d44695cd99de12f261ec49bd4adcce45e40970b82d08cef"
+      }
+    ],
+    "source_revision": "aaa56443a294aa61bad48b620427e53f9521c5fe",
+    "inputs": {
+      ".local/modern-qualification/build.gradle": "3079d50a38b9caec3ef3823c7d8e5dc7afd4dbc5faf02bd97f8ffb411ac7fb59",
+      ".local/modern-qualification/app/build.gradle": "d44cd9a5070e854e37ba577c1dd755695f3ce9838eceed75bd0459822b9749ba",
+      ".local/modern-qualification/settings.gradle": "b725061d2a76a06441d3481de0f6eed52b5f7c7d54279864ecf6b3b04a42bd4d",
+      ".local/modern-qualification/gradle.properties": "1ef6157a4970eef09cf79edfea9bdf29496116711e9588f02f5218aa4014bdc2",
+      ".local/modern-qualification/gradle/wrapper/gradle-wrapper.properties": "91c1ed951e7e61e66acf8f08b181df8d9af06bac43d5b4a3a9c6b3ff353ad6d5",
+      ".local/modern-qualification/app/src/main/AndroidManifest.xml": "01df43ce65f9db7cce512e394c309f87c11736d9dd40808f7d0a50968fcc708d",
+      ".local/modern-qualification/app/src/main/ic_launcher-playstore.png": "6c2a7ea9feb47526705c68f30c1d27cc56d767c3e060c77ad4570cd1b3020c4b",
+      ".local/modern-qualification/app/src/main/java/com/markobl/calllogsync/AutostartReceiver.java": "dcde4455f71c3ab517669f5509b312c7a16cd13f764db316775728ba1a3e0b68",
+      ".local/modern-qualification/app/src/main/java/com/markobl/calllogsync/Config.java": "23b4ae821c36f0d2ad7337632fd6114b87dbc06aa3ecc15a30518b28dccc8b5d",
+      ".local/modern-qualification/app/src/main/java/com/markobl/calllogsync/LogFragment.java": "da8f4dd5c34e8c1b9d9d49cd59c9b34ed2b6ca03ffa5a705a3456e9e0047843e",
+      ".local/modern-qualification/app/src/main/java/com/markobl/calllogsync/LogItem.java": "68643c3bed8b66762670818d6fb5109b79beb7889dd4590b35d2799c5dcaaf69",
+      ".local/modern-qualification/app/src/main/java/com/markobl/calllogsync/LogItemRecyclerViewAdapter.java": "05bac90526e208fc934a584f5dd789e8f3e05790f0fcf2d1073fb07f421f966a",
+      ".local/modern-qualification/app/src/main/java/com/markobl/calllogsync/MainActivity.java": "19cc6dac6aad7aee47808cad2fc111b637fb211d75ced388331945e9fe88a417",
+      ".local/modern-qualification/app/src/main/java/com/markobl/calllogsync/MainFragment.java": "d732616ea2addd65cd827a32c0b22da7994cc3dbb2b8576a1c7618679115d58c",
+      ".local/modern-qualification/app/src/main/java/com/markobl/calllogsync/RandomString.java": "0c0c55e069467e4e1cd992d59fe5c53a9f79772e8170b7e84d6579358a540e82",
+      ".local/modern-qualification/app/src/main/java/com/markobl/calllogsync/SettingsFragment.java": "b8b32207904584b98b81cdbd9a4a883229c27a751a2ff29c20b8d1adbb98c873",
+      ".local/modern-qualification/app/src/main/java/com/markobl/calllogsync/Sync.java": "a2f73bd10b399c05d5cf917d58315b3cecd63e681fd3b9158e180e7ea8df8ff8",
+      ".local/modern-qualification/app/src/main/java/com/markobl/calllogsync/SyncResult.java": "2b6b0b55afad7ba0d87f1aa84b3220628f286a61c546efbe90b1d3a55d6201d0",
+      ".local/modern-qualification/app/src/main/java/com/markobl/calllogsync/SyncResultRunner.java": "137928ce06ce2c665ec0a77318ef064a73a8860ce1d45669e142b34e47e7bd20",
+      ".local/modern-qualification/app/src/main/java/com/markobl/calllogsync/SyncResultType.java": "391f8230adfac1f720c6d900f9b2a7929171a8b99bbb9d17f3aa35b89f7ec88b",
+      ".local/modern-qualification/app/src/main/java/com/markobl/calllogsync/SyncWorker.java": "4aa71769dc3120b5cc9b5cf5fdeafe934464ff29e857e71ec4c35b38f9224e72",
+      ".local/modern-qualification/app/src/main/res/drawable/ic_launcher_background.xml": "f6be98e2584ff88e9fbeb38e0552ccf1f7f6f068be06ce63b55d3450c83100c4",
+      ".local/modern-qualification/app/src/main/res/drawable/ic_launcher_foreground.xml": "df028a62eb821dd967adcbf035c2603789668ccb5a12afba1e83f875147caa34",
+      ".local/modern-qualification/app/src/main/res/layout/activity_main.xml": "0454d85b72af882024079b0b75dd9e6ea0710c7376219ed1046809268172842c",
+      ".local/modern-qualification/app/src/main/res/layout/content_main.xml": "b596321376c0b85d0c20d8884e3b2909637fa1099657a69e5d2acb6b21ff20dc",
+      ".local/modern-qualification/app/src/main/res/layout/fragment_log.xml": "b722ecda3fac88300a6c359f4dbeada398c4ebe95ea05cbd02409fc8d461eaca",
+      ".local/modern-qualification/app/src/main/res/layout/fragment_log_list.xml": "27a258eb62759be1cf49b9873e6c4da0d9c5cba27cfd682e05fd9d4acc501fad",
+      ".local/modern-qualification/app/src/main/res/layout/fragment_main.xml": "3e3679f42d62dcfc024f4aa88f03675fc9614afacbb6500311197373082eb277",
+      ".local/modern-qualification/app/src/main/res/menu/menu_main.xml": "75f9b9aa83e69b60177476890e9fc41975041964f82068ba9a70fb5e14fce590",
+      ".local/modern-qualification/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml": "46aef39e5993c8278c744bb9e8f58eb06ba663416fbaf0b954ae189c63b065a7",
+      ".local/modern-qualification/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml": "46aef39e5993c8278c744bb9e8f58eb06ba663416fbaf0b954ae189c63b065a7",
+      ".local/modern-qualification/app/src/main/res/mipmap-hdpi/ic_launcher.png": "b16071bcb0a76bb7bfdc1e8e46e98ca29f62da76ff72c3a29d0116197daa3f00",
+      ".local/modern-qualification/app/src/main/res/mipmap-hdpi/ic_launcher_round.png": "60223cff074b54fd5ab20028d4599751ebb0711bd1ddc34758eb88b53fe5c34e",
+      ".local/modern-qualification/app/src/main/res/mipmap-mdpi/ic_launcher.png": "6952a9674eb946026ad97d08670d69a830cdbb38933cd892b66e08ff097c21f0",
+      ".local/modern-qualification/app/src/main/res/mipmap-mdpi/ic_launcher_round.png": "700517327eb6f68fd38b80fe717c9d20abe9f3a7892fd08301ec0cf1442aa352",
+      ".local/modern-qualification/app/src/main/res/mipmap-xhdpi/ic_launcher.png": "970858b1ef2339a64e42544dc59b4afc4663798a4d19c9644bce699dbed359d8",
+      ".local/modern-qualification/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png": "14fe841513ec15e1d169f0ec3ccf1d340100445fe6c0fef0a0b2bd39367e1f3c",
+      ".local/modern-qualification/app/src/main/res/mipmap-xxhdpi/ic_launcher.png": "964c0447021d2af0829905286a6374825eb19a4cdba1f1f153b0d98ec934e49e",
+      ".local/modern-qualification/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png": "d8335f3bc152e97dee312e767f06b7092da3aae41af45f3d285134d9017fd797",
+      ".local/modern-qualification/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png": "998527c39e08e23e29d4ef276347578c2a2a10c1a416eb78b07c12ddc924c97f",
+      ".local/modern-qualification/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png": "1faa0725c0f93a19fd12a4ef4a6a51f359947ba3bfeea7bfbbdd4802cd6b33b4",
+      ".local/modern-qualification/app/src/main/res/navigation/nav_graph.xml": "520ad7c2979f3d433de3992d888305cae5ec5ff38f7b01cec86d1d17844246fd",
+      ".local/modern-qualification/app/src/main/res/values/colors.xml": "b5626527d503417f0d8e5b1e08f338de7b31173bf0e122815f03e64932adbd88",
+      ".local/modern-qualification/app/src/main/res/values/dimens.xml": "e54b8f556d2d62ef5fc86d5b8cae1acc1be53e43fa70ece6300d60a84cf0b6c6",
+      ".local/modern-qualification/app/src/main/res/values/strings.xml": "7b0cf68affa870d6492b2dd1787c4bbfc0af083cc2eead7de363c0fd64c4353e",
+      ".local/modern-qualification/app/src/main/res/values/themes.xml": "980b1c1f279d4011fedcf3caaa92a9660a27fd3da8bc5f8d7ed476086fd7ee08",
+      ".local/modern-qualification/app/src/main/res/values-de/strings.xml": "d8b8dbe06fea6f1137e0ade193c70898119d95f243b9de8ac5786d7d72fd83d6",
+      ".local/modern-qualification/app/src/main/res/values-land/dimens.xml": "3efd84816b428a7af7ee473c70d6be22017b2358c33bb7a91fdf04f518cc7573",
+      ".local/modern-qualification/app/src/main/res/values-night/themes.xml": "4f9605a8df95f285e11ca91ad885737d40aa686a595e32a08b28d16035175e13",
+      ".local/modern-qualification/app/src/main/res/values-w1240dp/dimens.xml": "d6887b19bf9d21f1cbd6b05226bc25079c1cfa455ab30e9cf66f46cc1837db70",
+      ".local/modern-qualification/app/src/main/res/values-w600dp/dimens.xml": "3efd84816b428a7af7ee473c70d6be22017b2358c33bb7a91fdf04f518cc7573",
+      ".local/modern-qualification/app/src/main/res/xml/root_preferences.xml": "320bb6b10712cad231fd6bdf70fca957da148329c8221c5c24b7069c5e1c12f7",
+      "qualification/src/androidTest/java/com/markobl/calllogsync/PermissionQualificationTest.java": "4f44a53dcd1c75bee926be0d6d88d34d7d916aa26778f27d5f4e8358fb5daa35"
+    }
+  },
+  "same_host_apk_repeatability": {
+    "upstream": true,
+    "modern": true
+  },
+  "modern_lint": {
+    "errors": 0,
+    "warnings": 30,
+    "skipped_fragment_registry": false,
+    "issues": [
+      {
+        "id": "FragmentTagUsage",
+        "severity": "Warning",
+        "message": "Replace the <fragment> tag with FragmentContainerView."
+      },
+      {
+        "id": "RedundantLabel",
+        "severity": "Warning",
+        "message": "Redundant label can be removed"
+      },
+      {
+        "id": "AndroidGradlePluginVersion",
+        "severity": "Warning",
+        "message": "A newer version of Gradle than 8.13 is available: 8.14.6"
+      },
+      {
+        "id": "GradleDependency",
+        "severity": "Warning",
+        "message": "A newer version of androidx.work:work-runtime than 2.7.1 is available: 2.12.0"
+      },
+      {
+        "id": "GradleDependency",
+        "severity": "Warning",
+        "message": "A newer version of androidx.appcompat:appcompat than 1.4.1 is available: 1.8.0"
+      },
+      {
+        "id": "GradleDependency",
+        "severity": "Warning",
+        "message": "A newer version of com.google.android.material:material than 1.5.0 is available: 1.14.0"
+      },
+      {
+        "id": "GradleDependency",
+        "severity": "Warning",
+        "message": "A newer version of androidx.constraintlayout:constraintlayout than 2.1.3 is available: 2.2.2"
+      },
+      {
+        "id": "GradleDependency",
+        "severity": "Warning",
+        "message": "A newer version of androidx.navigation:navigation-fragment than 2.4.1 is available: 2.10.2"
+      },
+      {
+        "id": "GradleDependency",
+        "severity": "Warning",
+        "message": "A newer version of androidx.navigation:navigation-ui than 2.4.1 is available: 2.10.2"
+      },
+      {
+        "id": "GradleDependency",
+        "severity": "Warning",
+        "message": "A newer version of androidx.recyclerview:recyclerview than 1.2.1 is available: 1.4.0"
+      },
+      {
+        "id": "GradleDependency",
+        "severity": "Warning",
+        "message": "A newer version of androidx.preference:preference than 1.2.0 is available: 1.2.1"
+      },
+      {
+        "id": "GradleDependency",
+        "severity": "Warning",
+        "message": "A newer version of androidx.test.ext:junit than 1.1.3 is available: 1.3.0"
+      },
+      {
+        "id": "GradleDependency",
+        "severity": "Warning",
+        "message": "A newer version of androidx.test.espresso:espresso-core than 3.4.0 is available: 3.7.0"
+      },
+      {
+        "id": "GradleDependency",
+        "severity": "Warning",
+        "message": "A newer version of androidx.fragment:fragment than 1.5.1 is available: 1.9.1"
+      },
+      {
+        "id": "GradleDependency",
+        "severity": "Warning",
+        "message": "A newer version of androidx.lifecycle:lifecycle-viewmodel-ktx than 2.5.1 is available: 2.11.0"
+      },
+      {
+        "id": "NewerVersionAvailable",
+        "severity": "Warning",
+        "message": "A newer version of com.google.code.gson:gson than 2.9.0 is available: 2.14.0"
+      },
+      {
+        "id": "SpUsage",
+        "severity": "Warning",
+        "message": "Should use \"`sp`\" instead of \"`dp`\" for text sizes"
+      },
+      {
+        "id": "Typos",
+        "severity": "Warning",
+        "message": "\"zur\u00fcck gesetzt\" is a common misspelling; did you mean \"zur\u00fcckgesetzt\"?"
+      },
+      {
+        "id": "PluralsCandidate",
+        "severity": "Warning",
+        "message": "Formatting %d followed by words (\"entries\"): This should probably be a plural rather than a string"
+      },
+      {
+        "id": "UnsafeProtectedBroadcastReceiver",
+        "severity": "Warning",
+        "message": "This broadcast receiver declares an intent-filter for a protected broadcast action string, which can only be sent by the system, not third-party applications. However, the receiver's `onReceive` method does not appear to call `getAction` to ensure that the received Intent's action string matches the expected value, potentially making it possible for another actor to send a spoofed intent with no action string or a different action string and cause undesired behavior."
+      },
+      {
+        "id": "ObsoleteSdkInt",
+        "severity": "Warning",
+        "message": "Unnecessary; `SDK_INT` is always >= 26"
+      },
+      {
+        "id": "ObsoleteSdkInt",
+        "severity": "Warning",
+        "message": "This folder configuration (`v26`) is unnecessary; `minSdkVersion` is 26. Merge all the resources in this folder into `mipmap-anydpi`."
+      },
+      {
+        "id": "ObsoleteSdkInt",
+        "severity": "Warning",
+        "message": "Unnecessary; `SDK_INT` is always >= 21"
+      },
+      {
+        "id": "ObsoleteSdkInt",
+        "severity": "Warning",
+        "message": "Unnecessary; `SDK_INT` is always >= 21"
+      },
+      {
+        "id": "UnusedResources",
+        "severity": "Warning",
+        "message": "The resource `R.dimen.fab_margin` appears to be unused"
+      },
+      {
+        "id": "UnusedResources",
+        "severity": "Warning",
+        "message": "The resource `R.string.settings_fragment_label` appears to be unused"
+      },
+      {
+        "id": "UnusedResources",
+        "severity": "Warning",
+        "message": "The resource `R.string.log_fragment_label` appears to be unused"
+      },
+      {
+        "id": "UnusedResources",
+        "severity": "Warning",
+        "message": "The resource `R.string.device_header` appears to be unused"
+      },
+      {
+        "id": "MonochromeLauncherIcon",
+        "severity": "Warning",
+        "message": "The application adaptive icon is missing a monochrome tag"
+      },
+      {
+        "id": "MonochromeLauncherIcon",
+        "severity": "Warning",
+        "message": "The application adaptive roundIcon is missing a monochrome tag"
+      }
+    ]
+  },
+  "device_final": {
+    "device": {
+      "android": "17",
+      "sdk": "37"
+    },
+    "apks": [
+      {
+        "name": "app-debug.apk",
+        "sha256": "127e77667f53c4025d44695cd99de12f261ec49bd4adcce45e40970b82d08cef"
+      },
+      {
+        "name": "app-debug-androidTest.apk",
+        "sha256": "26b8b230cf7beb25290d607ef8abdad92cc86e6e1ec3871a5ec0c1fb043588a9"
+      }
+    ],
+    "steps": [
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "pm",
+          "list",
+          "packages",
+          "org.calltrack.qualification"
+        ],
+        "exit_code": 0,
+        "output": ""
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "pm",
+          "list",
+          "packages",
+          "org.calltrack.qualification.test"
+        ],
+        "exit_code": 0,
+        "output": ""
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "getprop",
+          "ro.build.version.release"
+        ],
+        "exit_code": 0,
+        "output": "17\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "getprop",
+          "ro.build.version.sdk"
+        ],
+        "exit_code": 0,
+        "output": "37\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "install",
+          "/Users/doughnut/Documents/calltrack/.local/modern-qualification/app/build/outputs/apk/debug/app-debug.apk"
+        ],
+        "exit_code": 0,
+        "output": "Performing Streamed Install\nSuccess\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "install",
+          "/Users/doughnut/Documents/calltrack/.local/modern-qualification/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk"
+        ],
+        "exit_code": 0,
+        "output": "Performing Streamed Install\nSuccess\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "am",
+          "start",
+          "-W",
+          "-n",
+          "org.calltrack.qualification/com.markobl.calllogsync.MainActivity"
+        ],
+        "exit_code": 0,
+        "output": "Starting: Intent { cmp=org.calltrack.qualification/com.markobl.calllogsync.MainActivity }\nStatus: ok\nLaunchState: UNKNOWN (0)\nActivity: org.calltrack.qualification/com.markobl.calllogsync.MainActivity\nWaitTime: 167\nComplete\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "pidof",
+          "org.calltrack.qualification"
+        ],
+        "exit_code": 0,
+        "output": "25810\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "am",
+          "instrument",
+          "-w",
+          "-r",
+          "-e",
+          "class",
+          "com.markobl.calllogsync.PermissionQualificationTest#testDenied",
+          "org.calltrack.qualification.test/androidx.test.runner.AndroidJUnitRunner"
+        ],
+        "exit_code": 0,
+        "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.PermissionQualificationTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.PermissionQualificationTest:\nINSTRUMENTATION_STATUS: test=testDenied\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.PermissionQualificationTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=testDenied\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.005\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "pm",
+          "grant",
+          "org.calltrack.qualification",
+          "android.permission.READ_CALL_LOG"
+        ],
+        "exit_code": 0,
+        "output": ""
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "am",
+          "instrument",
+          "-w",
+          "-r",
+          "-e",
+          "class",
+          "com.markobl.calllogsync.PermissionQualificationTest#testGranted",
+          "org.calltrack.qualification.test/androidx.test.runner.AndroidJUnitRunner"
+        ],
+        "exit_code": 0,
+        "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.PermissionQualificationTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.PermissionQualificationTest:\nINSTRUMENTATION_STATUS: test=testGranted\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.PermissionQualificationTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=testGranted\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.039\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "pm",
+          "revoke",
+          "org.calltrack.qualification",
+          "android.permission.READ_CALL_LOG"
+        ],
+        "exit_code": 0,
+        "output": ""
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "am",
+          "instrument",
+          "-w",
+          "-r",
+          "-e",
+          "class",
+          "com.markobl.calllogsync.PermissionQualificationTest#testDenied",
+          "org.calltrack.qualification.test/androidx.test.runner.AndroidJUnitRunner"
+        ],
+        "exit_code": 0,
+        "output": "INSTRUMENTATION_STATUS: class=com.markobl.calllogsync.PermissionQualificationTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=\ncom.markobl.calllogsync.PermissionQualificationTest:\nINSTRUMENTATION_STATUS: test=testDenied\nINSTRUMENTATION_STATUS_CODE: 1\nINSTRUMENTATION_STATUS: class=com.markobl.calllogsync.PermissionQualificationTest\nINSTRUMENTATION_STATUS: current=1\nINSTRUMENTATION_STATUS: id=AndroidJUnitRunner\nINSTRUMENTATION_STATUS: numtests=1\nINSTRUMENTATION_STATUS: stream=.\nINSTRUMENTATION_STATUS: test=testDenied\nINSTRUMENTATION_STATUS_CODE: 0\nINSTRUMENTATION_RESULT: stream=\n\nTime: 0.021\n\nOK (1 test)\n\n\nINSTRUMENTATION_CODE: -1\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "uninstall",
+          "org.calltrack.qualification.test"
+        ],
+        "exit_code": 0,
+        "output": "Success\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "uninstall",
+          "org.calltrack.qualification"
+        ],
+        "exit_code": 0,
+        "output": "Success\n"
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "pm",
+          "list",
+          "packages",
+          "org.calltrack.qualification"
+        ],
+        "exit_code": 0,
+        "output": ""
+      },
+      {
+        "command": [
+          "adb",
+          "-s",
+          "<selected-device>",
+          "shell",
+          "pm",
+          "list",
+          "packages",
+          "org.calltrack.qualification.test"
+        ],
+        "exit_code": 0,
+        "output": ""
+      }
+    ],
+    "result": "passed",
+    "cleanup_complete": true
+  },
+  "log_digests": {
+    "upstream-initial.log": "c46294b32030f887a269f4c944dfd33fe622e49e3ffb0bb392adb1a16ea1cf69",
+    "upstream-qualified.log": "b2a0d0bccc2f96afc93a07b570521c299d9adf7e6b21b675631cc6e6d0f5055c",
+    "upstream-clean-verification.log": "aaaad307ebc3a0a3dde8ca06692348d92dd5af986c559a8a189e5705bee966f8",
+    "modern-resumed.log": "a4bf21aa514bb7fe76315902e97a1a273f59ba5d72e2fb3bf4da5012381f45d9",
+    "fragment-only-modern-clean-verification.log": "e8c4f9a515783a68f469b22439fb51e05da2a932daa529bac50bb31ecc6ace36",
+    "modern-clean-verification.log": "9caa7ce03f2616b3e085c24166389217b60d3f42e0f7eb4357cff1f1f2582e48",
+    "modern-verification.log": "51cf1013626f5e678646b1880feb202c5dd90ea4bfc7bc12f6b99080d1f75a68"
+  },
+  "tooling_tests": {
+    "command": "python3 -m unittest discover -s tests -v",
+    "passed": 12
+  },
+  "debug_certificate_sha256": "1fb724b184374c597a0289eacf573bb6c2fdf32e8a303067040783885107cd8c",
+  "ci_status": "definition parsed and commands exercised locally; hosted CI not run"
+}

@@ -1,0 +1,16 @@
+{
+  "track_id": "baseline_20261020",
+  "type": "research-led-development",
+  "status": "completed",
+  "milestone": "M0",
+  "created_at": "2026-10-20",
+  "updated_at": "2026-10-20",
+  "depends_on": [],
+  "requirements": "R01\u2013R18",
+  "implementation_status": "not-applicable-research-only",
+  "review_status": "passed-with-fixes",
+  "completed_at": "2026-10-20",
+  "implementation_commit": "f5fb750",
+  "archived": true,
+  "archived_at": "2026-10-20"
+}

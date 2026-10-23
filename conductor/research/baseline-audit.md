@@ -20,7 +20,7 @@ Evidence below is static implementation evidence, not proof of behaviour on mode
 |---|---|---|
 | Enable/disable | `CalltrackReceiver.onReceive`, preference resources | Default enabled read; disabled receiver path exits |
 | Type filters | `CalltrackUtils` constructor and copy methods | Independent incoming, outgoing and missed switches |
-| Destination selection | `CalltrackPreferenceActivity.loadCalendarList` | Selected calendar ID stored as preference; exact eligibility rules still to test |
+| Destination selection | `CalltrackPreferenceActivity.loadCalendarList` | Selected calendar ID stored as preference; queries non-null calendar names without access-level filter; writable eligibility needs modern validation |
 | Automatic capture | Manifest PHONE_STATE receiver; `onReceive` | On idle, sleeps 5 seconds then calls `copyNewCallsToCalendar`; replace blocking receiver design |
 | Historical import | Menu resources; `copyAllCallsToCalendar` | “Sync Entire Call Log”; imports available device history, not deleted history |
 | Call metadata | Both copy methods; `CallRecord` constructor | Reads number, cached contact name/type, direction, date, duration |
@@ -32,7 +32,7 @@ Evidence below is static implementation evidence, not proof of behaviour on mode
 
 No custom public HTTP API is apparent in the inspected manifest or main classes. The relevant API map is Android `CallLog.Calls` → transformation → `CalendarContract.Events`, with `TelephonyManager`/PHONE_STATE triggering, SharedPreferences configuration and calendar observation. Legacy content URI strings are present but do not prove active use. The manifest has phone-state, contacts and calendar permissions, no INTERNET permission and no explicit READ_CALL_LOG permission. Modern permissions must be designed afresh.
 
-Remaining reconstruction tasks: decode preference defaults and calendar eligibility exactly; trace new-call scan termination and five-insert cap; inspect missed/zero-length display; confirm contact-label semantics; run controlled legacy-compatible emulator fixtures if practical. Do not reproduce legacy defects merely to match implementation.
+Static follow-up completed in [Track 1 findings](../archive/baseline_20261020/findings.md): preferences, calendar fallbacks, labels and scan semantics are mapped. The auto path examines at most **four rows**, not five inserts. Runtime display/provider validation is assigned to later tracks; no emulator execution occurred. Do not reproduce legacy defects merely to match implementation.
 
 ## FOSS capability and implementation map
 
@@ -54,3 +54,7 @@ Remaining reconstruction tasks: decode preference defaults and calendar eligibil
 Source anchors: [Sync.java](https://github.com/MarkoBL/AndroidCallLogSync/blob/aaa56443a294aa61bad48b620427e53f9521c5fe/app/src/main/java/com/markobl/calllogsync/Sync.java), [SyncWorker.java](https://github.com/MarkoBL/AndroidCallLogSync/blob/aaa56443a294aa61bad48b620427e53f9521c5fe/app/src/main/java/com/markobl/calllogsync/SyncWorker.java), [SettingsFragment.java](https://github.com/MarkoBL/AndroidCallLogSync/blob/aaa56443a294aa61bad48b620427e53f9521c5fe/app/src/main/java/com/markobl/calllogsync/SettingsFragment.java), [CalendarActivity.java](https://github.com/JianLoong/Call-Log-to-Cal/blob/ccf3166a8e3ffc55b7df02236ba20d5ed737f132/app/src/main/java/io/github/jianloong/calllogtocal/CalendarActivity.java), [CallLogRVAdapter.java](https://github.com/JianLoong/Call-Log-to-Cal/blob/ccf3166a8e3ffc55b7df02236ba20d5ed737f132/app/src/main/java/io/github/jianloong/calllogtocal/CallLogRVAdapter.java).
 
 Callvent remains a commercial feature reference (notes, reminders, tags, batch save), not a reusable code baseline. Its documented calendar action requires saving; no unattended parity established. [Developer documentation](https://callvent.app/en/).
+
+## Completed static mapping
+
+The [Track 1 findings](../archive/baseline_20261020/findings.md) supersede preliminary interpretations here; [uncertainties](../archive/baseline_20261020/requirements.md) identify remaining downstream evidence.

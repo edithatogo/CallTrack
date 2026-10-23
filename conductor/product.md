@@ -6,4 +6,4 @@ The user authorised Conductor incorporation and track creation on 2026-10-20. Th
 
 Success: call events persist accurately without duplicates, recover from interruptions, and remain understandable and controllable by the user. Community build and contribution instructions are reproducible. Local tests, device persistence, provider synchronisation and operational acceptance are separate evidence.
 
-See [requirements](requirements.md), [roadmap](roadmap.md) and [tracks](tracks.md). Audio recording, surveillance and universal third-party VoIP capture are outside initial scope. No public fork or runtime qualification exists yet.
+See [requirements](requirements.md), [roadmap](roadmap.md) and [tracks](tracks.md). Audio recording, surveillance and universal third-party VoIP capture are outside initial scope. Local build and bounded zero-row device qualification are recorded in the build track; real-call/calendar acceptance and public distribution remain unqualified.
