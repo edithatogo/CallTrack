@@ -1,14 +1,15 @@
 # Release qualification runbook
 
 Status: development only. Track5 has prepared this protocol; M4 has not passed.
-No release candidate, production key, public repository or supported release is
-established. Track4 parity is the prerequisite. Public release is outside this
+A frozen unsigned development candidate is locally qualified. No production key,
+public repository or supported production release is established. Track4 parity is the prerequisite. Public release is outside this
 track's scope; use a separately authorised execution after these gates pass.
 
 ## Candidate and source evidence
 
 1. Complete Track4 and review its exact acceptance evidence. Record every open
-   limitation; physical-call acceptance is still pending by user choice. Emulator
+   limitation; physical-call acceptance now awaits a selected connected phone and
+   participating controlled second phone. Emulator
    evidence cannot establish OEM telephony or cloud-account behaviour.
 2. Select the permanent application ID, name/icon, initial version and distribution
    route. The current `org.calltrack.community.dev`, versionCode10/0.1.0-dev is a
@@ -256,3 +257,40 @@ provides a separate software environment, but still shares this physical compute
 It does not establish a second physical host, hosted CI or independent contributor
 execution. A prepared workflow is not a hosted run: retain GitHub job/run/artifact
 readback only after an authorised repository upload and workflow execution.
+
+
+## First-release baseline
+
+The [installation and supported-upgrade policy](conductor/tracks/release_20261020/first-release-baseline.md)
+selects fresh installation for the first public release, with no issued predecessor
+and no in-place migration claim from other packages or unpublished development
+builds. The development identity remains unchanged while permanent identity/key
+custody is pending. A version label alone never identifies a frozen candidate.
+
+To bind emulator fresh-install and forward-compatibility tests to the exact unsigned
+release payload, add `--release-build-receipt MATCHING-BUILDS/receipt.json` to
+`scripts/qualify_release_upgrade.py --provider-schema`. The existing development
+key signs a local test copy only; all original APK entries must remain identical.
+The probe checks fresh state and the actual launcher before synthetic10→11 upgrade
+acceptance. The11 overlay is separately hashed and is not the frozen10 candidate.
+
+
+## Physical calls and account-backed calendars
+
+Follow the [physical and account-route procedure](conductor/tracks/release_20261020/physical-calendar-qualification.md).
+Use the frozen development-signed release payload on the selected physical phone,
+normal user-granted permissions and controlled calls. Existing destructive fixture
+and emulator harnesses remain emulator-only. Qualify app→Android provider→existing
+sync adapter→the exact remote account/calendar; a connector-created event or a
+calendar visible only in Outlook is insufficient. Current physical/remote results
+remain pending until actual participation and readback occur.
+
+
+## Seven-day operational follow-through
+
+Use the [observation protocol](conductor/tracks/release_20261020/seven-day-observation.md)
+and private cohort/day journal. The daily follow-up checks prerequisites first;
+only actual qualified physical use starts the clock. Unknown observations remain
+unknown. Seven scheduler runs are not seven accepted days, and final review/fixes
+must use the actual candidate's outcomes. One active calendar is supported per
+installation; each operational route claim needs its own accounted window.

@@ -69,8 +69,8 @@ the explicit JDK bundle-resource-seal limitation and original production gates.
 - [Runtime artifact/POM inventory](runtime-artifacts-20261021.json)
 - [Resumed review and fixes](review-20261021.md)
 
-Two clean same-host builds match; production signing, independent-host
-reproduction and original operational acceptance remain pending.
+At the initial checkpoint two same-host builds matched. Later independent-host
+qualification is linked below; production signing and operational acceptance remain pending.
 
 - [Current unsigned Kotlin candidate evidence](unsigned-kotlin-evidence-20261021.json)
 
@@ -101,3 +101,24 @@ The current app fixes require a new release freeze/source bundle and independent
 reproduction;9464408 remains the previously qualified unsigned artifact. Physical/
 OEM/manual speech/contrast, cloud, production-signing and actual observation gates
 remain. Track5 is active.
+
+- [First-release installation and supported-upgrade baseline](first-release-baseline.md)
+
+
+## First-release baseline and final local candidate —2026-10-22
+
+[Candidate qualification](first-release-candidate-qualification-20261022.md),
+[machine evidence](first-release-candidate-evidence-20261022.json) and
+[review/fixes](review-first-release-candidate-20261022.md) qualify15998ba: two Mac
+builds and a separate fresh Linux build match;115 JVM/144 host tests pass, as do60
+native fresh/upgrade/rendered invocations across26/33/36 and6 expected install
+rejections. Source/notices are refreshed; fixtures/packages and new guests are
+cleaned up. First public release is fresh-install-first, with no issued predecessor.
+Permanent identity/key custody, production signing, physical/cloud/operational,
+hosted/source/support/channel gates remain. Track5 stays active.
+
+- [Physical calls and account-calendar qualification procedure](physical-calendar-qualification.md) — prepared; selected physical device, participant and remote routes pending.
+- [Physical-route preparation review](review-physical-preparation-20261022.md) — prepared scope only; actual runtime acceptance remains pending.
+
+- [Seven-day operational observation](seven-day-observation.md) — prepared; start not set and zero accepted days.
+- [Observation preparation review](review-observation-preparation-20261022.md) — final runtime review remains pending actual seven-day evidence.

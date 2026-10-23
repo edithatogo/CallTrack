@@ -12,6 +12,7 @@ import re
 import subprocess
 import uuid
 import tempfile
+import zipfile
 
 from parity_health import require_healthy_boot
 from parity_targets import is_dedicated_avd
@@ -27,7 +28,9 @@ def require_rejection(result, reason):
         raise RuntimeError('Expected controlled rejection: ' + reason)
 
 
-def cleanup_owned_packages(adb, attempted):
+def cleanup_owned_packages(adb, attempted, provider_cleanup_verified=True):
+    if not provider_cleanup_verified:
+        return ["Provider cleanup unverified; owned packages retained for recovery"]
     errors = []
     for package in reversed(attempted):
         try:
@@ -46,7 +49,43 @@ def qualification_inputs(directory):
     return {str(p.relative_to(ROOT)): sha(p) for p in sorted(paths)}
 
 
-def qualify(serial, output, provider_schema=False):
+def frozen_release_apk(receipt_path, revision, sdk, env):
+    """Require two exact-source, byte-identical, still-unsigned release artifacts."""
+    build = json.loads(receipt_path.read_text())
+    records = build.get('builds', [])
+    if (not build.get('success') or build.get('signed') is not False or
+            build.get('revision') != revision or len(records) != 2):
+        raise RuntimeError('Matching frozen unsigned build receipt required')
+    from qualify_release_build import verify_unsigned
+    hashes = []
+    for record in records:
+        apk = Path(record['apk'])
+        if (record.get('exit_code') != 0 or
+                record.get('signature_check', {}).get('unsigned_verified') is not True or
+                sha(apk) != record.get('apk_sha256')):
+            raise RuntimeError('Frozen unsigned artifact changed or failed')
+        verify_unsigned(apk, sdk, env)
+        hashes.append(sha(apk))
+    if hashes[0] != hashes[1]:
+        raise RuntimeError('Frozen unsigned artifacts differ')
+    return Path(records[0]['apk'])
+
+
+def require_identical_payload(unsigned, signed):
+    # Signing may add only signature metadata, never alter an original entry.
+    with zipfile.ZipFile(unsigned) as before, zipfile.ZipFile(signed) as after:
+        first, second = before.namelist(), after.namelist()
+        if len(first) != len(set(first)) or len(second) != len(set(second)):
+            raise RuntimeError('Duplicate APK entries')
+        allowed = {'META-INF/MANIFEST.MF', 'META-INF/ANDROIDD.SF', 'META-INF/ANDROIDD.RSA'}
+        if set(second) - set(first) - allowed:
+            raise RuntimeError('Unexpected signed APK entries')
+        for name in first:
+            if name not in second or before.read(name) != after.read(name):
+                raise RuntimeError('Signed fixture changed candidate payload: ' + name)
+
+
+def qualify(serial, output, provider_schema=False, release_build_receipt=None):
     if not re.fullmatch(r'emulator-\d+', serial):
         raise RuntimeError('Release upgrade probe refuses physical-device serials')
     if subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT).strip():
@@ -78,6 +117,22 @@ def qualify(serial, output, provider_schema=False):
         receipt['scope'] = 'development-key-release-mode-historical-schema-provider-upgrade'
     attempted = []
     provider_attempted = False
+    if release_build_receipt is not None:
+        unsigned = frozen_release_apk(release_build_receipt, revision, sdk, env)
+        original = output / 'exact-release-development-signed.apk'
+        signing_env = dict(env, CALLTRACK_DEBUG_PASSWORD='android')
+        subprocess.run([str(sdk / 'build-tools/35.0.0/apksigner'), 'sign',
+                        '--ks', str(key), '--ks-key-alias', 'androiddebugkey',
+                        '--ks-pass', 'env:CALLTRACK_DEBUG_PASSWORD',
+                        '--key-pass', 'env:CALLTRACK_DEBUG_PASSWORD',
+                        '--out', str(original), str(unsigned)], env=signing_env,
+                       capture_output=True, text=True, check=True)
+        require_identical_payload(unsigned, original)
+        receipt['exact_release_baseline'] = dict(
+            unsigned_sha256=sha(unsigned), signed_fixture_sha256=sha(original),
+            payload_identical=True, build_receipt_sha256=sha(release_build_receipt),
+            production_signing=False)
+
 
     def adb(*args, reject=None):
         result = subprocess.run([str(sdk / 'platform-tools/adb'), '-s', serial, *args],
@@ -169,6 +224,15 @@ gradle.beforeProject { project ->
             attempted.append(package)
             if 'Success' not in adb('install', str(apk)):
                 raise RuntimeError('Install unconfirmed')
+        if release_build_receipt is not None:
+            native('freshInstallIsUnconfiguredAndDenied')
+            launch = adb('shell', 'am', 'start', '-W', '-n',
+                         PACKAGE + '/com.markobl.calllogsync.slice.CalendarSliceActivity')
+            if 'Status: ok' not in launch:
+                raise RuntimeError('Fresh candidate launcher failed')
+            adb('shell', 'am', 'force-stop', PACKAGE)
+            native('freshInstallIsUnconfiguredAndDenied')
+            receipt['exact_release_fresh_install_qualified'] = True
         native('seedJavaEraState')
         if provider_schema:
             provider_attempted = True
@@ -239,7 +303,7 @@ gradle.beforeProject { project ->
             except Exception as error:
                 errors.append('Provider cleanup unverified: ' + str(error))
                 receipt['provider_fixture_removed'] = False
-        errors.extend(cleanup_owned_packages(adb, attempted))
+        errors.extend(cleanup_owned_packages(adb, attempted, not errors))
         clean = not errors
         if errors:
             receipt['cleanup_errors'] = errors
@@ -257,5 +321,6 @@ if __name__ == '__main__':
     parser.add_argument('--serial', required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--provider-schema', action='store_true', help='Use synthetic source-pinned schemas and LOCAL provider fixtures')
+    parser.add_argument('--release-build-receipt', type=Path, help='Qualify an exact unsigned release payload using the existing development key only')
     args = parser.parse_args()
-    print(json.dumps(qualify(args.serial, args.output.resolve(), args.provider_schema), indent=2))
+    print(json.dumps(qualify(args.serial, args.output.resolve(), args.provider_schema, args.release_build_receipt), indent=2))

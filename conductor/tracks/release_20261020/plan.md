@@ -147,4 +147,52 @@ key generation, cloud consent, physical testing or elapsed observation is claime
 - [x] Task: Run native store/provider/worker, rendered settings/import/recovery, accessibility at normal/large text, lifecycle and simulated telephony plus development-key schema/provider upgrades —109 successful native invocations each on API26/API33,11 affected API36 checks, two expected terminations,134 screenshot/tree pairs;115 JVM/141 host tests.
 - [x] Task: Review, fix and rerun affected checks — runtime fixes6f3381c, final fixture hardeningbd8c2e9, evidence/review fa7b944; protected-cache round-trip/worker regression and cleanup pass; API26 ordinary ADB privilege restored and both new guests stopped. Original external/manual gates retained.
 
-- [ ] Task: Refreeze the current runtime fixes into new unsigned artifacts/source-notices bundle and independently reproduce that exact candidate;9464408 remains the prior qualified release/source snapshot. Hosted execution awaits repository authority; original identity/signing, physical/OEM/manual, remote and operational gates remain before M4/archive.
+- [x] Task: Refreeze the current runtime fixes into new unsigned artifacts/source-notices bundle and independently reproduce that exact candidate —15998ba; see final local candidate evidence below.9464408 retains its prior qualified release/source scope.
+- [ ] Task: Complete authorised hosted execution and original identity/signing, physical/OEM/manual, remote and operational gates before M4/archive; repository authority remains pending.
+
+
+## First-release baseline and final local candidate —2026-10-22
+
+- [x] Task: Define fresh-install-first support, empty issued-predecessor set and immutable future upgrade baseline; preserve development identity and production custody gates —29c6211,15998ba.
+- [x] Task: Freeze current minimum-platform/accessibility fixes into matching unsigned builds and refreshed source/notices; reproduce exact candidate on the separate Linux host —15998ba; first-release-candidate-evidence-20261022.json.
+- [x] Task: Qualify the exact release payload using an existing-development-key copy on dedicated emulators; prove initial denied/unconfigured launch and historical schema/provider forward upgrade preservation —15998ba;60 successful invocations across26/33/36,6 expected rejections,3 PNG/tree pairs; cleanup passes.
+- [x] Task: Review/fix tools and evidence, run host/Conductor checks and record remaining production/physical/cloud/operational gates without archiving M4 —a8c7f9f,15998ba; review-first-release-candidate-20261022.md;144 host tests on Mac/Linux; final document checkpoint recorded below.
+
+The final local candidate supersedes the pending runtime-refreeze action recorded
+under the extended emulator checkpoint:15998ba includes the fixes and is independently
+reproduced. Older artifacts/probes retain their original scope; full M4 is still
+open. First-release installation has no issued predecessor; production identity/
+signing and original physical/cloud/operational/conveyance gates are not waived.
+
+- [x] Task: Commit reviewed candidate evidence and final document checkpoint —76c5f64bd02365c3b14c03d823364d06943b6341;
+  Mac/Linux144 host tests pass; current Conductor check165 documents/20 tracks/25
+  scenarios passes. Artifact freeze remains15998ba; evidence commits do not relabel
+  that APK/source bundle. Original M4 release gates remain pending.
+
+
+## Physical calls and account-calendar continuation —2026-10-22
+
+- [x] Task: Inspect current device visibility, retained candidate and native calendar contract; refresh official provider/Google/Outlook prerequisites — physical-calendar-qualification.md; no physical phone visible, candidate15998ba artifact/signature/payload rechecked.
+- [x] Task: Prepare staged controlled-call, local/provider/remote readback, preservation and cleanup criteria; review preparation without treating it as executed acceptance — physical-calendar-qualification.md.
+- [ ] Task: Select connected physical phone, participating controlled second phone and dedicated account calendars; preserve existing installations/accounts before testing.
+- [ ] Task: Execute actual physical-call cases and independently read back each claimed Google/Outlook route; record failures/unsupported configurations without substituting destinations.
+- [ ] Task: Verify cleanup/settings restoration, review actual runtime outcomes and apply/requalify any fixes before promoting route claims.
+
+Physical preparation review: review-physical-preparation-20261022.md.144 host tests
+and167-document/20-track/25-scenario Conductor checks pass. Repeated discovery
+still exposes only emulators. Required device, participation and account-calendar
+answers remain pending; no physical/remote acceptance or observation time is claimed.
+
+
+## Seven-day operational observation —2026-10-22
+
+- [x] Task: Recheck physical prerequisites and prepare private cohort/day journal with unknown outcome counts and no start date; seven-day-observation.md. Only emulators visible; no elapsed observation claimed.
+- [x] Task: Configure daily thread follow-up with prerequisite checks and evidence-only accounting; never equate runs/time with accepted use —calltrack-seven-day-observation, active daily09:00 local; native create/view and saved configuration verified.
+- [ ] Task: Complete selected physical/remote baselines, confirm observation scope and participant readiness, verify actual installation and start an explicit cohort/window.
+- [ ] Task: Observe at least168 real elapsed hours with seven accounted daily intervals; preserve denominators, delays, conditions, gaps and findings without fabricated zeros.
+- [ ] Task: Perform final outcome review, apply findings and repeat affected acceptance/new observation where required; retain independent release gates.
+
+Observation preparation review: review-observation-preparation-20261022.md;144
+host tests and169-document/20-track/25-scenario Conductor checks pass. Readback
+confirms one active daily09:00 AEST heartbeat, null observation dates, seven pending
+intervals and zero accepted days/hours. Final runtime review is not yet performed.

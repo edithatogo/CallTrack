@@ -56,6 +56,10 @@ now passes selected API26/API33 suites and affected API36 recovery/accessibility
 229 native invocations, two expected terminations,115 JVM/141 host tests. It fixed
 minimum-platform SQLite scoped use and undersized controls. Physical/OEM/manual
 speech/contrast, remote synchronisation and public release remain pending. The
-current runtime fixes need refreezing/reproduction before inheriting release
-qualification; the older9464408 artifact retains its original evidence. See [Track4 handoff](archive/parity_20261020/handoff.md)
+[first-release candidate](tracks/release_20261020/first-release-candidate-qualification-20261022.md)
+now refreezes those fixes at15998ba: two Mac and a separate fresh Linux build match;
+115 JVM/144 host tests and60 candidate native invocations across26/33/36 pass.
+Fresh-install-first support has no issued predecessor; identity/key custody and
+production/physical/cloud/operational/channel gates remain. The older9464408
+artifact retains its original evidence. See [Track4 handoff](archive/parity_20261020/handoff.md)
 and the [archive index](archive/index.md) for precise evidence boundaries.
