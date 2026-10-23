@@ -1,0 +1,254 @@
+{
+  "date": "2026-10-21",
+  "scope": "Active-code migration; partial selected API36 emulator acceptance; no full-M5 or production readiness",
+  "app_source_commit": "51c43f0",
+  "active_java_converted": 33,
+  "inherited_java_removed": 14,
+  "production_kotlin_files": 36,
+  "production_java_exceptions": [
+    "NullableCalendarLabel.java preserves nullable legacy toString ABI"
+  ],
+  "schemas": {
+    "ledger": 6,
+    "imports": 2
+  },
+  "build": {
+    "path": ".local/slice-evidence/build-receipt.json",
+    "sha256": "25f97a21e7107ff49e4be275b019f324ecbe76420ed11971771f2af2277578da",
+    "bytes": 15662
+  },
+  "artifacts": {
+    "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk": "a42b8927c9232cad3918e144873ba34ab484ac5b3fe7f11880a3fda769db8665",
+    "app/build/outputs/apk/debug/app-debug.apk": "528ca78626b1241b5825173610881540298cb493d699f1b384ef13c27e00c23a"
+  },
+  "jvm_tests": 115,
+  "host_tests": 89,
+  "host_log": {
+    "path": ".local/kotlin-evidence/review-host.log",
+    "sha256": "6332cbc207e89cf9ae96ed7ffbe6674ee5d876886ef1fe10a5bbfdd49238eb7b",
+    "bytes": 5528
+  },
+  "native_accepted_suites": [
+    {
+      "suite": "store",
+      "invocations": 39,
+      "receipt": {
+        "path": ".local/parity-evidence/final-matrix-6d91e3f9e0f54517a4acca5c0a304493/store-receipt.json",
+        "sha256": "9b9d02b254828f05b3bae083c3382aaadfefec29426f0f418b562224241f3132",
+        "bytes": 69141
+      }
+    },
+    {
+      "suite": "source-identity",
+      "invocations": 3,
+      "receipt": {
+        "path": ".local/parity-evidence/final-matrix-6d91e3f9e0f54517a4acca5c0a304493/source-identity-receipt.json",
+        "sha256": "9669e0ba87871c9a6e5fb93d81ca1445692cfc25a7fa3618f56d6471e5d30169",
+        "bytes": 21560
+      }
+    },
+    {
+      "suite": "wake-budget",
+      "invocations": 1,
+      "receipt": {
+        "path": ".local/parity-evidence/final-matrix-6d91e3f9e0f54517a4acca5c0a304493/wake-budget-receipt.json",
+        "sha256": "3c0c784e9f236b8aa75020fcb5e5cc7cd88867d113e8e19199c47afd8f8cc9b3",
+        "bytes": 18920
+      }
+    },
+    {
+      "suite": "provider",
+      "invocations": 8,
+      "receipt": {
+        "path": ".local/parity-evidence/final-matrix-6d91e3f9e0f54517a4acca5c0a304493/provider-receipt.json",
+        "sha256": "1f06a372408e41ac15d502a28035a3108e3de581158cdd785e107cf078c8fd5a",
+        "bytes": 29420
+      }
+    },
+    {
+      "suite": "worker",
+      "invocations": 5,
+      "receipt": {
+        "path": ".local/parity-evidence/final-matrix-6d91e3f9e0f54517a4acca5c0a304493/worker-receipt.json",
+        "sha256": "75160a536844c8ba6dbcb56c08a9c4e1434826b07e2360a9d43d22f279beda9e",
+        "bytes": 25559
+      }
+    }
+  ],
+  "native_accepted_invocations": 56,
+  "standalone_import_ui": {
+    "invocations": 5,
+    "result": "passed",
+    "receipt": {
+      "path": ".local/slice-evidence/parity-ui-imports-receipt.json",
+      "sha256": "1b17acb6c23f5e704d32341aa9b5674a1cdd2a2c1e896cd5eabdc680151aba7a",
+      "bytes": 150633
+    },
+    "ui_files": {
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-cancelled.png": {
+        "sha256": "07d0820dcf8db8c3857e13e8fe618b4607a2acd5601425ff15fc146a665d3a47",
+        "bytes": 173034
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-cancelled.txt": {
+        "sha256": "6258a4ae6f690263a33ff01abe14a14e84b3dd2728a42b3a6914bae116f2d67e",
+        "bytes": 4283
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-complete.png": {
+        "sha256": "d04530ac18be113d23513ee08f08805355266a024d4ea795493ed353b2786c4b",
+        "bytes": 183556
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-complete.txt": {
+        "sha256": "30e962d6b5936694e0ba16523253fcd88c8e5fc2ada939fed3152331aea442d7",
+        "bytes": 4453
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-confirmation-preview.png": {
+        "sha256": "199ffd3ae728d18d82970395b88db90056ac0169ddf5dabf850209653d5926e2",
+        "bytes": 186010
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-confirmation-preview.txt": {
+        "sha256": "f934d9d3baa30bd5349eb49d9bdd17566a88f49b6655dc4c924e255d5a7a6fb2",
+        "bytes": 2230
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-edited-range.png": {
+        "sha256": "26701b349797336f47c82bb2d9d580280c6d57f9eebdfdfe2da8006b9e050de5",
+        "bytes": 177411
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-edited-range.txt": {
+        "sha256": "6b6d823cce63129d1fd68d3b6ec101c8c9721551a164bff76b855358f8b639cb",
+        "bytes": 4042
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-keyboard-visible-before-cancel.png": {
+        "sha256": "f8fdb5d45d482a755e1936a314c1ac8e8f2e7b844713cbb2c0d2806714938c98",
+        "bytes": 209053
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-keyboard-visible-before-cancel.txt": {
+        "sha256": "042cee06c89e8e26ee0b9bc5c53663fc370e7f0e8037fe7306e531bb6fa24993",
+        "bytes": 4356
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-persisted-partial.png": {
+        "sha256": "ce1c9e0519426e6110816aee65161511e74edc9f6567e0c3f8f558614d88739d",
+        "bytes": 212503
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-persisted-partial.txt": {
+        "sha256": "ca46e0885e53563d7868b2ce10a6442f24c3f0de25dd54aadad89ae92286756e",
+        "bytes": 4867
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-read-only-preview.png": {
+        "sha256": "f8fdb5d45d482a755e1936a314c1ac8e8f2e7b844713cbb2c0d2806714938c98",
+        "bytes": 209053
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-read-only-preview.txt": {
+        "sha256": "042cee06c89e8e26ee0b9bc5c53663fc370e7f0e8037fe7306e531bb6fa24993",
+        "bytes": 4356
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-repeated-without-duplicates.png": {
+        "sha256": "232d9257de74db44e86ea3a61475227564a8f70851efc24a80689c13fd56fd05",
+        "bytes": 193133
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-repeated-without-duplicates.txt": {
+        "sha256": "b5d0798c923a5368c612b2eec1e1b16635494b0671e4e75b64e21c3880ba27d7",
+        "bytes": 4625
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-resumed-complete.png": {
+        "sha256": "eb350d51a8c5944f5e1982afdffcd5dca9fb64bffad9f455df0e73009957b7be",
+        "bytes": 205104
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-resumed-complete.txt": {
+        "sha256": "bab7c22def758e6729b8b849ca1c1fcbc5fdba66a716b4b4023fb47aa0c465ae",
+        "bytes": 4831
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-user-stopped-partial.png": {
+        "sha256": "37240ac945f74089dedc5cd5744093f4f0c5339ee63746c5addc081f81fe0017",
+        "bytes": 223131
+      },
+      ".local/slice-evidence/ui-d7049a3704d04ea2abfc845b403d59d6/import-user-stopped-partial.txt": {
+        "sha256": "2981d5448cd08b699ab0f5e45bd445f9dc06065b7a74f3e57a4769a5361c9d36",
+        "bytes": 5010
+      }
+    }
+  },
+  "private_state_update": {
+    "invocations": 2,
+    "result": "passed",
+    "receipt": {
+      "path": ".local/kotlin-evidence/package-update-b259bfbef7fe43a89e3d85bf5cc9860a.json",
+      "sha256": "e3c73d96da64d18c383840915944a01a979cda438135e2527ddf2a7162a90fc9",
+      "bytes": 38665
+    },
+    "limits": "Same-version debug-key private data only; no production/version-increase/provider/cloud proof"
+  },
+  "unsigned_release": {
+    "receipt": {
+      "path": ".local/release-evidence/kotlin-final-20261021/receipt.json",
+      "sha256": "d079fd36dc2f6306d818184f096f3128270607f14b55987c34d95c7c0b443d48",
+      "bytes": 12918
+    },
+    "candidate_revision": "787ae35b8a8da829641222f0e755fa3c4664aa11",
+    "comparison": {
+      "sha256": [
+        "117909cbb95f70faac43c905ad6957daf746fa7713027786cb794b3f3b8945c4",
+        "117909cbb95f70faac43c905ad6957daf746fa7713027786cb794b3f3b8945c4"
+      ],
+      "identical": true
+    },
+    "tests_per_checkout": 115,
+    "lint_errors": 0,
+    "lint_warnings": 69,
+    "independent_environment": false,
+    "signed": false
+  },
+  "failed_matrix_runs": [
+    {
+      "path": ".local/parity-evidence/final-matrix-84bd9e2ba5f94c9297bf4497cb326873/manifest.json",
+      "sha256": "f0cbf1a101c3e8df55074123a5441ccbad6f21d9af0ed67eeea253a3307a021e",
+      "bytes": 4581
+    },
+    {
+      "path": ".local/parity-evidence/final-matrix-6d91e3f9e0f54517a4acca5c0a304493/manifest.json",
+      "sha256": "6d580501740808aa835fc385318b153247fd653bf7a04cb3959c0da7f7ba0916",
+      "bytes": 3187
+    }
+  ],
+  "diagnostics": [
+    {
+      "path": ".local/kotlin-evidence/lifecycle-retry-exit-info.log",
+      "sha256": "124dcc2c52fc8c74175a40be99742c167de53ebc41606ba168c1a0a1af79ccde",
+      "bytes": 1164
+    },
+    {
+      "path": ".local/kotlin-evidence/lifecycle-retry-crash.log",
+      "sha256": "6f62603bc2f4fdb71f8691f335d230e0041b6c599758e41f31ef120a096a29a1",
+      "bytes": 36121
+    },
+    {
+      "path": ".local/kotlin-evidence/lifecycle-guest-crash.log",
+      "sha256": "4752b330fe312a10f3337da871ec1c7aa2e8ec302cb87ac97f13c635ca88dd59",
+      "bytes": 15353
+    }
+  ],
+  "recovery": [
+    {
+      "path": ".local/kotlin-evidence/lifecycle-restoration-retry.json",
+      "sha256": "10db3851db01cfd5dbbfae7911bc30ac63e676782b83a916d6a2813b3111e822",
+      "bytes": 94717
+    },
+    {
+      "path": ".local/kotlin-evidence/lifecycle-manual-cleanup.json",
+      "sha256": "be3d2dff82e6bcc028ffc80bfd293a63d7e91dd5fcdebc50f91771587a1b12cd",
+      "bytes": 2737
+    },
+    {
+      "path": ".local/kotlin-evidence/final-native-handoff-state.json",
+      "sha256": "510ceaaf8a83e3fd7566c9287255766a9684dc5faac16ec41d15742914f0fa6b",
+      "bytes": 102009
+    }
+  ],
+  "native_pending": [
+    "lifecycle full-suite acceptance after provider timeout/startup ANRs",
+    "telephony on corrected build",
+    "settings UI on corrected build",
+    "recovery UI on corrected build"
+  ],
+  "full_migration_accepted": false,
+  "later_frameworks_implemented": false
+}

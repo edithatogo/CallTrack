@@ -20,3 +20,5 @@
 
 Two clean same-host builds match; production signing, independent-host
 reproduction and original operational acceptance remain pending.
+
+- [Current unsigned Kotlin candidate evidence](unsigned-kotlin-evidence-20261021.json)

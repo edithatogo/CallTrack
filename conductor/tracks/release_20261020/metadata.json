@@ -13,5 +13,7 @@
   "release_ready": false,
   "implementation_commit": "6b353f4",
   "review_commit": "66593c3",
-  "review_status": "passed-with-fixes-for-unsigned-scope"
+  "review_status": "passed-with-fixes-for-unsigned-scope",
+  "unsigned_candidate_revision": "787ae35b8a8da829641222f0e755fa3c4664aa11",
+  "unsigned_kotlin_candidate_qualified": true
 }

@@ -37,9 +37,12 @@ python3 scripts/verify_conductor.py
 ```
 
 The build runs JVM tests, builds app/test APKs and lints. Receipts and logs stay under
-excluded `.local/slice-evidence`. Kotlin2.3.21 now implements event mapping,
-identity and filtering behind existing Java contracts. Compose/KMP/Rust remain
-research directions, not dependencies of this slice. Dependencies inherited from upstream include
+excluded `.local/slice-evidence`. The active implementation now comprises36 Kotlin
+production files and one Java bridge preserving nullable calendar-label behaviour.
+[Track6](conductor/tracks/kotlin_20261020/index.md) records migration and acceptance
+separately. Compose/KMP/Rust are pending successor tracks in the
+[approved iOS-last sequence](conductor/future-architecture.md), not runtime dependencies.
+Retained dependencies include
 interim compatibility overrides documented in [tech stack](conductor/tech-stack.md).
 
 For an explicitly selected, authorised test device with neither development test
@@ -71,21 +74,21 @@ CI checks both languages. The upstream build reproducer remains available throug
 [qualification instructions](qualification/README.md). CI definitions are local
 configuration until a hosted run is observed.
 
-Ledger schema2 preserves schema1 receipts and adds a durable outbox foundation;
-unsupported upgrades fail instead of dropping data. The manual launcher still uses
-the original receipt path; automatic delivery/import integration is unfinished.
-The receipt key includes per-install source namespace, call row ID and destination.
+Ledger schema6 preserves earlier receipts and durable delivery state; import sessions
+use schema2. Unsupported upgrades fail instead of dropping data. Manual, automatic
+and confirmed historical delivery share durable ownership/receipts and conservative
+recovery. Receipt identity includes the source namespace, call row ID and destination.
 Do not clear app data as a retry strategy: losing receipts changes recovery and
-identity semantics. Cross-device restore, edited/deleted crash-gap tombstones and
-full background reconciliation are Track4 work. Keep working releases and source
-history until migration and recovery have passed.
+identity semantics. Cross-device restore is not implemented. Keep working artifacts
+and source history until preserving migration and recovery have passed.
 
 ## Community preparation
 
 See [contribution guide](CONTRIBUTING.md), [data lifecycle](PRIVACY.md),
 [security status](SECURITY.md) and [release runbook](RELEASING.md). These prepare
 future community distribution; they do not establish a release candidate or public
-reporting channel. Track4 acceptance and signing/distribution gates remain open.
+reporting channel. Physical/cloud/operational acceptance and signing/distribution
+gates remain open; Track4 selected-emulator acceptance is archived.
 
 [Compose research](prototypes/compose/README.md) is an isolated synthetic app, not
 part of this working application's build or runtime. Its research decision retains
@@ -107,3 +110,9 @@ selected `--serial`. Lifecycle changes only the guest's power/network state and
 reboots the guest; scoped cleanup/restoration and package removal must be verified.
 On uncertain cleanup retain instrumentation and the original fixture token.
 Computer restart is not an unblock option.
+
+Current Kotlin continuation: [implementation and acceptance handoff](conductor/tracks/kotlin_20261020/active-migration-handoff.md).
+115 JVM/89 host tests and selected native suites pass; guest startup ANRs/phone
+service availability block the full final emulator matrix. Two clean same-host
+unsigned release builds match. This is not production release or completion of
+the Compose/KMP/macOS/Rust/iOS roadmap.

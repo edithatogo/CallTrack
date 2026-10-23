@@ -66,6 +66,13 @@ def qualify(serial, suite="store"):
                          '-e', 'class', 'com.markobl.calllogsync.slice.' + class_name + '#' + method,
                          TEST_PACKAGE + '/androidx.test.runner.AndroidJUnitRunner')
         if 'OK (1 test)' not in output or 'FAILURES' in output or 'INSTRUMENTATION_FAILED' in output:
+            # Uninstall clears useful process-exit evidence; retain diagnostics first.
+            for args in (('shell', 'dumpsys', 'activity', 'exit-info', PACKAGE),
+                         ('logcat', '-d', '-b', 'crash', '-v', 'threadtime', '-t', '200')):
+                try:
+                    command(*args)
+                except Exception as diagnostic:
+                    receipt.setdefault('diagnostic_errors', []).append(str(diagnostic))
             raise RuntimeError('Native test failed: ' + method)
 
     try:

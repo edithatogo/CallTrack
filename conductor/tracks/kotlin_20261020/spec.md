@@ -1,6 +1,6 @@
 # Kotlin migration and dependency reassessment
 
-Milestone: M5. Type: research-led development. Status: planned discovery; implementation scope provisional.
+Milestone: M5. Type: research-led development. Status: active staged migration; approved successor roadmap, preserving acceptance gates.
 
 ## Objective
 
@@ -37,3 +37,11 @@ provider operations and scheduler unchanged. Preserve exact signatures/fingerpri
 nullable public constructor fields, legacy ASCII trim and overflow semantics.
 Further app-owned Java migration and the original upgrade/acceptance gate remain
 open; no completion/archive from this pilot alone. See [decision](decisions.md).
+
+## Approved continuation — 2026-10-21
+
+The [future sequence](../../future-architecture.md) authorises all stabilized active
+code in verified batches before remaining release work. K03 begins with seven
+additional model/policy components; old schema2/21-file descriptions above are
+historical pilot boundaries. Current baseline is schema6/import2,47 Java files
+before continuation (33 active/14 inherited). No M4/full-M5 gate is waived.

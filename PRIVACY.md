@@ -4,9 +4,10 @@ Observed implementation as of 2026-10-21; this is not a published store privacy
 policy or a claim that all planned retention controls exist. See the
 [release readiness track](conductor/tracks/release_20261020/index.md).
 
-The current launcher reads the latest call only after an explicit action and
-permission grant. It reads row ID, time, duration, type, cached name, number,
-number presentation and phone-account ID. It does not request contacts, SMS,
+With permission, the manual action reads the latest call; explicitly enabled
+automatic logging and confirmed historical imports read bounded call metadata.
+Fields include row ID, time, duration, type, cached name, number, number presentation
+and phone-account ID. It does not request contacts, SMS,
 microphone or location access. The manifest omits INTERNET. Calendar software may
 still synchronize an event to the chosen account and disclose it to that calendar's
 members. Private/free event flags do not encrypt content or revoke calendar access.
@@ -35,16 +36,20 @@ of calendar data. Recovery includes a bounded expired-payload clearing action.
 An expired never-attempted receipt cannot insert automatically: a confirmed historical
 import must collect matching fresh source data. Inactivity, clock changes and Android
 background deferral can delay clearing; this is not a wall-clock erasure guarantee.
-Full positive native/provider/UI acceptance remains incomplete.
+[Track4](conductor/archive/parity_20261020/handoff.md) records selected-emulator
+acceptance; [Track6](conductor/tracks/kotlin_20261020/index.md) separately binds the
+Kotlin migration. Physical calls, cloud synchronization and operational acceptance
+remain pending.
 Schema1–5 receipts and pending rows have preserving migration paths to schema6. Older source facts
 remain unknown; they are never inferred from event marker length. New source facts
 survive payload clearing and remain potentially sensitive; no age-based expiry is
 implemented for them or operation metadata. Clearing an outbox payload is logical
 removal from that row; it is not forensic erasure of SQLite pages/backups. Hashes and
 source/event identifiers remain potentially linkable metadata, not anonymized data.
-Legacy preferences/code remain packaged and need a release audit even though the
-old activity is unexported and boot receiver disabled. Do not enable its endpoint
-"test": upstream behaviour can upload history.
+Track6 removes the unreachable inherited HTTP sync/settings code, old unexported
+activity and disabled boot receiver. Old preference/data files are not cleared or
+reactivated. No direct network connector is implemented; artifact/licence review
+remains a release gate.
 
 Backup and device-transfer rules explicitly exclude app data; those declarations
 are not a cross-device recovery guarantee. Clearing app data or uninstalling loses
@@ -54,8 +59,8 @@ Revoking access prevents future permitted operations; it does not retract events
 already shared with the calendar. No automatic delete-all or remote erasure is
 implemented. Manually review the exact destination/provider copies before deletion.
 
-Before an alpha: complete native retention/recovery and positive UI acceptance
-in Track4; verify source namespace/reset handling; audit
+Before an alpha: retain source-bound native retention/recovery/UI and namespace
+qualification for the candidate, complete release/operational acceptance, and audit
 merged release permissions and logging; explain calendar sharing before first write;
 verify actual backup/restore behaviour. Do not publish a policy promising those
 controls before their runtime evidence exists. Direct Graph/Google/CalDAV adapters

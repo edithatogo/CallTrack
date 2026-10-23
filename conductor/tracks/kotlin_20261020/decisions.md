@@ -67,3 +67,61 @@ and five native methods, source-bound packaging, unsigned release and dependency
 readback. Retain Kotlin2.3.21 and ktfmt0.59 for these three components. This adopts
 the bounded development implementation, not all suggested libraries or full M5.
 See [verification](verification.md); compiler and app/runtime graphs remain distinct.
+
+## K03 — Expand stabilized model/policy migration (2026-10-21)
+
+The user approved the iOS-last implementation sequence and all active-code Kotlin
+migration. M3 selected-emulator contracts are stable; M4 signing/operational gates
+remain. Convert CallRecord, DeliveryCounts, ImportRange, PayloadRetention, WorkStatus,
+AutomaticWorkPolicy and ActivationCommitGuard without changing persistence or
+controllers. Seven components join the existing three Kotlin models.
+
+Retain the qualified compiler/formatter and native APIs. No runtime/build dependency
+is added or updated. Libraries cannot replace these product-specific validation,
+state and latch policies without a semantic change. Room/DataStore/coroutines
+remain deferred; combining takeover with language conversion is unjustified.
+
+Java fields/static entry points/overloads and nullable inputs remain explicit.
+CallRecord validates null IDs before asserting nonnull stored fields; raw nullable
+presentation is distinct from legacy absent presentation. WorkStatus preserves
+stale-generation early return and saturating failure counts. ActivationCommitGuard
+retains JVM synchronized methods and fail-closed latching before a throwing write.
+Its Kotlin internal class is public in bytecode (Kotlin has no Java package-private
+type visibility); methods retain unmangled names for existing package Java callers.
+This intentional visibility widening is not an exported Android component or a
+new external SDK contract, and does not bypass any operation/permission authority.
+
+The retained-class javac fallback is retired: once models move, compiling only
+remaining Java against old implementation classes cannot qualify Kotlin changes.
+Use Gradle mixed-source tests; preserve historical receipts without relabelling.
+
+Acceptance: freeze Java golden/interop contracts first, then the same JVM suite,
+full debug/test/release packaging/lint, native store regressions and actual
+same-version development package replacement of private synthetic state. This
+last fixture is separately named/bounded and cannot satisfy production-version,
+provider/cloud or operational gates. Roll back code only before promotion if a
+contract fails; preserve data/receipts and never clear app data or downgrade a
+user installation. Further26 active Java/14 inherited files remain work, not
+permanent justified exceptions. See current evidence when recorded.
+
+## Active-code continuation — 2026-10-21
+
+The approved stage1 converted33 active Java classes in preserving batches,
+retaining existing Views/executors/SQLite/WorkManager and golden identities.
+There are36 production Kotlin files and one deliberate Java exception:
+NullableCalendarLabel preserves the old nullable Choice.toString ABI, which
+Kotlin Any.toString cannot represent. Remove only with an explicit consumer
+contract change and parity evidence. Package-private helpers widen to public JVM
+visibility for unmangled Java interop; no component export or external SDK is added.
+
+Reachability audit retired14 inherited Java files,12 resources and seven unused
+direct dependencies. Material/AppCompat still consume ConstraintLayout, RecyclerView
+and Transition; review found their removal accidentally lowered selected versions.
+Gradle constraints retain qualified2.1.3/1.2.1/1.4.1 respectively without restoring
+unused API declarations. Reassess/remove constraints when those consumers retire.
+This is dependency preservation, not an ecosystem upgrade or licence clearance.
+
+The retained-javac fallback is retired; source-bound Kotlin APKs are mandatory.
+The private-state same-version debug replacement proves only selected private data
+preservation. Production identity/signing, increasing-version upgrades, cloud and
+physical/operational acceptance retain separate release gates.

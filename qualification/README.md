@@ -139,21 +139,30 @@ for scoped recovery. The receipt records the original emulator settings and exac
 failed command/state. These cases do not qualify physical calls, cloud delivery,
 rendered UI acceptance, every OEM/version or automatic execution while force-stopped.
 
-### Local JVM fallback while qualified storage is unavailable
+### Retired retained-class JVM fallback
 
-`scripts/run_parity_local.py` uses the existing `.local/counter-jvm` library manifest,
-classpath and last successful build receipt. It verifies library hashes and unchanged
-Kotlin source hashes, compiles current pure Java sources/tests into a fresh temporary
-directory and writes `.local/counter-jvm/latest-local-receipt.json`. It requires the
-locally retained compiled Kotlin/dependency classes and JDK17. It is an explicitly
-bounded development fallback, not a clean build or a portable qualification route.
-It does not change SDK/cache symlinks or install an alternative Android toolchain.
+The old `scripts/run_parity_local.py` now fails closed with an actionable message.
+Expanded Kotlin migration cannot be qualified by compiling only remaining Java
+sources against retained implementation classes. Historical local receipts remain
+evidence of their original subset, never current Android acceptance. Use
+`scripts/run_slice_build.py` with the qualified JDK17 and SDK. If PortableSSD is
+unavailable, reconnect it or explicitly qualify another SDK/cache route; do not
+claim current tests from old compiled classes. No symlink/cache replacement is
+performed by the retired command.
 
-Run `python3 scripts/run_parity_local.py` and `python3 -m unittest discover -s tests`.
-The fallback excludes SchedulingCommitTest, Android adapters and instrumentation.
-Its successful receipt must never authorise an APK install; native harnesses continue
-to require the full source-bound Android build. On storage restoration, use the normal
-build and native commands above before claiming Android acceptance.
+### Development package replacement fixture
+
+`python3 scripts/qualify_kotlin_update.py --serial emulator-5582` verifies a
+same-version, same-debug-key development replacement with private synthetic state.
+It requires absent packages, a verified dedicated guest, a retained Java baseline
+source/APK receipt at commitc7c3d91 and a current source-bound app/test build. It
+seeds paused activation/namespace/destination and READY/IN_FLIGHT/REVIEW/CONFIRMED
+receipts, replaces the app using `adb install -r`, reads the state through candidate
+code and verifies package removal. No call/calendar permissions or external effects
+are used. Receipts are uniquely named under .local/kotlin-evidence. This is not an
+increasing-version production update, wrong-key rejection, provider/cloud readback
+or signed release gate. The retained baseline is local; missing inputs must not be
+reconstructed from unverified APKs.
 
 ### Isolated recovery AVD without a host restart
 
