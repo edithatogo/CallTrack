@@ -27,5 +27,9 @@
   "review_commit": "152f39f",
   "review_document": "review-20261024.md",
   "review_status": "readiness-slice-reviewed-implementation-gated",
+  "draft_pr": 24,
+  "draft_pr_url": "https://github.com/edithatogo/CallTrack/pull/24",
+  "draft_pr_base": "codex/track19-cross-platform",
+  "draft_pr_hosted_ci": "failed-before-job-steps-no-logs",
   "production_adopted": false
 }

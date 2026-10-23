@@ -2,7 +2,7 @@
 
 The user selected [edithatogo/CallTrack](https://github.com/edithatogo/CallTrack)
 as the private successor repository. Its main branch holds the original roadmap
-commit. The following twenty-three draft PRs are stacked in history order; each
+commit. The following twenty-four draft PRs are stacked in history order; each
 compares with the preceding feature branch and keeps the local reviewed commits.
 Merge in order if and when each PR passes its applicable review and acceptance.
 
@@ -31,6 +31,7 @@ Merge in order if and when each PR passes its applicable review and acceptance.
 | [#21](https://github.com/edithatogo/CallTrack/pull/21) | Track 17 shared Compose Multiplatform presentation prototype |
 | [#22](https://github.com/edithatogo/CallTrack/pull/22) | Track 18 refreshed Rust evaluation; production adoption deferred |
 | [#23](https://github.com/edithatogo/CallTrack/pull/23) | Track 19 Android/macOS evidence reconciliation and conditional acceptance matrix |
+| [#24](https://github.com/edithatogo/CallTrack/pull/24) | Track 20 iOS readiness research behind the stage 1–8 gate |
 
 GitHub readback confirmed PRs1–22 as OPEN drafts. PR20 is stacked on the Track15
 `codex/track15-kmp` head; it contains only preview parsing and bounded
@@ -45,6 +46,10 @@ PR23 is stacked on PR22's `codex/track18-rust-evaluation` head. It records only
 the bounded Track19 evidence reconciliation; cross-platform native, packaging,
 upgrade/recovery and selected calendar-route qualification remain open. Its
 hosted checks failed before job steps; no hosted acceptance is claimed.
+PR24 is stacked on PR23's `codex/track19-cross-platform` head. It contains only
+Track20 readiness research and sequence guardrails; no iOS target or app was
+implemented. Hosted checks failed before any job steps and have no runner
+output; no hosted acceptance is claimed.
 PR21 is stacked on PR20's `codex/track16-macos` head. It contains the bounded
 common presentation/reducer and synthetic desktop rendering tests; it does not
 integrate an Android target or native macOS app. Its hosted workflow failed
