@@ -13,5 +13,9 @@
   "execution_stage": 4,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
   "implementation_status": "bounded-selection-range-shared-jvm-android-qualified-macos-native-pending",
+  "implementation_commit": "32ae39b",
+  "review_commit": "32ae39b",
+  "review_status": "bounded-slice-reviewed-macos-native-pending",
+  "macos_native_accepted": false,
   "production_adopted": false
 }
