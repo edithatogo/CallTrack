@@ -39,7 +39,7 @@ the archived research decisions; research Tracks7–13 remain unchanged.
   *Link: [Track](tracks/cross_platform_20261021/index.md)*
 
 ---
-- [ ] **Track: iOS companion implementation — last** (Track20)
+- [~] **Track: iOS companion implementation — last** (Track20)
   *Link: [Track](tracks/ios_companion_20261021/index.md)*
 
 Completed tracks are retained in the [archive index](archive/index.md).
