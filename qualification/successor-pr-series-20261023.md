@@ -2,7 +2,7 @@
 
 The user selected [edithatogo/CallTrack](https://github.com/edithatogo/CallTrack)
 as the private successor repository. Its main branch holds the original roadmap
-commit. The following twenty-one draft PRs are stacked in history order; each
+commit. The following twenty-two draft PRs are stacked in history order; each
 compares with the preceding feature branch and keeps the local reviewed commits.
 Merge in order if and when each PR passes its applicable review and acceptance.
 
@@ -29,12 +29,17 @@ Merge in order if and when each PR passes its applicable review and acceptance.
 | [#19](https://github.com/edithatogo/CallTrack/pull/19) | KMP shared call-type selection and time-range rules |
 | [#20](https://github.com/edithatogo/CallTrack/pull/20) | macOS preview-only bounded import prototype and Track 16 gates |
 | [#21](https://github.com/edithatogo/CallTrack/pull/21) | Track 17 shared Compose Multiplatform presentation prototype |
+| [#22](https://github.com/edithatogo/CallTrack/pull/22) | Track 18 refreshed Rust evaluation; production adoption deferred |
 
-GitHub readback confirmed PRs1–21 as OPEN drafts. PR20 is stacked on the Track15
+GitHub readback confirmed PRs1–22 as OPEN drafts. PR20 is stacked on the Track15
 `codex/track15-kmp` head; it contains only preview parsing and bounded
 documentation, with native macOS/EventKit acceptance still pending. Its hosted
 workflow failed before any job step or runner allocation; no hosted build result
 is claimed.
+PR22 is stacked on PR21's `codex/track17-shared-ui` head. Its local Rust and
+Conductor checks pass. Hosted CI failed before any job step or runner allocation
+because the repository account billing or spending limit blocks hosted jobs;
+no hosted acceptance is claimed.
 PR21 is stacked on PR20's `codex/track16-macos` head. It contains the bounded
 common presentation/reducer and synthetic desktop rendering tests; it does not
 integrate an Android target or native macOS app. Its hosted workflow failed
