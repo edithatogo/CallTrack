@@ -16,6 +16,7 @@
     <item name="auto_feedback" type="id" />
     <item name="open_imports" type="id" />
     <item name="import_calendar_picker" type="id" />
+    <item name="import_access_panel" type="id" />
     <item name="import_filters" type="id" />
     <item name="import_from" type="id" />
     <item name="import_to" type="id" />

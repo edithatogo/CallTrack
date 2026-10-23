@@ -72,17 +72,29 @@ class HistoricalImportActivity : ComponentActivity() {
         val intro = TextView(this)
         intro.text = getString(R.string.import_intro, zone)
         layout.addView(intro)
-        val access = button(layout, R.string.auto_access, 0)
-        access.setOnClickListener {
-            requestPermissions(
-                arrayOf(
-                    Manifest.permission.READ_CALL_LOG,
-                    Manifest.permission.READ_CALENDAR,
-                    Manifest.permission.WRITE_CALENDAR,
-                ),
-                9,
-            )
-        }
+        val accessPanel =
+            ComposeView(this).apply {
+                id = R.id.import_access_panel
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    HistoricalImportAccessPanel(
+                        label = stringResource(R.string.auto_access),
+                        onRequestAccess = {
+                            requestPermissions(
+                                arrayOf(
+                                    Manifest.permission.READ_CALL_LOG,
+                                    Manifest.permission.READ_CALENDAR,
+                                    Manifest.permission.WRITE_CALENDAR,
+                                ),
+                                9,
+                            )
+                        },
+                    )
+                }
+            }
+        layout.addView(accessPanel)
         val destinationPicker =
             ComposeView(this).apply {
                 id = R.id.import_calendar_picker
@@ -231,14 +243,6 @@ class HistoricalImportActivity : ComponentActivity() {
         loadCalendars(if (saved == null) -1 else saved.getLong("calendar", -1))
         loadHistory(-1)
         if (currentId != null) loadSession(currentId)
-    }
-
-    private fun button(layout: LinearLayout, text: Int, id: Int): Button {
-        val result = Button(this)
-        result.setText(text)
-        if (id != 0) result.id = id
-        layout.addView(result)
-        return result
     }
 
     private fun setFeedback(message: Int?) {

@@ -139,3 +139,25 @@ and broader accessibility acceptance remain open.
 **Rollback:** Restore the native Spinner listener/adapter and remove the
 Compose destination component. No schema, receipt, calendar event or
 confirmation semantics change.
+
+## D14-7: Render historical-import access action with Compose
+
+**Decision:** Replace the native historical-import access button with a
+lifecycle-disposed ComposeView retaining a stable `import_access_panel` host
+ID. Compose only dispatches an explicit tap to the existing Activity-owned
+`requestPermissions` call. Android's permission prompt and user consent remain
+platform-owned. Use the already-qualified `ComposeActionButton`; do not add a
+dependency or request a permission during composition.
+
+**Alternatives:** Keep the action in Views (no control-migration evidence); move
+permission checks or consent into the composable (rejected); add a new
+permission library (not needed for this button).
+
+**Promotion/removal:** This is a presentation migration only. Component tests
+verify no callback during rendering and one callback per explicit tap; the
+Activity test verifies the Compose host is present. Runtime grant, denial,
+revocation and resulting provider behavior remain in the permission acceptance
+matrix and are not inferred from the component callback test.
+
+**Rollback:** Restore the native button and remove the new host ID/panel. No
+permission state, provider access or data changes are involved.

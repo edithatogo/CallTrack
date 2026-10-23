@@ -13,6 +13,6 @@
   "track_number": 14,
   "execution_stage": 3,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
-  "implementation_status": "automatic-status-and-recovery-cards-and-empty-state-api36-qualified; import-date-type-history-and-destination-picker-compose-api36-qualified-at-component-and-host-level; provider-backed-destination-selection-and-restoration-plus-live-accessibility-permission-revocation-lifecycle-and-os-matrix-pending",
+  "implementation_status": "automatic-status-and-recovery-cards-and-empty-state-api36-qualified; import-filters-history-destination-and-access-controls-compose-api36-qualified-at-component-and-host-level; provider-backed-destination-selection-and-restoration-plus-runtime-permission-grant-denial-revocation-live-accessibility-lifecycle-and-os-matrix-pending",
   "production_adopted": false
 }
