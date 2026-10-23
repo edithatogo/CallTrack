@@ -14,6 +14,13 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 
+@Composable
+internal fun RecoveryEmptyPanel(visible: Boolean, message: String) {
+    Column(modifier = Modifier.fillMaxWidth().semantics { testTagsAsResourceId = true }) {
+        if (visible) BasicText(message, modifier = Modifier.testTag("recovery_empty_message"))
+    }
+}
+
 internal data class RecoveryCardUiState(
     val token: Long,
     val detail: String,
