@@ -1,5 +1,14 @@
 # Inventory and verification
 
+## Live gate refresh — 2026-10-23
+
+The repository-target decision is complete. Private successor PR [#17](https://github.com/edithatogo/CallTrack/pull/17)
+contains this track's Python/toolchain work; the full series is indexed in
+`qualification/successor-pr-series-20261023.md`. GitHub dispatched the workflow,
+but jobs failed before runner allocation with an account billing/spending-limit
+annotation. Hosted CI remains a blocker. Local macOS and isolated Linux qualification
+passed152 tests on code revision442e680; no hosted result is inferred.
+
 ## Reused evidence
 
 Commit96d0c72 is integrated on main: [dependency refresh](../../../qualification/dependency-refresh-20261023.md)
@@ -24,8 +33,9 @@ was rechecked unchanged. No new APK qualification is claimed by this track.
 | `.local/analysis-venv` | Inactive historical APK analysis,3.15.0/Androguard | Preserve history; never reactivate without separate3.15.1 qualification |
 | Earlier one-off release runner | JDK qualification process reached terminal exit0 | Environment handover completed; no running Python task found in this repo at audit |
 
-No configured Git remote exists. No PR or hosted CI result is available. Do not
-create/push a remote or claim the CI container executed based on YAML alone.
+At the initial inventory checkpoint, no remote or PR had been created. The later
+user-selected private successor and actual PR are recorded in the live refresh
+and final qualification section below.
 
 ## Current review findings
 
@@ -103,9 +113,10 @@ The new regression raises the suite count to152. Final integrated-head Mac/Linux
 rechecks and safe owned-container stop are recorded in private receipts after
 commit. This is actual Linux container execution using the same Python binary
 release family as setup-python, not a hosted GitHub Actions run or an execution
-of its installation action. Hosted dispatch remains unavailable for this separate
-CallTrack history until its contribution target is selected. The original-upstream
-checksum PR is [assessed separately](../../../qualification/upstream-contribution-assessment-20261023.md)
+of its installation action. At that point hosted dispatch had no selected
+contribution target. The later private successor and actual CI billing blocker
+are recorded below. The original-upstream checksum PR is
+[assessed separately](../../../qualification/upstream-contribution-assessment-20261023.md)
 and does not establish Python CI acceptance for this repository.
 
 ## Final code qualification

@@ -25,3 +25,17 @@ or durable goal complete based on configuration inspection alone.
    archive-only/shallow checkout. Full-history checkout and a regression fix the
    actual configured CI path; the original schema-provenance test stays intact.
    Full Git history in the isolated container reproduces the151-test pass.
+
+## Final local review refresh — 2026-10-23
+
+The successor repository target is now selected and private PR #17 is open. The
+configured workflow was dispatched, but GitHub reports an account
+billing/spending-limit error before any runner starts. The isolated Linux
+container and macOS each pass152 tests at code revision442e680; hosted CI remains
+the only Python-track execution blocker.
+
+Track21 Task10 is complete for the locally available Linux container and for
+recording the precise hosted blocker. Task11 is complete for requirement review
+and corrections. Task12 and track closure remain pending until hosted CI evidence
+is available. The goal is not marked complete. The original release, physical,
+calendar and seven-day observation gates remain separate.

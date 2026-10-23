@@ -137,7 +137,7 @@ key generation, cloud consent, physical testing or elapsed observation is claime
 - [x] Task: Diagnose initial cold verification failure; canonically audit three metadata files and preserve all736 old entries —9464408;739 entries, no runtime version change or trust exception.
 - [x] Task: Requalify two Mac builds and a separate native Linux physical host, including tests/lint/source/runtime/artifact readback — linux-reproduction-evidence-20261022.json; identical unsigned APK,115 JVM tests per build,131 Python tests on both systems; source/notices bundle refreshed.
 - [x] Task: Review/apply fixes and prepare exact-candidate manual GitHub workflow — review-linux-reproduction-20261022.md; evidence/review 484a8dd; actionlint and Linux execution of build/tooling commands pass. Final reporting fixture corrected;131 host tests and160 Conductor documents pass.
-- [ ] Task: Execute and read back hosted CI after the repository choice is authorised; source workflow preparation is not a provider run.
+- [ ] Task: Resolve the GitHub Actions account billing/spending-limit blocker, then execute and read back hosted CI; source workflow preparation is not a provider run.
 - [ ] Task: Finish original signing/identity, signed source conveyance, Android/platform/native, cloud and operational gates before M4/archive.
 
 
@@ -148,7 +148,7 @@ key generation, cloud consent, physical testing or elapsed observation is claime
 - [x] Task: Review, fix and rerun affected checks — runtime fixes6f3381c, final fixture hardeningbd8c2e9, evidence/review fa7b944; protected-cache round-trip/worker regression and cleanup pass; API26 ordinary ADB privilege restored and both new guests stopped. Original external/manual gates retained.
 
 - [x] Task: Refreeze the current runtime fixes into new unsigned artifacts/source-notices bundle and independently reproduce that exact candidate —15998ba; see final local candidate evidence below.9464408 retains its prior qualified release/source scope.
-- [ ] Task: Complete authorised hosted execution and original identity/signing, physical/OEM/manual, remote and operational gates before M4/archive; repository authority remains pending.
+- [ ] Task: Complete hosted execution after runner access is restored and original identity/signing, physical/OEM/manual, remote and operational gates before M4/archive.
 
 
 ## First-release baseline and final local candidate —2026-10-22
