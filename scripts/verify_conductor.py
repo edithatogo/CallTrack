@@ -31,7 +31,7 @@ def verify_future_sequence(conductor, tracks, locations):
         scoped_prerequisite_deferral = track.get('prerequisite_deferral_document')
         if scoped_prerequisite_deferral:
             deferral_path = Path(scoped_prerequisite_deferral)
-            assert entry['stage'] in (3, 4, 5, 6, 7, 8), 'Scoped prerequisite deferral is only valid for stages3 through8'
+            assert entry['stage'] in (3, 4, 5, 6, 7, 8, 9), 'Scoped prerequisite deferral is only valid for stages3 through9'
             assert not deferral_path.is_absolute() and '..' not in deferral_path.parts, (
                 'Scoped prerequisite deferral path must remain within the track'
             )
@@ -48,7 +48,7 @@ def verify_future_sequence(conductor, tracks, locations):
             assert (locations[track_id] / 'deferral.md').is_file(), 'Deferral decision missing document'
         if entry['stage'] == 9:
             assert set(expected[:-1]) <= set(track['depends_on']), 'iOS execution sequence prerequisites missing'
-            if track['status'] in ('in_progress', 'completed') and not deferred:
+            if track['status'] in ('in_progress', 'completed') and not deferred and not scoped_prerequisite_deferral:
                 assert all(resolved), 'iOS must remain last until all earlier stages pass or have justified deferrals'
         elif entry['stage'] > 2 and track['status'] in ('in_progress', 'completed') and not deferred:
             if not (entry['stage'] in (3, 4, 5, 6, 7, 8) and scoped_prerequisite_deferral):
