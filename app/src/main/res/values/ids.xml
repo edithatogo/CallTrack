@@ -32,4 +32,7 @@
     <item name="recovery_feedback" type="id" />
     <item name="recovery_rows" type="id" />
     <item name="recovery_empty" type="id" />
+    <item name="recovery_cards" type="id" />
+    <item name="recovery_navigation" type="id" />
+    <item name="recovery_retention" type="id" />
 </resources>

@@ -49,3 +49,20 @@ run installed the packages and passed the component plus settings host tests.
 TalkBack/Switch Access, font/RTL, permission revocation, process restoration,
 manual logging/import/recovery migrations and broader provider regression checks
 remain unaccepted.
+
+## Recovery cards/action migration — 2026-10-24
+
+`ReceiptRecoveryActivity` now projects up to ten recovery records into immutable
+Compose card state and a separate previous/more navigation state. The activity
+retains the data/provider read, permission and consent dialogs, effect checking,
+suppression, reapproval, retention and event-launch behavior. Compatibility IDs
+remain on the refresh ComposeView, feedback ComposeView, rows container and
+native empty-state TextView; the new card and navigation ComposeViews have
+dedicated IDs.
+
+The recovery component and fixture-backed API36 recovery journeys passed with a
+synthetic token-scoped LOCAL calendar. A separate existing historical-import
+control selector failed in a broader selected UI test: `RenderedUi` could not
+find `import_create`. Investigate that accessibility/selector path before
+claiming historical-import or whole-track parity. Track14's wider screen-reader,
+font, RTL, recreation and Android-version matrix remains open.

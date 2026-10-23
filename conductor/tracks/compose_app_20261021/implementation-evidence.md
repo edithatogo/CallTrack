@@ -152,3 +152,38 @@ exist. After implementation and ktfmt 0.59 formatting, the selected JDK17.0.21+9
 15 executed, 76 up-to-date). Rendered feedback and synthetic recovery workflows
 remain unexecuted because the API36 emulator profile stays offline. See the
 [slice review](review-20261024-recovery-status.md).
+
+## Recovery cards and actions — 2026-10-24
+
+Recovery cards/details and the check, suppress, reapproval, open-event, refresh,
+retention and pagination controls now render in lifecycle-disposed ComposeViews.
+`ReceiptRecoveryActivity` still owns formatted database/provider reads,
+permission requests, native confirmation dialogs, all receipt/calendar effects
+and operation sequencing. The existing `recovery_refresh`, `recovery_feedback`,
+`recovery_rows` and `recovery_empty` view IDs remain; new card, retention and
+navigation hosts are identified by stable IDs. Compose state contains only
+formatted display details, action eligibility and opaque per-render tokens; the
+Activity holds the receipt/calendar mapping and ignores stale tokens. No
+dependency, persistence or receipt identity changed.
+
+The new `RecoveryCardsPanelTest` verifies card state, busy/ineligible controls,
+the read-only event-open availability during background work, and that card,
+management and pagination callbacks only fire on explicit taps. All four panel
+tests passed in the final focused API36 emulator run. The provider-backed
+`RecoveryUiTest` methods passed with one bounded synthetic LOCAL calendar token:
+fixture preparation, queued-approval withdrawal on leave/return, permission
+cancel then explicit reapproval, read-only existing-effect check, edit/deletion
+and suppression, retention, and exact fixture cleanup. No physical phone, phone
+call, user calendar or remote account was used. The initial unscoped Gradle run
+without `fixtureToken` failed as expected by the provider test guard; the
+qualified methods were rerun individually with the required synthetic token.
+
+JDK17.0.21+9 compiled production and instrumentation Kotlin against SDK36.
+Formatting used the checksum-verified pinned ktfmt0.59 artifact. The wider
+`AutomaticSettingsTest` run passed its automatic-settings and recovery-open
+checks but exposed a separate existing `HistoricalImportActivity` selector
+failure (`import_create` was not found by the rendered accessibility helper).
+That import-control migration/test issue remains open and is not attributed to
+the recovery-card changes. Font/RTL, TalkBack/Switch Access, recreation/process
+restore, destination disappearance, minimum/intermediate OS matrix and full
+Track14 acceptance remain pending. See the [recovery cards review](review-20261024-recovery-cards.md).
