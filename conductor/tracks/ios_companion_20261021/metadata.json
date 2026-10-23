@@ -22,5 +22,9 @@
   "implementation_status": "scoped-readiness-research-only; iOS-product-implementation-blocked-pending-stages1-8",
   "readiness_document": "readiness.md",
   "decision_document": "decisions.md",
+  "implementation_commit": "b89d14d",
+  "reviewed_at": "2026-10-24",
+  "review_document": "review-20261024.md",
+  "review_status": "readiness-slice-reviewed-implementation-gated",
   "production_adopted": false
 }
