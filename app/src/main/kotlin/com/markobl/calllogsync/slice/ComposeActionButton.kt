@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.TextStyle
@@ -31,6 +32,7 @@ internal fun ComposeActionButton(
     tag: String,
     enabled: Boolean,
     onClick: () -> Unit,
+    accessibilityLabel: String? = null,
 ) {
     val dark = isSystemInDarkTheme()
     val background =
@@ -47,7 +49,10 @@ internal fun ComposeActionButton(
                 .heightIn(min = 48.dp)
                 .clip(RoundedCornerShape(4.dp))
                 .background(background)
-                .semantics { testTagsAsResourceId = true }
+                .semantics {
+                    testTagsAsResourceId = true
+                    accessibilityLabel?.let { contentDescription = it }
+                }
                 .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
                 .testTag(tag)
                 .padding(horizontal = 16.dp, vertical = 12.dp),

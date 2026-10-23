@@ -28,6 +28,8 @@ class HistoricalImportActivityComposeTest {
         compose.onNodeWithTag("import_continue").assertIsNotEnabled()
         compose.onNodeWithText(compose.activity.getString(R.string.import_none)).assertIsDisplayed()
         assertTrue(compose.activity.findViewById<ComposeView>(R.id.import_filters) != null)
+        assertTrue(compose.activity.findViewById<ComposeView>(R.id.import_calendar_picker) != null)
+        compose.onNodeWithTag("import_calendar_picker").assertIsNotEnabled()
         compose.onNodeWithTag("import_incoming").assertIsOn()
         compose.onNodeWithTag("import_outgoing").assertIsOn()
         compose.onNodeWithTag("import_missed").assertIsOn()

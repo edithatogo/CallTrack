@@ -23,6 +23,7 @@
 - [x] Task: Migrate receipt recovery feedback to a lifecycle-disposed ComposeView using the existing Compose Foundation stack. Keep calendar reads, existing-effect reconciliation, suppression, reapproval confirmation and retention work under the Activity; preserve `recovery_feedback`.
 - [x] Task: Migrate bounded recovery cards, explicit check/suppress/reapprove/open-event controls, refresh/retention actions and previous/more pagination to lifecycle-disposed ComposeViews; preserve Activity-owned effects and compatibility view IDs (see [recovery cards review](review-20261024-recovery-cards.md)).
 - [x] Task: Migrate historical import history title, bounded session rows and empty state into a lifecycle-disposed ComposeView; keep query, cursors and session identity in the Activity, preserve `import_history`, and verify explicit opening on API36 (66a73b1).
+- [x] Task: Migrate the historical-import destination picker to a lifecycle-disposed ComposeView with Activity-owned provider choices, opaque per-load tokens and saved calendar-ID semantics; keep `import_calendar_picker` stable and do not add Material dependencies.
 - [ ] Task: Migrate historical import and recovery screen by screen; preserve IDs, destination binding, operation ownership and saved-state semantics.
 - [ ] Task: Qualify real permission/revocation, destination disappearance, cancellation/recreation/process restore, font/RTL, TalkBack/Switch Access and no synchronization regression; remove replaced Views only after parity.
 - [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md).
@@ -41,5 +42,6 @@
 - [x] Task: Migrate the recovery empty-state message into a lifecycle-disposed ComposeView, preserving `recovery_empty` and Activity-owned query state; qualify its visibility transition and no-side-effect behavior (see [review](review-20261024-recovery-empty.md)).
 - [x] Task: Review and fix the historical import history Compose slice; qualify empty and populated panels plus explicit rendered session opening on the API36 emulator (66a73b1; see [review](review-20261024-import-history.md)).
 - [ ] Task: Perform Conductor review, apply fixes and rerun affected checks.
+- [x] Task: Review the historical-import destination selector slice; verify host/permission-denied rendering, explicit opaque-token selection, and no import side effects; record provider-backed selection and restored-calendar acceptance as pending in [review](review-20261024-import-destination.md).
 - [ ] Task: Update requirements, decisions, remaining limitations and next-track inputs; retire superseded code/prototypes only after parity.
 - [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger.

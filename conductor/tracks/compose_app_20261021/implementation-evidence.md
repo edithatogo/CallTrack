@@ -289,3 +289,32 @@ opening the historical import screen. `HistoricalImportActionsPanelTest` also
 passed on the API36 AVD. The fixture-backed delivery journey remains pending;
 its setup and UI phases were attempted in separate Gradle invocations, which
 did not preserve the emulator app's Calendar permission. See the [review](review-20261024-accessibility-selector.md).
+
+## Historical import destination selector — 2026-10-24
+
+The historical-import native Spinner is now a lifecycle-disposed ComposeView
+retaining `import_calendar_picker`. The Activity continues querying writable
+calendars, checking permissions, saving/restoring the selected calendar ID,
+and handling all previews and imports. Compose sees labels and fresh opaque
+tokens only; the Activity maps current tokens back to IDs and ignores stale
+callbacks. The component uses the existing Compose UI/Foundation stack without
+adding dependencies. Its selected value is exposed as the button's accessible
+label; when no choices are available, the control is disabled and shows the
+localized unavailable message.
+
+On API36 `calltrack-track14-api36`, `HistoricalImportDestinationPanelTest`
+passed both enabled selection and unavailable-state checks. Its explicit tap
+returned only the current opaque token, and the selected label was exposed in
+the accessibility tree. `HistoricalImportActivityComposeTest` verified the
+stable Compose host and disabled no-permission state. The combined focused
+`HistoricalImportDestinationPanelTest`, `HistoricalImportHistoryPanelTest`
+and `HistoricalImportActivityComposeTest` run passed five instrumentation
+tests; after the accessibility-label adjustment, the destination component's
+two tests passed again. JVM tests, lint and Android-test Kotlin/Java compilation
+passed. Pinned ktfmt0.59 and `git diff --check` passed.
+
+Provider-backed calendar selection, saving/restoring an actual selected
+calendar, permission revocation, destination disappearance, TalkBack/Switch
+Access and broader lifecycle/OS acceptance remain pending. No import was
+previewed or delivered in these selector tests. See the
+[destination selector review](review-20261024-import-destination.md).
