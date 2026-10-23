@@ -1,39 +1,36 @@
-# Desktop companion UI experiment
+# Shared UI prototype
 
-Standalone Compose Multiplatform desktop JVM trial. It is absent from the Android
-root Gradle settings and contains sample constants only. The screen lets you select
-a sample calendar, preview two synthetic entries and clear the selection. Nothing
-is imported, persisted or sent. It never opens a file, calendar, contacts or call
-provider. There is no shared production core or iOS build.
+This standalone Compose Multiplatform prototype puts an immutable sample screen
+state, explicit actions, pure reducer, and rendering in `src/commonMain`. A
+desktop JVM host remains in `src/desktopMain`. The shared screen only displays
+synthetic sample data. It performs no file, calendar, provider, permission,
+network, persistence, or receipt operation.
 
-From the repository root with JDK17:
+The desktop tests cover the reducer plus offscreen rendered interactions. They
+do not qualify Android rendering, native macOS/AppKit behavior, keyboard/focus,
+screen readers, large-text/RTL, application packaging, upgrade, or recovery.
+There is no Android SDK or native macOS target configured in this slice. Desktop
+JVM on macOS is not a native macOS companion. Production adoption remains false.
 
-```sh
-JAVA_HOME=/path/to/jdk17 bash ./gradlew -p prototypes/multiplatform-ui test jar --console=plain
-```
-
-`test` uses the offscreen desktop renderer (headless Java) and asserts rendered
-semantics/actions. This is not a window, screen-reader or visual layout check.
-The regular JAR is not a standalone installer; dependencies/native libraries are
-needed. Tests resolve the host-specific rendering dependency, not every platform.
-
-For optional manual exploration from the same root:
+From the repository root, use the qualified JDK17 installation and isolated
+Gradle state:
 
 ```sh
-JAVA_HOME=/path/to/jdk17 bash ./gradlew -p prototypes/multiplatform-ui run
+JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home \
+GRADLE_USER_HOME="$PWD/.local/gradle-track17" \
+bash ./gradlew --no-daemon --console=plain -p prototypes/multiplatform-ui desktopTest
 ```
 
-No manual run, packaging, signing, installation or accessibility acceptance follows
-from the automated test receipt. The window can be closed normally. No application
-data survives closing it; retained preview state is deliberately ephemeral.
+The current prototype pins Kotlin Multiplatform/Compose compiler2.4.21 and
+Compose Multiplatform1.12.2. Root Android build pins and production source remain
+unchanged. The root Gradle wrapper is8.13; Kotlin currently builds this prototype
+with a warning that future Kotlin2.5 requires at least8.14.4. No suppressions or
+root wrapper changes were made. Requalify a newer wrapper before promoting this
+prototype. The resolved runtime graph and dated dependency decision are captured
+in the Track17 findings; do a full licence/notice audit before distribution.
 
-Pinned trial: Kotlin/JVM and Compose compiler2.3.21, Compose plugin/Material2 1.10.3,
-JDK17, existing Gradle8.13 wrapper, JUnit4.13.2. Newer framework releases are research
-inputs in the [track](../../conductor/archive/multiplatform_ui_20261020/index.md),
-not automatically selected. Use the project's ktfmt0.59 Kotlin style check.
-The root app and prototype have separate dependency graphs.
-
-Review at second-platform feasibility/shared-core reopening. If no companion is
-selected, remove this directory (including its ignored build output) without
-changing the Android app or clearing global caches. Promotion requires the track's
-native/controller, licence, packaging, upgrade and manual accessibility gates.
+The prototype refresh and boundaries are recorded in
+`conductor/tracks/shared_ui_20261021/`. Android integration requires the SDK,
+qualified app host and a separate compatibility graph. Native macOS qualification
+requires a selected Track16 workflow and full Xcode. Do not infer either outcome
+from desktop tests.

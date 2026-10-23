@@ -155,7 +155,33 @@ class VerificationFailures(unittest.TestCase):
         shared_ui = self.root / 'conductor/tracks/shared_ui_20261021/metadata.json'
         data = json.loads(shared_ui.read_text())
         data['status'] = 'in_progress'
+        data.pop('prerequisite_deferral_document', None)
         shared_ui.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
+            self.run_verifier()
+
+        data = json.loads(path.read_text())
+        data['status'] = 'completed'
+        path.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'cannot complete the track'):
+            self.run_verifier()
+
+    def test_scoped_track17_deferral_allows_only_bounded_stage6_work(self):
+        shared_ui = self.root / 'conductor/tracks/shared_ui_20261021'
+        path = shared_ui / 'metadata.json'
+        data = json.loads(path.read_text())
+        data['status'] = 'in_progress'
+        data['prerequisite_deferral_document'] = 'prerequisite-deferral.md'
+        path.write_text(json.dumps(data))
+        (shared_ui / 'prerequisite-deferral.md').write_text(
+            'Synthetic bounded stage6 work; no earlier stage is resolved.'
+        )
+        self.run_verifier()
+
+        rust = self.root / 'conductor/tracks/rust_component_20261021/metadata.json'
+        data = json.loads(rust.read_text())
+        data['status'] = 'in_progress'
+        rust.write_text(json.dumps(data))
         with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
             self.run_verifier()
 
