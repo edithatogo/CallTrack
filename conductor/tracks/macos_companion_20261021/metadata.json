@@ -15,5 +15,10 @@
   "prerequisite_deferral_document": "prerequisite-deferral.md",
   "implementation_status": "preview-parser-prototype-native-acceptance-pending",
   "native_eventkit_accepted": false,
-  "macos_app_packaging_accepted": false
+  "macos_app_packaging_accepted": false,
+  "pull_request": "https://github.com/edithatogo/CallTrack/pull/20",
+  "pull_request_state": "open-draft-hosted-checks-blocked-before-runner",
+  "implementation_commit": "64935d1",
+  "review_commit": "64935d1",
+  "review_status": "preview-parser-slice-reviewed-native-acceptance-pending"
 }
