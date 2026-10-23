@@ -179,6 +179,7 @@ class VerificationFailures(unittest.TestCase):
         rust = self.root / 'conductor/tracks/rust_component_20261021/metadata.json'
         rust_data = json.loads(rust.read_text())
         rust_data['status'] = 'new'
+        rust_data['implementation_status'] = 'pending'
         rust_data.pop('prerequisite_deferral_document', None)
         rust.write_text(json.dumps(rust_data))
         self.run_verifier()

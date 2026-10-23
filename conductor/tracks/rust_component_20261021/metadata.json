@@ -1,7 +1,7 @@
 {
   "track_id": "rust_component_20261021",
   "type": "research-led-development",
-  "status": "in_progress",
+  "status": "completed",
   "milestone": "M8-component",
   "created_at": "2026-10-21",
   "updated_at": "2026-10-24",
@@ -11,9 +11,16 @@
   "requirements": "R26",
   "track_number": 18,
   "execution_stage": 7,
-  "implementation_status": "decision-recorded-review-pending",
+  "implementation_status": "deferred",
   "production_adopted": false,
-  "prerequisite_deferral_document": "prerequisite-deferral.md",
   "decision_document": "decisions.md",
-  "deferral_document": "deferral.md"
+  "deferral_document": "deferral.md",
+  "reviewed_at": "2026-10-24",
+  "review_document": "review-20261024.md",
+  "implementation_commit": "229adb8",
+  "deferral": {
+    "reason": "No accepted portable import format, Android exporter, measured bottleneck or demonstrated Rust production consumer exists; the only parser candidate is a synthetic preview prototype.",
+    "consequences": "No Rust code or dependency is adopted; Kotlin/native ownership and existing identities remain unchanged.",
+    "reconsideration_trigger": "Reopen after a qualified cross-platform app workflow selects a portable format with a real Android and Apple consumer."
+  }
 }

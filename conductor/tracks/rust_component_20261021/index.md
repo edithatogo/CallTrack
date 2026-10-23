@@ -9,6 +9,7 @@
 - [Deferral](deferral.md)
 - [Scoped prerequisite deferral](prerequisite-deferral.md)
 - [Verification](verification-20261024.md)
+- [Review](review-20261024.md)
 - [Execution sequence](../../future-architecture.md)
 
 The refreshed decision is Kotlin/native retention with production Rust deferred
