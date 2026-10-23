@@ -107,3 +107,23 @@ of its installation action. Hosted dispatch remains unavailable for this separat
 CallTrack history until its contribution target is selected. The original-upstream
 checksum PR is [assessed separately](../../../qualification/upstream-contribution-assessment-20261023.md)
 and does not establish Python CI acceptance for this repository.
+
+## Final code qualification
+
+Code commit442e680b403ac5038ef118303f5c44eea1402a8c passed152 tests, actual runtime
+readback/guard and Conductor174 documents/21 tracks/25 scenarios on both macOS
+and the isolated Linux container. Both used explicit repo-local Python3.15.1.
+Linux HEAD and tree13dc4faa55d2d6d0c24ec5dc8d36845628fcb515 matched the local
+integrated commit exactly. The container had no network during tests, no mounts,
+no published ports and no privileged mode; after terminal success it was stopped
+and read back as exited. Original release containers and devices were untouched.
+Private `final-mac.json`, `final-linux-receipt.json`, logs and final container-state
+readback remain under `.local/dependency-refresh-20261023/linux-python315/`.
+
+The user's request for actual PRs exposed the previously unpublished successor
+history. The original-upstream fork and checksum PR now exist, but they do not
+supply a hosted target for the separate calendar application/Python tooling. A
+successor-target question is pending after explaining the product difference.
+No further hosted Python acceptance or successor PR publication can be performed
+without that selection. Track remains in_progress; the durable goal is blocked
+on that repeatedly verified external prerequisite, rather than marked complete.
