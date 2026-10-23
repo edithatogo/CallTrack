@@ -9,5 +9,11 @@
   "goal_status": "active",
   "prior_implementation_commit": "96d0c72",
   "hosted_ci_qualified": false,
-  "native_changes_authorised": false
+  "native_changes_authorised": false,
+  "implementation_commit": "256eff0e9df11d2269c705797832d10fd969b99f",
+  "local_qualification_passed": true,
+  "local_tests": 151,
+  "post_integration_implementation_qualified": true,
+  "remaining_gate": "actual hosted/container Python3.15.1 execution; no configured remote or authorised hosted dispatch",
+  "review": "review.md"
 }

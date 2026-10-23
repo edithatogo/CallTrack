@@ -60,3 +60,20 @@ Private receipts: `track21-import-audit.json`, `runtime-guard-red.log`,
 `track21-preintegration-tests.log`, `python-runtime.json` in
 `.local/dependency-refresh-20261023/`. Current-main post-integration proof will be
 recorded separately with the actual commit after integration.
+
+## Integrated implementation proof
+
+Integrated commit256eff0e9df11d2269c705797832d10fd969b99f on main passed the real
+runtime guard,151 helper tests and Conductor174 documents/21 tracks/25 scenarios.
+The receipt proves unchanged HEAD, clean tracked worktree, no remote configured
+and unchanged native app/Gradle inputs since96d0c72. Private exact-command logs
+and `track21-current-head.json` retain timestamps and actual interpreter readback.
+A documentation-only checkpoint records this result; the final current-HEAD
+receipt is refreshed after that checkpoint without editing historical receipts.
+
+Remaining gate: actual hosted/container execution of the configured Python3.15.1
+jobs has not occurred. No Git remote/PR/hosted dispatch is configured or authorised.
+The durable goal remains active and this track remains in_progress. Do not create
+an external repository or mutate the retained Linux host/container/native bindings
+to manufacture that proof. Android's138-artifact trust qualification is a separate
+Track5 dependency concern, not a Python test failure.
