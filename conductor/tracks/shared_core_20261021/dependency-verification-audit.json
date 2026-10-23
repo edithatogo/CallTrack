@@ -1,0 +1,181 @@
+{
+  "track": "Track 15 KMP compiler and shared-test dependency audit",
+  "date": "2026-10-24",
+  "scope": "Only new artifacts introduced by the KMP shared module and common tests; original Gradle verification entries are preserved.",
+  "artifact_count": 12,
+  "all_new_artifacts_match_canonical_https_bytes": true,
+  "metadata_generation_alone_is_not_trust_approval": true,
+  "release_ready": false,
+  "license_evidence": "Fresh Maven Central POM reads declare Apache-2.0 for kotlin-test, kotlin-test-junit, kotlin-scripting-common, kotlin-scripting-compiler-embeddable, kotlin-scripting-compiler-impl-embeddable, and kotlin-scripting-jvm.",
+  "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/",
+  "artifacts": [
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-scripting-common:2.3.21",
+      "name": "kotlin-scripting-common-2.3.21.jar",
+      "sha256": [
+        "69885751bdce7d4e1d1b9758baf4bc0fe03b24827abd7b7687e5a7c0b4d029ed"
+      ],
+      "matches": true,
+      "downloads": [
+        {
+          "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-scripting-common/2.3.21/kotlin-scripting-common-2.3.21.jar",
+          "sha256": "69885751bdce7d4e1d1b9758baf4bc0fe03b24827abd7b7687e5a7c0b4d029ed"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-scripting-common:2.3.21",
+      "name": "kotlin-scripting-common-2.3.21.pom",
+      "sha256": [
+        "becd6a484160fe137f06d76d35f95b6776fa09ae6f751e5394e69359aee2f5f6"
+      ],
+      "matches": true,
+      "downloads": [
+        {
+          "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-scripting-common/2.3.21/kotlin-scripting-common-2.3.21.pom",
+          "sha256": "becd6a484160fe137f06d76d35f95b6776fa09ae6f751e5394e69359aee2f5f6"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:2.3.21",
+      "name": "kotlin-scripting-compiler-embeddable-2.3.21.jar",
+      "sha256": [
+        "a04ff06efb4a5ae07a928da94f9b5d061230c96d7febdaeb8bc7438e1aa31811"
+      ],
+      "matches": true,
+      "downloads": [
+        {
+          "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-scripting-compiler-embeddable/2.3.21/kotlin-scripting-compiler-embeddable-2.3.21.jar",
+          "sha256": "a04ff06efb4a5ae07a928da94f9b5d061230c96d7febdaeb8bc7438e1aa31811"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:2.3.21",
+      "name": "kotlin-scripting-compiler-embeddable-2.3.21.pom",
+      "sha256": [
+        "f1a4f2161d9f3d42c9ac4ecb9b9cee2a199036813509d5b5a4ff39a11cbb9fe3"
+      ],
+      "matches": true,
+      "downloads": [
+        {
+          "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-scripting-compiler-embeddable/2.3.21/kotlin-scripting-compiler-embeddable-2.3.21.pom",
+          "sha256": "f1a4f2161d9f3d42c9ac4ecb9b9cee2a199036813509d5b5a4ff39a11cbb9fe3"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:2.3.21",
+      "name": "kotlin-scripting-compiler-impl-embeddable-2.3.21.jar",
+      "sha256": [
+        "89e78a3326e1205a9420a19441a4f382f7a72241d52c96425e89e5b130387286"
+      ],
+      "matches": true,
+      "downloads": [
+        {
+          "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-scripting-compiler-impl-embeddable/2.3.21/kotlin-scripting-compiler-impl-embeddable-2.3.21.jar",
+          "sha256": "89e78a3326e1205a9420a19441a4f382f7a72241d52c96425e89e5b130387286"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:2.3.21",
+      "name": "kotlin-scripting-compiler-impl-embeddable-2.3.21.pom",
+      "sha256": [
+        "2f7c24ad5e82e2db5db5da8dc070ee6fc0f56c20e990639a54ca69076bce3e6d"
+      ],
+      "matches": true,
+      "downloads": [
+        {
+          "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-scripting-compiler-impl-embeddable/2.3.21/kotlin-scripting-compiler-impl-embeddable-2.3.21.pom",
+          "sha256": "2f7c24ad5e82e2db5db5da8dc070ee6fc0f56c20e990639a54ca69076bce3e6d"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-scripting-jvm:2.3.21",
+      "name": "kotlin-scripting-jvm-2.3.21.jar",
+      "sha256": [
+        "8cb637132fc7fa511c700ee7f2b63b282630167f5ebd699a263a0b67b5d486ab"
+      ],
+      "matches": true,
+      "downloads": [
+        {
+          "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-scripting-jvm/2.3.21/kotlin-scripting-jvm-2.3.21.jar",
+          "sha256": "8cb637132fc7fa511c700ee7f2b63b282630167f5ebd699a263a0b67b5d486ab"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-scripting-jvm:2.3.21",
+      "name": "kotlin-scripting-jvm-2.3.21.pom",
+      "sha256": [
+        "580b2c9857f3a662c53a3deb4851d7a1afa3bd5f4abbe9905f5b55fb5221f816"
+      ],
+      "matches": true,
+      "downloads": [
+        {
+          "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-scripting-jvm/2.3.21/kotlin-scripting-jvm-2.3.21.pom",
+          "sha256": "580b2c9857f3a662c53a3deb4851d7a1afa3bd5f4abbe9905f5b55fb5221f816"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-test-junit:2.3.21",
+      "name": "kotlin-test-junit-2.3.21.jar",
+      "sha256": [
+        "554739f282eaca114882ad7effcd8523de2651eb6d65189624425110992ca4ce"
+      ],
+      "matches": true,
+      "downloads": [
+        {
+          "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-test-junit/2.3.21/kotlin-test-junit-2.3.21.jar",
+          "sha256": "554739f282eaca114882ad7effcd8523de2651eb6d65189624425110992ca4ce"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-test-junit:2.3.21",
+      "name": "kotlin-test-junit-2.3.21.module",
+      "sha256": [
+        "7639fb8e0b9fc8bb8c219ffd2a9fc983c8e2653b30e4d2fa375cdbaac0036bfe"
+      ],
+      "matches": true,
+      "downloads": [
+        {
+          "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-test-junit/2.3.21/kotlin-test-junit-2.3.21.module",
+          "sha256": "7639fb8e0b9fc8bb8c219ffd2a9fc983c8e2653b30e4d2fa375cdbaac0036bfe"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-test:2.3.21",
+      "name": "kotlin-test-2.3.21.jar",
+      "sha256": [
+        "038f7d2c7df1039450809c486068f301a29c6e90356c9a4b595e34f4f4a813e7"
+      ],
+      "matches": true,
+      "downloads": [
+        {
+          "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-test/2.3.21/kotlin-test-2.3.21.jar",
+          "sha256": "038f7d2c7df1039450809c486068f301a29c6e90356c9a4b595e34f4f4a813e7"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-test:2.3.21",
+      "name": "kotlin-test-2.3.21.module",
+      "sha256": [
+        "d76413ad2af842264fca36c6780a8cc66500667d990366f254f75a87842a89bc"
+      ],
+      "matches": true,
+      "downloads": [
+        {
+          "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-test/2.3.21/kotlin-test-2.3.21.module",
+          "sha256": "d76413ad2af842264fca36c6780a8cc66500667d990366f254f75a87842a89bc"
+        }
+      ]
+    }
+  ]
+}

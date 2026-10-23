@@ -3933,5 +3933,53 @@
         <sha256 value="dafb8649763d29c29cda27bc22fcdab9a9efc53c0fff9ae3de90882eabaa8944" origin="Canonical HTTPS repository byte comparison 2026-10-23; Track14 ComponentActivity runtime expansion" />
       </artifact>
     </component>
+    <component group="org.jetbrains.kotlin" name="kotlin-scripting-common" version="2.3.21">
+      <artifact name="kotlin-scripting-common-2.3.21.jar">
+        <sha256 value="69885751bdce7d4e1d1b9758baf4bc0fe03b24827abd7b7687e5a7c0b4d029ed" origin="Canonical HTTPS repository byte comparison 2026-10-24; KMP compiler classpath" />
+      </artifact>
+      <artifact name="kotlin-scripting-common-2.3.21.pom">
+        <sha256 value="becd6a484160fe137f06d76d35f95b6776fa09ae6f751e5394e69359aee2f5f6" origin="Canonical HTTPS repository byte comparison 2026-10-24; KMP compiler classpath" />
+      </artifact>
+    </component>
+    <component group="org.jetbrains.kotlin" name="kotlin-scripting-compiler-embeddable" version="2.3.21">
+      <artifact name="kotlin-scripting-compiler-embeddable-2.3.21.jar">
+        <sha256 value="a04ff06efb4a5ae07a928da94f9b5d061230c96d7febdaeb8bc7438e1aa31811" origin="Canonical HTTPS repository byte comparison 2026-10-24; KMP compiler classpath" />
+      </artifact>
+      <artifact name="kotlin-scripting-compiler-embeddable-2.3.21.pom">
+        <sha256 value="f1a4f2161d9f3d42c9ac4ecb9b9cee2a199036813509d5b5a4ff39a11cbb9fe3" origin="Canonical HTTPS repository byte comparison 2026-10-24; KMP compiler classpath" />
+      </artifact>
+    </component>
+    <component group="org.jetbrains.kotlin" name="kotlin-scripting-compiler-impl-embeddable" version="2.3.21">
+      <artifact name="kotlin-scripting-compiler-impl-embeddable-2.3.21.jar">
+        <sha256 value="89e78a3326e1205a9420a19441a4f382f7a72241d52c96425e89e5b130387286" origin="Canonical HTTPS repository byte comparison 2026-10-24; KMP compiler classpath" />
+      </artifact>
+      <artifact name="kotlin-scripting-compiler-impl-embeddable-2.3.21.pom">
+        <sha256 value="2f7c24ad5e82e2db5db5da8dc070ee6fc0f56c20e990639a54ca69076bce3e6d" origin="Canonical HTTPS repository byte comparison 2026-10-24; KMP compiler classpath" />
+      </artifact>
+    </component>
+    <component group="org.jetbrains.kotlin" name="kotlin-scripting-jvm" version="2.3.21">
+      <artifact name="kotlin-scripting-jvm-2.3.21.jar">
+        <sha256 value="8cb637132fc7fa511c700ee7f2b63b282630167f5ebd699a263a0b67b5d486ab" origin="Canonical HTTPS repository byte comparison 2026-10-24; KMP compiler classpath" />
+      </artifact>
+      <artifact name="kotlin-scripting-jvm-2.3.21.pom">
+        <sha256 value="580b2c9857f3a662c53a3deb4851d7a1afa3bd5f4abbe9905f5b55fb5221f816" origin="Canonical HTTPS repository byte comparison 2026-10-24; KMP compiler classpath" />
+      </artifact>
+    </component>
+    <component group="org.jetbrains.kotlin" name="kotlin-test" version="2.3.21">
+      <artifact name="kotlin-test-2.3.21.jar">
+        <sha256 value="038f7d2c7df1039450809c486068f301a29c6e90356c9a4b595e34f4f4a813e7" origin="Canonical HTTPS repository byte comparison 2026-10-24; KMP tests" />
+      </artifact>
+      <artifact name="kotlin-test-2.3.21.module">
+        <sha256 value="d76413ad2af842264fca36c6780a8cc66500667d990366f254f75a87842a89bc" origin="Canonical HTTPS repository byte comparison 2026-10-24; KMP tests" />
+      </artifact>
+    </component>
+    <component group="org.jetbrains.kotlin" name="kotlin-test-junit" version="2.3.21">
+      <artifact name="kotlin-test-junit-2.3.21.jar">
+        <sha256 value="554739f282eaca114882ad7effcd8523de2651eb6d65189624425110992ca4ce" origin="Canonical HTTPS repository byte comparison 2026-10-24; KMP tests" />
+      </artifact>
+      <artifact name="kotlin-test-junit-2.3.21.module">
+        <sha256 value="7639fb8e0b9fc8bb8c219ffd2a9fc983c8e2653b30e4d2fa375cdbaac0036bfe" origin="Canonical HTTPS repository byte comparison 2026-10-24; KMP tests" />
+      </artifact>
+    </component>
   </components>
 </verification-metadata>

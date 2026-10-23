@@ -1,0 +1,30 @@
+apply plugin: 'org.jetbrains.kotlin.multiplatform'
+apply plugin: 'com.android.library'
+
+android {
+    namespace 'org.calltrack.core'
+    compileSdk 36
+    defaultConfig {
+        minSdk 26
+    }
+}
+
+kotlin {
+    androidTarget {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
+        }
+    }
+    jvm {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
+        }
+    }
+    macosArm64()
+
+    sourceSets {
+        commonTest.dependencies {
+            implementation kotlin('test')
+        }
+    }
+}
