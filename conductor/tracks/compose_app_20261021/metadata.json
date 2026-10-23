@@ -1,7 +1,7 @@
 {
   "track_id": "compose_app_20261021",
   "type": "research-led-development",
-  "status": "new",
+  "status": "in_progress",
   "milestone": "M6",
   "created_at": "2026-10-21",
   "updated_at": "2026-10-21",
@@ -12,6 +12,6 @@
   "requirements": "R15, R26",
   "track_number": 14,
   "execution_stage": 3,
-  "implementation_status": "pending",
+  "implementation_status": "in_progress-under-scoped-prerequisite-deferral",
   "production_adopted": false
 }
