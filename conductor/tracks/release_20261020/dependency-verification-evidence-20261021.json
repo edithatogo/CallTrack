@@ -1,14 +1,14 @@
 {
   "scope": "Independently check generated Gradle trust entries against canonical repository evidence.\n\nGeneration alone is not approval. Every checksum must match fresh repository bytes\nor an already completed source-bound canonical binary audit.\n",
-  "metadata_sha256": "ae3bf77c222e937c7a5d3b76b2e569cdcbc0e8b02e1a72878361370e62a1e4f0",
+  "metadata_sha256": "cbe6c94989323c7d3b5f96f1a684fdb805c3de9761fe1fbf189713d34bde345d",
   "canonical_audit_sha256": "9ecb54fdd7d0ddb8d1d8e2bf197b820245c7e2d3a7005d12c1dc94064e9488e9",
-  "entries": 736,
+  "entries": 739,
   "all_entries_verified": true,
   "independent_signatures": false,
   "release_ready": false,
-  "receipt_sha256": "d5c21aa9596d2057fe3ca244979ab54d3d1589d517024085e773b9422516a5cd",
+  "receipt_sha256": "a45ae81832177243f8efd5fd9bb1d35d2fe7aeeb4fc6ecf6853b4e15a2ae1b8a",
   "binary_entries_reusing_canonical_evidence": 242,
-  "fresh_download_entries": 494,
+  "fresh_download_entries": 497,
   "enforced_policy": "gradle/verification-metadata.xml",
   "faults": {
     "scope": "Real strict Gradle rejection of altered/missing AGP JAR trust entries in an isolated checkout; no cached binary modified",
@@ -48,7 +48,54 @@
       "matches": true
     }
   ],
-  "reviewed_audit_receipt_sha256": "d5c21aa9596d2057fe3ca244979ab54d3d1589d517024085e773b9422516a5cd",
+  "reviewed_audit_receipt_sha256": "a45ae81832177243f8efd5fd9bb1d35d2fe7aeeb4fc6ecf6853b4e15a2ae1b8a",
   "reviewed_auditor_sha256": "2c7ff8a4d48331ee85f0e49bf9f82946eddf0dadc1f19643150f35f03b1afe23",
-  "reviewed_https_reader_sha256": "7db02929ba2f90e1a0da183150713499d1bf7768e960e4e8d53dbf1d8269c3a8"
+  "reviewed_https_reader_sha256": "7db02929ba2f90e1a0da183150713499d1bf7768e960e4e8d53dbf1d8269c3a8",
+  "prior_verified_policy": {
+    "metadata_sha256": "ae3bf77c222e937c7a5d3b76b2e569cdcbc0e8b02e1a72878361370e62a1e4f0",
+    "receipt_sha256": "d5c21aa9596d2057fe3ca244979ab54d3d1589d517024085e773b9422516a5cd",
+    "entries": 736
+  },
+  "policy_refresh_20261024": {
+    "reason": "Hosted clean checkout resolved three additional transitive Gradle repository metadata files not present in the previous locally generated graph.",
+    "prior_metadata_sha256": "ae3bf77c222e937c7a5d3b76b2e569cdcbc0e8b02e1a72878361370e62a1e4f0",
+    "metadata_sha256": "cbe6c94989323c7d3b5f96f1a684fdb805c3de9761fe1fbf189713d34bde345d",
+    "entries": 739,
+    "all_entries_verified": true,
+    "audit_receipt_sha256": "a45ae81832177243f8efd5fd9bb1d35d2fe7aeeb4fc6ecf6853b4e15a2ae1b8a",
+    "new_entries": [
+      {
+        "coordinate": "com.google.guava:guava-parent:33.3.1-jre",
+        "artifact": "guava-parent-33.3.1-jre.pom",
+        "sha256": "55441db27e8869dfefe053059bdf478bdc7e95585642bf391f0023345fd56287",
+        "repositories": [
+          "repo.maven.apache.org",
+          "repo1.maven.org"
+        ],
+        "byte_identical": true
+      },
+      {
+        "coordinate": "org.junit:junit-bom:5.10.2",
+        "artifact": "junit-bom-5.10.2.module",
+        "sha256": "de23b114b3e4119a8fe6eb17bed5a3852816698bace67071579d6d927ebb080a",
+        "repositories": [
+          "repo.maven.apache.org",
+          "repo1.maven.org"
+        ],
+        "byte_identical": true
+      },
+      {
+        "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.0",
+        "artifact": "kotlinx-coroutines-bom-1.8.0.pom",
+        "sha256": "1239e9dbe1397cd5971342956b2511bc3ace7b641842e4372a088dcfa8b9ad55",
+        "repositories": [
+          "repo.maven.apache.org",
+          "repo1.maven.org"
+        ],
+        "byte_identical": true
+      }
+    ],
+    "independent_signatures": false,
+    "release_ready": false
+  }
 }
