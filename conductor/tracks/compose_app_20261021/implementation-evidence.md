@@ -378,3 +378,25 @@ acceptance. See the [recovery copy review](review-20261024-recovery-copy.md).
 
 Screen-reader, large-font/RTL, permission and provider journeys, retention
 execution, and wider OS acceptance remain pending.
+
+## Automatic settings introduction and access — 2026-10-24
+
+The automatic-settings introduction and permission-access Button now render
+through lifecycle-disposed ComposeViews, preserving `auto_permissions` and
+adding the `auto_intro_panel` host. The Activity supplies localized copy and
+keeps the four-permission system request in its explicit callback. No request
+occurs during composition. Calendar selection, filters, activation
+confirmation and scheduling remain unchanged.
+
+On API36 `calltrack-track14-api36`, the pure Compose test verified the
+intro/access rendering and that only an explicit tap invokes the callback.
+The focused existing Activity journey verified the exact intro copy and both
+Compose hosts while confirming logging stayed disabled and no destination
+was selected. The first rendered-tag assertion exposed that Compose tags were
+not represented as resource IDs; `testTagsAsResourceId` was added and the
+focused tests passed on rerun. `:app:testDebugUnitTest`, `:app:lintDebug`,
+Android-test Kotlin/Java compilation, ktfmt0.59 and `git diff --check` passed.
+
+System permission grant/denial/revocation, provider access, full settings
+parity, accessibility and lifecycle acceptance remain pending. See the
+[settings access review](review-20261024-settings-access.md).

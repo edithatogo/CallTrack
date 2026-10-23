@@ -49,5 +49,7 @@
 - [x] Task: Review the historical-import introductory-text slice; verify exact zone-formatted copy, stable host and no import side effects in [review](review-20261024-import-intro.md).
 - [x] Task: Move the recovery introduction and retention-policy copy into lifecycle-disposed Compose hosts, preserving Activity-owned permissions, retention execution and query state; verify component rendering and exact API36 resource text in [review](review-20261024-recovery-copy.md).
 - [x] Task: Review the recovery copy slice; distinguish the passing focused panel/Activity evidence from the unqualified fixture-backed full-class attempt in [review](review-20261024-recovery-copy.md).
+- [x] Task: Move the automatic-settings introduction and permission-access action into lifecycle-disposed Compose hosts; keep permission prompts and activation policy in the Activity and verify explicit callback plus no-activation behavior in [review](review-20261024-settings-access.md).
+- [x] Task: Review the automatic-settings introduction/access slice, fix missing accessibility test-tag exposure, and rerun the focused component and API36 Activity checks (see [review](review-20261024-settings-access.md)).
 - [ ] Task: Update requirements, decisions, remaining limitations and next-track inputs; retire superseded code/prototypes only after parity.
 - [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger.

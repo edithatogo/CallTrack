@@ -44,6 +44,12 @@ public class AutomaticSettingsTest {
                 SystemClock.sleep(50);
             } while (SystemClock.elapsedRealtime() < deadline);
             assertTrue("Compose settings status host did not initialize", ready.get());
+            assertTrue(activity.findViewById(R.id.auto_intro_panel) instanceof ComposeView);
+            assertTrue(activity.findViewById(R.id.auto_permissions) instanceof ComposeView);
+            RenderedUi rendered = new RenderedUi(instrumentation);
+            assertNotNull(rendered.shown("auto_intro_text", true));
+            assertNotNull(rendered.shown(context.getString(R.string.auto_intro), false));
+            assertNotNull(rendered.shown("auto_access_action", true));
             instrumentation.runOnMainSync(
                     () -> {
                         assertFalse(activity.findViewById(R.id.auto_enable).isEnabled());

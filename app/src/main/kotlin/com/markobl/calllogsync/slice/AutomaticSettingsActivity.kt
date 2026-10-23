@@ -77,24 +77,39 @@ class AutomaticSettingsActivity : ComponentActivity() {
         layout.orientation = LinearLayout.VERTICAL
         val pad = (16 * resources.displayMetrics.density).toInt()
         layout.setPadding(pad, pad, pad, pad)
-        val intro = TextView(this)
-        intro.setText(R.string.auto_intro)
+        val intro =
+            ComposeView(this).apply {
+                id = R.id.auto_intro_panel
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent { AutomaticSettingsIntroPanel(text = getString(R.string.auto_intro)) }
+            }
         layout.addView(intro)
-        val access = Button(this)
-        access.id = R.id.auto_permissions
-        access.setText(R.string.auto_access)
+        val access =
+            ComposeView(this).apply {
+                id = R.id.auto_permissions
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    AutomaticSettingsAccessPanel(
+                        label = getString(R.string.auto_access),
+                        onRequestAccess = {
+                            requestPermissions(
+                                arrayOf(
+                                    Manifest.permission.READ_CALENDAR,
+                                    Manifest.permission.WRITE_CALENDAR,
+                                    Manifest.permission.READ_CALL_LOG,
+                                    Manifest.permission.READ_PHONE_STATE,
+                                ),
+                                7,
+                            )
+                        },
+                    )
+                }
+            }
         layout.addView(access)
-        access.setOnClickListener {
-            requestPermissions(
-                arrayOf(
-                    Manifest.permission.READ_CALENDAR,
-                    Manifest.permission.WRITE_CALENDAR,
-                    Manifest.permission.READ_CALL_LOG,
-                    Manifest.permission.READ_PHONE_STATE,
-                ),
-                7,
-            )
-        }
         destination = Spinner(this)
         destination!!.id = R.id.auto_calendar_picker
         destination!!.contentDescription = getString(R.string.slice_choose)
