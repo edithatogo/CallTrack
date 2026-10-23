@@ -13,6 +13,7 @@
 | C14-9 | Recovery empty-state presentation is a pure rendering of Activity-supplied query state. | The stable `recovery_empty` host renders the localized message only when the Activity's completed recovery query reports no records; it performs no ledger/calendar work. |
 | C14-10 | Historical import history is rendered from Activity-supplied immutable session labels, while session identity and resume authority remain Activity-owned. | The stable `import_history` host shows localized title, bounded ordered rows or the empty message; only tapping a current opaque row token loads its mapped session. |
 | C14-11 | Historical import destination selection may move to Compose without moving provider or destination authority out of the Activity. | The `import_calendar_picker` Compose host displays Activity-loaded choices; selecting a current opaque token updates the Activity-owned calendar ID. Permission state, saved destination ID, and later import confirmation remain Activity-owned. |
+| C14-12 | The historical-import permission-access action may move to Compose while runtime permission requests remain platform- and Activity-owned. | A lifecycle-disposed Compose host exposes an accessible 48 dp action and dispatches no request during composition; an explicit tap enters the existing Activity `requestPermissions` path and leaves the Android system dialog in charge of consent. |
 
 Historical-import controls and any remaining recovery parity work stay gated on
 their own lifecycle, accessibility and behavior acceptance. Completed slices do

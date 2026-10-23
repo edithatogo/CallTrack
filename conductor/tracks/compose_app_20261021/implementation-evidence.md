@@ -318,3 +318,24 @@ calendar, permission revocation, destination disappearance, TalkBack/Switch
 Access and broader lifecycle/OS acceptance remain pending. No import was
 previewed or delivered in these selector tests. See the
 [destination selector review](review-20261024-import-destination.md).
+
+## Historical import permission-access action — 2026-10-24
+
+The native permission-access button now renders in a lifecycle-disposed
+ComposeView with stable `import_access_panel` host ID. Its only callback is an
+explicit tap that enters the existing Activity `requestPermissions` flow for
+Call Log and Calendar access. Compose does not request, inspect or grant
+permissions. The Android system dialog remains the consent surface; no
+dependency or persistence changes were made.
+
+On API36 `calltrack-track14-api36`, the focused suite passed six tests across
+the access component, destination selector, import history and Activity
+Compose host. The access component test verified no request during composition
+and exactly one callback on explicit tap. The Activity test verified the host
+and action are rendered in the no-permission state. `:app:testDebugUnitTest`,
+`:app:lintDebug`, Android-test Kotlin/Java compilation, pinned ktfmt0.59 and
+`git diff --check` passed.
+
+This does not qualify a system permission grant/denial/revocation journey or
+provider behavior. Those remain pending with physical, live-accessibility and
+OS-matrix gates. See the [access action review](review-20261024-import-access.md).
