@@ -31,7 +31,7 @@ the archived research decisions; research Tracks7–13 remain unchanged.
   *Link: [Track](tracks/shared_ui_20261021/index.md)*
 
 ---
-- [~] **Track: Rust component evaluation and conditional integration** (Track18)
+- [x] **Track: Rust component evaluation and conditional integration** (Track18; completed with production Rust deferred)
   *Link: [Track](tracks/rust_component_20261021/index.md)*
 
 ---

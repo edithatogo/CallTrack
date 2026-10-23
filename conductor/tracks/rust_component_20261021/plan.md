@@ -25,6 +25,6 @@
 ## Phase 4: Review, acceptance and handoff
 
 - [x] Task: Run local Rust host/tooling checks only; native/cloud/package/operational acceptance is not claimed because no application integration is adopted.
-- [ ] Task: Perform Conductor review, apply fixes and rerun affected checks.
+- [x] Task: Perform Conductor review, apply fixes and rerun affected checks (review-20261024.md; no remaining findings).
 - [x] Task: Update requirements, decisions, remaining limitations and next-track inputs; no prototype or app code is retired.
-- [ ] Task: Final checkpoint and archive after review of the explicit Rust deferral; the deferral does not unlock Track19.
+- [x] Task: Final checkpoint after review of the explicit Rust deferral; the deferral does not unlock Track19. Completion commit: recorded in final track metadata.
