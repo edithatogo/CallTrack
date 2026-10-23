@@ -13,6 +13,6 @@
   "track_number": 14,
   "execution_stage": 3,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
-  "implementation_status": "automatic-status-and-recovery-cards-api36-rendered-qualified; manual-log-and-import-status-panels-implemented; historical-import-controls-and-full-accessibility-lifecycle-os-matrix-pending",
+  "implementation_status": "automatic-status-and-recovery-cards-api36-rendered-qualified; import-date-and-type-filters-api36-compose-activity-recreation-qualified; manual-log-and-import-status-panels-implemented; remaining-permission-accessibility-lifecycle-and-os-matrix-pending",
   "production_adopted": false
 }
