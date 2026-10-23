@@ -35,8 +35,8 @@
 ### Live gate refresh — 2026-10-23
 
 The selected private successor repository is [edithatogo/CallTrack](https://github.com/edithatogo/CallTrack).
-Its seventeen feature/research PRs are open as drafts; the [PR index](../qualification/successor-pr-series-20261023.md)
-links each stage. Hosted GitHub Actions jobs fail before runner allocation because
+Its eighteen feature/research PRs are open as drafts; the [PR index](../qualification/successor-pr-series-20261023.md)
+links each stage, including the reviewed Track14 status slice. Hosted GitHub Actions jobs fail before runner allocation because
 the account billing/spending limit blocks them. This is not a passing hosted CI
 result. [Track21](tracks/python315_20261023/index.md) remains locally qualified
 on macOS and isolated Linux but open for this hosted gate.
@@ -51,8 +51,15 @@ is unstarted with null dates and zero accepted days/hours. The user previously
 chose to retain the development identity, leaving production signing/key custody
 pending.
 
-Future implementation Tracks14–20 have not started. Follow the approved sequence
-below; iOS remains last.
+Track14 has begun under a scoped development-only prerequisite deferral. Its first
+read-only automatic-settings status slice now uses lifecycle-bound ComposeViews;
+the Activity retains every provider, permission and action effect. Local build,
+JVM tests and APK packaging pass. The reviewed status component and its host
+Activity tests now pass on the API36 AVD; review fixed the required lifecycle
+owner and test-manifest setup. Manual logging, import, recovery and broader
+native accessibility/lifecycle acceptance remain. The [draft implementation PR](https://github.com/edithatogo/CallTrack/pull/18)
+is stacked on Track17. Tracks15–20 are still planned
+in the approved order, with iOS last.
 
 Tracks1–4 and research Tracks7–13 are complete, reviewed and archived. The
 [Track4 parity implementation](archive/parity_20261020/index.md) passes P01–P10 for

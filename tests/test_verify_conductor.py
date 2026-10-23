@@ -82,8 +82,33 @@ class VerificationFailures(unittest.TestCase):
         path = self.root / 'conductor/tracks/compose_app_20261021/metadata.json'
         data = json.loads(path.read_text())
         data['status'] = 'in_progress'
+        data.pop('prerequisite_deferral_document', None)
         path.write_text(json.dumps(data))
         with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
+            self.run_verifier()
+
+    def test_scoped_compose_deferral_does_not_unlock_shared_core(self):
+        compose = self.root / 'conductor/tracks/compose_app_20261021/metadata.json'
+        data = json.loads(compose.read_text())
+        data['status'] = 'in_progress'
+        data['prerequisite_deferral_document'] = 'prerequisite-deferral.md'
+        compose.write_text(json.dumps(data))
+        self.run_verifier()
+
+        shared_core = self.root / 'conductor/tracks/shared_core_20261021/metadata.json'
+        data = json.loads(shared_core.read_text())
+        data['status'] = 'in_progress'
+        shared_core.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
+            self.run_verifier()
+
+    def test_scoped_compose_deferral_cannot_complete_track(self):
+        path = self.root / 'conductor/tracks/compose_app_20261021/metadata.json'
+        data = json.loads(path.read_text())
+        data['status'] = 'completed'
+        data['prerequisite_deferral_document'] = 'prerequisite-deferral.md'
+        path.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'cannot complete the track'):
             self.run_verifier()
 
     def test_ios_can_start_after_explicit_documented_earlier_deferrals(self):

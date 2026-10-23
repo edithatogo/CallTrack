@@ -10,8 +10,9 @@ import hashlib
 import json
 from pathlib import Path
 import re
+from urllib.error import HTTPError
 import xml.etree.ElementTree as ET
-from audit_release_artifacts import repository_url, read_publication
+from audit_release_artifacts import module_artifact_url, repository_url, read_publication
 
 
 def rows(data):
@@ -37,6 +38,18 @@ def rows(data):
     return result
 
 
+def module_fallback_url(row, expected_hash, metadata_bytes, allowed_hashes):
+    """Resolve a Gradle variant's renamed artifact only through trusted .module bytes."""
+    module_name = row['coordinate'].split(':')[1]
+    version = row['coordinate'].split(':')[2]
+    metadata_name = f'{module_name}-{version}.module'
+    actual_metadata_hash = hashlib.sha256(metadata_bytes).hexdigest()
+    if actual_metadata_hash not in allowed_hashes.get((row['coordinate'], metadata_name), set()):
+        raise ValueError('Canonical module metadata hash is absent from the verification policy')
+    bound_row = dict(row, sha256=expected_hash)
+    return module_artifact_url(bound_row, json.loads(metadata_bytes))
+
+
 def audit(metadata, canonical, output):
     data = metadata.read_bytes()
     policy = rows(data)
@@ -49,6 +62,8 @@ def audit(metadata, canonical, output):
         for name in (row['name'], row['artifact_url'].rsplit('/', 1)[-1]):
             known[(row['coordinate'], name)] = row
     output.mkdir(parents=True, exist_ok=False)
+
+    allowed_hashes = {(row['coordinate'], row['name']): set(row['sha256']) for row in policy}
 
     def check(item):
         index, row = item
@@ -64,6 +79,10 @@ def audit(metadata, canonical, output):
             'https://dl.google.com/dl/android/maven2/', 'https://repo.maven.apache.org/maven2/') if not primary.startswith(base)]
         matched = set()
         proof['downloads'] = []
+        module_bases = [primary.split('/maven2/', 1)[0] + '/maven2/']
+        module_bases.extend(base for base in (
+            'https://dl.google.com/dl/android/maven2/', 'https://repo.maven.apache.org/maven2/')
+            if base not in module_bases)
         for attempt, url in enumerate(urls):
             try:
                 content = read_publication(url)
@@ -72,6 +91,30 @@ def audit(metadata, canonical, output):
                 proof['downloads'].append(dict(url=url, sha256=actual))
                 if actual in row['sha256']:
                     matched.add(actual)
+                if matched == set(row['sha256']):
+                    break
+            except HTTPError as error:
+                proof['downloads'].append(dict(url=url, error=str(error)))
+                if error.code != 404:
+                    continue
+                for module_base in module_bases:
+                    group, module, version = row['coordinate'].split(':')
+                    module_url = (module_base + group.replace('.', '/') + '/' + module + '/' +
+                                  version + '/' + module + '-' + version + '.module')
+                    try:
+                        module_bytes = read_publication(module_url)
+                        module_hashes = allowed_hashes.get((row['coordinate'], module_url.rsplit('/', 1)[-1]), set())
+                        actual_url = module_fallback_url(row, row['sha256'][0], module_bytes, allowed_hashes)
+                        artifact_bytes = read_publication(actual_url)
+                        actual_hash = hashlib.sha256(artifact_bytes).hexdigest()
+                        proof['downloads'].append(dict(url=module_url, sha256=hashlib.sha256(module_bytes).hexdigest()))
+                        proof['downloads'].append(dict(url=actual_url, sha256=actual_hash))
+                        if actual_hash in row['sha256'] and module_hashes:
+                            matched.add(actual_hash)
+                        if matched == set(row['sha256']):
+                            break
+                    except Exception as fallback_error:
+                        proof['downloads'].append(dict(url=module_base, error=str(fallback_error)))
                 if matched == set(row['sha256']):
                     break
             except Exception as error:

@@ -1,0 +1,123 @@
+{
+  "scope": "Independently check generated Gradle trust entries against canonical repository evidence.\n\nGeneration alone is not approval. Every checksum must match fresh repository bytes\nor an already completed source-bound canonical binary audit.\n",
+  "metadata_sha256": "dd2a77c8f14ae02a66d47c5459723cf8eccf5afbce9534124a60be73c66ed3ce",
+  "canonical_audit_sha256": "239dd1b0b7374c605997f2496b5c850aaf29b94d4671573fda426f64c678a6e7",
+  "entries": 8,
+  "artifacts": [
+    {
+      "coordinate": "androidx.annotation:annotation:1.1.0",
+      "name": "annotation-1.1.0.pom",
+      "sha256": [
+        "2e9372ba7780ef44952adbf86b66e1f08682c1e5277c926185f6564a13799efe"
+      ],
+      "downloads": [
+        {
+          "url": "https://dl.google.com/dl/android/maven2/androidx/annotation/annotation/1.1.0/annotation-1.1.0.pom",
+          "sha256": "2e9372ba7780ef44952adbf86b66e1f08682c1e5277c926185f6564a13799efe"
+        }
+      ],
+      "matches": true
+    },
+    {
+      "coordinate": "androidx.core:core:1.8.0",
+      "name": "core-1.8.0.module",
+      "sha256": [
+        "505f1838869611519d65ec7feb650e88856e3682e37e42a2a24b73e655a98d74"
+      ],
+      "downloads": [
+        {
+          "url": "https://dl.google.com/dl/android/maven2/androidx/core/core/1.8.0/core-1.8.0.module",
+          "sha256": "505f1838869611519d65ec7feb650e88856e3682e37e42a2a24b73e655a98d74"
+        }
+      ],
+      "matches": true
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-common:2.6.1",
+      "name": "lifecycle-common-2.6.1.module",
+      "sha256": [
+        "93747a9145cb36bc71005f598ede32e2b1149ade5a16e62b0e4969345bc62d85"
+      ],
+      "downloads": [
+        {
+          "url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-common/2.6.1/lifecycle-common-2.6.1.module",
+          "sha256": "93747a9145cb36bc71005f598ede32e2b1149ade5a16e62b0e4969345bc62d85"
+        }
+      ],
+      "matches": true
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-livedata-core:2.6.1",
+      "name": "lifecycle-livedata-core-2.6.1.module",
+      "sha256": [
+        "e9c0dc3f0ac54419c0cfed8ff5cecb82943a7c58f7a54169f0d849b2c60a3552"
+      ],
+      "downloads": [
+        {
+          "url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-livedata-core/2.6.1/lifecycle-livedata-core-2.6.1.module",
+          "sha256": "e9c0dc3f0ac54419c0cfed8ff5cecb82943a7c58f7a54169f0d849b2c60a3552"
+        }
+      ],
+      "matches": true
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-runtime:2.6.1",
+      "name": "lifecycle-runtime-2.6.1.module",
+      "sha256": [
+        "a4cbb01a42d07047bd8d870017c96a1b0b7b4673320e86b66317a13be2ec10c7"
+      ],
+      "downloads": [
+        {
+          "url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-runtime/2.6.1/lifecycle-runtime-2.6.1.module",
+          "sha256": "a4cbb01a42d07047bd8d870017c96a1b0b7b4673320e86b66317a13be2ec10c7"
+        }
+      ],
+      "matches": true
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel:2.6.1",
+      "name": "lifecycle-viewmodel-2.6.1.module",
+      "sha256": [
+        "2b406faea5c12f2b8df4b7a60931f846648f2e1f4d78361e198d1184f19a4797"
+      ],
+      "downloads": [
+        {
+          "url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel/2.6.1/lifecycle-viewmodel-2.6.1.module",
+          "sha256": "2b406faea5c12f2b8df4b7a60931f846648f2e1f4d78361e198d1184f19a4797"
+        }
+      ],
+      "matches": true
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1",
+      "name": "lifecycle-viewmodel-ktx-2.6.1.module",
+      "sha256": [
+        "a5110f85788bc167df9fe8fbe08004ddc5c5dd9b15cb7376ceeaef025fccaaf8"
+      ],
+      "downloads": [
+        {
+          "url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel-ktx/2.6.1/lifecycle-viewmodel-ktx-2.6.1.module",
+          "sha256": "a5110f85788bc167df9fe8fbe08004ddc5c5dd9b15cb7376ceeaef025fccaaf8"
+        }
+      ],
+      "matches": true
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.1",
+      "name": "lifecycle-viewmodel-savedstate-2.6.1.module",
+      "sha256": [
+        "dafb8649763d29c29cda27bc22fcdab9a9efc53c0fff9ae3de90882eabaa8944"
+      ],
+      "downloads": [
+        {
+          "url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel-savedstate/2.6.1/lifecycle-viewmodel-savedstate-2.6.1.module",
+          "sha256": "dafb8649763d29c29cda27bc22fcdab9a9efc53c0fff9ae3de90882eabaa8944"
+        }
+      ],
+      "matches": true
+    }
+  ],
+  "all_entries_verified": true,
+  "independent_signatures": false,
+  "release_ready": false
+}

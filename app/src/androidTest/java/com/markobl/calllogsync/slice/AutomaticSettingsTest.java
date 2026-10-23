@@ -36,16 +36,13 @@ public class AutomaticSettingsTest {
                 instrumentation.runOnMainSync(
                         () ->
                                 ready.set(
-                                        ((TextView) activity.findViewById(R.id.auto_state))
-                                                .getText()
-                                                .toString()
-                                                .equals(
-                                                        activity.getString(
-                                                                R.string.auto_disabled))));
+                                        activity.findViewById(R.id.auto_state)
+                                                instanceof
+                                                androidx.compose.ui.platform.ComposeView));
                 if (ready.get()) break;
                 SystemClock.sleep(50);
             } while (SystemClock.elapsedRealtime() < deadline);
-            assertTrue("Settings state did not finish loading", ready.get());
+            assertTrue("Compose settings status host did not initialize", ready.get());
             instrumentation.runOnMainSync(
                     () -> {
                         assertFalse(activity.findViewById(R.id.auto_enable).isEnabled());

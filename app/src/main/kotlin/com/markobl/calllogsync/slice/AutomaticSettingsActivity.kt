@@ -1,20 +1,53 @@
 package com.markobl.calllogsync.slice
 
 import android.Manifest
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import android.widget.*
+import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import com.markobl.calllogsync.R
 import java.util.Collections
 import java.util.TimeZone
 import java.util.concurrent.Executors
 
+internal data class AutomaticStatusUiState(
+    val state: String,
+    val counts: String,
+    val feedback: String,
+    val lastRun: String,
+)
+
+@androidx.compose.runtime.Composable
+internal fun AutomaticStatusLine(text: String, tag: String, announceChanges: Boolean = false) {
+    var modifier = Modifier.testTag(tag)
+    if (announceChanges) modifier = modifier.semantics { liveRegion = LiveRegionMode.Polite }
+    BasicText(text, modifier = modifier)
+}
+
+@androidx.compose.runtime.Composable
+internal fun AutomaticStatusPanel(state: AutomaticStatusUiState) {
+    Column {
+        AutomaticStatusLine(state.state, "auto_state", announceChanges = true)
+        AutomaticStatusLine(state.counts, "auto_counts")
+        AutomaticStatusLine(state.feedback, "auto_feedback")
+        AutomaticStatusLine(state.lastRun, "auto_last")
+    }
+}
+
 /** Explicit activation controls; reopening can resume enabled policy but never enable it. */
-class AutomaticSettingsActivity : Activity() {
+class AutomaticSettingsActivity : ComponentActivity() {
     private val executor = Executors.newSingleThreadExecutor()
     private var destination: Spinner? = null
     private var incoming: CheckBox? = null
@@ -22,10 +55,14 @@ class AutomaticSettingsActivity : Activity() {
     private var missed: CheckBox? = null
     private var enable: Button? = null
     private var pause: Button? = null
-    private var state: TextView? = null
-    private var counts: TextView? = null
-    private var last: TextView? = null
-    private var feedback: TextView? = null
+    private var statePanel: ComposeView? = null
+    private var countsPanel: ComposeView? = null
+    private var feedbackPanel: ComposeView? = null
+    private var lastPanel: ComposeView? = null
+    private var stateText = ""
+    private var countsText = ""
+    private var lastText = ""
+    private var feedbackText = ""
     private var choices: List<AndroidCalendarSink.Choice> = Collections.emptyList()
     private var selected = -1L
     private var busy = false
@@ -100,19 +137,10 @@ class AutomaticSettingsActivity : Activity() {
         pause!!.setText(R.string.auto_pause)
         layout.addView(pause)
         pause!!.setOnClickListener { change { AutomaticScheduling.pause(applicationContext) } }
-        state = TextView(this)
-        state!!.id = R.id.auto_state
-        state!!.accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
-        layout.addView(state)
-        counts = TextView(this)
-        counts!!.id = R.id.auto_counts
-        layout.addView(counts)
-        feedback = TextView(this)
-        feedback!!.id = R.id.auto_feedback
-        layout.addView(feedback)
-        last = TextView(this)
-        last!!.id = R.id.auto_last
-        layout.addView(last)
+        statePanel = statusView(layout, R.id.auto_state)
+        countsPanel = statusView(layout, R.id.auto_counts)
+        feedbackPanel = statusView(layout, R.id.auto_feedback)
+        lastPanel = statusView(layout, R.id.auto_last)
         val refresh = Button(this)
         refresh.setText(R.string.auto_refresh)
         layout.addView(refresh)
@@ -135,6 +163,7 @@ class AutomaticSettingsActivity : Activity() {
         scroll.addView(layout)
         ActivityInsets.apply(scroll)
         setContentView(scroll)
+        renderStatus()
         buttons()
     }
 
@@ -220,9 +249,9 @@ class AutomaticSettingsActivity : Activity() {
             runOnUiThread {
                 if (isDestroyed) return@runOnUiThread
                 busy = false
-                feedback!!.setText(
-                    if (done) R.string.auto_action_saved else R.string.auto_action_failed
-                )
+                feedbackText =
+                    getString(if (done) R.string.auto_action_saved else R.string.auto_action_failed)
+                renderStatus()
                 buttons()
                 load(false)
             }
@@ -263,10 +292,10 @@ class AutomaticSettingsActivity : Activity() {
                     if (settings != null)
                         for (choice in loaded) if (choice.id == settings.calendar)
                             activeName = choice.name
-                    state!!.text =
+                    stateText =
                         if (active) getString(R.string.auto_enabled, activeName)
                         else getString(R.string.auto_disabled)
-                    counts!!.text =
+                    countsText =
                         getString(
                             R.string.auto_count_text,
                             summary.pending,
@@ -274,13 +303,14 @@ class AutomaticSettingsActivity : Activity() {
                             summary.review,
                             summary.suppressed,
                         )
-                    last!!.text =
+                    lastText =
                         getString(
                             R.string.auto_status_summary,
                             getString(workerMessage(code)),
                             getString(R.string.auto_failure_count, worker?.failures ?: 0L),
                         )
                     choices = loaded
+                    renderStatus()
                     val labels = ArrayList<String?>()
                     labels.add(getString(R.string.slice_choose))
                     var position = 0
@@ -311,7 +341,8 @@ class AutomaticSettingsActivity : Activity() {
                 runOnUiThread {
                     if (isDestroyed) return@runOnUiThread
                     busy = false
-                    state!!.setText(R.string.auto_action_failed)
+                    stateText = getString(R.string.auto_action_failed)
+                    renderStatus()
                     buttons()
                     reloadIfRequested()
                 }
@@ -343,6 +374,21 @@ class AutomaticSettingsActivity : Activity() {
             else -> R.string.auto_unknown
         }
 
+    private fun statusView(parent: LinearLayout, id: Int): ComposeView =
+        ComposeView(this).apply {
+            this.id = id
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            parent.addView(this)
+        }
+
+    private fun renderStatus() {
+        statePanel?.setContent { AutomaticStatusLine(stateText, "auto_state", true) }
+        countsPanel?.setContent { AutomaticStatusLine(countsText, "auto_counts") }
+        feedbackPanel?.setContent { AutomaticStatusLine(feedbackText, "auto_feedback") }
+        lastPanel?.setContent { AutomaticStatusLine(lastText, "auto_last") }
+    }
+
+    @Deprecated("Required to preserve the existing permission callback contract")
     public override fun onRequestPermissionsResult(
         code: Int,
         permissions: Array<out String>,

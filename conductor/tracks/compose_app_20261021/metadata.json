@@ -1,10 +1,10 @@
 {
   "track_id": "compose_app_20261021",
   "type": "research-led-development",
-  "status": "new",
+  "status": "in_progress",
   "milestone": "M6",
   "created_at": "2026-10-21",
-  "updated_at": "2026-10-21",
+  "updated_at": "2026-10-23",
   "depends_on": [
     "kotlin_20261020",
     "release_20261020"
@@ -12,6 +12,7 @@
   "requirements": "R15, R26",
   "track_number": 14,
   "execution_stage": 3,
-  "implementation_status": "pending",
+  "prerequisite_deferral_document": "prerequisite-deferral.md",
+  "implementation_status": "read-only-status-slice-reviewed-and-api36-qualified; manual-import-recovery-screens-and-full-matrix-pending",
   "production_adopted": false
 }
