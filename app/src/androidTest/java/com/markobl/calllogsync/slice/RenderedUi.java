@@ -117,6 +117,14 @@ final class RenderedUi {
         return false;
     }
 
+    void dismissKeyboard() {
+        if (!keyboardVisible()) return;
+        assertTrue(
+                automation.performGlobalAction(
+                        android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK));
+        await(() -> !keyboardVisible(), "Keyboard did not dismiss");
+    }
+
     void revealId(String id) {
         await(() -> shown(id, true) != null, "Visible field missing: " + id);
         AccessibilityNodeInfo node = shown(id, true);

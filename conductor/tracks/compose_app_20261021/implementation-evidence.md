@@ -1,5 +1,35 @@
 # Track 14 implementation checkpoint — 2026-10-23
 
+## Historical import date and call-type filters — 2026-10-24
+
+Historical import's date range and incoming/outgoing/missed controls now render
+in a lifecycle-disposed `ComposeView` hosted at the new stable
+`import_filters` ID. Existing `import_from`, `import_to`, and call-type tags,
+default values and `Activity` saved-state keys remain. The Activity remains the
+owner of parsing, destination selection, permission checks, session creation,
+preview/confirmation and delivery. Rendering and filter edits do not create
+import sessions or write calendar events.
+
+The new Activity Compose instrumentation test covers initial controls,
+explicit date input and call-type toggle, Activity recreation, saved filter
+state, and disabled import actions/no session creation. The component test
+separately checks that only explicit input emits state changes. The former
+accessibility-tree helper failed to synthesize the checkbox tap reliably on
+this emulator; the final acceptance uses Compose's instrumented semantics and
+pointer input at the Activity level, which passed. The legacy helper was
+restored unchanged apart from retaining its existing keyboard-dismiss helper.
+
+With the selected JDK17 and SDK36/API36 emulator, the focused command
+`bash ./gradlew :app:testDebugUnitTest :app:lintDebug
+:app:compileDebugAndroidTestKotlin :app:connectedDebugAndroidTest
+-Pandroid.testInstrumentationRunnerArguments.class=com.markobl.calllogsync.slice.AutomaticSettingsTest,com.markobl.calllogsync.slice.HistoricalImportActivityComposeTest,com.markobl.calllogsync.slice.HistoricalImportFiltersPanelTest`
+passed. All five selected instrumentation tests passed; unit tests, lint and
+Android-test Kotlin compilation also completed successfully. Pinned ktfmt0.59
+formatting, the 19-test Conductor suite, `scripts/verify_conductor.py` (218
+documents, 21 tracks and 25 synthetic scenarios), and `git diff --check` passed. The exact
+scope, review findings and remaining acceptance limits are recorded in
+[the import filters review](review-20261024-import-filters.md).
+
 ## Change
 
 The automatic settings screen now renders its four read-only state/counts/action

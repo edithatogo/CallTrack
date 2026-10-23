@@ -29,12 +29,8 @@ class HistoricalImportActivity : ComponentActivity() {
     private var currentId: String? = null
     private var zone: String? = null
     private var session: HistoricalImport.Session? = null
-    private var from: EditText? = null
-    private var to: EditText? = null
     private var destination: Spinner? = null
-    private var incoming: CheckBox? = null
-    private var outgoing: CheckBox? = null
-    private var missed: CheckBox? = null
+    private var filters by mutableStateOf(HistoricalImportFiltersUiState())
     private var actionState by mutableStateOf(HistoricalImportActionState())
     private var summary: ComposeView? = null
     private var feedback: ComposeView? = null
@@ -54,6 +50,18 @@ class HistoricalImportActivity : ComponentActivity() {
             if (saved == null) ZoneId.systemDefault().id
             else saved.getString("zone", ZoneId.systemDefault().id)
         currentId = saved?.getString("session")
+        filters =
+            HistoricalImportFiltersUiState(
+                fromDate =
+                    if (saved == null) LocalDate.now(ZoneId.of(zone)).minusDays(7).toString()
+                    else saved.getString("from") ?: "",
+                toDate =
+                    if (saved == null) LocalDate.now(ZoneId.of(zone)).plusDays(1).toString()
+                    else saved.getString("to") ?: "",
+                incoming = saved == null || saved.getBoolean("incoming"),
+                outgoing = saved == null || saved.getBoolean("outgoing"),
+                missed = saved == null || saved.getBoolean("missed"),
+            )
         val layout = LinearLayout(this)
         layout.orientation = LinearLayout.VERTICAL
         val pad = (16 * resources.displayMetrics.density).toInt()
@@ -101,27 +109,28 @@ class HistoricalImportActivity : ComponentActivity() {
                     buttons()
                 }
             }
-        from =
-            date(
-                layout,
-                R.string.import_from,
-                R.id.import_from,
-                if (saved == null) LocalDate.now(ZoneId.of(zone)).minusDays(7).toString()
-                else saved.getString("from"),
-            )
-        to =
-            date(
-                layout,
-                R.string.import_to,
-                R.id.import_to,
-                if (saved == null) LocalDate.now(ZoneId.of(zone)).plusDays(1).toString()
-                else saved.getString("to"),
-            )
-        incoming =
-            check(layout, R.string.auto_incoming, saved == null || saved.getBoolean("incoming"))
-        outgoing =
-            check(layout, R.string.auto_outgoing, saved == null || saved.getBoolean("outgoing"))
-        missed = check(layout, R.string.auto_missed, saved == null || saved.getBoolean("missed"))
+        val filtersPanel =
+            ComposeView(this).apply {
+                id = R.id.import_filters
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    HistoricalImportFiltersPanel(
+                        state = filters,
+                        fromLabel = stringResource(R.string.import_from),
+                        toLabel = stringResource(R.string.import_to),
+                        incomingLabel = stringResource(R.string.auto_incoming),
+                        outgoingLabel = stringResource(R.string.auto_outgoing),
+                        missedLabel = stringResource(R.string.auto_missed),
+                        onStateChange = {
+                            filters = it
+                            buttons()
+                        },
+                    )
+                }
+            }
+        layout.addView(filtersPanel)
         val createActions =
             ComposeView(this).apply {
                 id = R.id.import_actions
@@ -233,31 +242,6 @@ class HistoricalImportActivity : ComponentActivity() {
         return result
     }
 
-    private fun date(layout: LinearLayout, label: Int, id: Int, value: String?): EditText {
-        val text = TextView(this)
-        text.setText(label)
-        text.labelFor = id
-        layout.addView(text)
-        val field = EditText(this)
-        field.id = id
-        field.setSingleLine(true)
-        field.inputType =
-            android.text.InputType.TYPE_CLASS_DATETIME or
-                android.text.InputType.TYPE_DATETIME_VARIATION_DATE
-        field.setText(value)
-        layout.addView(field)
-        return field
-    }
-
-    private fun check(layout: LinearLayout, label: Int, checked: Boolean): CheckBox {
-        val box = CheckBox(this)
-        box.setText(label)
-        box.isChecked = checked
-        layout.addView(box)
-        box.setOnCheckedChangeListener { _, _ -> buttons() }
-        return box
-    }
-
     private fun setFeedback(message: Int?) {
         feedbackText = message?.let(::getString) ?: ""
     }
@@ -274,8 +258,7 @@ class HistoricalImportActivity : ComponentActivity() {
 
     private fun buttons() {
         val value = session
-        val hasCallTypes =
-            incoming?.isChecked == true || outgoing?.isChecked == true || missed?.isChecked == true
+        val hasCallTypes = filters.incoming || filters.outgoing || filters.missed
         actionState =
             HistoricalImportActionState(
                 createEnabled = !busy && selected >= 0 && access() && hasCallTypes,
@@ -329,15 +312,15 @@ class HistoricalImportActivity : ComponentActivity() {
         if (busy || selected < 0) return
         val range =
             try {
-                ImportRange.parse(from!!.text.toString(), to!!.text.toString(), zone)
+                ImportRange.parse(filters.fromDate, filters.toDate, zone)
             } catch (invalid: RuntimeException) {
                 setFeedback(R.string.import_invalid_range)
                 return
             }
         val calendar = selected
-        val inCalls = incoming!!.isChecked
-        val outCalls = outgoing!!.isChecked
-        val missedCalls = missed!!.isChecked
+        val inCalls = filters.incoming
+        val outCalls = filters.outgoing
+        val missedCalls = filters.missed
         val start = Runnable {
             running = true
             perform(
@@ -595,12 +578,12 @@ class HistoricalImportActivity : ComponentActivity() {
         super.onSaveInstanceState(out)
         out.putString("zone", zone)
         out.putString("session", currentId)
-        out.putString("from", from!!.text.toString())
-        out.putString("to", to!!.text.toString())
+        out.putString("from", filters.fromDate)
+        out.putString("to", filters.toDate)
         out.putLong("calendar", selected)
-        out.putBoolean("incoming", incoming!!.isChecked)
-        out.putBoolean("outgoing", outgoing!!.isChecked)
-        out.putBoolean("missed", missed!!.isChecked)
+        out.putBoolean("incoming", filters.incoming)
+        out.putBoolean("outgoing", filters.outgoing)
+        out.putBoolean("missed", filters.missed)
     }
 
     public override fun onRequestPermissionsResult(
