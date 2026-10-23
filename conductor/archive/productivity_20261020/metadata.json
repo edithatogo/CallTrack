@@ -1,0 +1,20 @@
+{
+  "track_id": "productivity_20261020",
+  "type": "research-led-development",
+  "status": "completed",
+  "milestone": "Post-M4",
+  "created_at": "2026-10-20",
+  "updated_at": "2026-10-21",
+  "depends_on": [
+    "release_20261020"
+  ],
+  "requirements": "R18, R21\u2013R23, R27",
+  "implementation_status": "deferred; no journal features or dependencies added",
+  "archived": true,
+  "archived_at": "2026-10-21",
+  "research_outcome": "defer-implementation; candidate-priorities-provisional",
+  "user_priority_validated": false,
+  "workflow_acceptance_complete": false,
+  "prototype_run": false,
+  "prerequisite_disposition": "research-only; Track4/5 implementation acceptance remains open"
+}

@@ -48,3 +48,10 @@ D01–D09 after the M3 evidence exists; do not repeat discovery without changed 
 Preparation implementation: 4754d72. Review corrections: 7a7d180. Final repository
 checks passed; no candidate release was created and archive remains conditional on
 the open Phase3/4 acceptance tasks.
+
+## Productivity research handoff
+
+[Track11 requirements](../../archive/productivity_20261020/requirements.md) distinguish future
+annotations/index/export copies from existing payload/receipt retention. No new
+storage/backup policy is adopted. Reopen lifecycle and recovery acceptance before
+shipping authored journal data; research closure is not release readiness.
