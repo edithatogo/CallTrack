@@ -10,6 +10,7 @@
 - [Scoped prerequisite deferral](prerequisite-deferral.md)
 - [Verification evidence](implementation-evidence.md)
 - [Review report](review-20261024.md)
+- [Draft implementation PR #19](https://github.com/edithatogo/CallTrack/pull/19)
 - [Execution sequence](../../future-architecture.md)
 
 Findings/requirements/decisions/evidence are created when work occurs, not as
