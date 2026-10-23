@@ -16,7 +16,7 @@
 
 ## Phase3 — Integration and acceptance
 
-- [~] Task9: Commit implementation to main, then verify actual HEAD, clean source, real interpreter path/version, runtime guard, full suite and Conductor; retain commit-bound evidence.
+- [x] Task9: Commit implementation to main, then verify actual HEAD, clean source, real interpreter path/version, runtime guard, full suite and Conductor; retain commit-bound evidence.
 - [ ] Task10: Qualify active hosted/container paths where available, or preserve precise execution/authority blocker. No new remote or external messages.
 - [ ] Task11: Final requirement-by-requirement review, fixes and affected rechecks. Keep goal/track active while required evidence is pending.
 - [ ] Task12: Phase checkpoint: record consolidated repo/track/index/commit/PR/actual goal status/blockers; close/archive only after full acceptance.
