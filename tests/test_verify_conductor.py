@@ -38,6 +38,13 @@ class VerificationFailures(unittest.TestCase):
         ), contextlib.redirect_stdout(io.StringIO()):
             VERIFY.verify()
 
+    def reset_track19_gate(self):
+        path = self.root / 'conductor/tracks/cross_platform_20261021/metadata.json'
+        data = json.loads(path.read_text())
+        data['status'] = 'new'
+        data.pop('prerequisite_deferral_document', None)
+        path.write_text(json.dumps(data))
+
     def test_current_documents_pass(self):
         self.run_verifier()
 
@@ -197,6 +204,7 @@ class VerificationFailures(unittest.TestCase):
             self.run_verifier()
 
     def test_track18_rust_deferral_does_not_unlock_track19(self):
+        self.reset_track19_gate()
         rust = self.root / 'conductor/tracks/rust_component_20261021'
         path = rust / 'metadata.json'
         data = json.loads(path.read_text())
@@ -222,6 +230,7 @@ class VerificationFailures(unittest.TestCase):
             self.run_verifier()
 
     def test_scoped_track18_work_does_not_complete_or_unlock_track19(self):
+        self.reset_track19_gate()
         rust = self.root / 'conductor/tracks/rust_component_20261021'
         path = rust / 'metadata.json'
         data = json.loads(path.read_text())
@@ -239,6 +248,31 @@ class VerificationFailures(unittest.TestCase):
         data['status'] = 'in_progress'
         cross_platform.write_text(json.dumps(data))
         with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
+            self.run_verifier()
+
+        data = json.loads(path.read_text())
+        data['status'] = 'completed'
+        path.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'cannot complete the track'):
+            self.run_verifier()
+
+    def test_scoped_track19_evidence_reconciliation_does_not_unlock_ios(self):
+        cross_platform = self.root / 'conductor/tracks/cross_platform_20261021'
+        path = cross_platform / 'metadata.json'
+        data = json.loads(path.read_text())
+        data['status'] = 'in_progress'
+        data['prerequisite_deferral_document'] = 'prerequisite-deferral.md'
+        path.write_text(json.dumps(data))
+        (cross_platform / 'prerequisite-deferral.md').write_text(
+            'Synthetic bounded stage8 evidence reconciliation; native acceptance remains blocked.'
+        )
+        self.run_verifier()
+
+        ios = self.root / 'conductor/tracks/ios_companion_20261021/metadata.json'
+        data = json.loads(ios.read_text())
+        data['status'] = 'in_progress'
+        ios.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'iOS must remain last'):
             self.run_verifier()
 
         data = json.loads(path.read_text())
