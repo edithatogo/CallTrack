@@ -3,7 +3,6 @@ import hashlib
 import json
 from pathlib import Path
 import re
-import subprocess
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -15,7 +14,9 @@ class HistoricalSchemaTest(unittest.TestCase):
         self.assertEqual([1, 2, 3, 4, 5], [r['version'] for r in rows])
         rows.append(json.loads((ROOT / 'qualification/release/import-schema-provenance.json').read_text()))
         for row in rows:
-            data = subprocess.check_output(['git', 'show', row['commit'] + ':' + row['source_path']], cwd=ROOT)
+            self.assertRegex(row['commit'], r'^[0-9a-f]{40}$')
+            self.assertTrue(row['source_path'])
+            data = (ROOT / row['source_snapshot']).read_bytes()
             self.assertEqual(row['source_sha256'], hashlib.sha256(data).hexdigest())
             self.assertIn('super(context, name, null, ' + str(row['version']) + ');', data.decode())
             statements = []

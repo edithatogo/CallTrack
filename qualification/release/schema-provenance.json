@@ -6,7 +6,8 @@
     "source_sha256": "3df649c29df68b95d6711624b60ae2cf7cc5132048e18984ea5ddbdb827e5b59",
     "fixture": "qualification/release/assets/release-schema-1.sql",
     "fixture_sha256": "5d84d769ca1b8ecf6b017bf36c8b5c5e4292155b90c0ec8d30b7ba872523a822",
-    "statement_count": 1
+    "statement_count": 1,
+    "source_snapshot": "qualification/release/assets/historical-schema-sources/SqliteLedger-v1.java"
   },
   {
     "version": 2,
@@ -15,7 +16,8 @@
     "source_sha256": "c02b93765794857a0245813ddbab98008197fd1496c7ae6f0e7867cf08fe81c9",
     "fixture": "qualification/release/assets/release-schema-2.sql",
     "fixture_sha256": "e8bd5f35d31dc172619ff571450002612e0fffe2989068f1f5a027744206cd1f",
-    "statement_count": 3
+    "statement_count": 3,
+    "source_snapshot": "qualification/release/assets/historical-schema-sources/SqliteLedger-v2.java"
   },
   {
     "version": 3,
@@ -24,7 +26,8 @@
     "source_sha256": "8a1810829685b0a9e661e23a4be863e3eb3110a74bbeb083ea4944f121c63a0c",
     "fixture": "qualification/release/assets/release-schema-3.sql",
     "fixture_sha256": "f86e1793cc44fc70eeff713ddfe121da1d260cdd4bd1734fb52315f1a21358e1",
-    "statement_count": 3
+    "statement_count": 3,
+    "source_snapshot": "qualification/release/assets/historical-schema-sources/SqliteLedger-v3.java"
   },
   {
     "version": 4,
@@ -33,7 +36,8 @@
     "source_sha256": "21c198fb14d1153147e2788090b1ca579bca51072c464b67bdc8cd996ab74ef0",
     "fixture": "qualification/release/assets/release-schema-4.sql",
     "fixture_sha256": "15a1b3a7c80ea247a441eb03ad20d89ce6b0ed431522ffbb209482515fa92a06",
-    "statement_count": 3
+    "statement_count": 3,
+    "source_snapshot": "qualification/release/assets/historical-schema-sources/SqliteLedger-v4.java"
   },
   {
     "version": 5,
@@ -42,6 +46,7 @@
     "source_sha256": "07d42dcac9297ff60cbd474e63e9931f1eb0f858dd12f890307c683531452b4c",
     "fixture": "qualification/release/assets/release-schema-5.sql",
     "fixture_sha256": "aff9dd9123deff645e631da7b56c6e76d264af3d8fd2d7470e14feafe05395bf",
-    "statement_count": 4
+    "statement_count": 4,
+    "source_snapshot": "qualification/release/assets/historical-schema-sources/SqliteLedger-v5.java"
   }
 ]

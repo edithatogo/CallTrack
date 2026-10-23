@@ -5,5 +5,6 @@
   "source_sha256": "3900a621eef3027ab0cbc05e12b4a88a0d890d6f2c442eb9197b5543e04fce70",
   "fixture": "qualification/release/assets/import-schema-1.sql",
   "fixture_sha256": "86a21611a2360476e9f31d0f04f2c7bebf3f4432593a983df74fee409883c8dc",
-  "statement_count": 2
+  "statement_count": 2,
+  "source_snapshot": "qualification/release/assets/historical-schema-sources/SqliteImportStore-v1.java"
 }
