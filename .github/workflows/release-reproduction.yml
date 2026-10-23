@@ -26,11 +26,6 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.15.1'
-      - name: Select repository Python runtime
-        run: |
-          python -m venv .venv
-          .venv/bin/python -c "import sys; assert sys.version_info[:3] == (3, 15, 1), sys.version"
-          echo "CALLTRACK_PYTHON=$GITHUB_WORKSPACE/.venv/bin/python" >> "$GITHUB_ENV"
       - name: Checkout qualification tooling
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -44,6 +39,12 @@ jobs:
           ref: ${{ inputs.candidate_sha }}
           fetch-depth: 1
           persist-credentials: false
+      - name: Select repository Python runtime
+        working-directory: qualification-tools
+        run: |
+          python -m venv .venv
+          .venv/bin/python scripts/verify_python_runtime.py
+          echo "CALLTRACK_PYTHON=$GITHUB_WORKSPACE/qualification-tools/.venv/bin/python" >> "$GITHUB_ENV"
       - name: Verify tooling and Conductor
         working-directory: qualification-tools
         run: |
