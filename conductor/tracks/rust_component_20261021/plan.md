@@ -2,29 +2,29 @@
 
 ## Phase 1: Refresh mapping and requirements
 
-- [ ] Task: Read prerequisite evidence and archived research; map behaviour, native APIs, dependencies and code ownership.
-- [ ] Task: Record findings, refined requirements and explicit acceptance/unsupported cases.
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md).
+- [x] Task: Read prerequisite evidence and archived research; map behaviour, native APIs, dependencies and code ownership.
+- [x] Task: Record findings, refined requirements and explicit acceptance/unsupported cases in findings.md and requirements.md.
+- [x] Task: Phase Verification & Checkpoint (current consumer map and prerequisite limits documented).
 
 ## Phase 2: Dependency and prototype decision
 
-- [ ] Task: Compare retained/native/owned/library replacement and deferral, including prototype-only versus long-term responsibilities.
-- [ ] Task: Run only uncertainty-resolving bounded experiments; record versions/licences/transitives/toolchain/cleanup and expiry criteria.
-- [ ] Task: Record adoption/deferral decision and refine implementation/rollback tasks before production change.
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md).
+- [x] Task: Compare retained/native/owned/library replacement and deferral, including prototype-only versus long-term responsibilities.
+- [x] Task: Refresh versions, licences/transitives and toolchain; no new parser experiment because the only current schema has no Android producer or accepted consumer.
+- [x] Task: Record the justified production Rust deferral and reconsideration gate; no implementation or rollback is needed.
+- [x] Task: Phase Verification & Checkpoint (Rust remains isolated; no production dependencies changed).
 
 ## Phase 3: Conditional implementation
 
-- [ ] Task: Establish golden/contract baseline and meaningful failing regressions before behaviour changes.
-- [ ] Task: Identify an actual consumer/bottleneck and baseline; refresh crate/toolchain/licence/transitive maintenance evidence and compare owned Kotlin, libraries and deferral.
-- [ ] Task: Prototype bounded import parsing or a selected backup format only if it resolves the named uncertainty; compare UniFFI and direct bindings including Kotlin/Native access, not JVM-only bindings.
-- [ ] Task: Test full input contracts, hostile bounds/fuzzing, panic/error/cancellation/lifetime handling and target/ABI packaging; measure end-to-end including FFI copies/build cost.
-- [ ] Task: Promote only with documented material benefit and retirement of duplicate responsibility, preserving receipts/old readers/recovery; otherwise record deferral/removal and leave Kotlin selected.
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md).
+- [x] Task: Establish the existing source identity golden baseline; no behaviour changed and the existing synthetic Rust contract suite passes.
+- [x] Task: Identify actual consumers/bottlenecks; no product bottleneck or supported cross-platform parser consumer is established.
+- [x] Task: Evaluate a bounded parser prototype; not applicable because the preview schema has no Android exporter and a second parser would invent unsupported format ownership.
+- [x] Task: Re-run applicable host contract/format/lint checks; FFI, fuzz, panic-boundary and target/ABI tests are not applicable without an adopted Rust component and remain future adoption gates.
+- [x] Task: Record no promotion and retain Kotlin/native ownership; preserve all identities, receipts and recovery behavior unchanged.
+- [x] Task: Phase Verification & Checkpoint (see verification-20261024.md).
 
 ## Phase 4: Review, acceptance and handoff
 
-- [ ] Task: Run applicable shared/rendered/native/cloud/package/operational acceptance with exact source/artifact evidence; verify cleanup and preserving upgrade/recovery.
+- [x] Task: Run local Rust host/tooling checks only; native/cloud/package/operational acceptance is not claimed because no application integration is adopted.
 - [ ] Task: Perform Conductor review, apply fixes and rerun affected checks.
-- [ ] Task: Update requirements, decisions, remaining limitations and next-track inputs; retire superseded code/prototypes only after parity.
-- [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger.
+- [x] Task: Update requirements, decisions, remaining limitations and next-track inputs; no prototype or app code is retired.
+- [ ] Task: Final checkpoint and archive after review of the explicit Rust deferral; the deferral does not unlock Track19.

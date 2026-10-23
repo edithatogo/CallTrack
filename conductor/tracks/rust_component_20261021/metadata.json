@@ -1,16 +1,19 @@
 {
   "track_id": "rust_component_20261021",
   "type": "research-led-development",
-  "status": "new",
+  "status": "in_progress",
   "milestone": "M8-component",
   "created_at": "2026-10-21",
-  "updated_at": "2026-10-21",
+  "updated_at": "2026-10-24",
   "depends_on": [
     "shared_ui_20261021"
   ],
   "requirements": "R26",
   "track_number": 18,
   "execution_stage": 7,
-  "implementation_status": "pending",
-  "production_adopted": false
+  "implementation_status": "decision-recorded-review-pending",
+  "production_adopted": false,
+  "prerequisite_deferral_document": "prerequisite-deferral.md",
+  "decision_document": "decisions.md",
+  "deferral_document": "deferral.md"
 }
