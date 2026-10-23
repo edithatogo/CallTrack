@@ -1,0 +1,58 @@
+{
+  "observed_at_utc": "2026-10-23T18:59:54Z",
+  "repository": {
+    "name": "edithatogo/CallTrack",
+    "visibility": "PUBLIC"
+  },
+  "workflow_run": {
+    "id": 40007294827,
+    "name": "Cold Linux release reproduction",
+    "event": "workflow_dispatch",
+    "branch": "main",
+    "workflow_revision": "ca8103f735f2e41753c1c5af446e021a8460fb74",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/edithatogo/CallTrack/actions/runs/40007294827",
+    "elapsed_seconds": 197,
+    "completed_steps": [
+      "Initialize digest-pinned container",
+      "Install Linux prerequisites",
+      "Select Python 3.15.1",
+      "Checkout qualification tooling and exact candidate separately",
+      "Verify tooling and Conductor",
+      "Build release candidate with fresh SDK and Gradle home",
+      "Upload unsigned APK and evidence"
+    ]
+  },
+  "candidate": {
+    "revision": "15998ba887e76ea223a6a8ba3430dd640330ed99",
+    "expected_unsigned_apk_sha256": "89a548489035a6df8c464cc621e49dfbb0c9d6d16619bbe54f27f78e612d5f86",
+    "uploaded_artifact_name": "cold-linux-release-evidence",
+    "uploaded_apk_filename": "app-release-unsigned.apk",
+    "downloaded_apk_sha256": "89a548489035a6df8c464cc621e49dfbb0c9d6d16619bbe54f27f78e612d5f86",
+    "apk_matches_expected": true,
+    "receipt_sha256": "29013bc06495c7fb93298113df3b865d150f2d54b85e951402655e602b45d7fc",
+    "runtime_inventory_sha256": "74f7138b8d5ee827095aff1efa28009ff7043675fe77589faf74441d50c73c82",
+    "build_log_sha256": "73bcc4d9cec52dbc6c493acf2f9400e724ef8f455605cf72e3bc2ba66d076e95"
+  },
+  "receipt_summary": {
+    "success": true,
+    "release_ready": false,
+    "build_exit_code": 0,
+    "jvm_tests": 115,
+    "jvm_failures": 0,
+    "jvm_errors": 0,
+    "lint_hints": 2,
+    "lint_warnings": 23,
+    "unsigned_signature_verified": true,
+    "bitwise_match_to_macos_candidate": true,
+    "script_hosted_ci_flag": false,
+    "physical_host_independence": false
+  },
+  "qualification_scope": [
+    "Hosted GitHub Actions execution of the exact unsigned 15998ba candidate passed and its uploaded APK matched the expected macOS SHA-256.",
+    "The helper receipt's hosted_ci and physical_host_independence fields remain false; provider run metadata independently proves the hosted execution, and no separate physical-host independence is claimed.",
+    "This evidence does not qualify production signing, permanent identity or key custody, physical-device calls, remote calendars, source conveyance, publication, or operational observation.",
+    "The candidate predates the merged Track14 UI changes; the current application requires a fresh candidate freeze and acceptance before release."
+  ]
+}

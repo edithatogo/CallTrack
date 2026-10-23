@@ -9,16 +9,21 @@
 - [Decisions](decisions.md)
 - [Verification and remaining gates](verification.md)
 - [Review](review.md)
+- [Hosted CI refresh review](review-hosted-ci-refresh-20261024.md)
 - [Preparation evidence](preparation-evidence.json)
 - [Resolved dependency report](dependency-report.json)
 
-## Live gate refresh — 2026-10-23
+## Live gate refresh — 2026-10-24
 
-The repository-target gate is resolved: [edithatogo/CallTrack](https://github.com/edithatogo/CallTrack)
-is private and has seventeen stacked draft PRs. GitHub Actions jobs are enabled
-but fail before assigning a runner with an account billing/spending-limit error;
-hosted CI therefore remains unqualified. See the
-[PR series](../../../qualification/successor-pr-series-20261023.md).
+[edithatogo/CallTrack](https://github.com/edithatogo/CallTrack) is public. The
+exact unsigned candidate `15998ba` was rebuilt by the
+hosted [cold Linux release reproduction](hosted-reproduction-evidence-20261024.json):
+the run passed, uploaded its evidence, and produced an APK matching the recorded
+macOS SHA-256. This clears the Actions billing/runner-access blocker and qualifies
+hosted reproduction for that candidate. The newer mainline includes Track14 app
+changes, so the release artifact must be refrozen and requalified before it can
+represent the current app. Hosted proof does not qualify a physical host or any
+device, signing, calendar, source-conveyance, or operational gate.
 
 Track5 remains not release-ready. The development identity remains selected for
 local qualification; production identity and key custody remain pending. The
@@ -38,9 +43,10 @@ The9464408 candidate reproduces exactly on a separate native Linux host with no
 Mac tool/cache mounts and fresh SDK/Gradle downloads.115 JVM tests per Mac/Linux
 build and131 Python tests on both systems pass. The cold run exposed three missing
 metadata checksums;739 entries are now enforced without changing old hashes or
-runtime dependencies. The source/notices bundle is refreshed. Hosted GitHub CI
-is prepared; current execution is blocked by the account billing/spending limit
-before runner assignment. Original full-M4 gates stay open.
+runtime dependencies. The source/notices bundle is refreshed. At this dated
+checkpoint, hosted GitHub CI was prepared but blocked by the account
+billing/spending limit before runner assignment; the blocker was later cleared
+as recorded in the live refresh above. Original full-M4 gates stay open.
 
 ## Earlier asset/source/notices checkpoint — 2026-10-22
 
