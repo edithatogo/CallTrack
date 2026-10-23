@@ -36,6 +36,25 @@ track's scope; use a separately authorised execution after these gates pass.
    Publish corresponding source and licence material with the chosen conveyance
    route when distribution is authorised; exclude credentials and private evidence.
 
+## Unsigned same-host qualification
+
+After committing the source, run:
+
+```sh
+python3 scripts/qualify_release_build.py --output .local/release-evidence/UNIQUE-RUN \
+  --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"
+```
+
+The output directory must not exist. The runner refuses dirty source, clones the
+exact commit twice without local hardlinks, builds/tests/lints the release variant,
+records raw dependency reports and APK badging, and compares unsigned APK SHA256.
+It does not sign, install, upload, or use private reference inputs. Failure leaves
+a failed receipt; keep it and use a fresh output directory after investigating.
+Both checkouts share the host and dependency cache. A byte match is same-host
+repeatability only, not independent-environment reproduction, checksum trust,
+licence clearance, upgrade acceptance or production readiness. The current
+development identity remains unchanged.
+
 ## Signing and channels
 
 Choose key custodian, offline recovery copy/access procedure and channel policy

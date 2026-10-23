@@ -4,6 +4,16 @@ Evidence refresh: 2026-10-20, source checkpoint 28b4180 (track start 4b31e39).
 Current local readback: clean tree at start; no Git remotes configured. No public
 repository, hosted CI, release tag, upload, signing key or store acceptance exists.
 
+## Resumption note — 2026-10-21
+
+The sections below retain the dated preparation audit. Their descriptions of
+Track4 being unfinished, schema2, WorkManager2.7.1 and Java-only app source are
+historical. Current source is schema6/import2, WorkManager2.12.0 with three Kotlin
+model components. Track4 selected API36 emulator acceptance is complete; physical,
+cloud, wider-device and public-release claims remain pending. Channel policies
+below have not been refreshed and must be rechecked before selecting/submitting
+a distribution route. No new channel eligibility claim is made.
+
 ## Channel comparison
 
 | Route | Evidence and conclusion | Remaining work |

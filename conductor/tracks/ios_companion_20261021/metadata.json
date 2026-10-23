@@ -1,0 +1,23 @@
+{
+  "track_id": "ios_companion_20261021",
+  "type": "research-led-development",
+  "status": "new",
+  "milestone": "M9",
+  "created_at": "2026-10-21",
+  "updated_at": "2026-10-21",
+  "depends_on": [
+    "kotlin_20261020",
+    "release_20261020",
+    "compose_app_20261021",
+    "shared_core_20261021",
+    "macos_companion_20261021",
+    "shared_ui_20261021",
+    "rust_component_20261021",
+    "cross_platform_20261021"
+  ],
+  "requirements": "R16, R17, R24, R26",
+  "track_number": 20,
+  "execution_stage": 9,
+  "implementation_status": "pending",
+  "production_adopted": false
+}

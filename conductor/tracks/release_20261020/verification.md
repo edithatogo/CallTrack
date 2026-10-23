@@ -1,5 +1,22 @@
 # Verification and readiness boundary
 
+## Current checkpoint — 2026-10-21
+
+Unsigned development qualification and review pass: see [current review](review-20261021.md),
+[source/artifact evidence](unsigned-evidence.json) and [runtime inventory](runtime-artifacts-20261021.json).
+Two clean checkouts at6b353f4 produced identical unsigned APKs in230.9s total,
+110 release JVM tests each andzero lint errors (32 warnings,5 hints).78 host tests
+pass. The user selected retaining development identity and leaving production
+signing pending. No runtime dependency or app change, native release acceptance,
+publication or key generation occurred.89 runtime artifact hashes/POM declarations
+are inventoried; per-artifact trust/licence/asset clearance remains open.
+
+The sections below are the retained preparation checkpoint, not current M3
+status. Track4 is now archived for selected-emulator acceptance. The original
+D01–D09 release gates stay open where not actually observed.
+
+## Preparation history — 2026-10-20
+
 Date: 2026-10-20. This track implements community preparation documents/templates,
 not app behaviour. No new runtime or build plugin dependency is added. No APK was
 installed, permission granted, call made, account registered or artifact uploaded.
