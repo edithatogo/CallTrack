@@ -187,3 +187,20 @@ That import-control migration/test issue remains open and is not attributed to
 the recovery-card changes. Font/RTL, TalkBack/Switch Access, recreation/process
 restore, destination disappearance, minimum/intermediate OS matrix and full
 Track14 acceptance remain pending. See the [recovery cards review](review-20261024-recovery-cards.md).
+
+## Compose test-tag accessibility selector — 2026-10-24
+
+The rendered `AutomaticSettingsTest` exposed that Compose maps
+`testTagsAsResourceId` tags to raw accessibility resource names, while the
+test helper recognized only package-qualified Android resource IDs. The import
+create-action panel now has a parent semantics node enabling tag exposure, and
+`RenderedUi` matches either the raw tag or the package-qualified resource ID.
+The helper still checks the target package before injecting any touch.
+
+The selected JDK17.0.21+9 / SDK36 run passed `:app:testDebugUnitTest
+:app:lintDebug :app:compileDebugAndroidTestKotlin` and all three
+`AutomaticSettingsTest` methods, including no-preview/no-confirm behavior on
+opening the historical import screen. `HistoricalImportActionsPanelTest` also
+passed on the API36 AVD. The fixture-backed delivery journey remains pending;
+its setup and UI phases were attempted in separate Gradle invocations, which
+did not preserve the emulator app's Calendar permission. See the [review](review-20261024-accessibility-selector.md).

@@ -27,12 +27,14 @@ internal fun HistoricalImportCreateActionPanel(
     label: String,
     onCreate: () -> Unit,
 ) {
-    ComposeActionButton(
-        label = label,
-        tag = "import_create",
-        enabled = state.createEnabled,
-        onClick = onCreate,
-    )
+    Column(modifier = Modifier.fillMaxWidth().semantics { testTagsAsResourceId = true }) {
+        ComposeActionButton(
+            label = label,
+            tag = "import_create",
+            enabled = state.createEnabled,
+            onClick = onCreate,
+        )
+    }
 }
 
 @Composable

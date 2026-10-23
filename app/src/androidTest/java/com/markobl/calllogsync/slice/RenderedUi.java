@@ -60,8 +60,9 @@ final class RenderedUi {
                         : node.getText() == null ? null : node.getText().toString();
         if (node.isVisibleToUser()
                 && actual != null
-                && (id ? actual.endsWith(":id/" + value) : value.equalsIgnoreCase(actual)))
-            return node;
+                && (id
+                        ? actual.equals(value) || actual.endsWith(":id/" + value)
+                        : value.equalsIgnoreCase(actual))) return node;
         for (int i = 0; i < node.getChildCount(); i++) {
             AccessibilityNodeInfo found = find(node.getChild(i), value, id);
             if (found != null) return found;
