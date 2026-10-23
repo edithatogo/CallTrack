@@ -27,7 +27,7 @@ the archived research decisions; research Tracks7–13 remain unchanged.
   *Link: [Track](tracks/macos_companion_20261021/index.md)*
 
 ---
-- [ ] **Track: Compose Multiplatform Android and macOS UI** (Track17)
+- [~] **Track: Compose Multiplatform Android and macOS UI** (Track17)
   *Link: [Track](tracks/shared_ui_20261021/index.md)*
 
 ---
