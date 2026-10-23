@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.View
 import android.widget.*
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.getValue
@@ -31,7 +30,7 @@ class HistoricalImportActivity : ComponentActivity() {
     private var currentId: String? = null
     private var zone: String? = null
     private var session: HistoricalImport.Session? = null
-    private var destination: Spinner? = null
+    private var destinationState by mutableStateOf(HistoricalImportDestinationUiState())
     private var filters by mutableStateOf(HistoricalImportFiltersUiState())
     private var actionState by mutableStateOf(HistoricalImportActionState())
     private var summary: ComposeView? = null
@@ -40,7 +39,8 @@ class HistoricalImportActivity : ComponentActivity() {
     private var feedbackText by mutableStateOf("")
     private var historyState by mutableStateOf(HistoricalImportHistoryUiState())
     private val historyTargets = HashMap<String, String>()
-    private var choices: List<AndroidCalendarSink.Choice> = Collections.emptyList()
+    private val destinationTargets = HashMap<String, Long>()
+    private var selectedDestinationToken: String? = null
     private var selected = -1L
     private var historyCursor = -1L
     private var renderVersion = 0L
@@ -83,35 +83,22 @@ class HistoricalImportActivity : ComponentActivity() {
                 9,
             )
         }
-        destination = Spinner(this)
-        destination!!.id = R.id.import_calendar_picker
-        destination!!.contentDescription = getString(R.string.slice_choose)
-        layout.addView(destination)
-        destination!!.adapter =
-            ArrayAdapter(
-                this,
-                android.R.layout.simple_spinner_dropdown_item,
-                Collections.singletonList(getString(R.string.slice_choose)),
-            )
-        destination!!.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long,
-                ) {
-                    selected =
-                        if (position > 0 && position <= choices.size) choices[position - 1].id
-                        else -1
-                    buttons()
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                    selected = -1
-                    buttons()
+        val destinationPicker =
+            ComposeView(this).apply {
+                id = R.id.import_calendar_picker
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    HistoricalImportDestinationPanel(
+                        state = destinationState,
+                        chooseLabel = stringResource(R.string.slice_choose),
+                        unavailableLabel = stringResource(R.string.auto_destination_unavailable),
+                        onSelect = ::selectDestination,
+                    )
                 }
             }
+        layout.addView(destinationPicker)
         val filtersPanel =
             ComposeView(this).apply {
                 id = R.id.import_filters
@@ -289,7 +276,7 @@ class HistoricalImportActivity : ComponentActivity() {
                 newerEnabled = !busy && historyBack.isNotEmpty(),
                 olderEnabled = !busy && nextHistoryCursor > 0,
             )
-        destination?.isEnabled = !busy && calendarAccess()
+        destinationState = destinationState.copy(enabled = !busy && calendarAccess())
     }
 
     private fun loadCalendars(preferred: Long) {
@@ -300,17 +287,25 @@ class HistoricalImportActivity : ComponentActivity() {
                     else Collections.emptyList()
                 runOnUiThread {
                     if (isDestroyed) return@runOnUiThread
-                    choices = loaded
-                    val labels = ArrayList<String?>()
-                    labels.add(getString(R.string.slice_choose))
-                    var position = 0
-                    for (i in loaded.indices) {
-                        labels.add(loaded[i].name)
-                        if (loaded[i].id == preferred) position = i + 1
-                    }
-                    destination!!.adapter =
-                        ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, labels)
-                    destination!!.setSelection(position)
+                    destinationTargets.clear()
+                    val options =
+                        loaded.map { choice ->
+                            val token = UUID.randomUUID().toString()
+                            destinationTargets[token] = choice.id
+                            HistoricalImportDestinationOption(
+                                token,
+                                choice.name ?: getString(R.string.auto_destination_unavailable),
+                            )
+                        }
+                    selectedDestinationToken =
+                        options.firstOrNull { destinationTargets[it.token] == preferred }?.token
+                    selected = selectedDestinationToken?.let(destinationTargets::get) ?: -1L
+                    destinationState =
+                        HistoricalImportDestinationUiState(
+                            options = options,
+                            selectedToken = selectedDestinationToken,
+                            enabled = !busy && calendarAccess(),
+                        )
                     if (session != null) render()
                     buttons()
                 }
@@ -362,6 +357,15 @@ class HistoricalImportActivity : ComponentActivity() {
                 .setPositiveButton(R.string.import_create) { _, _ -> start.run() }
                 .show()
         else start.run()
+    }
+
+    private fun selectDestination(token: String) {
+        val id = destinationTargets[token] ?: return
+        if (destinationState.options.none { it.token == token }) return
+        selectedDestinationToken = token
+        selected = id
+        destinationState = destinationState.copy(selectedToken = token)
+        buttons()
     }
 
     private fun confirmImport() {
@@ -499,7 +503,11 @@ class HistoricalImportActivity : ComponentActivity() {
     }
 
     private fun destinationName(value: HistoricalImport.Session): String? {
-        for (choice in choices) if (choice.id == value.calendar) return choice.name
+        destinationState.options
+            .firstOrNull { destinationTargets[it.token] == value.calendar }
+            ?.let {
+                return it.label
+            }
         return getString(R.string.auto_destination_unavailable)
     }
 
@@ -619,6 +627,7 @@ class HistoricalImportActivity : ComponentActivity() {
 
     public override fun onDestroy() {
         running = false
+        destinationTargets.clear()
         executor.shutdown()
         super.onDestroy()
     }

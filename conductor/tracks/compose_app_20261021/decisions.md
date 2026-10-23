@@ -111,3 +111,31 @@ acceptance remain open.
 **Rollback:** Restore the existing `TextView`/`LinearLayout` history rendering
 and row listeners. No session, candidate, receipt or calendar data migration is
 required.
+
+## D14-6: Render historical import destination choice with Compose
+
+**Decision:** Replace the native import `Spinner` with a lifecycle-disposed
+`ComposeView` that retains `import_calendar_picker`. Render only the current
+Activity-supplied calendar labels. Each provider choice receives a fresh opaque
+token; the Activity retains the token-to-calendar-ID map, rejects stale tokens,
+persists the selected calendar ID in the existing saved-state field, and
+continues to own permission checks, provider queries and all import actions.
+Use only the already-qualified Compose Foundation and UI stack. The list
+expands inline so no Material dependency is introduced.
+
+**Alternatives:** Keep the native spinner (no Compose control-migration
+evidence); pass calendar IDs to the composable (unneeded identity exposure);
+add Compose Material for a dropdown (not required for this bounded screen and
+would expand the qualified dependency graph); move provider queries or import
+delivery into the composable (rejected).
+
+**Promotion/removal:** This is a presentation migration. Preserve the host ID,
+saved calendar-ID key and Activity-owned `selected` ID. Component tests verify
+selection is explicit and returns only an opaque token. Activity tests verify
+the Compose host and the empty/permission-denied state. Real provider selection,
+permission revocation, activity recreation with an actual selected calendar,
+and broader accessibility acceptance remain open.
+
+**Rollback:** Restore the native Spinner listener/adapter and remove the
+Compose destination component. No schema, receipt, calendar event or
+confirmation semantics change.
