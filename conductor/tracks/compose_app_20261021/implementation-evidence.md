@@ -339,3 +339,23 @@ and action are rendered in the no-permission state. `:app:testDebugUnitTest`,
 This does not qualify a system permission grant/denial/revocation journey or
 provider behavior. Those remain pending with physical, live-accessibility and
 OS-matrix gates. See the [access action review](review-20261024-import-access.md).
+
+## Historical import explanatory text — 2026-10-24
+
+The native intro TextView now renders through a lifecycle-disposed ComposeView
+with a stable `import_intro_panel` host. The Activity still formats the
+localized explanation with its selected time-zone ID and supplies the final
+text to a read-only composable. The Compose panel starts no import or provider
+work, and no dependency, session or persisted state changed.
+
+On API36 `calltrack-track14-api36`, the focused suite passed seven
+instrumentation tests across the intro, access action, destination selection,
+history, and Activity host. The tests verified exact zone-formatted intro
+visibility, enabled/disabled destination behavior, explicit opaque-token and
+permission callback dispatch, and an empty session store when the Activity is
+opened. `:app:testDebugUnitTest`, `:app:lintDebug`, Android-test Kotlin/Java
+compilation, pinned ktfmt0.59 and `git diff --check` passed.
+
+Provider-backed calendar selection, permission grant/denial/revocation,
+TalkBack/Switch Access, wider font/RTL and OS matrix acceptance remain pending.
+See the [intro review](review-20261024-import-intro.md).

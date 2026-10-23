@@ -161,3 +161,23 @@ matrix and are not inferred from the component callback test.
 
 **Rollback:** Restore the native button and remove the new host ID/panel. No
 permission state, provider access or data changes are involved.
+
+## D14-8: Render historical-import explanatory text with Compose
+
+**Decision:** Replace the historical-import intro TextView with a
+lifecycle-disposed ComposeView retaining a stable `import_intro_panel` host
+ID. The Activity formats the same localized string using its already selected
+time-zone ID and supplies the text to a read-only Compose panel. Import range,
+session creation and provider work remain Activity-owned.
+
+**Alternatives:** Keep the one remaining static intro in Views (no complete
+presentation migration evidence); move time-zone selection or import defaults
+into composition (rejected); add a dependency (not needed).
+
+**Promotion/removal:** This is a presentation-only migration. An API36
+instrumentation test checks the exact formatted text and stable host, while the
+Activity test verifies no import session was created. Broader font/RTL and
+screen-reader acceptance remain open.
+
+**Rollback:** Restore the TextView with its existing formatted resource string
+and remove the Compose host/panel. No data or state migration is required.

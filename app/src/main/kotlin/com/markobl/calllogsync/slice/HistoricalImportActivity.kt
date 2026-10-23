@@ -69,9 +69,15 @@ class HistoricalImportActivity : ComponentActivity() {
         layout.orientation = LinearLayout.VERTICAL
         val pad = (16 * resources.displayMetrics.density).toInt()
         layout.setPadding(pad, pad, pad, pad)
-        val intro = TextView(this)
-        intro.text = getString(R.string.import_intro, zone)
-        layout.addView(intro)
+        val introPanel =
+            ComposeView(this).apply {
+                id = R.id.import_intro_panel
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent { HistoricalImportIntroPanel(getString(R.string.import_intro, zone)) }
+            }
+        layout.addView(introPanel)
         val accessPanel =
             ComposeView(this).apply {
                 id = R.id.import_access_panel
