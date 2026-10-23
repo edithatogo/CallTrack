@@ -51,8 +51,14 @@ is unstarted with null dates and zero accepted days/hours. The user previously
 chose to retain the development identity, leaving production signing/key custody
 pending.
 
-Future implementation Tracks14–20 have not started. Follow the approved sequence
-below; iOS remains last.
+Track14 has begun under a scoped development-only prerequisite deferral. Its first
+read-only automatic-settings status slice now uses lifecycle-bound ComposeViews;
+the Activity retains every provider, permission and action effect. Local build,
+JVM tests and APK packaging pass. The reviewed status component and its host
+Activity tests now pass on the API36 AVD; review fixed the required lifecycle
+owner and test-manifest setup. Manual logging, import, recovery and broader
+native accessibility/lifecycle acceptance remain. Tracks15–20 are still planned
+in the approved order, with iOS last.
 
 Tracks1–4 and research Tracks7–13 are complete, reviewed and archived. The
 [Track4 parity implementation](archive/parity_20261020/index.md) passes P01–P10 for
