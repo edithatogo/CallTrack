@@ -80,3 +80,7 @@ See [contribution guide](CONTRIBUTING.md), [data lifecycle](PRIVACY.md),
 [security status](SECURITY.md) and [release runbook](RELEASING.md). These prepare
 future community distribution; they do not establish a release candidate or public
 reporting channel. Track4 acceptance and signing/distribution gates remain open.
+
+[Compose research](prototypes/compose/README.md) is an isolated synthetic app, not
+part of this working application's build or runtime. Its research decision retains
+Views until real screen behaviour and manual accessibility are qualified.

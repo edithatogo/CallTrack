@@ -94,3 +94,12 @@ translation with library takeover. Three pure components migrate behind Java
 contracts with pinned Kotlin2.3.21, without data-schema or UI changes. Remaining21
 Java files, stabilized M3/M4 contracts and full preserving update/recovery acceptance
 remain open before M5 completion; a pilot does not authorize Compose/KMP rewrites.
+
+## M6 research decision
+
+[Track7 research](archive/compose_20261020/index.md) tested an isolated Compose screen
+and compared incremental/native/library options. Retain the working Views UI;
+production M6 migration is deferred pending stable M3/M5 controller/state contracts
+and actual behavioural/manual accessibility acceptance. The conditional research
+track can close with this justified decision; the M6 production exit gate does not
+change. Reopen the recorded decision before adopting any prototype screen/version.

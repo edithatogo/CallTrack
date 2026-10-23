@@ -56,7 +56,7 @@ The following are proposed extensions, not changes to the minimum parity release
 
 ## Conductor execution policy (2026-10-20)
 
-The [track registry](tracks.md) now owns execution. These inventories are planning hypotheses and dated evidence, not fully specified future implementations. Each later track must map, understand, research and document its requirements and dependency options when activated. Dependencies can be temporary prototype aids, enduring replacements for existing libraries, or replacements for app-owned/native code. Decisions require explicit purpose, evidence, promotion/removal criteria and recovery. See [workflow](workflow.md). Tracks 1–3 are complete; Tracks4–6 are active and seven tracks remain unstarted.
+The [track registry](tracks.md) now owns execution. These inventories are planning hypotheses and dated evidence, not fully specified future implementations. Each later track must map, understand, research and document its requirements and dependency options when activated. Dependencies can be temporary prototype aids, enduring replacements for existing libraries, or replacements for app-owned/native code. Decisions require explicit purpose, evidence, promotion/removal criteria and recovery. See [workflow](workflow.md). Tracks1–3 and Track7 research are complete; Tracks4–6 are active and six tracks remain unstarted. Track7 production adoption is deferred, not delivered.
 
 ## Track 1 mapping outcome
 
@@ -86,3 +86,12 @@ legacy null/whitespace/overflow semantics. [K01–K07](tracks/kotlin_20261020/re
 separate this bounded qualification from the remaining21 Java files, prerequisite
 release acceptance and whole-app migration/upgrade requirements. No Compose/KMP
 or coroutine architecture adoption follows from adding Kotlin source.
+
+## Track7 Compose research outcome
+
+R15/R26 now have screen/state/accessibility mapping, dependency comparisons and an
+isolated synthetic Compose experiment. [C01–C08](archive/compose_20261020/requirements.md)
+distinguish prototype evidence from production adoption. The final decision retains
+Views and defers real migration with reopening gates; R15's production UI outcome
+remains pending. Conditional research closure does not establish an adopted screen
+or waive manual accessibility, permission/provider or process-recovery acceptance.

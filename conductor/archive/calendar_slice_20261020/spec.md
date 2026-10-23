@@ -14,7 +14,7 @@ One event accurately persisted and read back, with denied-permission behaviour d
 
 ## Inputs and dependencies
 
-Prerequisites: [build](../../archive/build_20261020/index.md). Requirement references: R02–R04, R08, R10, R19 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
+Prerequisites: [build](../build_20261020/index.md). Requirement references: R02–R04, R08, R10, R19 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
 
 ## Required outputs
 

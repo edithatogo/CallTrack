@@ -14,7 +14,7 @@ Decision supported by second-platform prototype; production migration only if ju
 
 ## Inputs and dependencies
 
-Prerequisites: [compose](../compose_20261020/index.md), [kmp](../kmp_20261020/index.md). Requirement references: R17, R24 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
+Prerequisites: [compose](../../archive/compose_20261020/index.md), [kmp](../kmp_20261020/index.md). Requirement references: R17, R24 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
 
 ## Required outputs
 
@@ -27,3 +27,10 @@ Decision supported by second-platform prototype; production migration only if ju
 ## Out of scope
 
 No automatic adoption of shortlisted technology, wholesale rewrite, paid service, unqualified platform parity or public release. Cross-track responsibilities remain with their owning tracks. A negative feasibility result or justified deferral is an acceptable research outcome.
+
+## Android UI prerequisite clarification
+
+The [Compose research decision](../../archive/compose_20261020/decisions.md) retains Views in
+the working Android app; a completed research track does not mean an Android
+Compose UI exists. At activation, map the actual Android/second-platform workflows
+and qualify the UI/state adoption requirements afresh before proposing shared UI.

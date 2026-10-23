@@ -42,3 +42,14 @@ changes runtime resolution and requires recorded graph readback. No app-owned
 coroutine, Room, DataStore, Compose, KMP or Rust adoption occurs. Twenty-one Java
 production files remain, with explicit ownership and conversion/removal gates in
 the track. Mixed-language qualification and full M5 completion remain distinct.
+
+## Track7 Compose research outcome
+
+The [isolated experiment](archive/compose_20261020/index.md) uses prototype-only
+Compose BOM2026.03.00 (UI1.10.5/Material3 1.4.0), Activity Compose1.12.4 and
+Kotlin/Compose compiler2.3.21. It is a standalone Gradle project absent from root
+settings, with separate ID, no sensitive/network permissions and no provider code.
+Retain Views in the working app; no Compose runtime adoption or legacy UI removal
+is approved by this experiment. Revisit after stable M3/M5 state contracts, refreshed
+compatibility and real screen/manual accessibility acceptance. Prototype tools can
+be retired independently; no application data/code rollback is needed.
