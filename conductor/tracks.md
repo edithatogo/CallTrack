@@ -19,7 +19,7 @@ the archived research decisions; research Tracks7–13 remain unchanged.
   *Link: [Track](tracks/compose_app_20261021/index.md)*
 
 ---
-- [ ] **Track: KMP shared core implementation** (Track15)
+- [~] **Track: KMP shared core implementation** (Track15)
   *Link: [Track](tracks/shared_core_20261021/index.md)*
 
 ---

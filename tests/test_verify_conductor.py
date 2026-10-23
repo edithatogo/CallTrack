@@ -98,6 +98,7 @@ class VerificationFailures(unittest.TestCase):
         shared_core = self.root / 'conductor/tracks/shared_core_20261021/metadata.json'
         data = json.loads(shared_core.read_text())
         data['status'] = 'in_progress'
+        data.pop('prerequisite_deferral_document', None)
         shared_core.write_text(json.dumps(data))
         with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
             self.run_verifier()
@@ -109,6 +110,33 @@ class VerificationFailures(unittest.TestCase):
         data['prerequisite_deferral_document'] = 'prerequisite-deferral.md'
         path.write_text(json.dumps(data))
         with self.assertRaisesRegex(AssertionError, 'cannot complete the track'):
+            self.run_verifier()
+
+    def test_scoped_track15_deferral_does_not_unlock_track16(self):
+        shared_core = self.root / 'conductor/tracks/shared_core_20261021'
+        path = shared_core / 'metadata.json'
+        data = json.loads(path.read_text())
+        data['status'] = 'in_progress'
+        data['prerequisite_deferral_document'] = 'prerequisite-deferral.md'
+        path.write_text(json.dumps(data))
+        (shared_core / 'prerequisite-deferral.md').write_text(
+            'Synthetic bounded Track15 scope; no later stage is resolved.'
+        )
+        self.run_verifier()
+
+        data['status'] = 'completed'
+        path.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'cannot complete the track'):
+            self.run_verifier()
+
+        data['status'] = 'in_progress'
+        path.write_text(json.dumps(data))
+
+        macos = self.root / 'conductor/tracks/macos_companion_20261021/metadata.json'
+        data = json.loads(macos.read_text())
+        data['status'] = 'in_progress'
+        macos.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
             self.run_verifier()
 
     def test_ios_can_start_after_explicit_documented_earlier_deferrals(self):

@@ -1,6 +1,8 @@
 # KMP shared core implementation
 
-Track 15; execution stage 4; milestone M7. Status: pending implementation.
+Track 15; execution stage 4; milestone M7. Status: bounded shared selection/range
+slice implemented and JVM/Android-qualified; macOS Kotlin/Native and full track
+acceptance remain pending.
 
 ## Objective
 

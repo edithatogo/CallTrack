@@ -1,8 +1,8 @@
-# Private CallTrack successor PR series — 2026-10-23
+# Private CallTrack successor PR series — updated 2026-10-24
 
 The user selected [edithatogo/CallTrack](https://github.com/edithatogo/CallTrack)
 as the private successor repository. Its main branch holds the original roadmap
-commit. The following eighteen draft PRs are stacked in history order; each
+commit. The following nineteen draft PRs are stacked in history order; each
 compares with the preceding feature branch and keeps the local reviewed commits.
 Merge in order if and when each PR passes its applicable review and acceptance.
 
@@ -26,9 +26,13 @@ Merge in order if and when each PR passes its applicable review and acceptance.
 | [#16](https://github.com/edithatogo/CallTrack/pull/16) | Final local candidate and observation preparation |
 | [#17](https://github.com/edithatogo/CallTrack/pull/17) | Python3.15.1 and toolchain qualification |
 | [#18](https://github.com/edithatogo/CallTrack/pull/18) | Incremental Android Compose automatic-status slice |
+| [#19](https://github.com/edithatogo/CallTrack/pull/19) | KMP shared call-type selection and time-range rules |
 
-GitHub readback confirmed PRs1–18 as OPEN drafts. PR18 is based on Track17's
-`codex/python-315-toolchain` head and retains its reviewed local feature commits.
+GitHub readback confirmed PRs1–19 as OPEN drafts. PR18 is based on Track17's
+`codex/python-315-toolchain` head. PR19 is stacked on PR18's
+`codex/track14-compose` head and retains the reviewed Track15 slice. Its hosted
+Actions attempt failed before any job step or runner started because the account
+billing/spending limit remains unresolved; no hosted CI pass is claimed.
 The separately portable Gradle checksum change is open against
 the original upstream as [MarkoBL/AndroidCallLogSync#3](https://github.com/MarkoBL/AndroidCallLogSync/pull/3).
 
