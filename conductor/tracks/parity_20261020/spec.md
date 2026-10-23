@@ -14,7 +14,7 @@ Parity suite, crash/retry and background-recovery evidence; preserved edits and 
 
 ## Inputs and dependencies
 
-Prerequisites: [calendar_slice](../calendar_slice_20261020/index.md). Requirement references: R01–R11, R23, R27 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
+Prerequisites: [calendar_slice](../../archive/calendar_slice_20261020/index.md). Requirement references: R01–R11, R23, R27 in [requirements](../../requirements.md). Read [baseline](../../research/baseline-audit.md) and [future research](../../research/future-architecture.md) as dated inputs, not settled designs.
 
 ## Required outputs
 

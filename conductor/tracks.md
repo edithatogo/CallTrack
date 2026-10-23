@@ -1,10 +1,6 @@
 # Tracks registry
 
-Remaining active tracks are planned, not implemented. Tracks 1 and 2 are complete and archived. Discovery deliverables are required work within each track; earlier research is input to refresh. Later implementation phases are conditional on track findings. See [workflow](workflow.md).
-
----
-- [ ] **Track: Call-to-calendar vertical slice** (M2)
-  *Link: [Track](tracks/calendar_slice_20261020/index.md)*
+Remaining active tracks are planned, not implemented. Tracks 1–3 are complete and archived. Discovery deliverables are required work within each track; earlier research is input to refresh. Later implementation phases are conditional on track findings. See [workflow](workflow.md).
 
 ---
 - [ ] **Track: Parity and durable synchronisation** (M3)

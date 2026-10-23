@@ -1,6 +1,6 @@
 # Call-to-calendar vertical slice
 
-Milestone: M2. Type: research-led development. Status: planned discovery; implementation scope provisional.
+Milestone: M2. Type: research-led development. Status: completed, reviewed with fixes and natively verified; bounded manual slice.
 
 ## Objective
 
@@ -27,3 +27,9 @@ One event accurately persisted and read back, with denied-permission behaviour d
 ## Out of scope
 
 No automatic adoption of shortlisted technology, wholesale rewrite, paid service, unqualified platform parity or public release. Cross-track responsibilities remain with their owning tracks. A negative feasibility result or justified deferral is an acceptable research outcome.
+
+## Refined implementation scope
+
+Implement a usable manual development app with explicit destination selection and runtime permission requests. CallSource, mapper, native calendar sink and durable SQLite receipt ledger are separate. Synthetic native acceptance exercises the same mapper/sink/ledger without reading personal call rows. Exact event fields are read back; retries reconcile receipts/markers, while changes require review. See [concrete acceptance](requirements.md), [findings](findings.md) and [decisions](decisions.md).
+
+Automatic logging and historical import remain Track 4. Remote sync, production distribution, full localisation and second-platform support remain assigned downstream. Development installation is disposable and native fixtures must be cleaned before package removal.

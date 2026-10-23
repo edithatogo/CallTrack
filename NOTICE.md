@@ -4,7 +4,10 @@ This repository's development direction is a GPL-3.0 fork of
 [MarkoBL/AndroidCallLogSync](https://github.com/MarkoBL/AndroidCallLogSync), audited at
 `aaa56443a294aa61bad48b620427e53f9521c5fe`.
 
-The upstream source is fetched into an excluded local checkout. Preparation scripts
+The upstream source is preserved in an excluded reference checkout and adopted into
+the root app workspace for Track 3. The new manual slice replaces the launcher,
+disables legacy boot entry, removes network permission and adds local-provider
+source/mapping/calendar/ledger adapters and tests. Preparation scripts
 apply documented build-only changes to a separate copy and add our qualification
 tests. The upstream GPL notice is preserved in both source copies. LICENSE contains
 the GPL version 3 text. No original CallTrack APK implementation is incorporated.

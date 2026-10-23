@@ -2,7 +2,7 @@
 
 Date: 2026-10-20. Planning authorised by user. Working direction: evaluate AndroidCallLogSync for a GPL-compatible fork, restore useful CallTrack capabilities, then migrate incrementally to Kotlin. Jetpack Compose, Kotlin Multiplatform (KMP) and Compose Multiplatform remain conditional stages, as requested.
 
-Conductor planning structure is established; this roadmap does not establish completed track work or approved release scope. No public fork, app installation, calendar write or runtime compatibility claim has been made. Local reference checkouts are available for inspection.
+Conductor planning structure is established; this roadmap does not establish completed track work or approved release scope. No public fork or production release is established. Bounded development installation and synthetic local-calendar readback are now verified in the archived tracks. Local reference checkouts are available for inspection.
 
 ## Evidence-led milestones
 
@@ -10,7 +10,7 @@ Conductor planning structure is established; this roadmap does not establish com
 |---|---|---|---|
 | M0 — Baseline and requirements | Inventory APK/resources/manifest/API calls; map both FOSS apps; separate observed behaviour from enhancements; resolve audit unknowns; create synthetic fixtures and traceability | None | R01–R18 reviewed, sources pinned, unresolved details explicitly recorded; initial static mapping is complete, dynamic validation pending |
 | M1 — Fork feasibility and build baseline | Reproduce chosen upstream revision; qualify Java/JDK/Gradle/SDK compatibility; select package/signing identity; establish GPL notices and contributor build; compare repair cost with smaller fresh implementation | M0 | Repeatable build plus install/launch on test device; permission access demonstrated; fork-versus-rebuild decision recorded |
-| M2 — End-to-end vertical slice | Introduce small source/mapper/calendar/ledger boundaries; retain working Java; select test calendar; transform one controlled call into one event | M1 | Native event readback matches system call data; no external endpoint needed; denied-permission path works |
+| M2 — End-to-end vertical slice | Introduce small source/mapper/calendar/ledger boundaries; retain working Java; select test calendar; transform one controlled call into one event | M1 | Native event readback matches controlled source fields; real-call acceptance continues in M3; no external endpoint needed; denied-permission path works |
 | M3 — CallTrack parity and reliability | R01–R11: type switches, automatic operation, contact/unknown handling, historical preview/import, duplicate recovery, edit protection, background catch-up | M2 | Controlled incoming/outgoing/missed matrix passes; retry/crash/import tests prove no duplicates; offline/reboot/permission tests recorded |
 | M4 — Community alpha and dependable release | Documentation, contribution guide, issue templates, CI, reproducible build recipe, release signing/upgrade policy, privacy/data lifecycle, device support matrix and distribution qualification | M3 | Installable source-matched alpha, upgrade test and recovery path; longer real-device observation before stable label |
 | M5 — Kotlin migration | Convert pure mapping and ledger logic first, then repositories/workers and remaining app-owned Java; Kotlin tests/coroutines where appropriate; avoid simultaneous UI redesign | M4, may prepare isolated work after M3 | Same acceptance suite and persisted-data upgrade tests pass; app-owned Java migrated or remaining exceptions documented |
@@ -18,7 +18,7 @@ Conductor planning structure is established; this roadmap does not establish com
 | M7 — KMP core (conditional) | Choose concrete second-platform use case; extract models, mapping, dedup rules and orchestration where portable; implement native adapters | M5; independent of M6 | Shared fixtures run on Android and second target; permission/calendar/background capability matrix demonstrates useful achievable scope |
 | M8 — Compose Multiplatform (conditional) | Share suitable UI/state after second-platform prototype; retain platform-specific permissions and acquisition screens | M6 + M7 | Useful second-platform workflow demonstrated; packaging/accessibility/upgrade tested; Android remains dependable |
 
-No calendar estimates yet: M1 determines build and permission constraints. Track milestones by exit evidence rather than technology adoption alone. M3 delivers the functional objective; M5 fulfils the Kotlin direction; M6–M8 require demonstrated value.
+No calendar dates are committed. M1 qualified the build/permission baseline and M2 qualified the controlled manual slice. Track milestones by exit evidence rather than technology adoption alone. M3 delivers the functional objective; M5 fulfils the Kotlin direction; M6–M8 require demonstrated value.
 
 ## Architecture evolution
 
@@ -52,7 +52,7 @@ The user's SharePoint structured-document preference was considered: these are m
 - [Incremental Compose migration](https://developer.android.com/develop/ui/compose/migrate/strategy): coexistence with Views supports screen-by-screen migration.
 - [Compose Multiplatform and Jetpack Compose](https://kotlinlang.org/docs/multiplatform/compose-multiplatform-and-jetpack-compose.html): shared UI relationship and platform-specific boundaries.
 
-Next action: use completed M0 mapping to resolve acceptance defaults in their owning tracks and run M1 before creating the public fork or committing to a large refactor.
+Next action: use completed M0–M2 evidence to implement and qualify M3 parity and durable synchronisation.
 
 ## Expanded roadmap tracks (2026-10-20)
 
@@ -68,8 +68,12 @@ See [future features and architecture](research/future-architecture.md) and R19�
 
 ## Conductor execution policy (2026-10-20)
 
-The [track registry](tracks.md) now owns execution. These inventories are planning hypotheses and dated evidence, not fully specified future implementations. Each later track must map, understand, research and document its requirements and dependency options when activated. Dependencies can be temporary prototype aids, enduring replacements for existing libraries, or replacements for app-owned/native code. Decisions require explicit purpose, evidence, promotion/removal criteria and recovery. See [workflow](workflow.md). Tracks 1 and 2 are complete; the remaining tracks are pending.
+The [track registry](tracks.md) now owns execution. These inventories are planning hypotheses and dated evidence, not fully specified future implementations. Each later track must map, understand, research and document its requirements and dependency options when activated. Dependencies can be temporary prototype aids, enduring replacements for existing libraries, or replacements for app-owned/native code. Decisions require explicit purpose, evidence, promotion/removal criteria and recovery. See [workflow](workflow.md). Tracks 1–3 are complete; ten tracks remain pending.
 
 ## Qualified M1 outcome
 
 [Track 2 archive](archive/build_20261020/index.md): proceed with the audited fork and modern development configuration. Original and repaired target36 APKs repeated byte-for-byte on this host. Android17 launch and zero-row denied/granted/revoked permission checks passed, and disposable packages were removed. The next milestone must implement and verify an actual calendar event; this build evidence does not establish that result.
+
+## Qualified M2 outcome
+
+[Track 3 archive](archive/calendar_slice_20261020/index.md): manual source/mapper/provider/ledger/UI implemented. Final 16 JVM contracts, 16 host tests, five Android17/API37 instrumentation invocations and fixture/package cleanup passed. Native persistence and retry/edit protection are qualified for synthetic inputs in a LOCAL calendar; saved-choice/missing-destination UI passed. No writable Microsoft-like calendar was exposed by the bounded metadata query, so remote Outlook qualification remains pending. M3 must cover automatic operation, live calls, history, durable pre-insert intent/lost-marker/tombstone recovery and restore identity.

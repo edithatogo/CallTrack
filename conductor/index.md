@@ -27,4 +27,4 @@
 
 ## Current checkpoint
 
-Tracks 1 and 2 are complete, reviewed and archived. The [qualified fork build](archive/build_20261020/index.md) provides original/modern repeatability and bounded Android17 permission evidence. Next: [call-to-calendar vertical slice](tracks/calendar_slice_20261020/index.md). Eleven tracks remain unstarted. Runtime logging/calendar parity and production release approval are still later outcomes.
+Tracks 1–3 are complete, reviewed and archived. The [manual call-to-calendar slice](archive/calendar_slice_20261020/index.md) passed its source-bound build, synthetic native provider/SQLite/UI acceptance and cleanup. Ten tracks remain unstarted. Next: [parity and durable synchronisation](tracks/parity_20261020/index.md). Automatic logging, live-call acceptance, provider cloud sync and production release remain later outcomes.
