@@ -20,3 +20,8 @@ Seven focused tests and the151-test full helper suite pass. Required current-mai
 integration proof is next. Hosted/container runtime evidence is missing: no Git
 remote/PR/authorised hosted dispatch is configured. Do not call the entire track
 or durable goal complete based on configuration inspection alone.
+
+5. Linux runtime execution exposed missing historical schema commits in an
+   archive-only/shallow checkout. Full-history checkout and a regression fix the
+   actual configured CI path; the original schema-provenance test stays intact.
+   Full Git history in the isolated container reproduces the151-test pass.

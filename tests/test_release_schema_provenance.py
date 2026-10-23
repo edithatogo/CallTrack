@@ -28,3 +28,4 @@ class HistoricalSchemaTest(unittest.TestCase):
             self.assertEqual(row['fixture_sha256'], hashlib.sha256(fixture).hexdigest())
             self.assertEqual('\n'.join(statements) + '\n', fixture.decode())
             self.assertEqual(row['statement_count'], len(statements))
+

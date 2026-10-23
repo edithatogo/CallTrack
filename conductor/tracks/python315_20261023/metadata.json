@@ -12,8 +12,11 @@
   "native_changes_authorised": false,
   "implementation_commit": "256eff0e9df11d2269c705797832d10fd969b99f",
   "local_qualification_passed": true,
-  "local_tests": 151,
+  "local_tests": 152,
   "post_integration_implementation_qualified": true,
-  "remaining_gate": "actual hosted/container Python3.15.1 execution; no configured remote or authorised hosted dispatch",
-  "review": "review.md"
+  "remaining_gate": "final current-head Mac/Linux recheck; actual hosted CallTrack workflow dispatch remains pending repository target",
+  "review": "review.md",
+  "linux_container_runtime_qualified": true,
+  "linux_suite_at_first_qualification": 151,
+  "upstream_assessment": "../../../qualification/upstream-contribution-assessment-20261023.md"
 }
