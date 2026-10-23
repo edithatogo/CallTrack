@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.CalendarContract
+import android.view.View
 import android.widget.*
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.getValue
@@ -14,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
 import com.markobl.calllogsync.R
 import java.text.DateFormat
 import java.util.Date
@@ -26,10 +28,13 @@ class ReceiptRecoveryActivity : ComponentActivity() {
     private var current: SqliteLedger.RecoveryCursor? = null
     private var next: SqliteLedger.RecoveryCursor? = null
     private var rows: LinearLayout? = null
+    private var emptyMessage: TextView? = null
     private var feedback: ComposeView? = null
     private var feedbackText by mutableStateOf("")
-    private var previous: Button? = null
-    private var more: Button? = null
+    private var cards by mutableStateOf<List<RecoveryCardUiState>>(emptyList())
+    private var visibleRecords: Map<Long, Pair<DurableDelivery.Intent, String?>> = emptyMap()
+    private var nextCardToken = 0L
+    private var navigationState by mutableStateOf(RecoveryNavigationUiState())
     private var busy = false
     @Volatile private var resumed = false
     @Volatile private var approvalSession = Any()
@@ -48,19 +53,44 @@ class ReceiptRecoveryActivity : ComponentActivity() {
         access.setOnClickListener {
             requestPermissions(arrayOf(Manifest.permission.READ_CALENDAR), 11)
         }
-        val refresh = button(layout, R.string.recovery_refresh)
-        refresh.id = R.id.recovery_refresh
-        refresh.setOnClickListener {
-            if (!busy) {
-                back.clear()
-                load(null)
+        val actions =
+            ComposeView(this).apply {
+                id = R.id.recovery_refresh
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    RecoveryRefreshPanel(
+                        busy = navigationState.busy,
+                        refreshLabel = stringResource(R.string.recovery_refresh),
+                        onRefresh = {
+                            if (!busy) {
+                                back.clear()
+                                load(null)
+                            }
+                        },
+                    )
+                }
             }
-        }
+        layout.addView(actions)
         val retention = TextView(this)
         retention.setText(R.string.retention_policy)
         layout.addView(retention)
-        val expire = button(layout, R.string.retention_run)
-        expire.setOnClickListener { expireOldPayloads() }
+        val expire =
+            ComposeView(this).apply {
+                id = R.id.recovery_retention
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    RecoveryRetentionPanel(
+                        busy = navigationState.busy,
+                        label = stringResource(R.string.retention_run),
+                        onExpire = ::expireOldPayloads,
+                    )
+                }
+            }
+        layout.addView(expire)
         feedback =
             ComposeView(this).apply {
                 id = R.id.recovery_feedback
@@ -73,18 +103,68 @@ class ReceiptRecoveryActivity : ComponentActivity() {
         rows = LinearLayout(this)
         rows!!.id = R.id.recovery_rows
         rows!!.orientation = LinearLayout.VERTICAL
-        layout.addView(rows)
-        previous = button(layout, R.string.recovery_previous)
-        previous!!.setOnClickListener {
-            if (!busy && back.isNotEmpty()) load(back.removeAt(back.size - 1))
-        }
-        more = button(layout, R.string.recovery_more)
-        more!!.setOnClickListener {
-            if (!busy && next != null) {
-                back.add(current)
-                load(next)
+        emptyMessage =
+            TextView(this).apply {
+                id = R.id.recovery_empty
+                setText(R.string.recovery_empty)
+                visibility = View.GONE
             }
-        }
+        rows!!.addView(emptyMessage)
+        val cardsPanel =
+            ComposeView(this).apply {
+                id = R.id.recovery_cards
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    RecoveryCardsPanel(
+                        cards = cards,
+                        busy = navigationState.busy,
+                        checkLabel = stringResource(R.string.recovery_check),
+                        suppressLabel = stringResource(R.string.recovery_suppress),
+                        reapproveLabel = stringResource(R.string.reapproval_open),
+                        openEventLabel = stringResource(R.string.recovery_open_event),
+                        onCheck = { token ->
+                            visibleRecords[token]?.let { action(it.first, false) }
+                        },
+                        onSuppress = { token ->
+                            visibleRecords[token]?.let { confirmSuppression(it.first) }
+                        },
+                        onReapprove = { token ->
+                            visibleRecords[token]?.let { confirmReapproval(it.first, it.second) }
+                        },
+                        onOpenEvent = { token ->
+                            visibleRecords[token]?.let { openEvent(it.first) }
+                        },
+                    )
+                }
+            }
+        rows!!.addView(cardsPanel)
+        layout.addView(rows)
+        val navigation =
+            ComposeView(this).apply {
+                id = R.id.recovery_navigation
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    RecoveryNavigationPanel(
+                        state = navigationState,
+                        previousLabel = stringResource(R.string.recovery_previous),
+                        moreLabel = stringResource(R.string.recovery_more),
+                        onPrevious = {
+                            if (!busy && back.isNotEmpty()) load(back.removeAt(back.size - 1))
+                        },
+                        onMore = {
+                            if (!busy && next != null) {
+                                back.add(current)
+                                load(next)
+                            }
+                        },
+                    )
+                }
+            }
+        layout.addView(navigation)
         val scroll = ScrollView(this)
         scroll.addView(layout)
         ActivityInsets.apply(scroll)
@@ -134,18 +214,19 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                         if (isDestroyed || ticket != version) return@runOnUiThread
                         busy = false
                         current = cursor
-                        rows!!.removeAllViews()
                         val size = minOf(10, page.size)
-                        for (i in 0 until size) card(
-                            page[i].intent!!,
-                            labels[page[i].intent!!.calendar],
-                        )
-                        if (size == 0) {
-                            val empty = TextView(this)
-                            empty.id = R.id.recovery_empty
-                            empty.setText(R.string.recovery_empty)
-                            rows!!.addView(empty)
-                        }
+                        val records =
+                            (0 until size).map { index ->
+                                val intent = page[index].intent!!
+                                intent to labels[intent.calendar]
+                            }
+                        val keyedRecords = records.map { nextCardToken++ to it }
+                        visibleRecords = keyedRecords.toMap()
+                        cards =
+                            keyedRecords.map { (token, record) ->
+                                cardState(token, record.first, record.second)
+                            }
+                        emptyMessage?.visibility = if (size == 0) View.VISIBLE else View.GONE
                         next = if (page.size > 10) page[9].cursor else null
                         navigation()
                     }
@@ -162,8 +243,12 @@ class ReceiptRecoveryActivity : ComponentActivity() {
     }
 
     private fun navigation() {
-        previous?.isEnabled = !busy && back.isNotEmpty()
-        more?.isEnabled = !busy && next != null
+        navigationState =
+            RecoveryNavigationUiState(
+                busy = busy,
+                previousEnabled = back.isNotEmpty(),
+                moreEnabled = next != null,
+            )
     }
 
     private fun setFeedback(message: Int) {
@@ -174,12 +259,11 @@ class ReceiptRecoveryActivity : ComponentActivity() {
         feedbackText = text
     }
 
-    private fun card(intent: DurableDelivery.Intent, calendar: String?) {
-        val card = LinearLayout(this)
-        card.orientation = LinearLayout.VERTICAL
-        val pad = (12 * resources.displayMetrics.density).toInt()
-        card.setPadding(0, pad, 0, pad)
-        val detail = TextView(this)
+    private fun cardState(
+        token: Long,
+        intent: DurableDelivery.Intent,
+        calendar: String?,
+    ): RecoveryCardUiState {
         var source = getString(R.string.recovery_source_unknown)
         val facts = intent.facts
         if (facts != null) {
@@ -198,45 +282,43 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                     facts.seconds,
                 )
         }
-        detail.text =
-            getString(R.string.recovery_item, source, calendar, getString(stateLabel(intent.state)))
-        card.addView(detail)
-        val check = button(card, R.string.recovery_check)
-        check.isEnabled = intent.state != DurableDelivery.State.SUPPRESSED
-        check.setOnClickListener { if (!busy) action(intent, false) }
-        val suppress = button(card, R.string.recovery_suppress)
-        suppress.isEnabled = intent.state != DurableDelivery.State.SUPPRESSED
-        suppress.setOnClickListener {
-            if (busy) return@setOnClickListener
-            AlertDialog.Builder(this)
-                .setMessage(R.string.recovery_suppress_confirm)
-                .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(R.string.recovery_suppress) { _, _ -> action(intent, true) }
-                .show()
+        return RecoveryCardUiState(
+            token = token,
+            detail =
+                getString(
+                    R.string.recovery_item,
+                    source,
+                    calendar,
+                    getString(stateLabel(intent.state)),
+                ),
+            checkEnabled = intent.state != DurableDelivery.State.SUPPRESSED,
+            suppressEnabled = intent.state != DurableDelivery.State.SUPPRESSED,
+            reapproveVisible = ReadyReapproval.eligible(intent),
+            openEventVisible = intent.eventId >= 0,
+        )
+    }
+
+    private fun confirmSuppression(intent: DurableDelivery.Intent) {
+        if (busy) return
+        AlertDialog.Builder(this)
+            .setMessage(R.string.recovery_suppress_confirm)
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(R.string.recovery_suppress) { _, _ -> action(intent, true) }
+            .show()
+    }
+
+    private fun openEvent(intent: DurableDelivery.Intent) {
+        if (intent.eventId < 0) return
+        try {
+            startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, intent.eventId),
+                )
+            )
+        } catch (unavailable: RuntimeException) {
+            setFeedback(R.string.recovery_open_failed)
         }
-        if (ReadyReapproval.eligible(intent)) {
-            val approve = button(card, R.string.reapproval_open)
-            approve.setOnClickListener { confirmReapproval(intent, calendar) }
-        }
-        if (intent.eventId >= 0) {
-            val open = button(card, R.string.recovery_open_event)
-            open.setOnClickListener {
-                try {
-                    startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            ContentUris.withAppendedId(
-                                CalendarContract.Events.CONTENT_URI,
-                                intent.eventId,
-                            ),
-                        )
-                    )
-                } catch (unavailable: RuntimeException) {
-                    setFeedback(R.string.recovery_open_failed)
-                }
-            }
-        }
-        rows!!.addView(card)
     }
 
     private fun expireOldPayloads() {

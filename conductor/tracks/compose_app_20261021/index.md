@@ -5,7 +5,11 @@
 - [Metadata](metadata.json)
 - [Execution sequence](../../future-architecture.md)
 
-The reviewed status slice is recorded in [review](review-20261023.md). The
+The reviewed status slice is recorded in [review](review-20261023.md); later
+incremental reviews cover [manual logging](review-20261024-manual-logging.md),
+[historical-import status](review-20261024-import-status.md), [recovery
+feedback](review-20261024-recovery-status.md) and [recovery
+cards/actions](review-20261024-recovery-cards.md). The
 [current findings](findings.md), refined [requirements](requirements.md),
 [decisions](decisions.md), prerequisite [deferral](prerequisite-deferral.md),
 [runtime/licence audit](dependency-runtime-audit.json) and

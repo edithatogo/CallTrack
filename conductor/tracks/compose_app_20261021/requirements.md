@@ -7,6 +7,8 @@
 | C14-3 | Existing operational semantics remain authoritative. | Activity continues loading/formatting activation state, counts, worker status and action feedback; no recomposition initiates work. |
 | C14-4 | Status remains accessible. | State label exposes polite live-region semantics; text and test tag are available to UI tests. |
 | C14-5 | Trust and acceptance evidence remain honest. | Every added dependency is pinned through reviewed metadata checksums; native rendered acceptance is reported separately from JVM/build tests. |
+| C14-6 | Recovery cards and controls keep effect ownership in the Activity. | Compose receives bounded immutable presentation state and opaque per-render tokens; receipt/calendar objects stay Activity-owned, stale tokens are ignored, and recovery host IDs remain addressable. |
 
-Manual logging, import and recovery remain later slices in this track, gated on
-the first Compose boundary's lifecycle, accessibility and behavior review.
+Historical-import controls and any remaining recovery parity work stay gated on
+their own lifecycle, accessibility and behavior acceptance. Completed slices do
+not close the remaining Track14 migration or its broader acceptance matrix.

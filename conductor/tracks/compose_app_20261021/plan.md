@@ -21,6 +21,7 @@
 - [x] Task: Migrate the manual “Log latest call” action and status presentation to a lifecycle-disposed ComposeView using the already-qualified Compose UI/Foundation stack. Preserve the native destination picker and permission prompts; keep all delivery and provider work in the Activity callback. The focused instrumentation test compiles; rendered execution remains pending an available emulator.
 - [x] Task: Migrate historical import summary and feedback to separate lifecycle-disposed ComposeViews with Compose Foundation text and polite announcements. Keep date/type inputs, destination selection, history navigation, confirmations and bounded delivery under the Activity; preserve `import_summary` and `import_feedback` IDs.
 - [x] Task: Migrate receipt recovery feedback to a lifecycle-disposed ComposeView using the existing Compose Foundation stack. Keep calendar reads, existing-effect reconciliation, suppression, reapproval confirmation and retention work under the Activity; preserve `recovery_feedback`.
+- [x] Task: Migrate bounded recovery cards, explicit check/suppress/reapprove/open-event controls, refresh/retention actions and previous/more pagination to lifecycle-disposed ComposeViews; preserve Activity-owned effects and compatibility view IDs (see [recovery cards review](review-20261024-recovery-cards.md)).
 - [ ] Task: Migrate historical import and recovery screen by screen; preserve IDs, destination binding, operation ownership and saved-state semantics.
 - [ ] Task: Qualify real permission/revocation, destination disappearance, cancellation/recreation/process restore, font/RTL, TalkBack/Switch Access and no synchronization regression; remove replaced Views only after parity.
 - [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md).
@@ -32,6 +33,7 @@
 - [x] Task: Review the manual logging presentation slice; remove the initially tried Material 3 dependency to comply with D14-1, retain Activity-owned delivery, and document the unavailable rendered-test runtime in [review](review-20261024-manual-logging.md).
 - [x] Task: Review the historical import status slice; keep the existing dependency set, preserve the status host IDs and transaction callbacks, and document the pending emulator result in [review](review-20261024-import-status.md).
 - [x] Task: Review the recovery feedback slice; retain all recovery effects and resource IDs, and document the pending runtime result in [review](review-20261024-recovery-status.md).
+- [x] Task: Review and fix the recovery card/action/pagination slice; run the Compose component and fixture-backed API36 recovery journeys, and record the separate historical-import accessibility test failure (see [review](review-20261024-recovery-cards.md)).
 - [ ] Task: Perform Conductor review, apply fixes and rerun affected checks.
 - [ ] Task: Update requirements, decisions, remaining limitations and next-track inputs; retire superseded code/prototypes only after parity.
 - [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger.
