@@ -27,6 +27,7 @@ class UiSafety(unittest.TestCase):
         (evidence / 'build-receipt.json').write_text(json.dumps({'exit_code': 0, 'inputs_unchanged': True, 'inputs': {}, 'artifacts': artifacts}))
         self.calls = []
         self.phone_available = True
+        self.systemui_anr = False
         self.files = 'screen.png\nscreen.txt'
         self.fail_cleanup = False
         self.avd = RECOVERY_AVD
@@ -41,6 +42,8 @@ class UiSafety(unittest.TestCase):
             output = 'Service phone: found' if self.phone_available else 'Service phone: not found'
         elif args == ['emu', 'avd', 'name']:
             output = self.avd + '\nOK'
+        elif args == ['shell', 'dumpsys', 'window']:
+            output = 'mCurrentFocus=Window{Application Not Responding: com.android.systemui}' if self.systemui_anr else 'mCurrentFocus=Window{Launcher}'
         elif args[0] in ('install', 'uninstall'):
             output = 'Success'
         elif args[:3] == ['shell', 'am', 'instrument']:
@@ -51,13 +54,42 @@ class UiSafety(unittest.TestCase):
             output = b'\x89PNG\r\n\x1a\n' + b'0' * 100 if args[-1].endswith('.png') else b'visible fixture controls'
         return subprocess.CompletedProcess(command, 0, output, b'' if isinstance(output, bytes) else '')
 
-    def run_fixture(self, suite="settings"):
+    def run_fixture(self, suite="settings", receipt_dir=None):
         identities = ["package: name='" + p + "'" for p in (device.PACKAGE, device.TEST_PACKAGE)]
         environment = Mock()
         environment.snapshot.return_value = {'awake': 'Awake'}
         environment.restore.return_value = {'verified': True}
         with patch.object(device, 'ROOT', self.root), patch.object(device, 'inputs', return_value={}), patch.object(device.subprocess, 'check_output', side_effect=identities), patch.object(device.subprocess, 'run', side_effect=self.command), patch.object(device, 'EmulatorEnvironment', return_value=environment):
-            return device.qualify('emulator-5582', suite)
+            return device.qualify('emulator-5582', suite, receipt_dir)
+
+    def test_guest_anr_refuses_ui_acceptance_before_install(self):
+        self.systemui_anr = True
+        self.assertEqual(1, self.run_fixture())
+        self.assertFalse(any(args[0] == 'install' for args in self.calls))
+        receipt = json.loads((self.root / '.local/slice-evidence/parity-ui-receipt.json').read_text())
+        self.assertIn('emulator has an ANR', receipt['error'])
+        self.assertTrue(receipt['packages_removed'])
+
+    def test_matrix_receipt_isolated_and_cannot_overwrite_a_prior_run(self):
+        output = self.root / 'matrix' / 'first'
+        self.assertEqual(0, self.run_fixture('accessibility', output))
+        receipt = output / 'parity-ui-accessibility-receipt.json'
+        original = receipt.read_bytes()
+        self.assertFalse((self.root / '.local/slice-evidence/parity-ui-accessibility-receipt.json').exists())
+        self.calls.clear()
+        with self.assertRaises(FileExistsError):
+            self.run_fixture('accessibility', output)
+        self.assertFalse(self.calls)
+        self.assertEqual(original, receipt.read_bytes())
+
+    def test_accessibility_suite_retains_screenshots_and_cleanup(self):
+        self.assertEqual(0, self.run_fixture('accessibility'))
+        calls = ' '.join(' '.join(args) for args in self.calls)
+        self.assertIn('renderedAccessibilityLabelsTargetsAndKeyboardFocus', calls)
+        self.assertIn('cleanupFixture', calls)
+        receipt = json.loads((self.root / '.local/slice-evidence/parity-ui-accessibility-receipt.json').read_text())
+        self.assertTrue(receipt['packages_removed'])
+        self.assertTrue(receipt['fixture_cleanup_verified'])
 
     def test_physical_target_refused_before_tools(self):
         with patch.object(device.subprocess, 'run') as run:

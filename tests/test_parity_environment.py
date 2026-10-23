@@ -4,7 +4,7 @@ from pathlib import Path
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from parity_environment import EmulatorEnvironment
+from parity_environment import EmulatorEnvironment, EmulatorDisplayEnvironment
 
 
 class EnvironmentSafety(unittest.TestCase):
@@ -48,6 +48,39 @@ class EnvironmentSafety(unittest.TestCase):
         self.values['battery'] = True
         with self.assertRaisesRegex(RuntimeError, 'baseline'): self.environment.snapshot()
         self.assertIsNone(self.environment.original)
+
+    def test_legacy_network_commands_restore_the_original_native_state(self):
+        original = self.command
+        def legacy(*args):
+            if args[:4] == ('shell', 'cmd', 'connectivity', 'airplane-mode'):
+                return 'No shell command implementation.'
+            if args == ('shell', 'dumpsys', 'wifi'):
+                return self.values['wifi'].replace('Wifi', 'Wi-Fi')
+            if args == ('shell', 'settings', 'get', 'global', 'airplane_mode_on'):
+                return '1' if self.values['airplane'] == 'enabled' else '0'
+            if args[:5] == ('shell', 'settings', 'put', 'global', 'airplane_mode_on'):
+                self.values['airplane'] = 'enabled' if args[-1] == '1' else 'disabled'
+                return ''
+            if args[:3] == ('shell', 'am', 'broadcast'):
+                return 'Broadcast completed: result=0'
+            return original(*args)
+        self.environment = EmulatorEnvironment(legacy, settle_timeout=0, sdk='26')
+        before = self.environment.snapshot().copy()
+        self.assertTrue(self.environment.legacy_network)
+        self.environment.offline()
+        self.assertEqual('enabled', self.values['airplane'])
+        self.assertTrue(self.environment.restore()['verified'])
+        self.assertEqual(before, self.environment.snapshot())
+
+    def test_older_battery_service_without_dock_flag_is_qualified(self):
+        original = self.command
+        def old_battery(*args):
+            value = original(*args)
+            return value.replace('\nDock powered: false', '') if args == ('shell', 'dumpsys', 'battery') else value
+        self.environment.command = old_battery
+        self.assertEqual(3, len(self.environment.snapshot()['power_flags']))
+        self.environment.doze()
+        self.assertTrue(self.environment.restore()['verified'])
 
     def test_offline_and_doze_restore_original_settings(self):
         original = self.environment.snapshot().copy()
@@ -114,3 +147,30 @@ class EnvironmentSafety(unittest.TestCase):
         self.environment.poll_seconds = 0.001
         self.assertTrue(self.environment.restore()['verified'])
         self.assertGreaterEqual(len(reads), 2)
+
+
+class DisplayEnvironment(unittest.TestCase):
+    def test_display_only_restore_uses_no_network_commands(self):
+        calls = []
+        state = {'awake': 'Asleep'}
+        def command(*args):
+            calls.append(args)
+            if args == ('shell', 'dumpsys', 'power'):
+                return 'mWakefulness=' + state['awake']
+            if args[:3] == ('shell', 'input', 'keyevent'):
+                state['awake'] = 'Asleep' if args[-1] == 'KEYCODE_SLEEP' else 'Awake'
+                return ''
+            raise AssertionError(args)
+        env = EmulatorDisplayEnvironment(command)
+        old = env.snapshot().copy()
+        env.changed = True
+        state['awake'] = 'Awake'
+        self.assertTrue(env.restore()['verified'])
+        self.assertEqual(old, env.snapshot())
+        self.assertFalse(any('connectivity' in args or 'wifi' in args for args in calls))
+
+    def test_unknown_display_state_is_refused(self):
+        env = EmulatorDisplayEnvironment(lambda *args: 'mWakefulness=Dreaming')
+        with self.assertRaisesRegex(RuntimeError, 'display baseline'):
+            env.snapshot()
+        self.assertFalse(env.changed)

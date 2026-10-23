@@ -110,3 +110,40 @@ class LifecycleSafety(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'phone service'):
             self.qualify()
         self.assertFalse(any(args[0] == 'install' for args in self.calls))
+
+
+class LegacyFixtureRoot(unittest.TestCase):
+    def test_foreign_target_refused_before_root_request(self):
+        calls = []
+        def command(*args):
+            calls.append(args)
+            if args == ('shell', 'getprop', 'ro.kernel.qemu'): return '1'
+            if args == ('emu', 'avd', 'name'): return 'unrelated-emulator'
+            raise AssertionError(args)
+        with self.assertRaisesRegex(RuntimeError, 'dedicated emulator'):
+            DEVICE.ensure_legacy_fixture_root(command)
+        self.assertNotIn(('root',), calls)
+
+    def test_owned_guest_root_reconnect_is_read_back(self):
+        state = {'uid': '2000'}
+        def command(*args):
+            if args == ('shell', 'getprop', 'ro.kernel.qemu'): return '1'
+            if args == ('emu', 'avd', 'name'): return 'calltrack-release-api26-20261022\nOK'
+            if args == ('shell', 'getprop', 'ro.build.version.sdk'): return '26'
+            if args == ('shell', 'id', '-u'): return state['uid']
+            if args == ('root',): state['uid'] = '0'; return 'restarting adbd as root'
+            raise AssertionError(args)
+        self.assertTrue(DEVICE.ensure_legacy_fixture_root(command))
+        self.assertFalse(DEVICE.ensure_legacy_fixture_root(command))
+
+    def test_modern_guest_never_requests_legacy_root(self):
+        calls = []
+        def command(*args):
+            calls.append(args)
+            if args == ('shell', 'getprop', 'ro.kernel.qemu'): return '1'
+            if args == ('emu', 'avd', 'name'): return 'calltrack-release-api33-20261022\nOK'
+            if args == ('shell', 'getprop', 'ro.build.version.sdk'): return '33'
+            raise AssertionError(args)
+        with self.assertRaisesRegex(RuntimeError, 'restricted to API26'):
+            DEVICE.ensure_legacy_fixture_root(command)
+        self.assertNotIn(('root',), calls)

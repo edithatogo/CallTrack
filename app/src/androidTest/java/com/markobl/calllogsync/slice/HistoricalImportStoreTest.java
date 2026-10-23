@@ -209,7 +209,23 @@ public class HistoricalImportStoreTest {
                 importer.deliver(id, 1);
                 assertEquals(
                         DurableDelivery.Result.SAVED, imports.candidates(id, -1, 4).get(0).outcome);
-                imports.getWritableDatabase().execSQL("ALTER TABLE candidates DROP COLUMN outcome");
+                // Reconstruct the historical table using SQL supported by the minimum SDK.
+                android.database.sqlite.SQLiteDatabase db = imports.getWritableDatabase();
+                db.beginTransaction();
+                try {
+                    db.execSQL("ALTER TABLE candidates RENAME TO candidates_v2");
+                    db.execSQL(
+                            "CREATE TABLE candidates (session TEXT NOT NULL REFERENCES"
+                                + " sessions(id), source_id INTEGER NOT NULL, source_key TEXT NOT"
+                                + " NULL, binding TEXT NOT NULL, PRIMARY KEY(session,source_id))");
+                    db.execSQL(
+                            "INSERT INTO candidates (session,source_id,source_key,binding) SELECT"
+                                    + " session,source_id,source_key,binding FROM candidates_v2");
+                    db.execSQL("DROP TABLE candidates_v2");
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
                 imports.getWritableDatabase().setVersion(1);
             }
             try (SqliteImportStore imports = new SqliteImportStore(context(), name);

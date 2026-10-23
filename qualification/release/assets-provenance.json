@@ -1,0 +1,176 @@
+{
+  "date": "2026-10-22",
+  "scope": "Current non-code main-source files; historical artwork excluded from snapshots; no permanent trademark clearance claimed.",
+  "upstream_revision": "aaa56443a294aa61bad48b620427e53f9521c5fe",
+  "artwork_reuse_uncertainty_removed": true,
+  "assets": [
+    {
+      "path": "app/src/main/AndroidManifest.xml",
+      "sha256": "0ae9e163d0398c0636708e79d33cdda70b2f120c298f49539f80e81fd9961d43",
+      "provenance": "project-authored-GPL-resource",
+      "upstream_path_present": true,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/assets/open_source/Apache-2.0.txt",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "provenance": "third-party-notice",
+      "upstream_path_present": false,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/assets/open_source/GPL-3.0.txt",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "provenance": "third-party-notice",
+      "upstream_path_present": false,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/assets/open_source/NOTICE.md",
+      "sha256": "3346071024165c745f02c6a6fbe85dde25eb13e2065d9bad998ad6bc62a70bf3",
+      "provenance": "third-party-notice",
+      "upstream_path_present": false,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/assets/open_source/THIRD_PARTY_NOTICES.md",
+      "sha256": "68b69b1b78150a71d2ae1c879338e8732954114e0ec4b7d45eb44337f005d5b0",
+      "provenance": "third-party-notice",
+      "upstream_path_present": false,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/assets/open_source/retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt",
+      "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+      "provenance": "third-party-notice",
+      "upstream_path_present": false,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/assets/open_source/retained/41-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt",
+      "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+      "provenance": "third-party-notice",
+      "upstream_path_present": false,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/assets/open_source/retained/42-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt",
+      "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+      "provenance": "third-party-notice",
+      "upstream_path_present": false,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/assets/open_source/retained/44-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt",
+      "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+      "provenance": "third-party-notice",
+      "upstream_path_present": false,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/assets/open_source/retained/45-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt",
+      "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+      "provenance": "third-party-notice",
+      "upstream_path_present": false,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/assets/open_source/retained/55-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt",
+      "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+      "provenance": "third-party-notice",
+      "upstream_path_present": false,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/assets/open_source/retained-index.json",
+      "sha256": "6fe2487f70326bbe8c7c4bd8b984184ebd3e587003642c98e86757f4dee20cae",
+      "provenance": "third-party-notice",
+      "upstream_path_present": false,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_launcher_background.xml",
+      "sha256": "57d975fc99d8937940a1750474fb418b3a7d98c36bfaa74fd667b296be125a8d",
+      "provenance": "project-authored-GPL-resource",
+      "upstream_path_present": true,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_launcher_foreground.xml",
+      "sha256": "e3885f05f534ee71006805bea8df05c0d7aff2a9c3d5298402f04739fb130e00",
+      "provenance": "project-authored-GPL-resource",
+      "upstream_path_present": true,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "sha256": "442003322f4191bf52a247bfab4366972bec161be888e3c75e8bf64314ac2bbe",
+      "provenance": "project-authored-GPL-resource",
+      "upstream_path_present": true,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml",
+      "sha256": "442003322f4191bf52a247bfab4366972bec161be888e3c75e8bf64314ac2bbe",
+      "provenance": "project-authored-GPL-resource",
+      "upstream_path_present": true,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/res/values/colors.xml",
+      "sha256": "b5626527d503417f0d8e5b1e08f338de7b31173bf0e122815f03e64932adbd88",
+      "provenance": "upstream-GPL-functional-configuration",
+      "upstream_path_present": true,
+      "unchanged_from_upstream": true
+    },
+    {
+      "path": "app/src/main/res/values/ids.xml",
+      "sha256": "76ae646e01454331bf3b431b846fee5da3811f1cc5f0693935e75e3423cff742",
+      "provenance": "project-authored-GPL-resource",
+      "upstream_path_present": false,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/res/values/strings.xml",
+      "sha256": "14b5e74633a369ea09915dd024af43dd32ceebe94281fd7652633eecee67af0b",
+      "provenance": "project-authored-GPL-resource",
+      "upstream_path_present": true,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/res/values/themes.xml",
+      "sha256": "980b1c1f279d4011fedcf3caaa92a9660a27fd3da8bc5f8d7ed476086fd7ee08",
+      "provenance": "upstream-GPL-functional-configuration",
+      "upstream_path_present": true,
+      "unchanged_from_upstream": true
+    },
+    {
+      "path": "app/src/main/res/values-de/strings.xml",
+      "sha256": "0faacf6092f67359e46e2073a3b2d5da7e17f24b2a22683c71fc18908ce0395d",
+      "provenance": "project-authored-GPL-resource",
+      "upstream_path_present": true,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/res/values-night/themes.xml",
+      "sha256": "4f9605a8df95f285e11ca91ad885737d40aa686a595e32a08b28d16035175e13",
+      "provenance": "upstream-GPL-functional-configuration",
+      "upstream_path_present": true,
+      "unchanged_from_upstream": true
+    },
+    {
+      "path": "app/src/main/res/xml/slice_backup_rules.xml",
+      "sha256": "80be325e44eb49bec54794399e7de6b4d274513a3ebce30584889d06372f1a0a",
+      "provenance": "project-authored-GPL-resource",
+      "upstream_path_present": false,
+      "unchanged_from_upstream": false
+    },
+    {
+      "path": "app/src/main/res/xml/slice_extraction_rules.xml",
+      "sha256": "cb029b35db0e976c087100424e16e14a6256b46962398887520e51508c3b5842",
+      "provenance": "project-authored-GPL-resource",
+      "upstream_path_present": false,
+      "unchanged_from_upstream": false
+    }
+  ]
+}

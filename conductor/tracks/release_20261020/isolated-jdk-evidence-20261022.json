@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-22",
+  "scope": "isolated-macos-arm64-jdk17-build-qualification",
+  "success": true,
+  "release_ready": false,
+  "candidate_revision": "5578bf56c7a664947324d45d4dcc8c3dd3d08c87",
+  "jdk": {
+    "vendor": "Eclipse Adoptium Temurin",
+    "version": "jdk-17.0.20.1+1",
+    "archive_url": "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.20.1%2B1/OpenJDK17U-jdk_aarch64_mac_hotspot_17.0.20.1_1.tar.gz",
+    "archive_sha256": "196d13ba5f10414bef7f6a05a9b3f00edacb18ebacef2b99485db9e2ee18f0e8",
+    "publisher_team": "JCDTMS22B4",
+    "strict_bundle_verification": true,
+    "apple_chain_publisher_requirement": true,
+    "archive_files_checked": 459,
+    "all_extracted_archive_files_match": true,
+    "manifest_sha256": "376c63e4a03d4250c4d1524c9c84dc60ed935049dac1193878f5605784a91916",
+    "resource_tamper_rejected": true,
+    "tamper_copy_removed": true,
+    "post_build_manifest_unchanged": true,
+    "post_build_strict_publisher_recheck": true,
+    "gatekeeper_application_assessment": "exit3: valid code but does not seem to be an app",
+    "notarization_qualified": false,
+    "detached_gpg_verified": false,
+    "legal": "Archive legal directory retained; GPLv2 with Classpath exception and third-party terms; build tool not bundled into APK"
+  },
+  "builds": [
+    {
+      "jvm": {
+        "tests": 115,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "lint": {
+        "Hint": 2,
+        "Warning": 69
+      },
+      "apk_sha256": "b5ba573be2d79e0b4edd9a1c858ac578347f972ddb3e12704185543d7a47a283",
+      "unsigned_verified": true,
+      "log_sha256": "b1f04e5c95b02e6a3964b5051d1493fde9defdf76274cff470e2cdca53045a02"
+    },
+    {
+      "jvm": {
+        "tests": 115,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "lint": {
+        "Hint": 2,
+        "Warning": 69
+      },
+      "apk_sha256": "b5ba573be2d79e0b4edd9a1c858ac578347f972ddb3e12704185543d7a47a283",
+      "unsigned_verified": true,
+      "log_sha256": "4102b75546a91586afaea3de445e66a7159ed832593a33b2140598ca737c2546"
+    }
+  ],
+  "matches_prior_candidate_apk": true,
+  "elapsed_build_seconds": 177.0,
+  "independent_environment_reproduction": false,
+  "shared_dependency_cache": true,
+  "existing_homebrew": {
+    "historical_jdk_files": 359,
+    "all_historical_installed_jdk_hashes_unchanged": true,
+    "existing_jdk_strict_check": {
+      "exit_code": 1,
+      "stderr": "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/MacOS/libjli.dylib: code has no resources but signature indicates they must be present\n"
+    }
+  },
+  "host_tests": 121,
+  "raw_evidence": {
+    "github-release.json": "bf0e3a18db3556118e79f30f4205e6ad7ff1645f375fa5b215047a1b9fdf74ab",
+    "jdk-receipt.json": "3839ba1e2b062ad20e79d25bef111d3c41198c94190c56318841371f952f1c2e",
+    "extracted-manifest.json": "376c63e4a03d4250c4d1524c9c84dc60ed935049dac1193878f5605784a91916",
+    "qualify.py": "169cd8a09251bad1ee64c9717a1146e86c84a5cd33b247bb64422fc967c2db72",
+    "gradle-version.log": "236c9bfd53de45ca9812e052045def35b11667fca8e3599009d2a48bca76c515",
+    "unsigned-builds/receipt.json": "497b6585f610d8e6bf23061f9623588180c40d5e648492fd6ef7f9ca83051438",
+    "existing-jdk-readback.json": "a9d75ee46105fdf4582b8a04215b5ad1bf694aec3cc1e8b762ddd6c838e511fa",
+    "host-tests.log": "fc6618fade5201431ade34e2bf378b0dc17be444249e6549e56eb19f9968b0bc",
+    "post-build-readback.json": "a3aad5e8446f68281541c6ad52cbad85047cdb4be3e3bf84e58417a9da75f7dd",
+    "final-host-tests.log": "86fd0c6b040eaca3b10ef652baf1a1f89aa6fd4c22cf7041d3e56d9369baf882"
+  },
+  "conductor_verification": {
+    "documents": 156,
+    "tracks": 20,
+    "synthetic_scenarios": 25,
+    "passed": true
+  }
+}

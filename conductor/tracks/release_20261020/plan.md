@@ -106,6 +106,45 @@ key generation, cloud consent, physical testing or elapsed observation is claime
 
 ## Local licence/tool-trust and schema/provider continuation — 2026-10-21
 
-- [~] Task: Inventory and audit selected build-plugin/compile/test/lint dependencies, wrapper and SDK tool origins; preserve licences/notices and unresolved rights without production conveyance.
-- [~] Task: Qualify exact source-pinned schema1–5 fixtures across10→11 replacement with human-edited/deleted events, ambiguous insert recovery, paused/permission-loss/resume and migration rollback/newer-schema refusal.
-- [ ] Task: Review continuation, apply fixes and record source-bound local evidence; retain production signing, physical, cloud and operational gates.
+- [x] Task: Inventory and audit selected build-plugin/compile/test/lint dependencies, wrapper and SDK tool origins; preserve licences/notices and unresolved rights without production conveyance —350ce3d,3daa8ef,b1ed08b;239 binaries,736 enforced metadata/binary checks; JDK resource sealing explicitly unqualified.
+- [x] Task: Qualify exact source-pinned schema1–5 fixtures across10→11 replacement with human-edited/deleted events, ambiguous insert recovery, paused/permission-loss/resume and migration rollback/newer-schema refusal —350ce3d,caf8d8c;15 native invocations including import1→2; cleanup/readback pass.
+- [x] Task: Review continuation, apply fixes and record source-bound local evidence; retain production signing, physical, cloud and operational gates — review-licence-tool-upgrade-20261021.md;121 host tests,154-document verification and fresh5578bf5 clean-build comparison pass.
+
+- [x] Task: Promote independently audited strict Gradle verification after positive/fault tests; bind policy in build receipts —5578bf5 (policy),caf8d8c (receipt binding).
+- [x] Task: Qualify two clean unsigned release builds under the promoted policy —5578bf5;trusted-unsigned-evidence-20261021.json;115 JVM tests each,zero lint errors,identical APKs.
+- [ ] Task: Complete the retained production/independent/platform/licence-conveyance/operational gates before full M4 and archive.
+
+- [x] Task: Apply licence/tool-trust and schema/provider review fixes — fee1f27; local acceptance only, original full-M4 gates retained.
+
+## Isolated JDK continuation — 2026-10-22
+
+- [x] Task: Qualify an isolated publisher-signed JDK17 archive without restart, global install changes or ad-hoc re-signing — isolated-jdk-evidence-20261022.json;459 archive files, strict resource/publisher verification and real tamper rejection pass.
+- [x] Task: Rebuild frozen5578bf5 twice under the isolated JDK; verify unchanged installed tools and review evidence —115 JVM tests per build, zero lint errors, exact prior APK match;121 host tests. Review: review-isolated-jdk-20261022.md; implementation/review evidence95d3851.
+- [ ] Task: Complete independent-host/platform, production identity/signing, rights/conveyance and live/operational gates before full M4 and archive.
+
+
+## Asset/source/notices continuation — 2026-10-22
+
+- [x] Task: Finish current asset/translation provenance; replace uncertain launcher/store artwork and preserve active translations —5a3a3e4; ASSET_PROVENANCE.md, MODIFICATIONS.md and qualification/release/assets-provenance.json.
+- [x] Task: Prepare exact-source/licence/notices candidate with all63 published dependency source/POM archives and embedded APK notices —5a3a3e4; assets-source-evidence-20261022.json,643-member archive, four real CLI rejection cases and full readback/repeatability pass.
+- [x] Task: Qualify two clean unsigned builds and a source-only archive reconstruction outside Git; review and apply corrections —115 JVM tests per build, zero lint errors,126 host tests; review-assets-source-20261022.md; evidence/review1384c58. Original production/native/external gates retained.
+- [ ] Task: Complete signed/channel corresponding-source delivery, permanent identity/signing, independent/platform/native and live/operational acceptance before full M4/archive. Published source JARs are not proof of complete upstream dependency rebuilding.
+
+
+## Independent Linux build continuation — 2026-10-22
+
+- [x] Task: Discover safe separate environments and prepare a cold Linux runner/CI recipe —9464408; exact Git source, digest-pinned JDK image, fresh SDK/Gradle directories, no host cache/source mounts.
+- [x] Task: Diagnose initial cold verification failure; canonically audit three metadata files and preserve all736 old entries —9464408;739 entries, no runtime version change or trust exception.
+- [x] Task: Requalify two Mac builds and a separate native Linux physical host, including tests/lint/source/runtime/artifact readback — linux-reproduction-evidence-20261022.json; identical unsigned APK,115 JVM tests per build,131 Python tests on both systems; source/notices bundle refreshed.
+- [x] Task: Review/apply fixes and prepare exact-candidate manual GitHub workflow — review-linux-reproduction-20261022.md; evidence/review 484a8dd; actionlint and Linux execution of build/tooling commands pass. Final reporting fixture corrected;131 host tests and160 Conductor documents pass.
+- [ ] Task: Execute and read back hosted CI after the repository choice is authorised; source workflow preparation is not a provider run.
+- [ ] Task: Finish original signing/identity, signed source conveyance, Android/platform/native, cloud and operational gates before M4/archive.
+
+
+## Extended emulator acceptance — 2026-10-22
+
+- [x] Task: Qualify exact dedicated API26 minimum and API33 intermediate images and source-bound builds; preserve existing guests — production6f3381c, emulator-matrix-evidence-20261022.json; one exact development APK across standard suites.
+- [x] Task: Run native store/provider/worker, rendered settings/import/recovery, accessibility at normal/large text, lifecycle and simulated telephony plus development-key schema/provider upgrades —109 successful native invocations each on API26/API33,11 affected API36 checks, two expected terminations,134 screenshot/tree pairs;115 JVM/141 host tests.
+- [x] Task: Review, fix and rerun affected checks — runtime fixes6f3381c, final fixture hardeningbd8c2e9, evidence/review fa7b944; protected-cache round-trip/worker regression and cleanup pass; API26 ordinary ADB privilege restored and both new guests stopped. Original external/manual gates retained.
+
+- [ ] Task: Refreeze the current runtime fixes into new unsigned artifacts/source-notices bundle and independently reproduce that exact candidate;9464408 remains the prior qualified release/source snapshot. Hosted execution awaits repository authority; original identity/signing, physical/OEM/manual, remote and operational gates remain before M4/archive.

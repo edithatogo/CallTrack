@@ -19,7 +19,7 @@ from qualify_kotlin_update import PACKAGE, TEST_PACKAGE, require_successful_rece
 from run_slice_build import inputs
 
 ROOT = Path(__file__).resolve().parents[1]
-JDK = Path('/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home')
+JDK = Path(os.environ.get('JAVA_HOME', '/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home'))
 
 
 def require_rejection(result, reason):

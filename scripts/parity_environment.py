@@ -4,17 +4,25 @@ import time
 
 
 class EmulatorEnvironment:
-    def __init__(self, command, settle_timeout=10, poll_seconds=0.2):
+    def __init__(self, command, settle_timeout=10, poll_seconds=0.2, sdk=None):
         self.command = command
         self.original = None
         self.changed = False
         self.settle_timeout = settle_timeout
         self.poll_seconds = poll_seconds
+        self.legacy_network = sdk == '26'
 
     def snapshot(self):
         run = self.command
-        airplane = run('shell', 'cmd', 'connectivity', 'airplane-mode')
-        wifi = run('shell', 'cmd', 'wifi', 'status').splitlines()[0]
+        if self.legacy_network:
+            value = run('shell', 'settings', 'get', 'global', 'airplane_mode_on')
+            airplane = {'0': 'disabled', '1': 'enabled'}.get(value, value)
+            lines = run('shell', 'dumpsys', 'wifi').splitlines()
+            wifi = lines[0].replace('Wi-Fi', 'Wifi') if lines else ''
+        else:
+            airplane = run('shell', 'cmd', 'connectivity', 'airplane-mode')
+            lines = run('shell', 'cmd', 'wifi', 'status').splitlines()
+            wifi = lines[0] if lines else ''
         mobile = run('shell', 'settings', 'get', 'global', 'mobile_data')
         stay = run('shell', 'settings', 'get', 'global', 'stay_on_while_plugged_in')
         battery = run('shell', 'dumpsys', 'battery')
@@ -23,13 +31,23 @@ class EmulatorEnvironment:
         awake = re.search(r'mWakefulness=(\w+)', power)
         flags = dict(re.findall(r'(AC|USB|Wireless|Dock) powered: (true|false)', battery))
         if (airplane not in ('enabled', 'disabled') or wifi not in ('Wifi is enabled', 'Wifi is disabled')
-                or mobile not in ('0', '1') or not stay.isdigit() or len(flags) != 4
+                or mobile not in ('0', '1') or not stay.isdigit()
+                or not {'AC', 'USB', 'Wireless'} <= flags.keys()
                 or 'UPDATES STOPPED' in battery or deep != 'ACTIVE'
                 or awake is None or awake[1] not in ('Awake', 'Asleep')):
             raise RuntimeError('Unqualified emulator power/network baseline; no setting changed')
         self.original = dict(airplane=airplane, wifi=wifi, mobile=mobile, stay=stay,
                              power_flags=flags, awake=awake[1])
         return self.original
+
+    def airplane_actions(self, enabled):
+        if self.legacy_network:
+            return [
+                ('shell', 'settings', 'put', 'global', 'airplane_mode_on', '1' if enabled else '0'),
+                ('shell', 'am', 'broadcast', '--user', '0', '-a', 'android.intent.action.AIRPLANE_MODE',
+                 '--ez', 'state', 'true' if enabled else 'false'),
+            ]
+        return [('shell', 'cmd', 'connectivity', 'airplane-mode', 'enable' if enabled else 'disable')]
 
     def reboot(self):
         if self.original is None:
@@ -43,10 +61,13 @@ class EmulatorEnvironment:
             raise RuntimeError('Snapshot required before emulator mutation')
         self.changed = True  # A command timeout is an uncertain mutation, too.
         run = self.command
-        run('shell', 'cmd', 'connectivity', 'airplane-mode', 'enable')
+        for action in self.airplane_actions(True):
+            run(*action)
         run('shell', 'svc', 'wifi', 'disable')
         run('shell', 'svc', 'data', 'disable')
-        if run('shell', 'cmd', 'connectivity', 'airplane-mode') != 'enabled':
+        observed = (run('shell', 'settings', 'get', 'global', 'airplane_mode_on') == '1'
+                    if self.legacy_network else run('shell', 'cmd', 'connectivity', 'airplane-mode') == 'enabled')
+        if not observed:
             raise RuntimeError('Offline setting not confirmed')
 
     def doze(self):
@@ -71,7 +92,7 @@ class EmulatorEnvironment:
             ('shell', 'dumpsys', 'deviceidle', 'unforce'),
             ('shell', 'dumpsys', 'battery', 'reset'),
             ('shell', 'settings', 'put', 'global', 'stay_on_while_plugged_in', old['stay']),
-            ('shell', 'cmd', 'connectivity', 'airplane-mode', 'enable' if old['airplane'] == 'enabled' else 'disable'),
+            *self.airplane_actions(old['airplane'] == 'enabled'),
             ('shell', 'svc', 'wifi', 'enable' if old['wifi'] == 'Wifi is enabled' else 'disable'),
             ('shell', 'svc', 'data', 'enable' if old['mobile'] == '1' else 'disable'),
             ('shell', 'input', 'keyevent', 'KEYCODE_WAKEUP' if old['awake'] == 'Awake' else 'KEYCODE_SLEEP'),
@@ -99,6 +120,42 @@ class EmulatorEnvironment:
         if not restored:
             errors.append(last_error)
         # Keep the original snapshot for any recovery retry, even if verification failed.
+        self.original = old
+        if not errors:
+            self.changed = False
+        return {'verified': not errors, 'changed': True, 'errors': errors}
+
+
+class EmulatorDisplayEnvironment:
+    """Snapshot only screen wakefulness for UI tests that do not change radios/power."""
+    def __init__(self, command):
+        self.command = command
+        self.original = None
+        self.changed = False
+
+    def snapshot(self):
+        power = self.command('shell', 'dumpsys', 'power')
+        awake = re.search(r'mWakefulness=(\w+)', power)
+        if awake is None or awake[1] not in ('Awake', 'Asleep'):
+            raise RuntimeError('Unqualified emulator display baseline; no setting changed')
+        self.original = {'awake': awake[1]}
+        return self.original
+
+    def restore(self):
+        if not self.changed:
+            return {'verified': True, 'changed': False}
+        old = self.original
+        errors = []
+        try:
+            self.command('shell', 'input', 'keyevent',
+                         'KEYCODE_WAKEUP' if old['awake'] == 'Awake' else 'KEYCODE_SLEEP')
+            deadline = time.monotonic() + 10
+            while self.snapshot() != old:
+                if time.monotonic() >= deadline:
+                    raise RuntimeError('Restored display differs from its snapshot')
+                time.sleep(0.2)
+        except Exception as error:
+            errors.append(str(error))
         self.original = old
         if not errors:
             self.changed = False

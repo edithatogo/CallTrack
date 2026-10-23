@@ -36,15 +36,64 @@ public class WorkerProviderTest {
     }
 
     private void shellCalls(Runnable action) {
-        android.app.UiAutomation automation =
-                InstrumentationRegistry.getInstrumentation().getUiAutomation();
-        automation.adoptShellPermissionIdentity(
-                Manifest.permission.READ_CALL_LOG, Manifest.permission.WRITE_CALL_LOG);
-        try {
-            action.run();
-        } finally {
-            automation.dropShellPermissionIdentity();
-        }
+        FixtureCallLog.asShell(action);
+    }
+
+    @Test
+    public void shellFixtureRoundTripDoesNotGrantAppWritePermission() {
+        assertEquals(
+                android.content.pm.PackageManager.PERMISSION_DENIED,
+                context().checkSelfPermission(Manifest.permission.WRITE_CALL_LOG));
+        shellCalls(
+                () -> {
+                    try (Cursor before =
+                            FixtureCallLog.query(
+                                    context(), new String[] {Calls._ID}, null, null, null)) {
+                        assertEquals("Refusing a nonempty source", 0, before.getCount());
+                    }
+                    try {
+                        ContentValues call = new ContentValues();
+                        call.put(Calls.NUMBER, "0000000000");
+                        call.put(Calls.CACHED_NAME, "Fixture O'Brien");
+                        call.put(Calls.DATE, System.currentTimeMillis());
+                        call.put(Calls.DURATION, 1);
+                        call.put(Calls.TYPE, Calls.INCOMING_TYPE);
+                        call.put(Calls.PHONE_ACCOUNT_ID, tag());
+                        assertNotNull(FixtureCallLog.insert(context(), call));
+                        try (Cursor row =
+                                FixtureCallLog.query(
+                                        context(),
+                                        new String[] {Calls._ID, Calls.CACHED_NAME},
+                                        Calls.PHONE_ACCOUNT_ID + "=?",
+                                        new String[] {tag()},
+                                        null)) {
+                            assertEquals(1, row.getCount());
+                            assertTrue(row.moveToFirst());
+                            assertEquals("Fixture O'Brien", row.getString(1));
+                        }
+                        if (android.os.Build.VERSION.SDK_INT < 29)
+                            assertEquals(
+                                    android.content.pm.PackageManager.PERMISSION_DENIED,
+                                    context()
+                                            .checkSelfPermission(
+                                                    Manifest.permission.WRITE_CALL_LOG));
+                    } finally {
+                        FixtureCallLog.delete(
+                                context(), Calls.PHONE_ACCOUNT_ID + "=?", new String[] {tag()});
+                        try (Cursor after =
+                                FixtureCallLog.query(
+                                        context(),
+                                        new String[] {Calls._ID},
+                                        Calls.PHONE_ACCOUNT_ID + "=?",
+                                        new String[] {tag()},
+                                        null)) {
+                            assertEquals(0, after.getCount());
+                        }
+                    }
+                });
+        assertEquals(
+                android.content.pm.PackageManager.PERMISSION_DENIED,
+                context().checkSelfPermission(Manifest.permission.WRITE_CALL_LOG));
     }
 
     private void insertCalls(int first, int last, long at) {
@@ -59,8 +108,7 @@ public class WorkerProviderTest {
                         call.put(Calls.TYPE, i % 4 == 0 ? Calls.BLOCKED_TYPE : i % 4);
                         call.put(Calls.NUMBER_PRESENTATION, Calls.PRESENTATION_ALLOWED);
                         call.put(Calls.PHONE_ACCOUNT_ID, tag());
-                        assertNotNull(
-                                context().getContentResolver().insert(Calls.CONTENT_URI, call));
+                        assertNotNull(FixtureCallLog.insert(context(), call));
                     }
                 });
     }
@@ -72,14 +120,8 @@ public class WorkerProviderTest {
         shellCalls(
                 () -> {
                     try (Cursor c =
-                            context()
-                                    .getContentResolver()
-                                    .query(
-                                            Calls.CONTENT_URI,
-                                            new String[] {Calls._ID},
-                                            null,
-                                            null,
-                                            null)) {
+                            FixtureCallLog.query(
+                                    context(), new String[] {Calls._ID}, null, null, null)) {
                         assertNotNull(c);
                         assertEquals(
                                 "Refusing a nonempty call-log fixture environment",
@@ -276,21 +318,15 @@ public class WorkerProviderTest {
                 .get(15, TimeUnit.SECONDS);
         shellCalls(
                 () -> {
-                    context()
-                            .getContentResolver()
-                            .delete(
-                                    Calls.CONTENT_URI,
-                                    Calls.PHONE_ACCOUNT_ID + "=?",
-                                    new String[] {tag()});
+                    FixtureCallLog.delete(
+                            context(), Calls.PHONE_ACCOUNT_ID + "=?", new String[] {tag()});
                     try (Cursor c =
-                            context()
-                                    .getContentResolver()
-                                    .query(
-                                            Calls.CONTENT_URI,
-                                            new String[] {Calls._ID},
-                                            Calls.PHONE_ACCOUNT_ID + "=?",
-                                            new String[] {tag()},
-                                            null)) {
+                            FixtureCallLog.query(
+                                    context(),
+                                    new String[] {Calls._ID},
+                                    Calls.PHONE_ACCOUNT_ID + "=?",
+                                    new String[] {tag()},
+                                    null)) {
                         assertNotNull(c);
                         assertEquals(0, c.getCount());
                     }

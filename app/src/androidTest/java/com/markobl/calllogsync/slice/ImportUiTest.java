@@ -2,7 +2,6 @@ package com.markobl.calllogsync.slice;
 
 import static org.junit.Assert.*;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.ContentValues;
@@ -56,15 +55,7 @@ public class ImportUiTest {
     }
 
     private void shellCalls(Runnable action) {
-        android.app.UiAutomation ui =
-                InstrumentationRegistry.getInstrumentation().getUiAutomation();
-        ui.adoptShellPermissionIdentity(
-                Manifest.permission.READ_CALL_LOG, Manifest.permission.WRITE_CALL_LOG);
-        try {
-            action.run();
-        } finally {
-            ui.dropShellPermissionIdentity();
-        }
+        FixtureCallLog.asShell(action);
     }
 
     private void add(long at, int type) {
@@ -76,7 +67,7 @@ public class ImportUiTest {
         row.put(Calls.TYPE, type);
         row.put(Calls.NUMBER_PRESENTATION, Calls.PRESENTATION_ALLOWED);
         row.put(Calls.PHONE_ACCOUNT_ID, tag());
-        assertNotNull(context().getContentResolver().insert(Calls.CONTENT_URI, row));
+        assertNotNull(FixtureCallLog.insert(context(), row));
     }
 
     private HistoricalImport.Session latest() {
@@ -126,14 +117,8 @@ public class ImportUiTest {
         shellCalls(
                 () -> {
                     try (Cursor c =
-                            context()
-                                    .getContentResolver()
-                                    .query(
-                                            Calls.CONTENT_URI,
-                                            new String[] {Calls._ID},
-                                            null,
-                                            null,
-                                            null)) {
+                            FixtureCallLog.query(
+                                    context(), new String[] {Calls._ID}, null, null, null)) {
                         assertNotNull(c);
                         assertEquals("Refusing nonempty call provider", 0, c.getCount());
                     }
@@ -325,21 +310,15 @@ public class ImportUiTest {
         if (state().getBoolean("ownsCalls", false))
             shellCalls(
                     () -> {
-                        context()
-                                .getContentResolver()
-                                .delete(
-                                        Calls.CONTENT_URI,
-                                        Calls.PHONE_ACCOUNT_ID + "=?",
-                                        new String[] {tag()});
+                        FixtureCallLog.delete(
+                                context(), Calls.PHONE_ACCOUNT_ID + "=?", new String[] {tag()});
                         try (Cursor c =
-                                context()
-                                        .getContentResolver()
-                                        .query(
-                                                Calls.CONTENT_URI,
-                                                new String[] {Calls._ID},
-                                                Calls.PHONE_ACCOUNT_ID + "=?",
-                                                new String[] {tag()},
-                                                null)) {
+                                FixtureCallLog.query(
+                                        context(),
+                                        new String[] {Calls._ID},
+                                        Calls.PHONE_ACCOUNT_ID + "=?",
+                                        new String[] {tag()},
+                                        null)) {
                             assertNotNull(c);
                             assertEquals(0, c.getCount());
                         }

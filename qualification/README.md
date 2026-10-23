@@ -100,7 +100,7 @@ fixture cleanup and package absence. They preserve cleanup code if external fixt
 removal cannot be verified. Inspect the saved receipt before retrying a failure.
 
 ```sh
-python3 scripts/run_slice_build.py --jdk /opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home --sdk .local/android-sdk
+python3 scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk .local/android-sdk
 python3 scripts/qualify_parity_emulator.py --serial emulator-5580
 python3 scripts/qualify_parity_provider.py --serial emulator-5580
 python3 scripts/qualify_parity_worker.py --serial emulator-5580
@@ -220,3 +220,44 @@ success. The harness snapshots/restores the dedicated emulator environment and
 verifies token-owned calendar cleanup and both package removals. No physical phone,
 real caller data or cloud account is used. Native API36/day evidence does not establish
 older-platform/night-mode runtime parity.
+
+
+## Minimum/intermediate matrix — 2026-10-22
+
+[Recorded acceptance](../conductor/tracks/release_20261020/emulator-matrix-qualification-20261022.md)
+uses the exact additional AVDs `calltrack-release-api26-20261022` (5578) and
+`calltrack-release-api33-20261022` (5584), official Google APIs ARM64 images. The
+shared allowlist accepts exact owned names; an emulator prefix alone is insufficient.
+Set JAVA_HOME to a qualified JDK17 before building; this run uses the isolated
+Temurin17.0.20.1+1 recorded in the receipts, with PortableSSD's SDK available.
+
+Build source-bound debug/test APKs once, keep them stable while native cases run,
+and retain build and per-version receipts before another invocation overwrites a
+default receipt. Core harnesses use fixed receipt files and must run serially.
+UI runs may use unique new receipt directories:
+
+```sh
+python3 scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk .local/android-sdk
+python3 scripts/qualify_parity_ui.py --serial emulator-5584 --suite accessibility --receipt-dir .local/matrix-new/api33-accessibility
+python3 scripts/qualify_release_upgrade.py --serial emulator-5584 --provider-schema --output .local/matrix-new/api33-upgrade
+```
+
+Accessibility checks cover four rendered screens, labels,48dp targets, scroll
+reachability and actual keyboard Tab focus. This qualification ran normal and2.0
+font scales and restored their saved values. Manual speech/contrast and physical
+acceptance remain separate. A focused guest ANR refuses installation; repair only
+the owned guest and retain failure/cleanup evidence before retrying.
+
+API26 call-log-seeded worker/import/lifecycle/telephony fixtures additionally need
+the selected userdebug image's existing su tool and explicitly selected temporary
+ADB root mode. Verify the exact AVD, qemu identity and API26 before selecting that
+mode. The test-only adapter provisions tagged rows through SDK provider commands;
+a real round-trip checks quoted data and proves app write permission stays denied.
+No app permission or release dependency is added. Ordinary UI/provider/store and
+upgrade tests do not need that fixture mode. Lifecycle reselects it after a real
+guest reboot only after background delivery has already been observed.
+
+After fixture cleanup is confirmed, restore ordinary ADB mode with the selected
+guest's `unroot` command and verify UID2000/root flag0. Retain settings/row/package
+readback and stop only the newly owned guests. The qualified run did this for both
+new guests; no computer restart, physical-phone action or cloud acceptance occurred.

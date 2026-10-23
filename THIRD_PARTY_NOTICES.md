@@ -5,9 +5,12 @@ The application source retains the GPLv3 licence and upstream attribution in
 Apache License2.0; the retained licence text is in
 [Apache-2.0.txt](qualification/release/licences/Apache-2.0.txt).
 
-This is a candidate attribution inventory, not permission to publish or a claim
-that all corresponding-source, upstream-notice, trademark or asset obligations
-are discharged. The exact runtime binary/POM hashes and embedded licence entries
+This inventory accompanies the exact-source candidate bundle; it does not
+authorise publication or assert permanent trademark rights. Published source
+archives, retained copyright headers and all discovered binary/source licence and
+notice documents accompany the bundle. A clean app rebuild uses the pinned
+prebuilt dependencies; rebuilding every dependency from its upstream repository
+is a separate unqualified scope. The exact runtime binary/POM hashes and embedded licence entries
 are recorded in the Track5 canonical runtime audit. Listenablefuture1.0 has no
 POM declaration; its exact published source header supplies the Apache2 evidence.
 
@@ -80,3 +83,13 @@ JDK or Gradle distributions with an app/source release by default.
 | org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.9.0 | Apache-2.0 |
 | org.jetbrains:annotations:23.0.0 | Apache-2.0 |
 | org.jspecify:jspecify:1.0.0 | Apache-2.0 |
+
+## Modified project and assets
+
+The fork and original replacement vector artwork use GPLv3; upstream attribution
+is retained in NOTICE.md. See [asset provenance](ASSET_PROVENANCE.md) and
+[modification notices](MODIFICATIONS.md). The exact63 dependency source coordinates
+and hashes are in [the source inventory](qualification/release/runtime-sources.json).
+The APK carries this notice, GPL/Apache texts and retained embedded notices under
+`assets/open_source/`. No original CallTrack APK material, upstream launcher bitmap,
+font, screenshot or store artwork is used in the current app.

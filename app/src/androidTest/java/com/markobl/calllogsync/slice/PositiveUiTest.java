@@ -99,15 +99,17 @@ public class PositiveUiTest {
                             android.view.ViewGroup layout =
                                     (android.view.ViewGroup) scroll.getChildAt(0);
                             layout.getChildAt(0).getLocationOnScreen(firstPosition);
+                            android.view.WindowInsets insets =
+                                    activity.getWindow().getDecorView().getRootWindowInsets();
                             requiredTop[0] =
-                                    activity.getWindow()
-                                            .getDecorView()
-                                            .getRootWindowInsets()
-                                            .getInsets(
-                                                    android.view.WindowInsets.Type.systemBars()
-                                                            | android.view.WindowInsets.Type
-                                                                    .displayCutout())
-                                            .top;
+                                    android.os.Build.VERSION.SDK_INT >= 30
+                                            ? insets.getInsets(
+                                                            android.view.WindowInsets.Type
+                                                                            .systemBars()
+                                                                    | android.view.WindowInsets.Type
+                                                                            .displayCutout())
+                                                    .top
+                                            : insets.getSystemWindowInsetTop();
                         });
                 assertTrue(
                         names[i]
@@ -119,6 +121,100 @@ public class PositiveUiTest {
             } finally {
                 finish(instrumentation, activity);
             }
+        }
+    }
+
+    @Test
+    public void renderedAccessibilityLabelsTargetsAndKeyboardFocus() {
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        RenderedUi ui = new RenderedUi(instrumentation);
+        Class<?>[] screens = {
+            AutomaticSettingsActivity.class,
+            CalendarSliceActivity.class,
+            HistoricalImportActivity.class,
+            ReceiptRecoveryActivity.class
+        };
+        String[] anchors = {
+            "auto_permissions",
+            "slice_calendar_picker",
+            "import_calendar_picker",
+            "recovery_refresh"
+        };
+        for (int i = 0; i < screens.length; i++) {
+            Activity activity =
+                    instrumentation.startActivitySync(
+                            new Intent(context(), screens[i])
+                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            try {
+                final String anchor = anchors[i];
+                ui.await(() -> ui.find(anchor, true) != null, "Missing screen " + anchor);
+                ui.capture("accessibility-before-" + i);
+                final int[] controls = {0};
+                instrumentation.runOnMainSync(
+                        () -> {
+                            android.view.ViewGroup content =
+                                    activity.findViewById(android.R.id.content);
+                            android.widget.ScrollView scroll =
+                                    (android.widget.ScrollView) content.getChildAt(0);
+                            android.view.ViewGroup layout =
+                                    (android.view.ViewGroup) scroll.getChildAt(0);
+                            assertAccessibilityControls(layout, controls);
+                        });
+                assertTrue("Screen has no reachable controls", controls[0] > 0);
+                android.view.accessibility.AccessibilityNodeInfo node = ui.shown(anchor, true);
+                assertNotNull("Anchor must be reachable by scrolling", node);
+                assertTrue("Anchor must expose keyboard focus", node.isFocusable());
+                instrumentation.sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_TAB);
+                ui.await(
+                        () -> {
+                            android.view.accessibility.AccessibilityNodeInfo root =
+                                    ui.automation.getRootInActiveWindow();
+                            if (root == null) return false;
+                            android.view.accessibility.AccessibilityNodeInfo focused =
+                                    root.findFocus(
+                                            android.view.accessibility.AccessibilityNodeInfo
+                                                    .FOCUS_INPUT);
+                            return focused != null
+                                    && focused.isFocusable()
+                                    && focused.isVisibleToUser()
+                                    && context()
+                                            .getPackageName()
+                                            .contentEquals(focused.getPackageName());
+                        },
+                        "Keyboard Tab did not expose visible application focus " + anchor);
+                ui.capture("accessibility-" + i);
+            } finally {
+                finish(instrumentation, activity);
+            }
+        }
+        assertNull("Reading screens must not enable logging", active());
+    }
+
+    private void assertAccessibilityControls(android.view.View view, int[] controls) {
+        if (view.getVisibility() != android.view.View.VISIBLE) return;
+        if ((view instanceof android.widget.Button
+                        || view instanceof android.widget.Spinner
+                        || view instanceof android.widget.EditText)
+                && view.isEnabled()) {
+            controls[0]++;
+            float density = view.getResources().getDisplayMetrics().density;
+            assertTrue(
+                    "Touch target below 48dp: "
+                            + view.getClass().getSimpleName()
+                            + " height="
+                            + view.getHeight() / density,
+                    view.getHeight() >= 48 * density - 1);
+            assertTrue("Touch target too narrow", view.getWidth() >= 48 * density - 1);
+            CharSequence label = view.getContentDescription();
+            if (view instanceof android.widget.TextView && (label == null || label.length() == 0))
+                label = ((android.widget.TextView) view).getText();
+            assertTrue("Unlabelled interactive control", label != null && label.length() > 0);
+            assertTrue("Enabled control must accept keyboard focus", view.isFocusable());
+        }
+        if (view instanceof android.view.ViewGroup && !(view instanceof android.widget.Spinner)) {
+            android.view.ViewGroup group = (android.view.ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++)
+                assertAccessibilityControls(group.getChildAt(i), controls);
         }
     }
 

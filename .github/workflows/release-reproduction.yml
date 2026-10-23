@@ -1,0 +1,61 @@
+name: Cold Linux release reproduction
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_sha:
+        description: Exact reviewed candidate commit (40 hex characters)
+        required: true
+        default: 94644086159137bab27767b6a1a46727409695b5
+      expected_apk_sha256:
+        description: Expected unsigned macOS APK SHA256
+        required: true
+        default: 0f672916f06afbc2ec4b0730c1df167d44dcb094b41385cb8a0bfc6b234f48df
+permissions:
+  contents: read
+jobs:
+  cold-linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    container:
+      image: eclipse-temurin@sha256:67d52fac68c483f8a91dda88d4d0518ca2375d4c8260a9114d37aa49cf11cfac
+    steps:
+      - name: Install Linux prerequisites
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends python3 git unzip ca-certificates
+      - name: Checkout qualification tooling
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: qualification-tools
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Checkout exact candidate separately
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: candidate
+          ref: ${{ inputs.candidate_sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Verify tooling and Conductor
+        working-directory: qualification-tools
+        run: |
+          python3 -m unittest discover -s tests -v
+          python3 scripts/verify_conductor.py
+      - name: Build with fresh SDK and Gradle home
+        env:
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          EXPECTED_APK_SHA256: ${{ inputs.expected_apk_sha256 }}
+        run: |
+          python3 qualification-tools/scripts/qualify_linux_build.py \
+            --source "$GITHUB_WORKSPACE/candidate" \
+            --output "$RUNNER_TEMP/calltrack-cold-linux" \
+            --expected-revision "$CANDIDATE_SHA" \
+            --expected-apk-sha256 "$EXPECTED_APK_SHA256"
+      - name: Retain unsigned artifact and evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: cold-linux-release-evidence
+          path: ${{ runner.temp }}/calltrack-cold-linux/evidence/
+          if-no-files-found: warn
+          retention-days: 14
