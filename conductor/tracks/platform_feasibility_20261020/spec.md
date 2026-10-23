@@ -27,3 +27,10 @@ Evidence-backed capability matrix and useful second-platform scope; rejection/de
 ## Out of scope
 
 No automatic adoption of shortlisted technology, wholesale rewrite, paid service, unqualified platform parity or public release. Cross-track responsibilities remain with their owning tracks. A negative feasibility result or justified deferral is an acceptable research outcome.
+
+## Shared-core research handoff
+
+[Track8 findings](../../archive/kmp_20261020/findings.md) propose manual/import companion
+workflows without selecting a platform. Qualify supported acquisition, calendar,
+background and packaging capabilities here before reopening KMP-D01. No native
+companion or target feasibility is established by that research closure.

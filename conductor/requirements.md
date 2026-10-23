@@ -95,3 +95,11 @@ distinguish prototype evidence from production adoption. The final decision reta
 Views and defers real migration with reopening gates; R15's production UI outcome
 remains pending. Conditional research closure does not establish an adopted screen
 or waive manual accessibility, permission/provider or process-recovery acceptance.
+
+## Track8 KMP research outcome
+
+R16/R24/R26 have a portable/native ownership map and [S01–S08](archive/kmp_20261020/requirements.md)
+for equivalent fixture, transaction, packaging and compatibility acceptance. KMP-D01
+retains existing code and defers extraction pending stable Track4/6 boundaries and
+Track12 workflow feasibility. No common module or second-target tests exist; R16/M7
+production acceptance remains pending.

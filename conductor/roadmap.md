@@ -103,3 +103,11 @@ production M6 migration is deferred pending stable M3/M5 controller/state contra
 and actual behavioural/manual accessibility acceptance. The conditional research
 track can close with this justified decision; the M6 production exit gate does not
 change. Reopen the recorded decision before adopting any prototype screen/version.
+
+## M7 research disposition
+
+[Track8 KMP-D01](archive/kmp_20261020/decisions.md) completes research with justified
+deferral. The M7 exit gate is unchanged: shared fixtures on Android and a selected
+second target remain required before adoption. Reopen after stable source/delivery
+contracts, qualified Kotlin extraction boundaries and Track12's useful workflow.
+No shared-core or second-platform application was implemented in this phase.
