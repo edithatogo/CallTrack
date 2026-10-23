@@ -34,6 +34,7 @@
 - [x] Task: Review the historical import status slice; keep the existing dependency set, preserve the status host IDs and transaction callbacks, and document the pending emulator result in [review](review-20261024-import-status.md).
 - [x] Task: Review the recovery feedback slice; retain all recovery effects and resource IDs, and document the pending runtime result in [review](review-20261024-recovery-status.md).
 - [x] Task: Review and fix the recovery card/action/pagination slice; run the Compose component and fixture-backed API36 recovery journeys, and record the separate historical-import accessibility test failure (see [review](review-20261024-recovery-cards.md)).
+- [x] Task: Fix the Compose test-tag accessibility selector mismatch, review the change, and rerun settings and historical-import panel checks (see [review](review-20261024-accessibility-selector.md)).
 - [ ] Task: Perform Conductor review, apply fixes and rerun affected checks.
 - [ ] Task: Update requirements, decisions, remaining limitations and next-track inputs; retire superseded code/prototypes only after parity.
 - [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger.

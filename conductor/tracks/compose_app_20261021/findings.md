@@ -63,6 +63,15 @@ dedicated IDs.
 The recovery component and fixture-backed API36 recovery journeys passed with a
 synthetic token-scoped LOCAL calendar. A separate existing historical-import
 control selector failed in a broader selected UI test: `RenderedUi` could not
-find `import_create`. Investigate that accessibility/selector path before
-claiming historical-import or whole-track parity. Track14's wider screen-reader,
-font, RTL, recreation and Android-version matrix remains open.
+find `import_create`. Review confirmed Compose emitted the test tag as the raw
+resource name while `RenderedUi` required the package-qualified Android form.
+The helper now accepts both forms, and the import action panel exposes its tag
+through parent semantics. The rendered settings test now passes; see the
+[accessibility selector review](review-20261024-accessibility-selector.md).
+
+Full fixture-backed import delivery remains unqualified: the synthetic calendar
+journey needs target-app calendar permissions to remain granted across its
+setup and rendered phases. The attempted multi-invocation run lost that grant
+between Gradle invocations and stopped before preview or delivery. No delivery
+success is claimed from that attempt. Track14's wider screen-reader, font, RTL,
+recreation and Android-version matrix remains open.
