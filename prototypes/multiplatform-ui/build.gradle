@@ -1,15 +1,27 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '2.3.21'
-    id 'org.jetbrains.kotlin.plugin.compose' version '2.3.21'
-    id 'org.jetbrains.compose' version '1.10.3'
+    id 'org.jetbrains.kotlin.multiplatform' version '2.4.21'
+    id 'org.jetbrains.kotlin.plugin.compose' version '2.4.21'
+    id 'org.jetbrains.compose' version '1.12.2'
 }
-kotlin { jvmToolchain(17) }
-dependencies {
-    implementation compose.desktop.currentOs
-    implementation compose.material
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation compose.desktop.uiTestJUnit4
+kotlin {
+    jvmToolchain(17)
+    jvm('desktop')
+    sourceSets {
+        commonMain.dependencies {
+            implementation compose.runtime
+            implementation compose.foundation
+            implementation compose.material
+        }
+        commonTest.dependencies { implementation kotlin('test') }
+        desktopMain.dependencies { implementation compose.desktop.currentOs }
+        desktopTest.dependencies {
+            implementation kotlin('test-junit')
+            implementation 'junit:junit:4.13.2'
+            implementation compose.desktop.uiTestJUnit4
+        }
+    }
 }
+
 compose.desktop {
     application { mainClass = 'org.calltrack.companion.MainKt' }
 }
