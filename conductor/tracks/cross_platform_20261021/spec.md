@@ -1,6 +1,6 @@
 # Consolidated Android and macOS qualification
 
-Track 19; execution stage 8; milestone M8-acceptance. Status: pending implementation.
+Track 19; execution stage 8; milestone M8-acceptance. Status: bounded prerequisite reconciliation; full qualification pending.
 
 ## Objective
 
@@ -41,3 +41,7 @@ working outputs until parity/recovery. Windows/Linux are outside this sequence.
 iOS implementation is stage9 and cannot be advanced past unresolved stages1–8.
 A justified deferral must state reason, evidence, consequences and reconsideration
 trigger; it cannot turn unavailable features into supported claims.
+
+Current execution is scoped by [prerequisite-deferral.md](prerequisite-deferral.md).
+Its [evidence map](findings.md) and [decision](decisions.md) do not satisfy the
+full acceptance criteria above and do not authorize Track 20.
