@@ -29,8 +29,18 @@ class HistoricalImportActivityComposeTest {
         compose.onNodeWithText(compose.activity.getString(R.string.import_none)).assertIsDisplayed()
         assertTrue(compose.activity.findViewById<ComposeView>(R.id.import_filters) != null)
         assertTrue(compose.activity.findViewById<ComposeView>(R.id.import_calendar_picker) != null)
+        assertTrue(compose.activity.findViewById<ComposeView>(R.id.import_intro_panel) != null)
         assertTrue(compose.activity.findViewById<ComposeView>(R.id.import_access_panel) != null)
         compose.onNodeWithTag("import_access_action").assertIsDisplayed()
+        compose.onNodeWithTag("import_intro_text").assertIsDisplayed()
+        compose
+            .onNodeWithText(
+                compose.activity.getString(
+                    R.string.import_intro,
+                    java.time.ZoneId.systemDefault().id,
+                )
+            )
+            .assertIsDisplayed()
         compose.onNodeWithTag("import_calendar_picker").assertIsNotEnabled()
         compose.onNodeWithTag("import_incoming").assertIsOn()
         compose.onNodeWithTag("import_outgoing").assertIsOn()
