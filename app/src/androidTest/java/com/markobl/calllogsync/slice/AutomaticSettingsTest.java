@@ -77,17 +77,17 @@ public class AutomaticSettingsTest {
                         new Intent(context, HistoricalImportActivity.class)
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         try {
-            instrumentation.runOnMainSync(
-                    () -> {
-                        assertFalse(activity.findViewById(R.id.import_create).isEnabled());
-                        assertFalse(activity.findViewById(R.id.import_confirm).isEnabled());
-                        assertFalse(activity.findViewById(R.id.import_continue).isEnabled());
-                        assertEquals(
-                                activity.getString(R.string.import_none),
-                                ((TextView) activity.findViewById(R.id.import_summary))
-                                        .getText()
-                                        .toString());
-                    });
+            RenderedUi ui = new RenderedUi(instrumentation);
+            assertTrue(
+                    activity.findViewById(R.id.import_summary)
+                            instanceof androidx.compose.ui.platform.ComposeView);
+            assertTrue(
+                    activity.findViewById(R.id.import_actions)
+                            instanceof androidx.compose.ui.platform.ComposeView);
+            ui.await(() -> ui.shown("import_create", true) != null, "Create action did not render");
+            assertFalse(ui.shown("import_create", true).isEnabled());
+            assertFalse(ui.shown("import_confirm", true).isEnabled());
+            assertFalse(ui.shown("import_continue", true).isEnabled());
             try (SqliteImportStore store = new SqliteImportStore(context)) {
                 assertTrue(store.sessions(-1, 10).isEmpty());
             }

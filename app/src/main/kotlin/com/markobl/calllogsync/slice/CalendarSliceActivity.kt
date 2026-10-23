@@ -1,22 +1,27 @@
 package com.markobl.calllogsync.slice
 
 import android.Manifest
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import android.widget.*
+import androidx.activity.ComponentActivity
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import com.markobl.calllogsync.R
 import java.util.TimeZone
 import java.util.concurrent.Executors
 
 /** Explicit manual action; any enabled automatic policy is controlled independently. */
-class CalendarSliceActivity : Activity() {
+class CalendarSliceActivity : ComponentActivity() {
     private val executor = Executors.newSingleThreadExecutor()
     private var picker: Spinner? = null
-    private var status: TextView? = null
-    private var log: Button? = null
+    private var panelState by
+        mutableStateOf(ManualLogUiState(logLabel = "", status = "", actionEnabled = false))
     private var choices: List<AndroidCalendarSink.Choice> = ArrayList()
     private var selected = -1L
     private var busy = false
@@ -70,56 +75,16 @@ class CalendarSliceActivity : Activity() {
                     updateButton()
                 }
             }
-        log = Button(this)
-        log!!.setText(R.string.slice_log_latest)
-        layout.addView(log)
-        log!!.isEnabled = false
-        status = TextView(this)
-        status!!.accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
-        layout.addView(status)
-        log!!.setOnClickListener {
-            if (selected < 0 || busy) return@setOnClickListener
-            if (!calendarAccess()) {
-                status!!.setText(R.string.slice_permission_needed)
-                updateButton()
-                return@setOnClickListener
+        val manualPanel =
+            ComposeView(this).apply {
+                id = R.id.slice_manual_panel
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent { ManualLogPanel(state = panelState, onLogLatest = ::logLatest) }
             }
-            if (
-                checkSelfPermission(Manifest.permission.READ_CALL_LOG) !=
-                    PackageManager.PERMISSION_GRANTED
-            ) {
-                requestPermissions(arrayOf(Manifest.permission.READ_CALL_LOG), 2)
-                return@setOnClickListener
-            }
-            val destination = selected
-            busy = true
-            updateButton()
-            status!!.setText(R.string.slice_working)
-            executor.execute {
-                val outcome =
-                    try {
-                        SqliteLedger(applicationContext).use { ledger ->
-                            ManualDelivery(
-                                    AndroidCallLogSource(applicationContext),
-                                    DurableDelivery(
-                                        ledger.outbox(),
-                                        AndroidCalendarSink(applicationContext),
-                                    ),
-                                    TimeZone.getDefault().id,
-                                )
-                                .run(destination)
-                        }
-                    } catch (failed: RuntimeException) {
-                        SliceEngine.Result.FAILED
-                    }
-                runOnUiThread {
-                    if (isDestroyed) return@runOnUiThread
-                    busy = false
-                    status!!.setText(message(outcome))
-                    updateButton()
-                }
-            }
-        }
+        layout.addView(manualPanel)
+        panelState = panelState.copy(logLabel = getString(R.string.slice_log_latest))
         val automatic = Button(this)
         automatic.id = R.id.open_automatic
         automatic.setText(R.string.auto_open)
@@ -150,7 +115,7 @@ class CalendarSliceActivity : Activity() {
         if (calendarAccess()) refresh()
         else {
             selected = -1
-            status?.setText(R.string.slice_permission_needed)
+            setStatus(R.string.slice_permission_needed)
             updateButton()
         }
     }
@@ -162,8 +127,59 @@ class CalendarSliceActivity : Activity() {
                 PackageManager.PERMISSION_GRANTED
 
     private fun updateButton() {
-        log?.isEnabled = !busy && !refreshing && selected >= 0 && calendarAccess()
+        panelState =
+            panelState.copy(
+                actionEnabled = !busy && !refreshing && selected >= 0 && calendarAccess()
+            )
         picker?.isEnabled = !busy && !refreshing && calendarAccess()
+    }
+
+    private fun setStatus(message: Int) {
+        panelState = panelState.copy(status = getString(message))
+    }
+
+    private fun logLatest() {
+        if (selected < 0 || busy) return
+        if (!calendarAccess()) {
+            setStatus(R.string.slice_permission_needed)
+            updateButton()
+            return
+        }
+        if (
+            checkSelfPermission(Manifest.permission.READ_CALL_LOG) !=
+                PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(arrayOf(Manifest.permission.READ_CALL_LOG), 2)
+            return
+        }
+        val destination = selected
+        busy = true
+        updateButton()
+        setStatus(R.string.slice_working)
+        executor.execute {
+            val outcome =
+                try {
+                    SqliteLedger(applicationContext).use { ledger ->
+                        ManualDelivery(
+                                AndroidCallLogSource(applicationContext),
+                                DurableDelivery(
+                                    ledger.outbox(),
+                                    AndroidCalendarSink(applicationContext),
+                                ),
+                                TimeZone.getDefault().id,
+                            )
+                            .run(destination)
+                    }
+                } catch (failed: RuntimeException) {
+                    SliceEngine.Result.FAILED
+                }
+            runOnUiThread {
+                if (isDestroyed) return@runOnUiThread
+                busy = false
+                setStatus(message(outcome))
+                updateButton()
+            }
+        }
     }
 
     private fun refresh() {
@@ -189,7 +205,7 @@ class CalendarSliceActivity : Activity() {
                     picker!!.adapter =
                         ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, labels)
                     picker!!.setSelection(position)
-                    status!!.setText(
+                    setStatus(
                         if (loaded.isEmpty()) R.string.slice_no_calendars else R.string.slice_ready
                     )
                     updateButton()
@@ -199,7 +215,7 @@ class CalendarSliceActivity : Activity() {
                     if (!isDestroyed && generation == refreshGeneration) {
                         refreshing = false
                         selected = -1
-                        status!!.setText(R.string.slice_calendar_unavailable)
+                        setStatus(R.string.slice_calendar_unavailable)
                         updateButton()
                     }
                 }
@@ -214,8 +230,8 @@ class CalendarSliceActivity : Activity() {
     ) {
         super.onRequestPermissionsResult(code, permissions, grants)
         if (code == 1 && calendarAccess()) refresh()
-        else if (code == 2) status!!.setText(R.string.slice_tap_again)
-        else status!!.setText(R.string.slice_permission_needed)
+        else if (code == 2) setStatus(R.string.slice_tap_again)
+        else setStatus(R.string.slice_permission_needed)
     }
 
     private fun message(result: SliceEngine.Result): Int =

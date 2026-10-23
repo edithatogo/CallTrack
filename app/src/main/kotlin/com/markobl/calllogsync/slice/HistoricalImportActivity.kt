@@ -1,12 +1,18 @@
 package com.markobl.calllogsync.slice
 
 import android.Manifest
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import android.widget.*
+import androidx.activity.ComponentActivity
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
 import com.markobl.calllogsync.R
 import java.time.Instant
 import java.time.LocalDate
@@ -16,7 +22,7 @@ import java.util.TimeZone
 import java.util.concurrent.Executors
 
 /** Foreground bounded runs; opening/resuming never confirms historical delivery. */
-class HistoricalImportActivity : Activity() {
+class HistoricalImportActivity : ComponentActivity() {
     private val executor = Executors.newSingleThreadExecutor()
     @Volatile private var running = false
     private var busy = false
@@ -29,15 +35,11 @@ class HistoricalImportActivity : Activity() {
     private var incoming: CheckBox? = null
     private var outgoing: CheckBox? = null
     private var missed: CheckBox? = null
-    private var create: Button? = null
-    private var continueRun: Button? = null
-    private var confirm: Button? = null
-    private var cancel: Button? = null
-    private var stop: Button? = null
-    private var older: Button? = null
-    private var newer: Button? = null
-    private var summary: TextView? = null
-    private var feedback: TextView? = null
+    private var actionState by mutableStateOf(HistoricalImportActionState())
+    private var summary: ComposeView? = null
+    private var feedback: ComposeView? = null
+    private var summaryText by mutableStateOf("")
+    private var feedbackText by mutableStateOf("")
     private var history: LinearLayout? = null
     private var choices: List<AndroidCalendarSink.Choice> = Collections.emptyList()
     private var selected = -1L
@@ -120,30 +122,66 @@ class HistoricalImportActivity : Activity() {
         outgoing =
             check(layout, R.string.auto_outgoing, saved == null || saved.getBoolean("outgoing"))
         missed = check(layout, R.string.auto_missed, saved == null || saved.getBoolean("missed"))
-        create = button(layout, R.string.import_create, R.id.import_create)
-        create!!.setOnClickListener { startPreview() }
-        summary = TextView(this)
-        summary!!.id = R.id.import_summary
-        summary!!.accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
-        summary!!.setText(R.string.import_none)
+        val createActions =
+            ComposeView(this).apply {
+                id = R.id.import_actions
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    HistoricalImportCreateActionPanel(
+                        state = actionState,
+                        label = stringResource(R.string.import_create),
+                        onCreate = ::startPreview,
+                    )
+                }
+            }
+        layout.addView(createActions)
+        summaryText = getString(R.string.import_none)
+        summary =
+            ComposeView(this).apply {
+                id = R.id.import_summary
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent { HistoricalImportSummaryText(summaryText) }
+            }
         layout.addView(summary)
-        continueRun = button(layout, R.string.import_continue, R.id.import_continue)
-        continueRun!!.setOnClickListener {
-            running = true
-            step()
-        }
-        confirm = button(layout, R.string.import_confirm, R.id.import_confirm)
-        confirm!!.setOnClickListener { confirmImport() }
-        stop = button(layout, R.string.import_stop, R.id.import_stop)
-        stop!!.setOnClickListener {
-            running = false
-            feedback!!.setText(R.string.import_stopping)
-            buttons()
-        }
-        cancel = button(layout, R.string.import_cancel, R.id.import_cancel)
-        cancel!!.setOnClickListener { cancelImport() }
-        feedback = TextView(this)
-        feedback!!.id = R.id.import_feedback
+        val runActions =
+            ComposeView(this).apply {
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    HistoricalImportRunActionsPanel(
+                        state = actionState,
+                        continueLabel = stringResource(R.string.import_continue),
+                        confirmLabel = stringResource(R.string.import_confirm),
+                        stopLabel = stringResource(R.string.import_stop),
+                        cancelLabel = stringResource(R.string.import_cancel),
+                        onContinue = {
+                            running = true
+                            step()
+                        },
+                        onConfirm = ::confirmImport,
+                        onStop = {
+                            running = false
+                            setFeedback(R.string.import_stopping)
+                            buttons()
+                        },
+                        onCancel = ::cancelImport,
+                    )
+                }
+            }
+        layout.addView(runActions)
+        feedback =
+            ComposeView(this).apply {
+                id = R.id.import_feedback
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent { HistoricalImportFeedbackText(feedbackText) }
+            }
         layout.addView(feedback)
         val historyLabel = TextView(this)
         historyLabel.setText(R.string.import_history)
@@ -152,17 +190,31 @@ class HistoricalImportActivity : Activity() {
         history!!.orientation = LinearLayout.VERTICAL
         history!!.id = R.id.import_history
         layout.addView(history)
-        newer = button(layout, R.string.import_newer, 0)
-        newer!!.setOnClickListener {
-            if (historyBack.isNotEmpty()) loadHistory(historyBack.removeAt(historyBack.size - 1))
-        }
-        older = button(layout, R.string.import_older, 0)
-        older!!.setOnClickListener {
-            if (nextHistoryCursor > 0) {
-                historyBack.add(historyCursor)
-                loadHistory(nextHistoryCursor)
+        val historyNavigation =
+            ComposeView(this).apply {
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    HistoricalImportPaginationPanel(
+                        state = actionState,
+                        newerLabel = stringResource(R.string.import_newer),
+                        olderLabel = stringResource(R.string.import_older),
+                        onNewer = {
+                            if (!busy && historyBack.isNotEmpty()) {
+                                loadHistory(historyBack.removeAt(historyBack.size - 1))
+                            }
+                        },
+                        onOlder = {
+                            if (!busy && nextHistoryCursor > 0) {
+                                historyBack.add(historyCursor)
+                                loadHistory(nextHistoryCursor)
+                            }
+                        },
+                    )
+                }
             }
-        }
+        layout.addView(historyNavigation)
         val scroll = ScrollView(this)
         scroll.addView(layout)
         ActivityInsets.apply(scroll)
@@ -206,6 +258,10 @@ class HistoricalImportActivity : Activity() {
         return box
     }
 
+    private fun setFeedback(message: Int?) {
+        feedbackText = message?.let(::getString) ?: ""
+    }
+
     private fun access(): Boolean =
         checkSelfPermission(Manifest.permission.READ_CALL_LOG) ==
             PackageManager.PERMISSION_GRANTED && calendarAccess()
@@ -217,25 +273,28 @@ class HistoricalImportActivity : Activity() {
                 PackageManager.PERMISSION_GRANTED
 
     private fun buttons() {
-        if (create != null)
-            create!!.isEnabled =
-                !busy &&
-                    selected >= 0 &&
-                    access() &&
-                    (incoming!!.isChecked || outgoing!!.isChecked || missed!!.isChecked)
-        destination?.isEnabled = !busy && calendarAccess()
         val value = session
-        continueRun?.isEnabled =
-            !busy &&
-                value != null &&
-                (value.phase == HistoricalImport.Phase.BUILDING ||
-                    value.phase == HistoricalImport.Phase.CONFIRMED)
-        confirm?.isEnabled = !busy && value != null && value.phase == HistoricalImport.Phase.PREVIEW
-        cancel?.isEnabled =
-            value != null &&
-                value.phase != HistoricalImport.Phase.COMPLETE &&
-                value.phase != HistoricalImport.Phase.CANCELLED
-        stop?.isEnabled = running
+        val hasCallTypes =
+            incoming?.isChecked == true || outgoing?.isChecked == true || missed?.isChecked == true
+        actionState =
+            HistoricalImportActionState(
+                createEnabled = !busy && selected >= 0 && access() && hasCallTypes,
+                continueEnabled =
+                    !busy &&
+                        value != null &&
+                        (value.phase == HistoricalImport.Phase.BUILDING ||
+                            value.phase == HistoricalImport.Phase.CONFIRMED),
+                confirmEnabled =
+                    !busy && value != null && value.phase == HistoricalImport.Phase.PREVIEW,
+                stopEnabled = running,
+                cancelEnabled =
+                    value != null &&
+                        value.phase != HistoricalImport.Phase.COMPLETE &&
+                        value.phase != HistoricalImport.Phase.CANCELLED,
+                newerEnabled = !busy && historyBack.isNotEmpty(),
+                olderEnabled = !busy && nextHistoryCursor > 0,
+            )
+        destination?.isEnabled = !busy && calendarAccess()
     }
 
     private fun loadCalendars(preferred: Long) {
@@ -272,7 +331,7 @@ class HistoricalImportActivity : Activity() {
             try {
                 ImportRange.parse(from!!.text.toString(), to!!.text.toString(), zone)
             } catch (invalid: RuntimeException) {
-                feedback!!.setText(R.string.import_invalid_range)
+                setFeedback(R.string.import_invalid_range)
                 return
             }
         val calendar = selected
@@ -401,8 +460,8 @@ class HistoricalImportActivity : Activity() {
                             }
                             if (result.stopped != null) {
                                 running = false
-                                feedback!!.setText(R.string.import_blocked)
-                            } else feedback!!.text = ""
+                                setFeedback(R.string.import_blocked)
+                            } else setFeedback(null)
                             buttons()
                             if (
                                 follow &&
@@ -424,7 +483,7 @@ class HistoricalImportActivity : Activity() {
                     if (isDestroyed || ticket != renderVersion) return@runOnUiThread
                     running = false
                     busy = false
-                    feedback!!.setText(R.string.import_failed)
+                    setFeedback(R.string.import_failed)
                     buttons()
                 }
             }
@@ -459,7 +518,7 @@ class HistoricalImportActivity : Activity() {
 
     private fun render() {
         val value = session!!
-        summary!!.text =
+        summaryText =
             getString(
                 R.string.import_progress,
                 dates(value),
@@ -510,8 +569,7 @@ class HistoricalImportActivity : Activity() {
                             history!!.addView(empty)
                         }
                         nextHistoryCursor = if (records.size > 10) records[9].cursor else -1
-                        older!!.isEnabled = nextHistoryCursor > 0
-                        newer!!.isEnabled = historyBack.isNotEmpty()
+                        buttons()
                     }
                 }
             } catch (failed: RuntimeException) {
@@ -523,7 +581,7 @@ class HistoricalImportActivity : Activity() {
     private fun showFailure() {
         runOnUiThread {
             if (isDestroyed) return@runOnUiThread
-            feedback!!.setText(R.string.import_failed)
+            setFeedback(R.string.import_failed)
             buttons()
         }
     }

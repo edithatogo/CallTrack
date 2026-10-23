@@ -275,17 +275,12 @@ public class ImportUiTest {
             assertEquals(3 + done.saved, fixture.events(calendar()));
             ui.revealId("import_summary");
             ui.capture("import-resumed-complete");
-            final Activity completedActivity = activity;
-            instrumentation.runOnMainSync(
+            ui.await(
                     () ->
-                            assertEquals(
-                                    "Completed import must clear stale stop feedback",
-                                    "",
-                                    ((android.widget.TextView)
-                                                    completedActivity.findViewById(
-                                                            R.id.import_feedback))
-                                            .getText()
-                                            .toString()));
+                            ui.find(context().getString(R.string.import_stopping), false) == null
+                                    && ui.find(context().getString(R.string.import_blocked), false)
+                                            == null,
+                    "Completed import must clear stale stop feedback");
             android.os.Bundle observation = new android.os.Bundle();
             observation.putLong("stoppedSaved", stopped.saved);
             observation.putLong("finalSaved", done.saved);
