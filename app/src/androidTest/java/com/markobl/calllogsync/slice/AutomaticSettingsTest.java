@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.SystemClock;
 import android.widget.*;
 
+import androidx.compose.ui.platform.ComposeView;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.markobl.calllogsync.R;
@@ -106,16 +107,15 @@ public class AutomaticSettingsTest {
                         new Intent(context, ReceiptRecoveryActivity.class)
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         try {
-            java.util.concurrent.atomic.AtomicBoolean ready =
-                    new java.util.concurrent.atomic.AtomicBoolean();
-            long deadline = SystemClock.elapsedRealtime() + 10000;
-            do {
-                instrumentation.runOnMainSync(
-                        () -> ready.set(activity.findViewById(R.id.recovery_empty) != null));
-                if (ready.get()) break;
-                SystemClock.sleep(50);
-            } while (SystemClock.elapsedRealtime() < deadline);
-            assertTrue("Recovery list did not load", ready.get());
+            RenderedUi ui = new RenderedUi(instrumentation);
+            ui.await(
+                    () -> ui.shown("recovery_empty_message", true) != null,
+                    "Recovery empty state did not render after the query");
+            assertTrue(
+                    activity.findViewById(R.id.recovery_empty) instanceof ComposeView);
+            assertEquals(
+                    context.getString(R.string.recovery_empty),
+                    ui.shown("recovery_empty_message", true).getText().toString());
             try (SqliteLedger ledger = new SqliteLedger(context)) {
                 assertTrue(ledger.recoveryPage(null, 10).isEmpty());
             }

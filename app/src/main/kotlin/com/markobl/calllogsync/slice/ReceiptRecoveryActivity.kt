@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.CalendarContract
-import android.view.View
 import android.widget.*
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.getValue
@@ -28,7 +27,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
     private var current: SqliteLedger.RecoveryCursor? = null
     private var next: SqliteLedger.RecoveryCursor? = null
     private var rows: LinearLayout? = null
-    private var emptyMessage: TextView? = null
+    private var emptyState by mutableStateOf(false)
     private var feedback: ComposeView? = null
     private var feedbackText by mutableStateOf("")
     private var cards by mutableStateOf<List<RecoveryCardUiState>>(emptyList())
@@ -103,13 +102,20 @@ class ReceiptRecoveryActivity : ComponentActivity() {
         rows = LinearLayout(this)
         rows!!.id = R.id.recovery_rows
         rows!!.orientation = LinearLayout.VERTICAL
-        emptyMessage =
-            TextView(this).apply {
+        val emptyPanel =
+            ComposeView(this).apply {
                 id = R.id.recovery_empty
-                setText(R.string.recovery_empty)
-                visibility = View.GONE
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    RecoveryEmptyPanel(
+                        visible = emptyState,
+                        message = stringResource(R.string.recovery_empty),
+                    )
+                }
             }
-        rows!!.addView(emptyMessage)
+        rows!!.addView(emptyPanel)
         val cardsPanel =
             ComposeView(this).apply {
                 id = R.id.recovery_cards
@@ -226,7 +232,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                             keyedRecords.map { (token, record) ->
                                 cardState(token, record.first, record.second)
                             }
-                        emptyMessage?.visibility = if (size == 0) View.VISIBLE else View.GONE
+                        emptyState = size == 0
                         next = if (page.size > 10) page[9].cursor else null
                         navigation()
                     }

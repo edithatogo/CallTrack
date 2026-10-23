@@ -42,6 +42,21 @@ passed both filter component cases on the API36 emulator. This is Compose
 semantics and layout evidence, not a live TalkBack or Switch Access session.
 See [the accessibility review](review-20261024-import-accessibility.md).
 
+## Recovery empty-state Compose slice — 2026-10-24
+
+The recovery empty-state `TextView` was replaced with a lifecycle-disposed
+`ComposeView`, retaining the `recovery_empty` resource ID. The Activity still
+sets the visible state only after its bounded ledger page returns; the Compose
+panel only renders the supplied localized message. The Activity test verifies
+the host type and waits for the localized message after the ledger query; the
+panel test verifies hidden and visible states without callbacks. The selected
+JDK17/SDK36 run of
+`:app:testDebugUnitTest :app:lintDebug :app:compileDebugAndroidTestKotlin
+:app:connectedDebugAndroidTest` passed all eight selected API36 instrumentation
+tests. This completes the remaining native presentation inside the recovery
+list; recovery intro and permission prompts stay Activity/native-owned. See
+[the recovery empty-state review](review-20261024-recovery-empty.md).
+
 ## Change
 
 The automatic settings screen now renders its four read-only state/counts/action

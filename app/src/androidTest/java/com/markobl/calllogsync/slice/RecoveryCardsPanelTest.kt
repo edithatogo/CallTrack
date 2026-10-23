@@ -1,6 +1,9 @@
 package com.markobl.calllogsync.slice
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
@@ -18,6 +21,19 @@ import org.junit.Test
 
 class RecoveryCardsPanelTest {
     @get:Rule val compose = createComposeRule()
+
+    @Test
+    fun emptyMessageIsOnlyRenderedFromActivitySuppliedState() {
+        var visible by mutableStateOf(false)
+        compose.setContent { RecoveryEmptyPanel(visible, "No recovery records") }
+
+        compose.onAllNodesWithTag("recovery_empty_message").assertCountEquals(0)
+        compose.onAllNodesWithText("No recovery records").assertCountEquals(0)
+
+        visible = true
+        compose.onNodeWithTag("recovery_empty_message").assertIsDisplayed()
+        compose.onNodeWithText("No recovery records").assertIsDisplayed()
+    }
 
     @Test
     fun cardsRenderBoundedActionsAndInvokeOnlyExplicitCallbacks() {

@@ -37,6 +37,7 @@
 - [x] Task: Fix the Compose test-tag accessibility selector mismatch, review the change, and rerun settings and historical-import panel checks (see [review](review-20261024-accessibility-selector.md)).
 - [x] Task: Migrate historical import date and call-type filters to a lifecycle-disposed ComposeView; preserve filter IDs and Activity-saved filter values, and qualify explicit edits/toggles plus Activity recreation on API36 (see [review](review-20261024-import-filters.md)).
 - [x] Task: Qualify filter date labels, checkbox role/state, large-font visibility, RTL rendering and 48 dp touch target semantics in the Compose test harness (see [review](review-20261024-import-accessibility.md)).
+- [x] Task: Migrate the recovery empty-state message into a lifecycle-disposed ComposeView, preserving `recovery_empty` and Activity-owned query state; qualify its visibility transition and no-side-effect behavior (see [review](review-20261024-recovery-empty.md)).
 - [ ] Task: Perform Conductor review, apply fixes and rerun affected checks.
 - [ ] Task: Update requirements, decisions, remaining limitations and next-track inputs; retire superseded code/prototypes only after parity.
 - [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger.

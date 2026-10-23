@@ -65,3 +65,24 @@ recreation, font/RTL and accessibility acceptance remains a Track14 gate.
 **Rollback:** Restore the previous Activity card/button construction and remove
 the recovery panels and two added host IDs; no stored schema or receipt identity
 changes are involved.
+
+## D14-4: Render recovery empty state with Compose
+
+**Decision:** Move only the recovery empty-state message from `TextView` to a
+lifecycle-disposed `ComposeView` retaining the `recovery_empty` resource ID.
+The Activity continues to derive the visibility flag from the completed ledger
+page. The composable receives that flag and the localized string and performs
+no ledger/calendar reads or writes. This supersedes D14-3's choice to retain a
+native empty-state view; the compatibility ID remains.
+
+**Alternatives:** Keep a mixed native/Compose recovery list (rejected after the
+cards and controls were migrated); move query or permission logic into
+composition (rejected); remove the legacy ID (rejected to preserve existing
+automation and host lookups).
+
+**Promotion/removal:** Compose now owns all recovery list presentation while
+the Activity owns data/query and effect authority. Retain the ID and native
+Activity boundary until broader UI and provider acceptance pass.
+
+**Rollback:** Restore the `TextView` and its visibility update; no persisted
+state, schema or calendar behavior changes.
