@@ -176,12 +176,68 @@ class VerificationFailures(unittest.TestCase):
         (shared_ui / 'prerequisite-deferral.md').write_text(
             'Synthetic bounded stage6 work; no earlier stage is resolved.'
         )
+        rust = self.root / 'conductor/tracks/rust_component_20261021/metadata.json'
+        rust_data = json.loads(rust.read_text())
+        rust_data['status'] = 'new'
+        rust_data['implementation_status'] = 'pending'
+        rust_data.pop('prerequisite_deferral_document', None)
+        rust.write_text(json.dumps(rust_data))
         self.run_verifier()
 
-        rust = self.root / 'conductor/tracks/rust_component_20261021/metadata.json'
         data = json.loads(rust.read_text())
         data['status'] = 'in_progress'
         rust.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
+            self.run_verifier()
+
+        data = json.loads(path.read_text())
+        data['status'] = 'completed'
+        path.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'cannot complete the track'):
+            self.run_verifier()
+
+    def test_track18_rust_deferral_does_not_unlock_track19(self):
+        rust = self.root / 'conductor/tracks/rust_component_20261021'
+        path = rust / 'metadata.json'
+        data = json.loads(path.read_text())
+        data.pop('prerequisite_deferral_document', None)
+        data.update({
+            'status': 'completed',
+            'implementation_status': 'deferred',
+            'deferral': {
+                'reason': 'Synthetic no-consumer decision',
+                'consequences': 'No Rust capability accepted',
+                'reconsideration_trigger': 'Reopen after a real supported consumer exists',
+            },
+        })
+        path.write_text(json.dumps(data))
+        (rust / 'deferral.md').write_text('Synthetic Rust adoption deferral.')
+        self.run_verifier()
+
+        cross_platform = self.root / 'conductor/tracks/cross_platform_20261021/metadata.json'
+        data = json.loads(cross_platform.read_text())
+        data['status'] = 'in_progress'
+        cross_platform.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
+            self.run_verifier()
+
+    def test_scoped_track18_work_does_not_complete_or_unlock_track19(self):
+        rust = self.root / 'conductor/tracks/rust_component_20261021'
+        path = rust / 'metadata.json'
+        data = json.loads(path.read_text())
+        data['status'] = 'in_progress'
+        data['implementation_status'] = 'scoped-evaluation-only'
+        data['prerequisite_deferral_document'] = 'prerequisite-deferral.md'
+        path.write_text(json.dumps(data))
+        (rust / 'prerequisite-deferral.md').write_text(
+            'Synthetic bounded stage7 evaluation; later stages stay blocked.'
+        )
+        self.run_verifier()
+
+        cross_platform = self.root / 'conductor/tracks/cross_platform_20261021/metadata.json'
+        data = json.loads(cross_platform.read_text())
+        data['status'] = 'in_progress'
+        cross_platform.write_text(json.dumps(data))
         with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
             self.run_verifier()
 

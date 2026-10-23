@@ -1,16 +1,30 @@
 {
   "track_id": "rust_component_20261021",
   "type": "research-led-development",
-  "status": "new",
+  "status": "completed",
   "milestone": "M8-component",
   "created_at": "2026-10-21",
-  "updated_at": "2026-10-21",
+  "updated_at": "2026-10-24",
   "depends_on": [
     "shared_ui_20261021"
   ],
   "requirements": "R26",
   "track_number": 18,
   "execution_stage": 7,
-  "implementation_status": "pending",
-  "production_adopted": false
+  "implementation_status": "deferred",
+  "production_adopted": false,
+  "decision_document": "decisions.md",
+  "deferral_document": "deferral.md",
+  "reviewed_at": "2026-10-24",
+  "review_document": "review-20261024.md",
+  "implementation_commit": "229adb8",
+  "draft_pr": 22,
+  "draft_pr_url": "https://github.com/edithatogo/CallTrack/pull/22",
+  "draft_pr_base": "codex/track17-shared-ui",
+  "draft_pr_hosted_ci": "blocked-before-job-start",
+  "deferral": {
+    "reason": "No accepted portable import format, Android exporter, measured bottleneck or demonstrated Rust production consumer exists; the only parser candidate is a synthetic preview prototype.",
+    "consequences": "No Rust code or dependency is adopted; Kotlin/native ownership and existing identities remain unchanged.",
+    "reconsideration_trigger": "Reopen after a qualified cross-platform app workflow selects a portable format with a real Android and Apple consumer."
+  }
 }

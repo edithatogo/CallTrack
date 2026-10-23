@@ -3,7 +3,14 @@
 - [Specification](spec.md)
 - [Plan](plan.md)
 - [Metadata](metadata.json)
+- [Findings](findings.md)
+- [Refined requirements](requirements.md)
+- [Decision](decisions.md)
+- [Deferral](deferral.md)
+- [Scoped prerequisite deferral](prerequisite-deferral.md)
+- [Verification](verification-20261024.md)
+- [Review](review-20261024.md)
 - [Execution sequence](../../future-architecture.md)
 
-Findings/requirements/decisions/evidence are created when work occurs, not as
-fabricated completed reports. Research links and required outputs are in the spec.
+The refreshed decision is Kotlin/native retention with production Rust deferred
+until a selected real cross-platform parser consumer exists.
