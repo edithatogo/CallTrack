@@ -12,6 +12,22 @@
 - [Preparation evidence](preparation-evidence.json)
 - [Resolved dependency report](dependency-report.json)
 
+## Live gate refresh — 2026-10-23
+
+The repository-target gate is resolved: [edithatogo/CallTrack](https://github.com/edithatogo/CallTrack)
+is private and has seventeen stacked draft PRs. GitHub Actions jobs are enabled
+but fail before assigning a runner with an account billing/spending-limit error;
+hosted CI therefore remains unqualified. See the
+[PR series](../../../qualification/successor-pr-series-20261023.md).
+
+Track5 remains not release-ready. The development identity remains selected for
+local qualification; production identity and key custody remain pending. The
+latest read-only device check found no connected Android phone, so physical-call
+and any selected Google/Outlook route acceptance remain pending. Observation
+state remains unstarted: dates null, zero accepted days/hours. A physical phone,
+participating second phone, selected calendar route(s), and explicit usage scope
+are still required before starting that window.
+
 ## Independent Linux build checkpoint — 2026-10-22
 
 - [Current independent-build qualification](linux-reproduction-qualification-20261022.md)
@@ -23,7 +39,8 @@ Mac tool/cache mounts and fresh SDK/Gradle downloads.115 JVM tests per Mac/Linux
 build and131 Python tests on both systems pass. The cold run exposed three missing
 metadata checksums;739 entries are now enforced without changing old hashes or
 runtime dependencies. The source/notices bundle is refreshed. Hosted GitHub CI
-is prepared but awaits the repository choice; original full-M4 gates stay open.
+is prepared; current execution is blocked by the account billing/spending limit
+before runner assignment. Original full-M4 gates stay open.
 
 ## Earlier asset/source/notices checkpoint — 2026-10-22
 

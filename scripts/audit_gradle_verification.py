@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
 """Independently check generated Gradle trust entries against canonical repository evidence.
 
 Generation alone is not approval. Every checksum must match fresh repository bytes

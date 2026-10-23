@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
 """Build a prepared qualification checkout and retain local command/artifact receipts."""
 import argparse
 import hashlib

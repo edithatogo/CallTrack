@@ -30,10 +30,13 @@ calendar account software controls remote sync.
 Use JDK17, Android SDK platform36/build-tools35.0.0 and the included Gradle8.13
 wrapper and Kotlin/KGP2.3.21. Set `JAVA_HOME` and `ANDROID_HOME` to those installed toolchains, then:
 
+Create the selected Python runtime with `uv venv --python 3.15.1 .venv` and
+verify `.venv/bin/python -V` before running these commands.
+
 ```sh
-python3 scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"
-python3 -m unittest discover -s tests -v
-python3 scripts/verify_conductor.py
+.venv/bin/python scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"
+.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python scripts/verify_conductor.py
 ```
 
 The build runs JVM tests, builds app/test APKs and lints. Receipts and logs stay under
@@ -49,7 +52,7 @@ For an explicitly selected, authorised test device with neither development test
 package already installed:
 
 ```sh
-python3 scripts/qualify_slice_device.py --serial DEVICE_SERIAL
+.venv/bin/python scripts/qualify_slice_device.py --serial DEVICE_SERIAL
 ```
 
 The harness installs disposable APKs, launches the UI, checks denied calendar

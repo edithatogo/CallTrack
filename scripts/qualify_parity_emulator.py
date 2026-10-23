@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
 """Run bounded parity foundations on the dedicated emulator, never a physical phone.
 
 Refuses mismatched builds and pre-existing packages. Store phase changes only its

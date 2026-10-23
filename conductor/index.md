@@ -26,7 +26,33 @@
 - [Baseline audit](research/baseline-audit.md)
 - [Future architecture](research/future-architecture.md)
 
+## Python infrastructure
+
+- [Track21 — Python3.15 migration and qualification](tracks/python315_20261023/index.md)
+
 ## Current checkpoint
+
+### Live gate refresh — 2026-10-23
+
+The selected private successor repository is [edithatogo/CallTrack](https://github.com/edithatogo/CallTrack).
+Its seventeen feature/research PRs are open as drafts; the [PR index](../qualification/successor-pr-series-20261023.md)
+links each stage. Hosted GitHub Actions jobs fail before runner allocation because
+the account billing/spending limit blocks them. This is not a passing hosted CI
+result. [Track21](tracks/python315_20261023/index.md) remains locally qualified
+on macOS and isolated Linux but open for this hosted gate.
+
+[Track6](tracks/kotlin_20261020/active-migration-handoff.md) has completed the
+active Kotlin code migration and selected emulator acceptance; no further Kotlin
+conversion is identified. Its full M5 acceptance remains linked to Track5.
+[Track5](tracks/release_20261020/index.md) remains not release-ready. The latest
+read-only device check found no connected Android device. Physical calls and
+selected account-calendar routes remain unqualified; the seven-day observation
+is unstarted with null dates and zero accepted days/hours. The user previously
+chose to retain the development identity, leaving production signing/key custody
+pending.
+
+Future implementation Tracks14–20 have not started. Follow the approved sequence
+below; iOS remains last.
 
 Tracks1–4 and research Tracks7–13 are complete, reviewed and archived. The
 [Track4 parity implementation](archive/parity_20261020/index.md) passes P01–P10 for
@@ -38,8 +64,9 @@ binding; fixtures/packages are removed and original environment restored.
 reviewed verification entries. The [independent Linux follow-up](tracks/release_20261020/linux-reproduction-qualification-20261022.md)
 qualifies9464408 on a separate native x86-64 host with fresh tools/caches, matching
 two Mac builds exactly.115 JVM tests per build and131 Python tests on both systems
-pass; the source/notices bundle is refreshed. Hosted CI is prepared but awaits the
-repository choice. Original signing, native/platform, conveyance and operational
+pass; the source/notices bundle is refreshed. Hosted CI is prepared; current
+execution is blocked by the account billing/spending limit before runner assignment.
+Original signing, native/platform, conveyance and operational
 requirements remain; the [isolated JDK](tracks/release_20261020/isolated-jdk-qualification-20261022.md)
 remains qualified while the original Homebrew defect is retained as history.
 [Track6 Kotlin migration](tracks/kotlin_20261020/index.md) now has36 production Kotlin files and one documented Java nullable-label

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
 """Read-only comparison against official Gradle/SDK/Homebrew archive evidence.
 
 Never installs tools, accepts licences or treats HTTPS checksums as independent signatures.

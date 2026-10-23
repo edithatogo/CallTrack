@@ -43,3 +43,7 @@ the archived research decisions; research Tracks7–13 remain unchanged.
   *Link: [Track](tracks/ios_companion_20261021/index.md)*
 
 Completed tracks are retained in the [archive index](archive/index.md).
+
+---
+- [~] **Track: Python3.15 migration and qualification** (Track21)
+  *Link: [Track](tracks/python315_20261023/index.md)*

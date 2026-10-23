@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
 """Check Conductor integrity; optionally verify locally retained mapping inputs.
 
 This verifies documentation and evidence identities, not app behaviour.
