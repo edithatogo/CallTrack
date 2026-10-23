@@ -1,0 +1,31 @@
+{
+  "candidate_revision": "787ae35b8a8da829641222f0e755fa3c4664aa11",
+  "signature_checks": [
+    {
+      "apk_sha256": "117909cbb95f70faac43c905ad6957daf746fa7713027786cb794b3f3b8945c4",
+      "exit_code": 1,
+      "output": "DOES NOT VERIFY\nERROR: Missing META-INF/MANIFEST.MF\n",
+      "unsigned_verified": true
+    },
+    {
+      "apk_sha256": "117909cbb95f70faac43c905ad6957daf746fa7713027786cb794b3f3b8945c4",
+      "exit_code": 1,
+      "output": "DOES NOT VERIFY\nERROR: Missing META-INF/MANIFEST.MF\n",
+      "unsigned_verified": true
+    }
+  ],
+  "source_archive_sha256": "e74797b6a5dc5e874620d6c65130a73387d33f250c45fd0e3c680ff1144b9c01",
+  "source_archive_entries": 546,
+  "source_archive_contains_licence_and_build_inputs": true,
+  "private_inputs_excluded": true,
+  "guava_source_licence": {
+    "url": "https://repo.maven.apache.org/maven2/com/google/guava/listenablefuture/1.0/listenablefuture-1.0-sources.jar",
+    "source_jar_sha256": "3d1bd8d4a39b293612a40e547ec51d9ce34fa638d7adeae83871cdbe2923b161",
+    "source_path": "com/google/common/util/concurrent/ListenableFuture.java",
+    "source_sha256": "25e03c1f9be77fe9e7d324c80acca5579f3d3c318dfd04dc7cb6b94f7bf91808",
+    "header_declaration": "Apache License, Version 2.0",
+    "pom_declaration_still_missing": true,
+    "redistribution_clearance": false
+  },
+  "release_ready": false
+}

@@ -1,0 +1,26 @@
+gradle.projectsEvaluated {
+    gradle.rootProject.tasks.register('releaseToolTrustInventory') {
+        doLast {
+            def root = gradle.rootProject
+            def app = root.project(':app')
+            def configs = [root.buildscript.configurations.classpath]
+            def names = ['releaseCompileClasspath','releaseRuntimeClasspath','debugCompileClasspath','debugRuntimeClasspath','debugAndroidTestRuntimeClasspath','releaseUnitTestRuntimeClasspath','lintClassPath']
+            names.each { name ->
+                def config = app.configurations.findByName(name)
+                if (config != null && config.canBeResolved) configs.add(config)
+            }
+            [root, app].each { project ->
+                project.configurations.findAll { it.canBeResolved && it.name.toLowerCase() =~ /(lint|compiler|aapt|desugar)/ }.each { config ->
+                    if (!configs.contains(config)) configs.add(config)
+                }
+            }
+            def rows = configs.collectMany { config ->
+                config.resolvedConfiguration.resolvedArtifacts.collect { a ->
+                    [configuration: config.name, coordinate:a.moduleVersion.id.toString(), name:a.file.name,
+                    sha256:java.security.MessageDigest.getInstance('SHA-256').digest(a.file.bytes).encodeHex().toString()]
+                }
+            }
+            new File(System.getenv('CALLTRACK_TOOLTRUST_OUT')).text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson([configurations:configs.collect {it.name}, artifacts:rows]))+'\n'
+        }
+    }
+}

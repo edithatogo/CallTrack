@@ -34,12 +34,17 @@ the selected API36 emulator scope with110 JVM/73 host tests and89 successful nat
 invocations plus one expected process termination. All10 suites use source/APK
 binding; fixtures/packages are removed and original environment restored.
 
-[Track5 release preparation](tracks/release_20261020/index.md) remains active for
-source-matched candidate, upgrade, signing/distribution and operational gates.
+[Track5 release qualification](tracks/release_20261020/index.md) now enforces736
+audited dependency entries and qualifies239 canonical binary artifacts,15 native
+schema/provider upgrade invocations and two clean unsigned5578bf5 builds with115
+JVM tests each.121 host tests pass. It remains active for original production,
+independent/platform, licence-conveyance and operational gates; the JDK bundle
+resource-seal limit is explicit in the current handoff.
 [Track6 Kotlin migration](tracks/kotlin_20261020/index.md) now has36 production Kotlin files and one documented Java nullable-label
 bridge after33 active conversions and14 unreachable inherited-file removals.
-Code review/fixes are recorded; final native acceptance is blocked by guest startup
-ANRs/provider availability. See the [current handoff](tracks/kotlin_20261020/active-migration-handoff.md).
+Code review/fixes and emulator recovery are recorded; the final selected API36
+matrix passes89 successful native invocations plus one expected termination, with
+115 JVM/92 host tests and verified cleanup. See the [current handoff](tracks/kotlin_20261020/active-migration-handoff.md).
 M4-linked full acceptance remains open. Native providers/Views/SQLite remain selected. Research Tracks7–13 do not
 adopt production Compose/KMP/shared UI/direct cloud connectors/Rust or establish
 second-platform runtime parity.

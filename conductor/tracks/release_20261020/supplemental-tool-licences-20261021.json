@@ -1,0 +1,74 @@
+{
+  "scope": "Supplemental published source/project declarations for six build-only dependencies lacking effective POM licences; no blanket conveyance clearance",
+  "artifacts": [
+    {
+      "coordinate": "javax.inject:javax.inject:1",
+      "source_url": "https://repo.maven.apache.org/maven2/javax/inject/javax.inject/1/javax.inject-1-sources.jar",
+      "source_archive_sha256": "c4b87ee2911c139c3daf498a781967f1eb2e75bc1a8529a2e7b328a15d0e433e",
+      "header_file": {
+        "path": "javax/inject/Inject.java",
+        "sha256": "04cefc686b5ea6d0d40d569d2345a3a6f0a5f6baa5c39976f047fbbd7bc5cf9f"
+      },
+      "source_licence": "Apache-2.0 source header",
+      "licence_header_path": "qualification/release/licences/javax.inject-header.txt",
+      "licence_header_sha256": "030729292c636a6afc1505f5404ba728bca73beed714a69cd85bbcd5c6126c90",
+      "source_file": "javax/inject/Inject.java"
+    },
+    {
+      "coordinate": "net.sf.kxml:kxml2:2.3.0",
+      "source_url": "https://repo.maven.apache.org/maven2/net/sf/kxml/kxml2/2.3.0/kxml2-2.3.0-sources.jar",
+      "source_archive_sha256": "85495366666158b58961e8911ced0f6f3bc92f1ebee865518b493fdb90760250",
+      "header_file": {
+        "path": "org/kxml2/io/KXmlParser.java",
+        "sha256": "5fea0dc98dcc5fb8beef4f317a7d3cf01d6dcd1f91a56524a082362c7eeac978"
+      },
+      "source_licence": "MIT-style source header",
+      "licence_header_path": "qualification/release/licences/kxml2-header.txt",
+      "licence_header_sha256": "35dbc01bc3a2d34b64f0f376034e5838812dab8de74ee4bdf6dbe933ce891154",
+      "source_file": "org/kxml2/io/KXmlParser.java"
+    },
+    {
+      "coordinate": "org.jdom:jdom2:2.0.6",
+      "source_url": "https://repo.maven.apache.org/maven2/org/jdom/jdom2/2.0.6/jdom2-2.0.6-sources.jar",
+      "source_archive_sha256": "6c22216da089669c24bbb3607e974a8eb8b5c5dbd729613898ebc4ff9fe1bc7d",
+      "header_file": {
+        "path": "org/jdom2/Attribute.java",
+        "sha256": "cf95f3ceb642b5317253057b59e744460f76a1014f8f2a5af0b8074829191bbc"
+      },
+      "source_licence": "JDOM source licence header",
+      "licence_header_path": "qualification/release/licences/jdom2-header.txt",
+      "licence_header_sha256": "a35a44ef839d07fc4c08d0ea10cc846d4a6ad7c1783fbc27549126d7b404d467",
+      "source_file": "org/jdom2/Attribute.java"
+    },
+    {
+      "coordinate": "org.bouncycastle:bcpkix-jdk18on:1.79",
+      "source_url": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcpkix-jdk18on/1.79/bcpkix-jdk18on-1.79-sources.jar",
+      "source_archive_sha256": "e68973be5e2eed5c887e9e85d4ac68ceafe4d907e0f03bfb36db80964c904922",
+      "source_licence": "Bouncy Castle project permissive/MIT-style licence; source-pinned r1rv79",
+      "project_licence_url": "https://raw.githubusercontent.com/bcgit/bc-java/r1rv79/LICENSE.html",
+      "project_licence_path": "qualification/release/licences/bouncycastle-r1rv79-LICENSE.html",
+      "project_licence_sha256": "edbbb10380b1271998b867a2e36b1cbee226e03d438726e1a91f80c5dde11849"
+    },
+    {
+      "coordinate": "org.bouncycastle:bcutil-jdk18on:1.79",
+      "source_url": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcutil-jdk18on/1.79/bcutil-jdk18on-1.79-sources.jar",
+      "source_archive_sha256": "eea160325180797639d715311a04af9702e45ceaed3dbb487ab28ca778434cb6",
+      "source_licence": "Bouncy Castle project permissive/MIT-style licence; source-pinned r1rv79",
+      "project_licence_url": "https://raw.githubusercontent.com/bcgit/bc-java/r1rv79/LICENSE.html",
+      "project_licence_path": "qualification/release/licences/bouncycastle-r1rv79-LICENSE.html",
+      "project_licence_sha256": "edbbb10380b1271998b867a2e36b1cbee226e03d438726e1a91f80c5dde11849"
+    },
+    {
+      "coordinate": "org.bouncycastle:bcprov-jdk18on:1.79",
+      "source_url": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk18on/1.79/bcprov-jdk18on-1.79-sources.jar",
+      "source_archive_sha256": "ddab0541b2490e3013cac96179c1c4a8a50685d9b39f29ce5b233b310061ed23",
+      "source_licence": "Bouncy Castle project permissive/MIT-style licence; source-pinned r1rv79",
+      "project_licence_url": "https://raw.githubusercontent.com/bcgit/bc-java/r1rv79/LICENSE.html",
+      "project_licence_path": "qualification/release/licences/bouncycastle-r1rv79-LICENSE.html",
+      "project_licence_sha256": "edbbb10380b1271998b867a2e36b1cbee226e03d438726e1a91f80c5dde11849",
+      "licence_java_sha256": "4329601171ae4473f51e71c2e7f7ad873085ef3487828845cf760e39d6948715"
+    }
+  ],
+  "runtime_artifacts_affected": false,
+  "release_ready": false
+}

@@ -22,3 +22,19 @@ class BuildArtifactScope(unittest.TestCase):
             self.assertEqual({'app/build/outputs/apk/debug/app-debug.apk',
                               'app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk'},
                              set(artifacts))
+
+    def test_dependency_trust_policy_changes_invalidate_source_receipt(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in ('build.gradle', 'settings.gradle', 'gradle.properties', 'gradlew',
+                         'app/build.gradle', 'app/proguard-rules.pro'):
+                path = root / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_text('fixture')
+            (root / 'gradle/wrapper').mkdir(parents=True)
+            with patch.object(build, 'ROOT', root):
+                before = build.inputs()
+                policy = root / 'gradle/verification-metadata.xml'
+                policy.write_text('first approved policy')
+                added = build.inputs()
+                self.assertNotEqual(before, added)
+                policy.write_text('different trust policy')
+                self.assertNotEqual(added, build.inputs())

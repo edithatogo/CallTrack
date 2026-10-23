@@ -1,0 +1,131 @@
+{
+  "scope": "development-key-release-mode-version-increase-private-state-only",
+  "probe_revision": "77f153369bef3413b36d59c072d0c098b9dadc6c",
+  "source_inputs_match_unsigned_candidate": "787ae35b8a8da829641222f0e755fa3c4664aa11",
+  "raw_receipt_sha256": "8f6c0485654257f8d241fc37b529b7893b6b6fa15e188ffee404bb1f69480a6c",
+  "overlay_sha256": "4412face98c7b73072e9362b8709318fdbc61b481dbc069f29092d8ff9a2adaf",
+  "artifacts": {
+    "app/build/outputs/apk/debug/app-debug.apk": "528ca78626b1241b5825173610881540298cb493d699f1b384ef13c27e00c23a",
+    ".local/release-evidence/version-upgrade-final-20261021/checkout/app/build/outputs/apk/release/app-release.apk": "e5f83af6eb6305616d81831d339adfd561b4cda7609254c300b76ca3119350c8",
+    "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk": "a42b8927c9232cad3918e144873ba34ab484ac5b3fe7f11880a3fda769db8665"
+  },
+  "signer_sha256": "1fb724b184374c597a0289eacf573bb6c2fdf32e8a303067040783885107cd8c",
+  "rejected_fixture_signer_sha256": "f4f862d58759b42185052d3d3b0c63aa375ce4ff41e46cb65f5713fcaa6fa7a6",
+  "versions": [
+    10,
+    11
+  ],
+  "release_mode_not_debuggable": true,
+  "native_invocations": 4,
+  "expected_install_rejections": [
+    "Performing Streamed Install\nadb: failed to install /Users/doughnut/Documents/calltrack/app/build/outputs/apk/debug/app-debug.apk: Failure [INSTALL_FAILED_VERSION_DOWNGRADE: Downgrade detected: Update version code 10 is older than current 11]\n\n",
+    "Serving...\nPerforming Incremental Install\nFailure [INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package org.calltrack.community.dev signatures do not match newer version; ignoring!]\nPerforming Streamed Install\nAll files should be loaded. Notifying the device.\nadb: failed to install /Users/doughnut/Documents/calltrack/.local/release-evidence/version-upgrade-final-20261021/calltrack-test-key-dkr9y7mf/wrong-certificate.apk: Failure [INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package org.calltrack.community.dev signatures do not match newer version; ignoring!]\n\n"
+  ],
+  "private_state_preserved": true,
+  "packages_removed": true,
+  "disposable_fixture_key_removed": true,
+  "final_native_readback": [
+    {
+      "args": [
+        "emu",
+        "avd",
+        "name"
+      ],
+      "exit_code": 0,
+      "output": "calltrack-parity-api36-recovery-20261021\nOK\n"
+    },
+    {
+      "args": [
+        "shell",
+        "getprop",
+        "ro.kernel.qemu"
+      ],
+      "exit_code": 0,
+      "output": "1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "id",
+        "-u"
+      ],
+      "exit_code": 0,
+      "output": "2000\n"
+    },
+    {
+      "args": [
+        "shell",
+        "service",
+        "check",
+        "phone"
+      ],
+      "exit_code": 0,
+      "output": "Service phone: found\n"
+    },
+    {
+      "args": [
+        "shell",
+        "pm",
+        "list",
+        "packages",
+        "org.calltrack.community.dev"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "args": [
+        "shell",
+        "pm",
+        "list",
+        "packages",
+        "org.calltrack.community.dev.test"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "args": [
+        "shell",
+        "content",
+        "query",
+        "--uri",
+        "content://com.android.calendar/calendars",
+        "--projection",
+        "_id"
+      ],
+      "exit_code": 0,
+      "output": "No result found.\n"
+    },
+    {
+      "args": [
+        "shell",
+        "content",
+        "query",
+        "--uri",
+        "content://com.android.calendar/events",
+        "--projection",
+        "_id"
+      ],
+      "exit_code": 0,
+      "output": "No result found.\n"
+    },
+    {
+      "args": [
+        "shell",
+        "content",
+        "query",
+        "--uri",
+        "content://call_log/calls",
+        "--projection",
+        "_id"
+      ],
+      "exit_code": 0,
+      "output": "No result found.\n"
+    }
+  ],
+  "production_signed": false,
+  "release_ready": false,
+  "result": "passed",
+  "build_log_sha256": "71b83a4b60a02834e5bf3bb4948611d702198004c59742020ee5693b8d29f798"
+}

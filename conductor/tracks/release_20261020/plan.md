@@ -92,3 +92,20 @@ still-consumed transitive versions are preserved by compatibility constraints.
 Cached artifact/POM continuity is not licence clearance or independent trust.
 The user's development-identity/unsigned scope remains in force. No publication,
 key generation, cloud consent, physical testing or elapsed observation is claimed.
+
+## Local release continuation — 2026-10-21
+
+- [x] Task: Audit canonical repository bytes/POMs/embedded notices for all current runtime artifacts — b3774ac,77f1533;63 unique artifacts from68 resolved rows; all match. Build tools and redistribution clearance remain separate.
+- [x] Task: Compare retained assets to the audited upstream and preserve unresolved rights —77f1533;23 resource/artwork files,18 unchanged; source hash continuity is not rights clearance.
+- [x] Task: Verify exact unsigned artifacts and corresponding-source archive — local-artifact-checks-20261021.json; original787ae35 candidate retained without relabelling later tool commits.
+- [x] Task: Qualify development-key increasing-version replacement, controlled downgrade/wrong-key rejection and private-state preservation —547c869,b3774ac,77f1533; development-upgrade-evidence-20261021.json passes four native invocations and cleanup.
+- [x] Task: Review local continuation, apply fixes, run host/document checks and record bounded native evidence — review-local-qualification-20261021.md;105 host tests and current Conductor verification pass. Review-fix commit recorded below.
+- [ ] Task: Complete original D01–D09 release gates; no archive or full-M4 completion from this local continuation.
+
+- [x] Task: Apply local qualification review fixes and commit current evidence — 94f8893; production/physical/cloud/operational gates remain pending.
+
+## Local licence/tool-trust and schema/provider continuation — 2026-10-21
+
+- [~] Task: Inventory and audit selected build-plugin/compile/test/lint dependencies, wrapper and SDK tool origins; preserve licences/notices and unresolved rights without production conveyance.
+- [~] Task: Qualify exact source-pinned schema1–5 fixtures across10→11 replacement with human-edited/deleted events, ambiguous insert recovery, paused/permission-loss/resume and migration rollback/newer-schema refusal.
+- [ ] Task: Review continuation, apply fixes and record source-bound local evidence; retain production signing, physical, cloud and operational gates.

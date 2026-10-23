@@ -1,0 +1,589 @@
+{
+  "scope": "Read-only comparison against official Gradle/SDK/Homebrew archive evidence.\n\nNever installs tools, accepts licences or treats HTTPS checksums as independent signatures.\n",
+  "release_ready": false,
+  "independently_signed": false,
+  "success": true,
+  "reused_download_archives": true,
+  "wrapper": {
+    "official_matching_hash_reference": "7.0.2 (shared bootstrap hash; not inferred from distribution URL)",
+    "url": "https://services.gradle.org/distributions/gradle-7.0.2-wrapper.jar.sha256",
+    "expected": "e996d452d2645e70c01c11143ca2d3742734a28da2bf61f25c82bdc288c9e637",
+    "actual": "e996d452d2645e70c01c11143ca2d3742734a28da2bf61f25c82bdc288c9e637",
+    "matches": true,
+    "execution_distribution": "8.13"
+  },
+  "distribution_pin": {
+    "url": "https://services.gradle.org/distributions/gradle-8.13-bin.zip.sha256",
+    "sha256": "20f1b1176237254a6fc204d8434196fa11a4cfb387567519c61556e8710aed78",
+    "pin_matches": true
+  },
+  "sdk_repository_sha256": "f2bc624c8e1dc14c320fdf17e49a5501c35934948e46a444df8b36a138a03e1e",
+  "raw_receipt_sha256": "d684fd7ac03e11e8a25c1cb38196869ed015b963930904f32e1add5e4d6a745e",
+  "sdk": [
+    {
+      "package": "build-tools;35.0.0",
+      "url": "https://dl.google.com/android/repository/build-tools_r35_macosx.zip",
+      "repository_checksum_algorithm": "sha1",
+      "repository_checksum": "93ab8ce91230e067b5add4bfa79919c52b27f072",
+      "computed_sha256": "530cdbd1ec315e1477624d7ed2f0f2962108d69f36eddba5894cef9ea2cedb48",
+      "file_count": 169,
+      "all_archive_files_match": true,
+      "licence_id": "android-sdk-license"
+    },
+    {
+      "package": "platforms;android-36",
+      "url": "https://dl.google.com/android/repository/platform-36_r02.zip",
+      "repository_checksum_algorithm": "sha1",
+      "repository_checksum": "2c1a80dd4d9f7d0e6dd336ec603d9b5c55a6f576",
+      "computed_sha256": "37607369a28c5b640b3a7998868d45898ebcb777565a0e85f9acf36f29631d2e",
+      "file_count": 11342,
+      "all_archive_files_match": true,
+      "licence_id": "android-sdk-license"
+    },
+    {
+      "package": "platform-tools",
+      "url": "https://dl.google.com/android/repository/platform-tools_r37.0.1-darwin.zip",
+      "repository_checksum_algorithm": "sha1",
+      "repository_checksum": "6ae73f4de6452dc57e62ec02b68eed92a4c21661",
+      "computed_sha256": "ee39ad5967e95c2a07f04dbcbde96b1a0c916ba376096db5d2f498b7727a5d1d",
+      "file_count": 12,
+      "all_archive_files_match": true,
+      "licence_id": "android-sdk-license"
+    },
+    {
+      "package": "cmdline-tools;19.0",
+      "url": "https://dl.google.com/android/repository/commandlinetools-mac-13114758_latest.zip",
+      "repository_checksum_algorithm": "sha1",
+      "repository_checksum": "c3e06a1959762e89167d1cbaa988605f6f7c1d24",
+      "computed_sha256": "5673201e6f3869f418eeed3b5cb6c4be7401502bd0aae1b12a29d164d647a54e",
+      "file_count": 108,
+      "all_archive_files_match": true,
+      "licence_id": "android-sdk-license"
+    }
+  ],
+  "gradle_distribution": {
+    "file_count": 313,
+    "all_archive_files_match": true
+  },
+  "jdk": {
+    "formula_url": "https://formulae.brew.sh/api/formula/openjdk@17.json",
+    "formula_sha256": "1eae9e5e045a3a005e2de8c2d114e3b272bfa02c4747541e0d0bf5456fc51b31",
+    "bottle_sha256": "733939db388c3cae83209853048598287c029abe919bf5a534221fd74512e2b5",
+    "licence": "GPL-2.0-only WITH Classpath-exception-2.0",
+    "bundle_resource_seal_qualified": false,
+    "all_jdk_files_match": false,
+    "all_jdk_payloads_match": true,
+    "file_count": 359,
+    "archive_byte_identical": 318,
+    "relocated_byte_identical": 29,
+    "signature_allocation_normalized": 12,
+    "relocation_evidence": [
+      {
+        "path": "Contents/Home/lib/libattach.dylib",
+        "archive_sha256": "9e20335a80c2054e33c8dc3bfa872da8ed3bdbd4408d13b34c7a691179faed30",
+        "installed_sha256": "6f320545518c4e87a77869cb3546e99adc5674e7bc9d2130d7d2a3a03aad100a",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libattach.dylib"
+        ],
+        "reproduced_sha256": "6f320545518c4e87a77869cb3546e99adc5674e7bc9d2130d7d2a3a03aad100a"
+      },
+      {
+        "path": "Contents/Home/lib/libawt.dylib",
+        "archive_sha256": "4f6fc5a02aa362ce324c145917b9111a9b3a566c455183f2a2a3af5a9df4852d",
+        "installed_sha256": "5ab5e236693b2784d3109833941467157237af8337dd5ab3671e0f7ab9404110",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libawt.dylib"
+        ],
+        "reproduced_sha256": "da60970c4ee33f417af108bcdcaf4076ee41b35f30275a89f3f6b71eaf8a546f",
+        "signature_check": {
+          "strict_valid": true
+        },
+        "reproduced_payload_sha256": "ebc17c24577e18ecc670ee4f4f35638a35971a653236df366e3cace2990f4a56",
+        "installed_payload_sha256": "ebc17c24577e18ecc670ee4f4f35638a35971a653236df366e3cace2990f4a56",
+        "signature_allocation_only": true
+      },
+      {
+        "path": "Contents/Home/lib/libawt_lwawt.dylib",
+        "archive_sha256": "887332ff2491870d8103175be97c6128770dcce485a911ccded74f89f028cea9",
+        "installed_sha256": "b083c7e4e6b11e9ed8394c1938521ef3257d49968d6efa40ae8a4cdb3aabd856",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libawt_lwawt.dylib"
+        ],
+        "reproduced_sha256": "b083c7e4e6b11e9ed8394c1938521ef3257d49968d6efa40ae8a4cdb3aabd856"
+      },
+      {
+        "path": "Contents/Home/lib/libdt_socket.dylib",
+        "archive_sha256": "9eb21244b4c87238ae6848cd65217d45637661776127f66568dd6cc1903826f4",
+        "installed_sha256": "9725700eb05b681ced70578f7e7300ba7878f61ce1705103f3a35b89644a47a8",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libdt_socket.dylib"
+        ],
+        "reproduced_sha256": "9725700eb05b681ced70578f7e7300ba7878f61ce1705103f3a35b89644a47a8"
+      },
+      {
+        "path": "Contents/Home/lib/libextnet.dylib",
+        "archive_sha256": "ecfd602cb8b1226736de3538168802a7ba0950956c069a4d8c8800bec313b7d2",
+        "installed_sha256": "80bc3577e45ffd6aad943a2661da9406a7e01411e86ea1616a5690971123f69a",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libextnet.dylib"
+        ],
+        "reproduced_sha256": "80bc3577e45ffd6aad943a2661da9406a7e01411e86ea1616a5690971123f69a"
+      },
+      {
+        "path": "Contents/Home/lib/libfontmanager.dylib",
+        "archive_sha256": "2c4e8d4076da3c3bfd5868fa9345fe99cac94676d7a9621f8cc8d4cd05017671",
+        "installed_sha256": "8e00430be70a010e0403b6377653d9f2b368d2abb31b5b61ae0583553bd591ed",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libfontmanager.dylib",
+          "-change",
+          "@@HOMEBREW_PREFIX@@/opt/harfbuzz/lib/libharfbuzz.0.dylib",
+          "/opt/homebrew/opt/harfbuzz/lib/libharfbuzz.0.dylib",
+          "-change",
+          "@@HOMEBREW_PREFIX@@/opt/freetype/lib/libfreetype.6.dylib",
+          "/opt/homebrew/opt/freetype/lib/libfreetype.6.dylib"
+        ],
+        "reproduced_sha256": "8e00430be70a010e0403b6377653d9f2b368d2abb31b5b61ae0583553bd591ed"
+      },
+      {
+        "path": "Contents/Home/lib/libinstrument.dylib",
+        "archive_sha256": "348e45998120d790ad821f6e33bec595a733c8779a8ff26c5f641b8c32aee0a2",
+        "installed_sha256": "d7d8c4c985c7704e59359c455d7238cc4485c09de60b71187bbb9f732cbe636f",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libinstrument.dylib"
+        ],
+        "reproduced_sha256": "d7d8c4c985c7704e59359c455d7238cc4485c09de60b71187bbb9f732cbe636f"
+      },
+      {
+        "path": "Contents/Home/lib/libj2gss.dylib",
+        "archive_sha256": "e960c25f6021a97f903f32e14664590b731eacfbd68340b1536d31ee7c5cd0cf",
+        "installed_sha256": "6b4563539dd120944f14c47247829786fb4c4d267f981c9cfd4e513b92ca9dc3",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libj2gss.dylib"
+        ],
+        "reproduced_sha256": "6b4563539dd120944f14c47247829786fb4c4d267f981c9cfd4e513b92ca9dc3"
+      },
+      {
+        "path": "Contents/Home/lib/libj2pcsc.dylib",
+        "archive_sha256": "94abaec4562412301f21fb41f7d946dda09f6be6c5b1e9e0a91c15d3e4d8a899",
+        "installed_sha256": "adec743fe2368a23c250a2849c3e65175d4e7905517853d9681b8c1f96538657",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libj2pcsc.dylib"
+        ],
+        "reproduced_sha256": "adec743fe2368a23c250a2849c3e65175d4e7905517853d9681b8c1f96538657"
+      },
+      {
+        "path": "Contents/Home/lib/libj2pkcs11.dylib",
+        "archive_sha256": "0850bc8b7216e60ba6c8a3060bec25b3b9e72c56a88916128026b3e44a8d413b",
+        "installed_sha256": "c00e818e90022c58961e21b19aa202d2f65f6cf6752f90ed5f4db16755f0a699",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libj2pkcs11.dylib"
+        ],
+        "reproduced_sha256": "c00e818e90022c58961e21b19aa202d2f65f6cf6752f90ed5f4db16755f0a699"
+      },
+      {
+        "path": "Contents/Home/lib/libjaas.dylib",
+        "archive_sha256": "cef2289c20d0cc3ce8e822bbd38de4037f60d96f22e460cfa7c8282ac7dad400",
+        "installed_sha256": "6279e7d48ac4e1372c45f3922bafc431e6e87f88dfa9c65c321bbf6e59967367",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libjaas.dylib"
+        ],
+        "reproduced_sha256": "6279e7d48ac4e1372c45f3922bafc431e6e87f88dfa9c65c321bbf6e59967367"
+      },
+      {
+        "path": "Contents/Home/lib/libjava.dylib",
+        "archive_sha256": "24a60aee546896bec61bcdf1b3c26ab6af60c81ddef90ac39a9a2c5514de8504",
+        "installed_sha256": "afde818866b1ed35fa0a235885ccb435f3ecb97e8c08d9532de814eae28b061d",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libjava.dylib"
+        ],
+        "reproduced_sha256": "afde818866b1ed35fa0a235885ccb435f3ecb97e8c08d9532de814eae28b061d"
+      },
+      {
+        "path": "Contents/Home/lib/libjavajpeg.dylib",
+        "archive_sha256": "dda482354ef22392e5aae664aca2d092ec90b66058d2ebead3e9545b8deb8071",
+        "installed_sha256": "97c3c1136400346807b7809010c751bb7932b51a58fb77582ac5d28681717c1e",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libjavajpeg.dylib",
+          "-change",
+          "@@HOMEBREW_PREFIX@@/opt/jpeg-turbo/lib/libjpeg.8.dylib",
+          "/opt/homebrew/opt/jpeg-turbo/lib/libjpeg.8.dylib"
+        ],
+        "reproduced_sha256": "97c3c1136400346807b7809010c751bb7932b51a58fb77582ac5d28681717c1e"
+      },
+      {
+        "path": "Contents/Home/lib/libjawt.dylib",
+        "archive_sha256": "4d18cbe74fb134648eaf914fabe813dfc788a2250a4fdcf0f6e4435e95852c0d",
+        "installed_sha256": "bc45e196c16d5f9bdb70c396efc2bd5db5884b8e30b2a430612f229a8e1634ba",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libjawt.dylib"
+        ],
+        "reproduced_sha256": "bc45e196c16d5f9bdb70c396efc2bd5db5884b8e30b2a430612f229a8e1634ba"
+      },
+      {
+        "path": "Contents/Home/lib/libjdwp.dylib",
+        "archive_sha256": "b8d5221070540f536df01468fab579f564467e4e41c7a033f2cfb55d2995d7bb",
+        "installed_sha256": "ab90365bf1963d2f52a01df2eebcd913044f5563c3c7312410aa76462a55c8db",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libjdwp.dylib"
+        ],
+        "reproduced_sha256": "ab90365bf1963d2f52a01df2eebcd913044f5563c3c7312410aa76462a55c8db"
+      },
+      {
+        "path": "Contents/Home/lib/libjimage.dylib",
+        "archive_sha256": "729b74ec160f7c1b292a6cf8690a1ebfdb07acfd6d7f5592a9453d8c71500ad1",
+        "installed_sha256": "abee98b02862e83d9306a3836ac3692358383e5b9808ba8e7526ac7556e06d42",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libjimage.dylib"
+        ],
+        "reproduced_sha256": "abee98b02862e83d9306a3836ac3692358383e5b9808ba8e7526ac7556e06d42"
+      },
+      {
+        "path": "Contents/Home/lib/libjli.dylib",
+        "archive_sha256": "b08030046862e55adec9859baf5334ec0258a905e1218a89fc9aa112b7df52da",
+        "installed_sha256": "321d3e5807fdc146585083df15ab1f6c33443f82f553588cc1bad997800609fe",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libjli.dylib"
+        ],
+        "reproduced_sha256": "d2adad26d1d7d4ff0e32001008b4f160e2d78eee9e4cee5657ad07a6c9d9b796",
+        "signature_check": {
+          "strict_valid": true
+        },
+        "reproduced_payload_sha256": "2349e1d6fb6cce533791c5fb04f3e471b47fee008d19495f03f8514b6f3afa45",
+        "installed_payload_sha256": "2349e1d6fb6cce533791c5fb04f3e471b47fee008d19495f03f8514b6f3afa45",
+        "signature_allocation_only": true
+      },
+      {
+        "path": "Contents/Home/lib/libjsig.dylib",
+        "archive_sha256": "c2cbbb4a1c75e570491c046ff256286897b37514b5a459a374e76cb3529da40f",
+        "installed_sha256": "a917f2bfaaeecae578d10d47ca6f97cf428631004502583623db0044e18c5c28",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libjsig.dylib"
+        ],
+        "reproduced_sha256": "a917f2bfaaeecae578d10d47ca6f97cf428631004502583623db0044e18c5c28"
+      },
+      {
+        "path": "Contents/Home/lib/libjsound.dylib",
+        "archive_sha256": "b64dc824646f3a87503ef6a34e19bf5e1af0d082c3e78e9145de41d8a7cca3dd",
+        "installed_sha256": "62aab089e422141b0a6f3e251d10f82178b20887aca50e3498684bafc00786dd",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libjsound.dylib"
+        ],
+        "reproduced_sha256": "62aab089e422141b0a6f3e251d10f82178b20887aca50e3498684bafc00786dd"
+      },
+      {
+        "path": "Contents/Home/lib/liblcms.dylib",
+        "archive_sha256": "1399782eeaa88106886708bf3ca4cf87a2c5e7a90e937977032a4ba511ca7133",
+        "installed_sha256": "ecd5a6a35939132692a43b03c781303fa5515453bb28c5f934430a36b2e40c40",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/liblcms.dylib",
+          "-change",
+          "@@HOMEBREW_PREFIX@@/opt/little-cms2/lib/liblcms2.2.dylib",
+          "/opt/homebrew/opt/little-cms2/lib/liblcms2.2.dylib"
+        ],
+        "reproduced_sha256": "ecd5a6a35939132692a43b03c781303fa5515453bb28c5f934430a36b2e40c40"
+      },
+      {
+        "path": "Contents/Home/lib/libmanagement.dylib",
+        "archive_sha256": "2a5447a3b20b932ad707cac5a5d0d93d0541c9a9763fd765673b17dfff4d5327",
+        "installed_sha256": "200c562186015148fd75c1274ac037456ea09114c99962cbdc4bb9e4d1aed73f",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libmanagement.dylib"
+        ],
+        "reproduced_sha256": "200c562186015148fd75c1274ac037456ea09114c99962cbdc4bb9e4d1aed73f"
+      },
+      {
+        "path": "Contents/Home/lib/libmanagement_agent.dylib",
+        "archive_sha256": "79d3001e726514aca3817b527416ed0aeef99c227f6ef158286756a620501937",
+        "installed_sha256": "03f8064f75f7b90ac13f65391588992aad39010732017e821a3c5655c533ecd0",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libmanagement_agent.dylib"
+        ],
+        "reproduced_sha256": "f43775710707191bc3b350fb30372c5a0909456e5852eefd346807496879ac76",
+        "signature_check": {
+          "strict_valid": true
+        },
+        "reproduced_payload_sha256": "f0fe77034370ec0b3c511293cfec48ed64ba6f7ac99a5144e22e2da2d8a92fa5",
+        "installed_payload_sha256": "f0fe77034370ec0b3c511293cfec48ed64ba6f7ac99a5144e22e2da2d8a92fa5",
+        "signature_allocation_only": true
+      },
+      {
+        "path": "Contents/Home/lib/libmanagement_ext.dylib",
+        "archive_sha256": "d685e8c5ff11f1c62cf3b884e94271cb853530b0ca8d52de587467d3b318072a",
+        "installed_sha256": "b005ec406b0b597cffdd3422308f5c559f8facfaea48a4b6558682b9382ee23d",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libmanagement_ext.dylib"
+        ],
+        "reproduced_sha256": "14b66c8c9d13f6d2a94fe2c9d7bf314a54986e0bc98d1858fce37961bd924407",
+        "signature_check": {
+          "strict_valid": true
+        },
+        "reproduced_payload_sha256": "6b6b0a9e1807ac43b15f9329cadd2be5f010bc89107901477541403508c18a60",
+        "installed_payload_sha256": "6b6b0a9e1807ac43b15f9329cadd2be5f010bc89107901477541403508c18a60",
+        "signature_allocation_only": true
+      },
+      {
+        "path": "Contents/Home/lib/libmlib_image.dylib",
+        "archive_sha256": "bfe04b609c1bacfab3f36b6780e657cc8cb7c513e5b48fcf9f9b13a3dfc793d1",
+        "installed_sha256": "572dcbe22ee99bbcec4df3f5e838ba881c5953f7ba11a874bd0d3fd62cb13b95",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libmlib_image.dylib"
+        ],
+        "reproduced_sha256": "572dcbe22ee99bbcec4df3f5e838ba881c5953f7ba11a874bd0d3fd62cb13b95"
+      },
+      {
+        "path": "Contents/Home/lib/libnet.dylib",
+        "archive_sha256": "4c7222490770c7b276a68dd553d2f9cc8d5fd9b4e08d7d01ceb2886b1886d029",
+        "installed_sha256": "0c11517024e5506b23ebc1213b089a2c7b2109f956d210664bab3c00640374b2",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libnet.dylib"
+        ],
+        "reproduced_sha256": "8f58836c94fa9630be4db7f80bac133cad97efe5a4a18c35d2dfebf01617066e",
+        "signature_check": {
+          "strict_valid": true
+        },
+        "reproduced_payload_sha256": "2883d3e1210865df5fcd16490938f397ac0ece96ab853b5852d04cae065d9626",
+        "installed_payload_sha256": "2883d3e1210865df5fcd16490938f397ac0ece96ab853b5852d04cae065d9626",
+        "signature_allocation_only": true
+      },
+      {
+        "path": "Contents/Home/lib/libnio.dylib",
+        "archive_sha256": "edfff328a9abc3650d015f98d143dd107cf2fcac9ee0200fe3a2927025f9dd06",
+        "installed_sha256": "60caf0ad436924f94ea9ca15df57b36862a04290bb8ae71f33abae169fbbeb58",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libnio.dylib"
+        ],
+        "reproduced_sha256": "da43c477abfce9d7b5ce56836a2e014fcf78e8237207382317d6e2c0c0b4860d",
+        "signature_check": {
+          "strict_valid": true
+        },
+        "reproduced_payload_sha256": "bb9aee78c746eae9646b961f86f10fbd41177f1a78554e0c7d453ac56738a13c",
+        "installed_payload_sha256": "bb9aee78c746eae9646b961f86f10fbd41177f1a78554e0c7d453ac56738a13c",
+        "signature_allocation_only": true
+      },
+      {
+        "path": "Contents/Home/lib/libosx.dylib",
+        "archive_sha256": "75d7c964ee478cc0381a9059bcc6b4a93f6236d3ba931af3b3d0d36d841c1565",
+        "installed_sha256": "347237291d9734bcb411b495dc34fe13a80fdd53c1f5cfd11cad773be2d14087",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libosx.dylib"
+        ],
+        "reproduced_sha256": "261e5bc4e4ddcead6c9843de805de2c97d6808ff475036026163edba2c2c9b93",
+        "signature_check": {
+          "strict_valid": true
+        },
+        "reproduced_payload_sha256": "80fdcfb0191aacd142d2504539f01cad81ffe3c5c7f09c1e5a408b1b3fdec198",
+        "installed_payload_sha256": "80fdcfb0191aacd142d2504539f01cad81ffe3c5c7f09c1e5a408b1b3fdec198",
+        "signature_allocation_only": true
+      },
+      {
+        "path": "Contents/Home/lib/libosxapp.dylib",
+        "archive_sha256": "5ec761b9ba370443335098cd6973273c3aa0f914f90654a76796594a8ea4c7f0",
+        "installed_sha256": "6a1f824b4300795d1e9780058a02a52a20b5c83785fdf2838a7ef74f5c1d8334",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libosxapp.dylib"
+        ],
+        "reproduced_sha256": "6a1f824b4300795d1e9780058a02a52a20b5c83785fdf2838a7ef74f5c1d8334"
+      },
+      {
+        "path": "Contents/Home/lib/libosxkrb5.dylib",
+        "archive_sha256": "7825db589238bd7130cc0ba4d9a615a10b60f0ecf0da573a52c96b70a563e7db",
+        "installed_sha256": "589da0b4f65bb543e4bdc35ee9381eae0be4790272755a43605b2ea58ac021cd",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libosxkrb5.dylib"
+        ],
+        "reproduced_sha256": "589da0b4f65bb543e4bdc35ee9381eae0be4790272755a43605b2ea58ac021cd"
+      },
+      {
+        "path": "Contents/Home/lib/libosxsecurity.dylib",
+        "archive_sha256": "4b50c92bf8fc3e7b75a4297f41fe1fadb1302dce8f9be57030e24b5ff286c2c3",
+        "installed_sha256": "c8c7713f51e4e4c446d94776ccf8237023755c33f5864a9b8455251cc4750483",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libosxsecurity.dylib"
+        ],
+        "reproduced_sha256": "c8c7713f51e4e4c446d94776ccf8237023755c33f5864a9b8455251cc4750483"
+      },
+      {
+        "path": "Contents/Home/lib/libosxui.dylib",
+        "archive_sha256": "906ee2e3ca116a40b7a0137fdec814462d733682f834b033204a660d793cc68b",
+        "installed_sha256": "c3b9a889985324d6a84f706b3bdb3d23552310153cba7bbb047e4a3b3b533b66",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libosxui.dylib"
+        ],
+        "reproduced_sha256": "c3b9a889985324d6a84f706b3bdb3d23552310153cba7bbb047e4a3b3b533b66"
+      },
+      {
+        "path": "Contents/Home/lib/libprefs.dylib",
+        "archive_sha256": "330a18e6a98c697df9c60fcdb48df2baa64ab252fefa19e9a44f8eed28887958",
+        "installed_sha256": "319cffd351ec57bccaa54b7bc81fea086f747bd6c662d61050baf2ae0921d823",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libprefs.dylib"
+        ],
+        "reproduced_sha256": "319cffd351ec57bccaa54b7bc81fea086f747bd6c662d61050baf2ae0921d823"
+      },
+      {
+        "path": "Contents/Home/lib/librmi.dylib",
+        "archive_sha256": "a5366bbed23d6d753ef4cd6509bc2ad36bf3bfc4ff0c541afa3553b82f180af8",
+        "installed_sha256": "e5418605ce39e93d1c23404cd83f3c3ac53e006f64b3ebf36e078b5fcc8387c1",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/librmi.dylib"
+        ],
+        "reproduced_sha256": "cee886d09a90bfc0952f33871ece15a12d320b3f79202588520cf915148bf081",
+        "signature_check": {
+          "strict_valid": true
+        },
+        "reproduced_payload_sha256": "d4121ea56b2d14b379490b54e2bed07f4b30e77e05d84020cd9c8e5374c11ac1",
+        "installed_payload_sha256": "d4121ea56b2d14b379490b54e2bed07f4b30e77e05d84020cd9c8e5374c11ac1",
+        "signature_allocation_only": true
+      },
+      {
+        "path": "Contents/Home/lib/libsaproc.dylib",
+        "archive_sha256": "5448ea2d57d15c2c3ed9635567dd79a263567603b524230b40f8b58a3a6cd36b",
+        "installed_sha256": "cf5e00cbc3d40b4cd85079fa005f53d131f2116a993d82b743cca06f0daba1ed",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libsaproc.dylib"
+        ],
+        "reproduced_sha256": "cf5e00cbc3d40b4cd85079fa005f53d131f2116a993d82b743cca06f0daba1ed"
+      },
+      {
+        "path": "Contents/Home/lib/libsplashscreen.dylib",
+        "archive_sha256": "03943e101f6349d6731a4e3ade4a982e94194e902b8763d601815b2a5986ace3",
+        "installed_sha256": "b0104398001a253ce1f2b4a2be31f8c3f2937124a7764edf24c95b0df45e1e8e",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libsplashscreen.dylib",
+          "-change",
+          "@@HOMEBREW_PREFIX@@/opt/giflib/lib/libgif.dylib",
+          "/opt/homebrew/opt/giflib/lib/libgif.dylib",
+          "-change",
+          "@@HOMEBREW_PREFIX@@/opt/jpeg-turbo/lib/libjpeg.8.dylib",
+          "/opt/homebrew/opt/jpeg-turbo/lib/libjpeg.8.dylib",
+          "-change",
+          "@@HOMEBREW_PREFIX@@/opt/libpng/lib/libpng16.16.dylib",
+          "/opt/homebrew/opt/libpng/lib/libpng16.16.dylib"
+        ],
+        "reproduced_sha256": "3ed8c7483b47c4a4352ac4fdfed1725e3735abd574c36547fc4a3953eb311e03",
+        "signature_check": {
+          "strict_valid": true
+        },
+        "reproduced_payload_sha256": "e2fe51e4e2be34df0738f604b924080419c8fa33d65ae5f1dda2c127effe6aa2",
+        "installed_payload_sha256": "e2fe51e4e2be34df0738f604b924080419c8fa33d65ae5f1dda2c127effe6aa2",
+        "signature_allocation_only": true
+      },
+      {
+        "path": "Contents/Home/lib/libsyslookup.dylib",
+        "archive_sha256": "2a64a93baefe5e1e56f21e0751600003120e2499a97dd55ab809845efbd5be5e",
+        "installed_sha256": "377fdd2bd8be6bac2414c0d7d8145767c6aba4516f0c6c291b5273c40995f4f6",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libsyslookup.dylib"
+        ],
+        "reproduced_sha256": "377fdd2bd8be6bac2414c0d7d8145767c6aba4516f0c6c291b5273c40995f4f6"
+      },
+      {
+        "path": "Contents/Home/lib/libverify.dylib",
+        "archive_sha256": "477747cd20b1e0af3933ade603279dbe128931afbeed9d830cccc9df0edc1c38",
+        "installed_sha256": "e20836949fd8f5907d5649ee29716397ce8b75ccd04142778ac332ac6cce9ca3",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libverify.dylib"
+        ],
+        "reproduced_sha256": "e20836949fd8f5907d5649ee29716397ce8b75ccd04142778ac332ac6cce9ca3"
+      },
+      {
+        "path": "Contents/Home/lib/libzip.dylib",
+        "archive_sha256": "a7c5233d40b90cb631323b8e0be81f53742abd7e49ba23eb64d0cdc275039832",
+        "installed_sha256": "f73ff41cf2db3f9eaf0355b481192923cf8eb9c730d750ecdaeef3dcdfc221f2",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/libzip.dylib"
+        ],
+        "reproduced_sha256": "0154f5271b3b7373ac4c46246e3229297f9d1ecf3ff910e0e6d712e4b41f906e",
+        "signature_check": {
+          "strict_valid": true
+        },
+        "reproduced_payload_sha256": "8372819087985f3d730502e6c44405a58d0e210b42fef04647cfd2216e0641c7",
+        "installed_payload_sha256": "8372819087985f3d730502e6c44405a58d0e210b42fef04647cfd2216e0641c7",
+        "signature_allocation_only": true
+      },
+      {
+        "path": "Contents/Home/lib/server/libjsig.dylib",
+        "archive_sha256": "c9f04d18bf4b9c59e7092388c0df9a2bec8427f2cbcf4a76f68302b10b734c31",
+        "installed_sha256": "db58780542d89973e8a788fa2120026a2ba20e10cd0be269c6e98dfc434b4681",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/server/libjsig.dylib"
+        ],
+        "reproduced_sha256": "db58780542d89973e8a788fa2120026a2ba20e10cd0be269c6e98dfc434b4681"
+      },
+      {
+        "path": "Contents/Home/lib/server/libjvm.dylib",
+        "archive_sha256": "24a3fa1849058d54aeaaebbf9eb0e31e1d2e0ead784ddd10b1ce6a7494a1451e",
+        "installed_sha256": "ff390138f793991416aa6d4d8e7ea6fd3fc3924635c19d852d2730acec172fe1",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/lib/server/libjvm.dylib"
+        ],
+        "reproduced_sha256": "6b3a79245da09da1002b61454e97d71d7b3ae7e7d19528175a1f4c71d83c6e79",
+        "signature_check": {
+          "strict_valid": true
+        },
+        "reproduced_payload_sha256": "67de0cd9fffe37cf448ff3d4fd7341ad02b4ab0285849b26eef8ccef89c6aa7b",
+        "installed_payload_sha256": "67de0cd9fffe37cf448ff3d4fd7341ad02b4ab0285849b26eef8ccef89c6aa7b",
+        "signature_allocation_only": true
+      },
+      {
+        "path": "Contents/MacOS/libjli.dylib",
+        "archive_sha256": "49053da1c550949cdbf4a9d7fd098a9cf695655fd9a5dc91109e8fc7f337cf59",
+        "installed_sha256": "170493a16dd933c3f3a6b3cc7a77b348b042295bae4fef9cda217cfee4788b6e",
+        "reproduced_relocation_options": [
+          "-id",
+          "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/MacOS/libjli.dylib"
+        ],
+        "reproduced_sha256": "5af6e6adb3f47b48e69c1a33fde9d0dba1490631b958448a21bf82a56ddcb1a4",
+        "signature_check": {
+          "strict_valid": false,
+          "bundle_resource_seal_issue": "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/MacOS/libjli.dylib: code has no resources but signature indicates they must be present\n",
+          "code_pages_valid": true,
+          "resources_verified": false
+        },
+        "reproduced_payload_sha256": "14d8d6989c021c8b49981c848f7c01efa474ff4551d60c51077425117a7df421",
+        "installed_payload_sha256": "14d8d6989c021c8b49981c848f7c01efa474ff4551d60c51077425117a7df421",
+        "signature_allocation_only": true
+      }
+    ]
+  }
+}

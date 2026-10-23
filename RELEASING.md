@@ -26,7 +26,8 @@ track's scope; use a separately authorised execution after these gates pass.
    an SBOM. Retained legacy code remains part of the shipped artifact audit.
 5. Build the unsigned release variant on two clean isolated environments from
    that source. Compare artifacts; investigate nondeterminism and document tools,
-   OS, dependency graph and hashes. This has not been run. If claiming F-Droid
+   OS, dependency graph and hashes. Two clean same-host builds of the current
+   Kotlin app match; independent-environment reproduction remains pending. If claiming F-Droid
    upstream-signature reproducibility, test its exact recipe/comparator and the
    build-tools35 signing compatibility issue identified in Track5 findings.
 6. Keep source archive/commit, build scripts/configuration, toolchain manifest,
@@ -47,13 +48,73 @@ python3 scripts/qualify_release_build.py --output .local/release-evidence/UNIQUE
 
 The output directory must not exist. The runner refuses dirty source, clones the
 exact commit twice without local hardlinks, builds/tests/lints the release variant,
-records raw dependency reports and APK badging, and compares unsigned APK SHA256.
+records raw dependency reports and APK badging, verifies the expected unsigned
+signature result with apksigner, and compares unsigned APK SHA256.
 It does not sign, install, upload, or use private reference inputs. Failure leaves
 a failed receipt; keep it and use a fresh output directory after investigating.
 Both checkouts share the host and dependency cache. A byte match is same-host
 repeatability only, not independent-environment reproduction, checksum trust,
 licence clearance, upgrade acceptance or production readiness. The current
 development identity remains unchanged.
+
+## Local development upgrade probe
+
+```sh
+python3 scripts/qualify_release_upgrade.py --serial emulator-5582 \
+  --output "$PWD/.local/release-evidence/UNIQUE-UPGRADE-RUN"
+```
+
+Only the exact dedicated emulator is accepted; both development packages must be
+absent. Requires the existing debug key and successful source-matched debug/test
+receipt. A clean committed-source checkout uses a recorded temporary Gradle
+`finalizeDsl` overlay to build release mode at versionCode11 with that existing
+key. Committed app configuration stays versionCode10 and unsigned for release.
+The probe seeds synthetic private state at10, force-stops its app, upgrades in
+place to11, reads back state, then verifies downgrade and wrong-certificate
+rejections followed by unchanged state. The latter uses a one-day disposable
+fixture key removed on exit; it is never a production signing key. Cleanup checks
+both package removals. No phone permissions or provider writes occur.
+
+This covers paused settings, source namespace and READY/IN_FLIGHT/REVIEW/CONFIRMED
+receipts in schema6. It does not cover old schema1/2 production upgrades, human-edited
+provider events across upgrades, recovery execution after upgrade, uninstall/restore,
+permanent identity/key custody, physical devices or cloud synchronization. Use the
+full matrix below before supported release acceptance.
+
+## Local runtime repository and asset audit
+
+```sh
+python3 scripts/audit_release_artifacts.py \
+  --inventory conductor/tracks/kotlin_20261020/runtime-artifacts-20261021.json \
+  --output .local/release-evidence/UNIQUE-RUNTIME-AUDIT
+```
+
+The output must be new. The audit downloads each unique runtime artifact and POM
+from canonical Google Maven/Maven Central HTTPS endpoints, resolves renamed files
+through hash-bound published module metadata, compares bytes, and hashes embedded
+notices (including classes.jar). A mismatch/error retains the receipt and exits
+nonzero. Repository agreement is not independently signed provenance, verification
+of build plugins/SDK/tools, a complete SBOM or legal clearance. Current results and
+remaining licence/asset gates are in the Track5 local qualification handoff.
+
+## Qualified local trust and schema/provider upgrade continuation
+
+Ordinary builds now use the reviewed `gradle/verification-metadata.xml` allow-list,
+with binary and repository-metadata verification enabled. The policy is included
+in source-input receipts. See the [trust procedure](qualification/release/trust/README.md)
+and Track5 continuation evidence for canonical downloads and positive/negative
+Gradle tests. Independent-host/hosted execution and publisher signatures remain
+separate claims. The SDK/JDK comparison checks payloads against official archives;
+one JDK bundle resource-seal defect remains recorded, without changing global tools.
+
+Add `--provider-schema` to the development upgrade probe to include source-pinned
+ledger1–5→6 and import1→2 fixtures, human-edited/deleted LOCAL events, ambiguous
+insert recovery, permission loss, explicit resume, migration fault rollback and
+newer-schema preservation. Only Java/assets/schema-provenance fixture inputs are
+bound, so independent licence audit work does not invalidate a native build. The
+fixtures are synthetic historical database shapes, not published old APKs or real
+customer data. All test permissions and provider effects belong to disposable
+packages on the dedicated emulator; cleanup is mandatory.
 
 ## Signing and channels
 

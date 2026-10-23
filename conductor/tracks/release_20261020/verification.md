@@ -1,6 +1,34 @@
 # Verification and readiness boundary
 
-## Current checkpoint — 2026-10-21
+## Current trust and schema/provider continuation — 2026-10-21
+
+See [current qualification](licence-tool-upgrade-qualification-20261021.md) and
+[current review](review-licence-tool-upgrade-20261021.md). Native fixture scope
+passes15 invocations with provider/package/key cleanup; source-pinned ledger1–5→6
+and import1→2 are qualified on the dedicated emulator.736 independently compared
+binary/POM/module trust entries now fail closed in ordinary builds, with actual
+wrong/missing-entry negative tests.239 unique artifact binaries match repositories.
+The toolchain's payload-origin checks pass with an explicit unqualified JDK bundle
+resource seal.121 host tests and current document verification pass.
+
+Two fresh clean5578bf5 unsigned builds match,115 JVM tests each,zero lint errors,
+69 warnings/two hints. Production signing, independent/hosted reproduction, complete
+source/asset conveyance, supported real release baselines, physical/cloud and
+operational acceptance remain pending. No full-M4/archive claim follows.
+
+## Earlier local continuation — 2026-10-21
+
+See [local qualification handoff](local-qualification-20261021.md),
+[repository audit](canonical-runtime-audit-20261021.json),
+[asset hash audit](assets-audit-20261021.json) and
+[artifact/source checks](local-artifact-checks-20261021.json).
+The current unsigned Kotlin candidate is787ae35, not the historical6b353f4 below.
+Two same-host builds match with115 JVM tests each and zero lint errors; their exact
+APKs are rechecked unsigned. The [new native upgrade/rejection evidence](development-upgrade-evidence-20261021.json)
+passes four instrumentation invocations with development signing, two controlled
+rejections, preserved private state and verified cleanup;105 host tests pass. Full D01–D09 and release_ready=false remain.
+
+## Historical unsigned checkpoint — 2026-10-21
 
 Unsigned development qualification and review pass: see [current review](review-20261021.md),
 [source/artifact evidence](unsigned-evidence.json) and [runtime inventory](runtime-artifacts-20261021.json).

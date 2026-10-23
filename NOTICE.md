@@ -20,3 +20,7 @@ source licence for that original application has not been established.
 
 Development APKs use a disposable qualification identity and local debug signing.
 They are not public releases or replacements for the original developer's app.
+
+Runtime dependency declarations and retained licence text are inventoried in
+[third-party notices](THIRD_PARTY_NOTICES.md); build-only tool evidence remains
+separate. Publication and inherited-asset rights gates remain open.

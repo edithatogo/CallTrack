@@ -1,0 +1,259 @@
+{
+  "scope": "development-key-release-mode-historical-schema-provider-upgrade",
+  "probe_revision": "caf8d8c4d2613f89eb7cc98afa0ca38dcc06e3be",
+  "source_app_inputs": {
+    "build.gradle": "e12c8bd92c32b307f2aec4044aad6fc5e9c378329a3dab52b7e29fb7b176250f",
+    "settings.gradle": "b725061d2a76a06441d3481de0f6eed52b5f7c7d54279864ecf6b3b04a42bd4d",
+    "gradle.properties": "1ef6157a4970eef09cf79edfea9bdf29496116711e9588f02f5218aa4014bdc2",
+    "gradlew": "63135287117a1e6d12c84580f1f49c61d1ba02218ecd28660605e97f976e7d65",
+    "gradle/wrapper/gradle-wrapper.jar": "e996d452d2645e70c01c11143ca2d3742734a28da2bf61f25c82bdc288c9e637",
+    "gradle/wrapper/gradle-wrapper.properties": "91c1ed951e7e61e66acf8f08b181df8d9af06bac43d5b4a3a9c6b3ff353ad6d5",
+    "app/build.gradle": "b3b768925bf35d72be86d269a2eb5e540020b0d69d6d77f36730742c330fc3ed",
+    "app/proguard-rules.pro": "56fd960cf225f6ca40f982b13a5dbb0d8bc3dfde13ff76422825c6070d0a1890",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/ActivationStoreTest.java": "213ceb3d8b8ccc96a4a258177e6db96f9764d5cf29eeca2d8b6a6495022bd12f",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/AutomaticSettingsTest.java": "592375d8dcc54d640238fe63e59ae3c70bf03a2266a9c52c79c7c530e8184b69",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/AutomaticWorkTest.java": "7a78386a80ee6445cf8feebdffcaee2196ab6071df08fe9ccf05361cd1cb4e56",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/CalendarSliceTest.java": "37307686c2a3bf2cea8ab5e1633be713f9bb8d23a780dab649fb2adbdc8333be",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/HistoricalImportStoreTest.java": "661a3e2e84f932f311d22cd17403d9770fa7c7388cc787269e2a5b1562252df0",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/ImportUiTest.java": "498cc06bb2d42eed6b4f1c42add039cbe5fb15aab5fb0c466a2cbbe36cc995da",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/KotlinPackageUpdateTest.java": "aadd1ff11d70d12c595cfa7b95c0291afd853e6ef75b105cd8d016e34a476aea",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/LifecycleProviderTest.java": "699d24137ef44a82194d2c079bfec67b61b819d484e020d94885f1da11365620",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/ParityProviderTest.java": "ec46b944030b1592bc54955b0bd2360f5a639cfa8be88adc637c3b4cda3e1678",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/ParityStoreTest.java": "a50ffdb47ec9ea7c03af11c627e99784f31bab3f15b33850572bfc6e0321ca48",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/PositiveUiTest.java": "f8e922aada302751bd0cde407636e010f72456c3d35ddca8a74fabb06d427c52",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/RecoveryUiTest.java": "dc4e8d8af136799a02cd510cb8fa9247099cf37def410987c12ddf7fa16fe26b",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/RenderedUi.java": "4ce518f5373b68adbc75ab6979dc31f3f62aa2da154cfd324bedc5aa5c90f9e3",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/SourceNamespaceStoreTest.java": "b4363104791a747b4d127517a3f1fab5d241cd25ca6656edc0ed89336ee68c72",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/TelephonyProviderTest.java": "1ec2dd9be15666ba9d4e520e32ad822ce948cb06c28afa28e43fa78b4e597c04",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/WakeBudgetTest.java": "1102e3c1cd23f97cb36e982414d9f61a235fddb444e461587efe0cc1c10b3185",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/WorkStatusStoreTest.java": "69243b0856a5042c758244b313517c0b7dc5cbe4aba808e5420984721e5d9729",
+    "app/src/androidTest/java/com/markobl/calllogsync/slice/WorkerProviderTest.java": "054438e9bfcf0ee2f0bed936acf66bda7c18841352a596d959ab387736855ba3",
+    "app/src/main/AndroidManifest.xml": "0ae9e163d0398c0636708e79d33cdda70b2f120c298f49539f80e81fd9961d43",
+    "app/src/main/ic_launcher-playstore.png": "6c2a7ea9feb47526705c68f30c1d27cc56d767c3e060c77ad4570cd1b3020c4b",
+    "app/src/main/java/com/markobl/calllogsync/slice/NullableCalendarLabel.java": "e5c17b1a130ea05a90698f34a0e18c8e84e76ea8be10dcc9393888d743f3885d",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/ActivationCommitGuard.kt": "7fc928abfdcee3e360f9ebdb8655ecc90bf9d10de4ea0e408b1f81223ae37271",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/ActivationControl.kt": "634f2e6a4b400b3208c68ccf0d69a3424f0d65b9f344c33d1bcab7b73a7584aa",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/ActivityInsets.kt": "c2703e14dfed8a7bf8d18fc9450d86283d3fc8a4c9356f2b778b641694ed95ea",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/AndroidActivationStore.kt": "4ad2f63a63dba98d9ff1e5bdb234fe56312fe65019255595de373291f1e1c939",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/AndroidCalendarSink.kt": "d8a8e0507719eda35b09433f484972e858d4b67121b044eeb8b16b38d21643cb",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/AndroidCallLogSource.kt": "e679b0d33018114293c0b1ad96ca3494173c9610ed0a8db68668dbc68554c30f",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/AndroidWorkStatusStore.kt": "3f9686db40b104f1b74d145c5a21d38dba209f0d139e918cfd5d35d064fcfbb8",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/AutomaticDelivery.kt": "768e7024f6a3c7402337eec6508521ed211ca723cff46e6b11a9c93d18e63bdc",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/AutomaticLogWorker.kt": "7fa271ddc4342ac867ae3acb2860af2ef0df9fd4bcb0c9014cd688eebaf0c780",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/AutomaticScheduleControl.kt": "d0162c56c04e5439c38e27e9d7ca81bbd0e277aebde3958e8c1b80a8d1e22db8",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/AutomaticScheduling.kt": "3ec490b60e0a07e333a93ff7f74f2bb9933b28ff0cb6592033821546ba24f0da",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/AutomaticSettingsActivity.kt": "ca742830d4d3fdb53e96ea9ec3ca5cbe49b44d947bc63dadc53c17164d5857bf",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/AutomaticWakeReceiver.kt": "e804a26c757efd0e7934d82fc0045f4c509af26e0c49dab1c79957bd4ca6f90a",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/AutomaticWorkPolicy.kt": "e3db0fce36d57adf0ef75f45027baedf735c9c6e7852abb5caaf567afd5886ab",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/CalendarSliceActivity.kt": "ff9a7fb72e782d110eb53b0246e269a7fc0980f8e7fa1fe4297928b67e3c057e",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/CallEvent.kt": "3b4f035275c687211f420a84665054971934451a3d7d90f4ca5caec0046ffd6c",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/CallIdentity.kt": "6f9920a760af20368262f7d6e64ee36092a4ce4987b28fdddc0fd005165e941f",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/CallRecord.kt": "13e6faa70318f93729a5493679cae0e441becfc5f3cfc8e140396e5d161e45c6",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/CallSelection.kt": "0edee562b3efa945c933245beebb2a2affb1c65821653c685c27ef6289ca8fcd",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/DeliveryCounts.kt": "095061f771e2cbabee0d88af3459f572db20af5edcebb2470cf561ba48b14b12",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/DurableDelivery.kt": "f3bf1b5b3aad16e39c33d2a8df5ca0ea9ad1948e460a7221001853914ced4433",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/HistoricalImport.kt": "c101a5730b9c971faf8b4e271cef14252bfca9824cf057f7fe0568dc9b879078",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/HistoricalImportActivity.kt": "a398f254729034894a4d6a8c878555e07c5b576c446ade1299db25aefab69f9c",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/ImportRange.kt": "11ddf1d9bec5356341a8c6f2ecce729d9954b525529ae4d6424e23c7689c7f7c",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/LegacyEventMatcher.kt": "0af5907ffefb0e8d6928f242bd65311cee92da745642b4a2067f080cef64e5d3",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/ManualDelivery.kt": "a3afc127e0769a38f12ee1f162b6fe74bb4b565717d87c9c4aeb3ec0fbcf44aa",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/PagedCalls.kt": "8e1ee347d26d547da5fd2507a24bf2c8657448973e11b3f4f9b21b3da47afaca",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/PayloadRetention.kt": "5737c501fd7af03546f20d221cb27178e8c4ba37004ac57deb1006dbf884eb2d",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/ReadyReapproval.kt": "05cae2363e53ecbbbe7852e8438ec9ba6d10365bbbd32a25bf208bf56d861666",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/ReceiptRecovery.kt": "c62defe2348974c493e8f5090d80c1514f84c356468055b9c74b71f01ec5e06f",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/ReceiptRecoveryActivity.kt": "c9d2697df351bea7a8183d87e7a29ebe813d3e3a01004247b2ceaa9a87083298",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/ScanDelivery.kt": "465b00d2359a7ba62781e3179375172306ef442306d45018591c504faa96e94c",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/SliceEngine.kt": "fec8c030c954dcc7a4a6c18b8592393c8c853d2b3f6326256ee7153d5ddb4644",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/SqliteImportStore.kt": "37e1e7928081459f3e432f55d495c533a6217a817261a3347402697c64ae9ac2",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/SqliteLedger.kt": "bbf652fd47e8842b944c407003df7a24bba94c2b7a4200c7482b1b74625e7612",
+    "app/src/main/kotlin/com/markobl/calllogsync/slice/WorkStatus.kt": "50ff76ebc0ead925091a035a885c424c1e3b0a225f87c7666460b3586c25736d",
+    "app/src/main/res/drawable/ic_launcher_background.xml": "f6be98e2584ff88e9fbeb38e0552ccf1f7f6f068be06ce63b55d3450c83100c4",
+    "app/src/main/res/drawable/ic_launcher_foreground.xml": "df028a62eb821dd967adcbf035c2603789668ccb5a12afba1e83f875147caa34",
+    "app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml": "46aef39e5993c8278c744bb9e8f58eb06ba663416fbaf0b954ae189c63b065a7",
+    "app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml": "46aef39e5993c8278c744bb9e8f58eb06ba663416fbaf0b954ae189c63b065a7",
+    "app/src/main/res/mipmap-hdpi/ic_launcher.png": "b16071bcb0a76bb7bfdc1e8e46e98ca29f62da76ff72c3a29d0116197daa3f00",
+    "app/src/main/res/mipmap-hdpi/ic_launcher_round.png": "60223cff074b54fd5ab20028d4599751ebb0711bd1ddc34758eb88b53fe5c34e",
+    "app/src/main/res/mipmap-mdpi/ic_launcher.png": "6952a9674eb946026ad97d08670d69a830cdbb38933cd892b66e08ff097c21f0",
+    "app/src/main/res/mipmap-mdpi/ic_launcher_round.png": "700517327eb6f68fd38b80fe717c9d20abe9f3a7892fd08301ec0cf1442aa352",
+    "app/src/main/res/mipmap-xhdpi/ic_launcher.png": "970858b1ef2339a64e42544dc59b4afc4663798a4d19c9644bce699dbed359d8",
+    "app/src/main/res/mipmap-xhdpi/ic_launcher_round.png": "14fe841513ec15e1d169f0ec3ccf1d340100445fe6c0fef0a0b2bd39367e1f3c",
+    "app/src/main/res/mipmap-xxhdpi/ic_launcher.png": "964c0447021d2af0829905286a6374825eb19a4cdba1f1f153b0d98ec934e49e",
+    "app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png": "d8335f3bc152e97dee312e767f06b7092da3aae41af45f3d285134d9017fd797",
+    "app/src/main/res/mipmap-xxxhdpi/ic_launcher.png": "998527c39e08e23e29d4ef276347578c2a2a10c1a416eb78b07c12ddc924c97f",
+    "app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png": "1faa0725c0f93a19fd12a4ef4a6a51f359947ba3bfeea7bfbbdd4802cd6b33b4",
+    "app/src/main/res/values/colors.xml": "b5626527d503417f0d8e5b1e08f338de7b31173bf0e122815f03e64932adbd88",
+    "app/src/main/res/values/ids.xml": "76ae646e01454331bf3b431b846fee5da3811f1cc5f0693935e75e3423cff742",
+    "app/src/main/res/values/strings.xml": "a79849e154412a63fe862877034d6adba082e6df162c5c67049c746ccb9d3dd5",
+    "app/src/main/res/values/themes.xml": "980b1c1f279d4011fedcf3caaa92a9660a27fd3da8bc5f8d7ed476086fd7ee08",
+    "app/src/main/res/values-de/strings.xml": "f529873bfcedb6a83f8048efca801774586195c11c8883519ec57c748d0a1e23",
+    "app/src/main/res/values-night/themes.xml": "4f9605a8df95f285e11ca91ad885737d40aa686a595e32a08b28d16035175e13",
+    "app/src/main/res/xml/slice_backup_rules.xml": "80be325e44eb49bec54794399e7de6b4d274513a3ebce30584889d06372f1a0a",
+    "app/src/main/res/xml/slice_extraction_rules.xml": "cb029b35db0e976c087100424e16e14a6256b46962398887520e51508c3b5842",
+    "app/src/test/java/com/markobl/calllogsync/slice/ActivationCommitGuardTest.java": "d1f8efa81a80cb8ba20478fb5e99e3967f38e398f180f4753c3d9fcba3ce1c12",
+    "app/src/test/java/com/markobl/calllogsync/slice/ActivationControlTest.java": "06546f8fd5217d2e7a76597b2a657f854d6276a8fa5c061c0354eb318f6cf5c9",
+    "app/src/test/java/com/markobl/calllogsync/slice/AutomaticDeliveryTest.java": "eb1284a8976d3857f35e22617fa58bb5265f4f42a95c8bddab88724c5a9d5bf3",
+    "app/src/test/java/com/markobl/calllogsync/slice/AutomaticScheduleControlTest.java": "afd8bde2f9592a92ab6704ebd4bc8bb9c4413997b614bec313ace0b8183e1f06",
+    "app/src/test/java/com/markobl/calllogsync/slice/AutomaticWorkPolicyTest.java": "65e89314cff2a25d8ab6e81adbc49548472b4f9216bdf7b949bcb3956288754c",
+    "app/src/test/java/com/markobl/calllogsync/slice/CallSelectionTest.java": "9c9cdb6442b2c0ac0cb75a47628231516af03b243f11ae86c3d16f25a332e10f",
+    "app/src/test/java/com/markobl/calllogsync/slice/DurableDeliveryTest.java": "cabeb423cea26320db6ff49b4654df96f3cb97319be19adafcc2b9959f461d01",
+    "app/src/test/java/com/markobl/calllogsync/slice/ExpandedKotlinContractTest.java": "1aab4bb64f7a8cb9918fd7100b9cba94b7f56dd71e768e9107c323bb2f12d97a",
+    "app/src/test/java/com/markobl/calllogsync/slice/HistoricalImportTest.java": "3e33bdbb4383412d217965d66dfe09e7b7d7550a5bf76a950c95897ba8fedd7b",
+    "app/src/test/java/com/markobl/calllogsync/slice/ImportRangeTest.java": "a5609da16dac4f3d14dffcdd8761ea7333d211dfadd5588c80ccaeb037d1f81c",
+    "app/src/test/java/com/markobl/calllogsync/slice/KotlinMigrationContractTest.java": "915a4cb3d30f5c50962d0c4c0bafddc0d56842b3487c8588ce1ca3760e880eca",
+    "app/src/test/java/com/markobl/calllogsync/slice/LegacyEventMatcherTest.java": "4f5c03bbdf354d860f74dd495bb0a987008a880ec05c5118837141bd5590d1d9",
+    "app/src/test/java/com/markobl/calllogsync/slice/ManualDeliveryTest.java": "d3f1e53a88b93402d98673bbf535d4a7a7559528962b5c6ac84eb58e48d405a4",
+    "app/src/test/java/com/markobl/calllogsync/slice/PagedCallsTest.java": "0155a60ec91f0dfcd3d5c91121eccf34d10f336be58086309c685f0e4995d1d4",
+    "app/src/test/java/com/markobl/calllogsync/slice/PayloadRetentionTest.java": "d7112a8128f1913c467d5ec80c3eaf2d185584a8d6443795e53ac1eaa00bb4aa",
+    "app/src/test/java/com/markobl/calllogsync/slice/ReadyReapprovalTest.java": "cb8c298867370506cd18255e5e18f9494f0be725c2b957cb78a159a41233cbcc",
+    "app/src/test/java/com/markobl/calllogsync/slice/ReceiptRecoveryTest.java": "ab823fc1e8c24fec397e986d890c76b77492889ab007ef65bbc30adc01c82bc9",
+    "app/src/test/java/com/markobl/calllogsync/slice/ScanDeliveryTest.java": "9a168d3ca236108c0a487726da040fb02296580dcb8ecb05fb1e81553c1aee5a",
+    "app/src/test/java/com/markobl/calllogsync/slice/SchedulingCommitTest.java": "807ecb0b4224bd8ad4781267b8156241d293ef0584b5989e50fe2c87dbd4fbe8",
+    "app/src/test/java/com/markobl/calllogsync/slice/SliceTest.java": "a4257456086608fc09f5c857f6853a18738284919bb10983d993f0d391c19efa",
+    "app/src/test/java/com/markobl/calllogsync/slice/WorkStatusTest.java": "1e344ea8d495eca1e322e8cb70c9b8c15a26f30e98e357b839a3bd884c9e898e"
+  },
+  "qualification_inputs": {
+    "qualification/release/assets/import-schema-1.sql": "86a21611a2360476e9f31d0f04f2c7bebf3f4432593a983df74fee409883c8dc",
+    "qualification/release/assets/release-schema-1.sql": "5d84d769ca1b8ecf6b017bf36c8b5c5e4292155b90c0ec8d30b7ba872523a822",
+    "qualification/release/assets/release-schema-2.sql": "e8bd5f35d31dc172619ff571450002612e0fffe2989068f1f5a027744206cd1f",
+    "qualification/release/assets/release-schema-3.sql": "f86e1793cc44fc70eeff713ddfe121da1d260cdd4bd1734fb52315f1a21358e1",
+    "qualification/release/assets/release-schema-4.sql": "15a1b3a7c80ea247a441eb03ad20d89ce6b0ed431522ffbb209482515fa92a06",
+    "qualification/release/assets/release-schema-5.sql": "aff9dd9123deff645e631da7b56c6e76d264af3d8fd2d7470e14feafe05395bf",
+    "qualification/release/import-schema-provenance.json": "4b597720fde30f4ec99afb65e870da27cec26c4e25fc348f3c537c7931383acd",
+    "qualification/release/java/com/markobl/calllogsync/slice/ReleaseUpgradeProviderTest.java": "256339ec8ba5decf2f363f725478969f7cf788beeb8735e7d3c2d0fef1f9b4cb",
+    "qualification/release/schema-provenance.json": "0e156ac646dae7e80d47084906494e9ffcf7dde08aa926029c4001d296edd231"
+  },
+  "raw_receipt_sha256": "a3e38ded23defd1634edf5b2e51d8ba5a65f5188c1503749f2ecb4e56e7997c5",
+  "overlay_sha256": "322d2a13c5420c749117e0ca393c41235c4df06ae98846fa0ea983e059a6c351",
+  "artifacts": {
+    "app/build/outputs/apk/debug/app-debug.apk": "528ca78626b1241b5825173610881540298cb493d699f1b384ef13c27e00c23a",
+    ".local/release-evidence/schema-provider-reviewed-20261021/checkout/app/build/outputs/apk/release/app-release.apk": "f391d4ac6c5fe02518e55bc9a4a90470724d5256c5ef1e287172fb5efd939392",
+    ".local/release-evidence/schema-provider-reviewed-20261021/checkout/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk": "98355f4eba587e9df20284a895e5dd4a3ff25a27c011d006c0d9683584bbc0be"
+  },
+  "build_log_sha256": "11a0ac6ae55048e82da4b7b43432b0d9473723d373c1016ba4bfcb09bfd19e74",
+  "signer_sha256": "1fb724b184374c597a0289eacf573bb6c2fdf32e8a303067040783885107cd8c",
+  "rejected_fixture_signer_sha256": "58269cb1cca809965b929707b533afe8f1c43cc676bc0b048f93028e2e9804ff",
+  "ledger_versions": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "ledger_target": 6,
+  "import_versions": [
+    1,
+    2
+  ],
+  "package_versions": [
+    10,
+    11
+  ],
+  "native_invocations": 15,
+  "expected_install_rejections": [
+    "Performing Streamed Install\nadb: failed to install /Users/doughnut/Documents/calltrack/app/build/outputs/apk/debug/app-debug.apk: Failure [INSTALL_FAILED_VERSION_DOWNGRADE: Downgrade detected: Update version code 10 is older than current 11]\n\n",
+    "Serving...\nPerforming Incremental Install\nFailure [INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package org.calltrack.community.dev signatures do not match newer version; ignoring!]\nPerforming Streamed Install\nAll files should be loaded. Notifying the device.\nadb: failed to install /Users/doughnut/Documents/calltrack/.local/release-evidence/schema-provider-reviewed-20261021/calltrack-test-key-ldumncpo/wrong-certificate.apk: Failure [INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package org.calltrack.community.dev signatures do not match newer version; ignoring!]\n\n"
+  ],
+  "provider_fixture_removed": true,
+  "packages_removed": true,
+  "disposable_fixture_key_removed": true,
+  "current_policy_bound_debug_receipt_sha256": "e2119733f3d9d3ef04f3a8b981df0ab1ef438ebb2138f26e41dcefc98dc32192",
+  "current_debug_apk_unchanged": true,
+  "scope_limitations": [
+    "Synthetic historical database fixtures; not actual published old APKs or customer data",
+    "Current build policy adopted after probe; same debug APK bytes and unchanged app source bind runtime proof",
+    "No physical calls, cloud calendars, production signing, operational observation or full UI matrix rerun"
+  ],
+  "final_readback": [
+    {
+      "args": [
+        "emu",
+        "avd",
+        "name"
+      ],
+      "output": "calltrack-parity-api36-recovery-20261021\nOK\n"
+    },
+    {
+      "args": [
+        "shell",
+        "getprop",
+        "ro.kernel.qemu"
+      ],
+      "output": "1\n"
+    },
+    {
+      "args": [
+        "shell",
+        "id",
+        "-u"
+      ],
+      "output": "2000\n"
+    },
+    {
+      "args": [
+        "shell",
+        "service",
+        "check",
+        "phone"
+      ],
+      "output": "Service phone: found\n"
+    },
+    {
+      "args": [
+        "shell",
+        "pm",
+        "list",
+        "packages",
+        "org.calltrack.community.dev"
+      ],
+      "output": ""
+    },
+    {
+      "args": [
+        "shell",
+        "pm",
+        "list",
+        "packages",
+        "org.calltrack.community.dev.test"
+      ],
+      "output": ""
+    },
+    {
+      "args": [
+        "shell",
+        "content",
+        "query",
+        "--uri",
+        "content://com.android.calendar/calendars",
+        "--projection",
+        "_id"
+      ],
+      "output": "No result found.\n"
+    },
+    {
+      "args": [
+        "shell",
+        "content",
+        "query",
+        "--uri",
+        "content://com.android.calendar/events",
+        "--projection",
+        "_id"
+      ],
+      "output": "No result found.\n"
+    },
+    {
+      "args": [
+        "shell",
+        "content",
+        "query",
+        "--uri",
+        "content://call_log/calls",
+        "--projection",
+        "_id"
+      ],
+      "output": "No result found.\n"
+    }
+  ],
+  "result": "passed",
+  "release_ready": false
+}

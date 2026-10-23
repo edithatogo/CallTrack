@@ -1,82 +1,74 @@
 # Active Android Kotlin migration handoff — 2026-10-21
 
+The emulator blocker is resolved for the selected acceptance path. All ten suites
+now have matching-source/APK acceptance. Original full M4/M5 release and operational
+gates remain open; Track6 stays in progress and is not archived.
+
 ## Implemented and reviewed
 
 All33 active Java classes are converted, with36 production Kotlin files including
-the original three pilot models. One deliberately retained Java bridge preserves
-nullable Choice.toString ABI. Fourteen unreachable inherited Java files,12 obsolete
-resources and seven unused direct dependency declarations are removed. Three
-still-consumed Material/AppCompat transitives retain qualified versions through
-compatibility constraints. All68 retained runtime artifacts match prior inventory
-hashes; this is continuity evidence, not trusted licence/provenance clearance.
+the original pilot models. One Java bridge preserves nullable Choice.toString ABI.
+Fourteen unreachable inherited Java files,12 obsolete resources and seven unused
+direct dependency declarations are removed. Three still-consumed transitives retain
+qualified versions through constraints. All68 retained runtime artifacts match the
+prior inventory; this is continuity evidence, not licence/trust clearance.
 
-Schema6/import2, identities, signatures, namespaces, operation ownership, receipts,
+Schema6/import2, identities, signatures, namespaces, receipts, operation ownership,
 SQLite transactions, Views, one-writer locking and scheduling remain. The retained
-javac fallback is retired. Kotlin conversion does not introduce Compose, KMP,
-macOS, Rust, iOS or a new synchronization engine.
-
-Implementation source:51c43f0 (component commits e7126a2–b30540d). Evidence/tooling
-fixes include b93480d and cae25f9. See [review](review-active-migration-20261021.md),
-[acceptance evidence](active-migration-evidence.json), [inventory](migration-inventory-20261021.json),
-[removal audit](legacy-removal-audit.json) and [runtime inventory](runtime-artifacts-20261021.json).
+javac fallback is retired. No production Compose/KMP/macOS/Rust/iOS is introduced.
+App source remains51c43f0; emulator preflight fix826ccaf changes tooling only.
 
 ## Qualified scope
 
-- 115 JVM and89 host tests pass; debug/test packaging and lint pass.
-- Two isolated clean unsigned release builds at787ae35 pass115 JVM tests each,
- zero lint errors (69 warnings) and produce identical APKs. Both use the same host
- and cache; independent environment/signing remain unqualified.
-- Five source-matched native suites pass56 invocations: store39, source identity3,
- wake budget1, provider8 and worker5.
-- Standalone rendered import UI passes five invocations, including confirmation,
- cancellation, duplicate prevention and stop/reopen/resume. The120-candidate resumed
- fixture ends119 verified/one conservative review, with122 exact provider events
- including three earlier fixture events.
-- Same-version debug-key replacement passes two private-state instrumentation tests;
- paused activation, namespace and receipt states survive. This is not a production
- increasing-version/provider/cloud upgrade claim.
+- 115 JVM tests pass at unchanged app inputs;92 host tests pass after the repair.
+- The consolidated ten-suite native matrix passes89 successful invocations plus
+  one expected process termination. Lifecycle12 (11 successful plus the expected
+  kill), telephony5, settings UI5 and recovery UI7 were executed after repair.
+  Earlier exact-build store39/source-identity3/wake-budget1/provider8/worker5 and
+  import UI5 receipts were reused explicitly:61 invocations. This is not a claim
+  that every suite was freshly executed on the new guest.
+- The native lifecycle suite verifies process death, actual guest reboot, offline
+  and Doze recovery; telephony uses an emulator call and protected system wake.
+  Rendered UI checks include permissions, cancellation, explicit approval, human
+  edits/deletions and retention. Eighty screenshot/text artifacts are hashed;
+  settings and recovery previews were visually reviewed.
+- Two clean unsigned release builds at787ae35 pass115 JVM tests each,zero lint
+  errors (69 warnings), and produce identical APKs on this host/cache. They are
+  not independent-environment or production-signing evidence.
+- Same-version debug-key replacement passes two separate private-state tests for
+  paused activation, namespace and receipt states. This is not a production
+  increasing-version/provider/cloud upgrade claim.
 
-These are separate scopes; they are not a full final matrix pass. Earlier
-pre-constraint runs and Track4 historical acceptance do not substitute for current
-missing suites. The debug collector fix was run against real unchanged app inputs;
-both debug/test APK hashes remain identical and stale root release output is excluded.
+See [current evidence](active-migration-evidence.json), [repair/runbook](emulator-recovery-20261021.md)
+and [current review](review-emulator-recovery-20261021.md). The [initial partial checkpoint](partial-migration-evidence-20261021.json)
+and [initial review](review-active-migration-20261021.md) preserve failed-run history.
 
-## Native blocker and recovery
+## Recovery and final readback
 
-The first final lifecycle run verified the intended process termination and actual
-reboot, then a calendar query timed out. Restoration found the guest phone service
-missing. Its fixture cleanup/package removal passed; a later explicit environment
-restoration retry passed. After a data-preserving, no-snapshot restart of only the
-recovery AVD, readiness checks passed, but fixture setup and cleanup reported
-Process crashed. Exit-info records startup ANRs with state=empty, alongside guest
-Bluetooth/radio crash logs. No app-code root cause is established. Referenced ANR
-trace files were unavailable after package cleanup; they are not claimed captured.
+Resource pressure, duplicate idle chat-owned helpers, an orphaned simulator and
+unhealthy guest services were observed. Scoped helper retirement and a fresh
+API36 Google APIs ARM64 Pixel7 AVD on PortableSSD supplied a working path without
+restarting the computer. Original AVD data is preserved, not claimed repaired.
+The nondefault simulator experiment failed and is not the qualified launch recipe.
+A single root cause or permanent desktop-helper lifecycle fix is not claimed.
 
-The failed runs remain failed. On retry, packages were initially preserved as
-required by the cleanup guard. Direct native readback then proved calendars, events
-and call rows entirely empty before/after removal of only the two provisioned
-packages. Final readback confirms no fixture packages/rows, matching recorded
-power/network baseline and non-root ADB. Phone service is still unavailable; this
-is not a healthy acceptance environment. Raw recovery/diagnostic hashes are in the
-evidence file. No physical phone or computer restart was used.
+The harness now rejects boot=1/phone-service-missing before fixture installation.
+Three meaningful regressions fail before the fix and pass afterward; native time
+windows/assertions remain unchanged. Exact emulator identity checks still precede
+this read-only guard. No physical phone was used.
 
-## Resume sequence
+Final readback verifies no fixture packages, calendar/event/call rows, matching
+recorded power/network state, non-root ADB and an available phone service. No
+failed receipt is relabelled as passed. If resource pressure recurs, inspect current
+ownership and readiness; never reuse recorded process IDs or blindly remove data.
 
-1. Restore a healthy isolated API36 guest without changing the computer's boot
-   state. Capture startup/ANR diagnostics before package removal if failure repeats;
-   compare a fresh guest or an internal-storage AVD if needed. Do not infer an app
-   defect or waive it from unrelated system crashes.
-2. Rerun full lifecycle, telephony, rendered settings and rendered recovery on the
-   exact current APKs, with provider readback and cleanup. Existing passed receipts
-   can be reused only while all inputs/APKs match. Any app change requires rebuilding
-   and requalifying affected/native matrix scope.
-3. Close remaining Track5 release gates: permanent identity/key custody (currently
-   intentionally pending), trusted dependency/licence/assets, independent/hosted
-   reproduction, supported production upgrades/recovery and seven actual observation
+## Next gates
+
+1. Complete remaining Track5 release qualification: permanent identity/key custody
+   (intentionally pending), trusted dependency/licence/assets, independent/hosted
+   reproduction, supported production upgrade/recovery and seven actual observation
    days. Physical/cloud/OEM/manual accessibility outcomes remain separate.
-4. Close original full M5 only after its M4/operational gates. Then proceed through
-   successor Tracks14–20 in the [approved sequence](../../future-architecture.md).
-   No deferrals have been invented to skip prerequisites; iOS remains last.
-
-Track6 remains in progress and is not archived. Later frameworks are planned
-successor implementation tracks, not implemented capabilities.
+2. Close original full M5 only after its M4/operational gates. Code migration and
+   selected emulator acceptance are complete; this does not waive original gates.
+3. Continue successor Tracks14–20 in the [approved sequence](../../future-architecture.md).
+   No prerequisite deferrals were invented; iOS remains last.

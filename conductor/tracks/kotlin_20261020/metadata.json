@@ -9,13 +9,14 @@
     "release_20261020"
   ],
   "requirements": "R14, R26",
-  "implementation_status": "active-code-migrated-native-lifecycle-blocked-release-gates-pending",
+  "implementation_status": "active-code-selected-emulator-qualified-full-M5-release-gates-pending",
   "implementation_commit": "51c43f0",
   "full_migration_accepted": false,
-  "review_commit": "cae25f9",
+  "review_commit": "826ccaf",
   "active_code_migrated": true,
   "production_kotlin_files": 36,
   "production_java_exceptions": 1,
-  "review_status": "code-reviewed-fixes-applied-native-acceptance-pending",
-  "acceptance_blocker": "API36 guest phone service unavailable; startup ANRs/provider timeout; final lifecycle/telephony/settings/recovery pending"
+  "review_status": "reviewed-fixes-applied-selected-emulator-accepted",
+  "native_matrix_accepted": true,
+  "emulator_recovery_evidence": "active-migration-evidence.json"
 }

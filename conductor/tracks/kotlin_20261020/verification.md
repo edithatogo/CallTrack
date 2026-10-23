@@ -72,10 +72,13 @@ app downgrade or data reset was performed.
 
 The dated pilot above remains historical. Current33 active conversions, one Java
 exception and removal audit are documented in [handoff](active-migration-handoff.md),
-[evidence](active-migration-evidence.json) and [review](review-active-migration-20261021.md).
-115 JVM/89 host tests pass. Five native suites (56 invocations), standalone import
-UI (five) and private update (two) pass separately; the final matrix is not accepted
-because lifecycle/provider/startup ANRs block remaining qualification. Two clean
-unsigned builds pass115 tests each and match byte-for-byte on this host/cache.
-Manual recovery proves fixture/package absence and recorded environment restoration;
-phone service remains unavailable. Full M4/M5 and later frameworks stay pending.
+[evidence](active-migration-evidence.json) and [current review](review-emulator-recovery-20261021.md).
+115 JVM/92 host tests pass. All ten selected native suites pass89 successful
+invocations plus one expected process termination;61 earlier exact-build invocations
+are reused explicitly and29 (28 successful plus the expected kill) executed after
+repair. Private replacement adds two separate tests. Two clean unsigned builds
+pass115 tests each and match on this host/cache. Final direct readback verifies
+empty providers/packages, restored baseline, non-root ADB and available phone service.
+The failed initial checkpoint remains in partial-migration-evidence-20261021.json;
+[recovery details](emulator-recovery-20261021.md) do not claim original-data repair or
+a permanent desktop-helper fix. Full M4/M5 and later frameworks remain pending.
