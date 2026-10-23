@@ -1,0 +1,36 @@
+{
+  "baseline": "2d2de24",
+  "target": "desktop JVM, macOS arm64, offscreen renderer",
+  "source_inputs": {
+    "gradle/wrapper/gradle-wrapper.jar": "e996d452d2645e70c01c11143ca2d3742734a28da2bf61f25c82bdc288c9e637",
+    "gradle/wrapper/gradle-wrapper.properties": "91c1ed951e7e61e66acf8f08b181df8d9af06bac43d5b4a3a9c6b3ff353ad6d5",
+    "gradlew": "63135287117a1e6d12c84580f1f49c61d1ba02218ecd28660605e97f976e7d65",
+    "prototypes/multiplatform-ui/build.gradle": "c843fcc5f6e6660c44fa65e39f8e41a5dfa5a0f4929f331e82e1fd73ac7e7538",
+    "prototypes/multiplatform-ui/gradle.properties": "526e7d3f92e04315ac105c8e309c5204c286254fb2df9b3bd28147a831e12d66",
+    "prototypes/multiplatform-ui/settings.gradle": "65a9beacee18c3e05ad06a740cadbe0bac7c042a78ba6d85827501dbc430709a",
+    "prototypes/multiplatform-ui/src/main/kotlin/org/calltrack/companion/Main.kt": "6f6c70f6040c4661a28c27fa61a3103b4cc88761b25d316043c95d5402041488",
+    "prototypes/multiplatform-ui/src/test/kotlin/org/calltrack/companion/CompanionScreenTest.kt": "08f7af15e30e4fe94f60ae1d1ebe4cf027a75d491dea242346e434882081592f"
+  },
+  "versions": {
+    "kotlin": "2.3.21",
+    "compose_plugin": "1.10.3",
+    "junit": "4.13.2",
+    "gradle": "8.13",
+    "jdk": "17"
+  },
+  "tests": {
+    "tests": "4",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  "report_sha256": "d60b345ae814984b0d082148cc805253f2ad2f2cd1e0437273b38ef308a19193",
+  "runtime_graph_sha256": "281614d325967eb02aae028ff58f4c0f634784aa941e0387d2279472775bd0b6",
+  "jars": {
+    "prototypes/multiplatform-ui/build/libs/calltrack-companion-ui-experiment.jar": "71d546830642306072870fb0fb3896a30cf33995d505779e6c6cf36af10a46c7"
+  },
+  "production_adopted": false,
+  "ios_qualified": false,
+  "manual_accessibility_qualified": false,
+  "installer_qualified": false
+}

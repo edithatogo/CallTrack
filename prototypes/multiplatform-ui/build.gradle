@@ -1,0 +1,20 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '2.3.21'
+    id 'org.jetbrains.kotlin.plugin.compose' version '2.3.21'
+    id 'org.jetbrains.compose' version '1.10.3'
+}
+kotlin { jvmToolchain(17) }
+dependencies {
+    implementation compose.desktop.currentOs
+    implementation compose.material
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation compose.desktop.uiTestJUnit4
+}
+compose.desktop {
+    application { mainClass = 'org.calltrack.companion.MainKt' }
+}
+tasks.withType(Test).configureEach {
+    maxParallelForks = 1
+    // Offscreen desktop renderer: no window or user desktop interaction is needed.
+    systemProperty 'java.awt.headless', 'true'
+}

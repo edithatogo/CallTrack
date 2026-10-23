@@ -1,0 +1,23 @@
+{
+  "track_id": "multiplatform_ui_20261020",
+  "type": "research-led-development",
+  "status": "completed",
+  "milestone": "M8",
+  "created_at": "2026-10-20",
+  "updated_at": "2026-10-21",
+  "depends_on": [
+    "compose_20261020",
+    "kmp_20261020"
+  ],
+  "requirements": "R17, R24",
+  "implementation_status": "prototype-only; production deferred",
+  "archived": true,
+  "archived_at": "2026-10-21",
+  "research_outcome": "defer-production-sharing",
+  "prototype_target": "desktop JVM macOS arm64 offscreen renderer",
+  "prototype_ui_tests_passed": 4,
+  "production_migration_complete": false,
+  "ios_qualified": false,
+  "manual_accessibility_qualified": false,
+  "prerequisite_disposition": "Track7/8 research completed; production adoption gates still open"
+}
