@@ -11,6 +11,7 @@
 | C14-7 | Rendered UI selectors resolve both native Android resource IDs and Compose test-tag resource IDs. | Accessibility traversal finds namespaced Android IDs and raw IDs exposed by `testTagsAsResourceId`, then verifies the selected action's package before injecting touch. |
 | C14-8 | Historical import filters expose accessible date labels and checkbox semantics, with usable touch targets at large font scale and RTL layout. | Compose instrumentation verifies date content descriptions, checkbox role/state, visible controls, and a minimum 48 dp call-type target under 2x font scale and RTL. |
 | C14-9 | Recovery empty-state presentation is a pure rendering of Activity-supplied query state. | The stable `recovery_empty` host renders the localized message only when the Activity's completed recovery query reports no records; it performs no ledger/calendar work. |
+| C14-10 | Historical import history is rendered from Activity-supplied immutable session labels, while session identity and resume authority remain Activity-owned. | The stable `import_history` host shows localized title, bounded ordered rows or the empty message; only tapping a current opaque row token loads its mapped session. |
 
 Historical-import controls and any remaining recovery parity work stay gated on
 their own lifecycle, accessibility and behavior acceptance. Completed slices do

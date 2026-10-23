@@ -78,6 +78,7 @@ public class AutomaticSettingsTest {
                         new Intent(context, HistoricalImportActivity.class)
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         try {
+            RenderedUi rendered = new RenderedUi(instrumentation);
             assertTrue(
                     activity.findViewById(R.id.import_summary)
                             instanceof androidx.compose.ui.platform.ComposeView);
@@ -87,6 +88,11 @@ public class AutomaticSettingsTest {
             assertTrue(
                     activity.findViewById(R.id.import_filters)
                             instanceof androidx.compose.ui.platform.ComposeView);
+            assertTrue(
+                    activity.findViewById(R.id.import_history)
+                            instanceof androidx.compose.ui.platform.ComposeView);
+            rendered.revealId("import_history_empty");
+            assertNotNull(rendered.find(context.getString(R.string.import_empty_history), false));
             try (SqliteImportStore store = new SqliteImportStore(context)) {
                 assertTrue(store.sessions(-1, 10).isEmpty());
             }
