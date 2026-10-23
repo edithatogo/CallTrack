@@ -1,0 +1,41 @@
+{
+  "status": "primary-POM-declarations-not-complete-transitive-audit",
+  "records": [
+    {
+      "module": "kotlin-gradle-plugin",
+      "version": "2.3.21",
+      "pom": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-gradle-plugin/2.3.21/kotlin-gradle-plugin-2.3.21.pom",
+      "sha256": "6a6e2fe71c9832d0f66be768e20228ce02525149ea92f2742b66125e397a58c9",
+      "declared_licences": [
+        {
+          "name": "Apache-2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ]
+    },
+    {
+      "module": "kotlin-stdlib",
+      "version": "2.3.21",
+      "pom": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/2.3.21/kotlin-stdlib-2.3.21.pom",
+      "sha256": "3e0b48daa14dc73f8029d8d9e15ed32940377caf7b915510f88d33219b350186",
+      "declared_licences": [
+        {
+          "name": "Apache-2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ]
+    },
+    {
+      "module": "ktfmt",
+      "version": "0.59",
+      "pom": "https://repo.maven.apache.org/maven2/com/facebook/ktfmt/0.59/ktfmt-0.59.pom",
+      "sha256": "8bec2572d8afa25e54852723368f776e85415c12010106f3900ba1c677ed56a6",
+      "declared_licences": [
+        {
+          "name": "The Apache License, Version 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ]
+    }
+  ]
+}

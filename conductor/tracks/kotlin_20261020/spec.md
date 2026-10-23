@@ -27,3 +27,13 @@ Behaviour-preserving migration with upgrade/contract tests and explicit remainin
 ## Out of scope
 
 No automatic adoption of shortlisted technology, wholesale rewrite, paid service, unqualified platform parity or public release. Cross-track responsibilities remain with their owning tracks. A negative feasibility result or justified deferral is an acceptable research outcome.
+
+## Refined bounded implementation
+
+Independent preparation and a contract-preserving pure-component migration can
+proceed before M4. First translate CallSelection, CallIdentity and CallEvent only,
+using mixed Java/Kotlin interoperability. Keep schema2, app identity/version, UI,
+provider operations and scheduler unchanged. Preserve exact signatures/fingerprints,
+nullable public constructor fields, legacy ASCII trim and overflow semantics.
+Further app-owned Java migration and the original upgrade/acceptance gate remain
+open; no completion/archive from this pilot alone. See [decision](decisions.md).

@@ -56,7 +56,7 @@ The following are proposed extensions, not changes to the minimum parity release
 
 ## Conductor execution policy (2026-10-20)
 
-The [track registry](tracks.md) now owns execution. These inventories are planning hypotheses and dated evidence, not fully specified future implementations. Each later track must map, understand, research and document its requirements and dependency options when activated. Dependencies can be temporary prototype aids, enduring replacements for existing libraries, or replacements for app-owned/native code. Decisions require explicit purpose, evidence, promotion/removal criteria and recovery. See [workflow](workflow.md). Tracks 1–3 are complete; ten tracks remain pending.
+The [track registry](tracks.md) now owns execution. These inventories are planning hypotheses and dated evidence, not fully specified future implementations. Each later track must map, understand, research and document its requirements and dependency options when activated. Dependencies can be temporary prototype aids, enduring replacements for existing libraries, or replacements for app-owned/native code. Decisions require explicit purpose, evidence, promotion/removal criteria and recovery. See [workflow](workflow.md). Tracks 1–3 are complete; Tracks4–6 are active and seven tracks remain unstarted.
 
 ## Track 1 mapping outcome
 
@@ -69,3 +69,20 @@ R08/R13/R26 now have a bounded reproducible development build and call-log permi
 ## Track 3 bounded outcome
 
 [Slice verification](archive/calendar_slice_20261020/verification.md) supplies bounded evidence for R02–R04/R06–R08/R10/R19/R27: explicit calendar selection, pure mapping, actual LOCAL event readback, reopened SQLite receipts, retry/crash-gap recovery, edit preservation and denied/revoked permissions. It does not complete their broader M3 requirements. The manual source adapter is implemented but personal call acquisition, background operation, historical import, lost-marker/tombstone/restore policies and remote sync remain unqualified. Known insert IDs are retained on uncertain readback; receipt presence alone is never success.
+
+## Track 5 preparation outcome
+
+R13/R27 now have contributor instructions, a data-lifecycle map, issue/PR templates,
+channel research, resolved dependency inventory and a release/upgrade/observation
+protocol. [D01–D09](tracks/release_20261020/requirements.md) retain the unmet gates.
+This does not establish a source-matched release candidate, store eligibility,
+production signing, retention controls or operational acceptance.
+
+## Track 6 bounded migration outcome
+
+R14/R26 now have a Java/Kotlin responsibility map and conditional pure-component
+conversion, with Java golden contracts for persisted signatures, JVM interop and
+legacy null/whitespace/overflow semantics. [K01–K07](tracks/kotlin_20261020/requirements.md)
+separate this bounded qualification from the remaining21 Java files, prerequisite
+release acceptance and whole-app migration/upgrade requirements. No Compose/KMP
+or coroutine architecture adoption follows from adding Kotlin source.

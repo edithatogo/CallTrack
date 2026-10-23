@@ -22,7 +22,7 @@ UI is implemented yet; inspect the calendar and retain the ledger for investigat
 ## Build and verify
 
 Use JDK17, Android SDK platform36/build-tools35.0.0 and the included Gradle8.13
-wrapper. Set `JAVA_HOME` and `ANDROID_HOME` to those installed toolchains, then:
+wrapper and Kotlin/KGP2.3.21. Set `JAVA_HOME` and `ANDROID_HOME` to those installed toolchains, then:
 
 ```sh
 python3 scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"
@@ -31,8 +31,9 @@ python3 scripts/verify_conductor.py
 ```
 
 The build runs JVM tests, builds app/test APKs and lints. Receipts and logs stay under
-excluded `.local/slice-evidence`. Kotlin/Compose/KMP/Rust are research directions,
-not dependencies of this slice. Dependencies inherited from upstream include
+excluded `.local/slice-evidence`. Kotlin2.3.21 now implements event mapping,
+identity and filtering behind existing Java contracts. Compose/KMP/Rust remain
+research directions, not dependencies of this slice. Dependencies inherited from upstream include
 interim compatibility overrides documented in [tech stack](conductor/tech-stack.md).
 
 For an explicitly selected, authorised test device with neither development test
@@ -59,13 +60,23 @@ calendar availability or remote sync.
 ## Development and recovery
 
 Run new Java files through google-java-format1.24.0 with `--aosp`; the checksum and
-download recipe are in CI. The upstream build reproducer remains available through
+download recipe are in CI. Kotlin uses ktfmt0.59 with `--kotlinlang-style`;
+CI checks both languages. The upstream build reproducer remains available through
 [qualification instructions](qualification/README.md). CI definitions are local
 configuration until a hosted run is observed.
 
-Ledger schema1 is preserving: unsupported upgrades fail instead of dropping data.
+Ledger schema2 preserves schema1 receipts and adds a durable outbox foundation;
+unsupported upgrades fail instead of dropping data. The manual launcher still uses
+the original receipt path; automatic delivery/import integration is unfinished.
 The receipt key includes per-install source namespace, call row ID and destination.
 Do not clear app data as a retry strategy: losing receipts changes recovery and
 identity semantics. Cross-device restore, edited/deleted crash-gap tombstones and
 full background reconciliation are Track4 work. Keep working releases and source
 history until migration and recovery have passed.
+
+## Community preparation
+
+See [contribution guide](CONTRIBUTING.md), [data lifecycle](PRIVACY.md),
+[security status](SECURITY.md) and [release runbook](RELEASING.md). These prepare
+future community distribution; they do not establish a release candidate or public
+reporting channel. Track4 acceptance and signing/distribution gates remain open.

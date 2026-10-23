@@ -6,6 +6,9 @@ public final class CallRecord {
     public final long start, seconds;
     public final boolean identityAllowed;
 
+    public final int type;
+    public final String phoneAccountId;
+
     public CallRecord(
             String namespace,
             String id,
@@ -15,6 +18,53 @@ public final class CallRecord {
             String name,
             String number,
             boolean identityAllowed) {
+        this(
+                namespace,
+                id,
+                start,
+                seconds,
+                direction,
+                name,
+                number,
+                identityAllowed,
+                typeOf(direction),
+                null);
+    }
+
+    public CallRecord(
+            String namespace,
+            String id,
+            long start,
+            long seconds,
+            int type,
+            String name,
+            String number,
+            boolean identityAllowed,
+            String phoneAccountId) {
+        this(
+                namespace,
+                id,
+                start,
+                seconds,
+                directionOf(type),
+                name,
+                number,
+                identityAllowed,
+                type,
+                phoneAccountId);
+    }
+
+    private CallRecord(
+            String namespace,
+            String id,
+            long start,
+            long seconds,
+            String direction,
+            String name,
+            String number,
+            boolean identityAllowed,
+            int type,
+            String phoneAccountId) {
         if (namespace == null
                 || namespace.isEmpty()
                 || id == null
@@ -29,6 +79,18 @@ public final class CallRecord {
         this.name = name;
         this.number = number;
         this.identityAllowed = identityAllowed;
+        this.type = type;
+        this.phoneAccountId = phoneAccountId;
+    }
+
+    private static int typeOf(String direction) {
+        return "Incoming".equals(direction)
+                ? 1
+                : "Outgoing".equals(direction) ? 2 : "Missed".equals(direction) ? 3 : 0;
+    }
+
+    private static String directionOf(int type) {
+        return type == 1 ? "Incoming" : type == 2 ? "Outgoing" : type == 3 ? "Missed" : "Unknown";
     }
 
     public String key() {

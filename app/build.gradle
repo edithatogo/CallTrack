@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
 }
 
 android {
@@ -48,3 +49,10 @@ dependencies {
 }
 // Interim compatibility decisions from Track 2.
 dependencies { implementation 'androidx.fragment:fragment:1.5.1'; implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1' }
+
+// Match the Java bytecode target; retain JDK17 as the build runtime.
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
+    }
+}
