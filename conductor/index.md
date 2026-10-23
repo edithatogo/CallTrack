@@ -26,6 +26,10 @@
 - [Baseline audit](research/baseline-audit.md)
 - [Future architecture](research/future-architecture.md)
 
+## Python infrastructure
+
+- [Track21 — Python3.15 migration and qualification](tracks/python315_20261023/index.md)
+
 ## Current checkpoint
 
 Tracks1–4 and research Tracks7–13 are complete, reviewed and archived. The
