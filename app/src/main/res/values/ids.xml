@@ -33,9 +33,11 @@
     <item name="open_recovery" type="id" />
     <item name="recovery_refresh" type="id" />
     <item name="recovery_feedback" type="id" />
+    <item name="recovery_intro_panel" type="id" />
     <item name="recovery_rows" type="id" />
     <item name="recovery_empty" type="id" />
     <item name="recovery_cards" type="id" />
     <item name="recovery_navigation" type="id" />
     <item name="recovery_retention" type="id" />
+    <item name="recovery_retention_copy" type="id" />
 </resources>

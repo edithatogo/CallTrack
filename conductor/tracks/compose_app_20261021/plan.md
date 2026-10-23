@@ -47,5 +47,7 @@
 - [x] Task: Review the historical-import destination selector slice; verify host/permission-denied rendering, explicit opaque-token selection, and no import side effects; record provider-backed selection and restored-calendar acceptance as pending in [review](review-20261024-import-destination.md).
 - [x] Task: Review the historical-import access-action slice; verify explicit callback dispatch, stable host and no permission request during composition; keep runtime grant/deny/revocation checks pending in [review](review-20261024-import-access.md).
 - [x] Task: Review the historical-import introductory-text slice; verify exact zone-formatted copy, stable host and no import side effects in [review](review-20261024-import-intro.md).
+- [x] Task: Move the recovery introduction and retention-policy copy into lifecycle-disposed Compose hosts, preserving Activity-owned permissions, retention execution and query state; verify component rendering and exact API36 resource text in [review](review-20261024-recovery-copy.md).
+- [x] Task: Review the recovery copy slice; distinguish the passing focused panel/Activity evidence from the unqualified fixture-backed full-class attempt in [review](review-20261024-recovery-copy.md).
 - [ ] Task: Update requirements, decisions, remaining limitations and next-track inputs; retire superseded code/prototypes only after parity.
 - [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger.

@@ -120,6 +120,18 @@ public class RecoveryUiTest {
         assertEquals(0, fixture.events(calendar()));
     }
 
+    @Test
+    public void recoveryExplanationsRenderWithStableComposeHosts() {
+        journey(
+                "recovery-copy",
+                ui -> {
+                    assertNotNull(ui.shown("recovery_intro_panel", true));
+                    assertNotNull(ui.shown(context().getString(R.string.recovery_intro), false));
+                    assertNotNull(ui.shown("recovery_retention_copy", true));
+                    assertNotNull(ui.shown(context().getString(R.string.retention_policy), false));
+                });
+    }
+
     private Object field(Activity activity, String name) {
         try {
             java.lang.reflect.Field field = ReceiptRecoveryActivity.class.getDeclaredField(name);

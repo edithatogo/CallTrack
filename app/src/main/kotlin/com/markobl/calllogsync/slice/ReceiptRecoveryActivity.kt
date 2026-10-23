@@ -45,8 +45,19 @@ class ReceiptRecoveryActivity : ComponentActivity() {
         layout.orientation = LinearLayout.VERTICAL
         val pad = (16 * resources.displayMetrics.density).toInt()
         layout.setPadding(pad, pad, pad, pad)
-        val intro = TextView(this)
-        intro.setText(R.string.recovery_intro)
+        val intro =
+            ComposeView(this).apply {
+                id = R.id.recovery_intro_panel
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    RecoveryCopyPanel(
+                        text = stringResource(R.string.recovery_intro),
+                        tag = "recovery_intro_text",
+                    )
+                }
+            }
         layout.addView(intro)
         val access = button(layout, R.string.recovery_access)
         access.setOnClickListener {
@@ -72,9 +83,20 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                 }
             }
         layout.addView(actions)
-        val retention = TextView(this)
-        retention.setText(R.string.retention_policy)
-        layout.addView(retention)
+        val retentionCopy =
+            ComposeView(this).apply {
+                id = R.id.recovery_retention_copy
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    RecoveryCopyPanel(
+                        text = stringResource(R.string.retention_policy),
+                        tag = "recovery_retention_copy_text",
+                    )
+                }
+            }
+        layout.addView(retentionCopy)
         val expire =
             ComposeView(this).apply {
                 id = R.id.recovery_retention
