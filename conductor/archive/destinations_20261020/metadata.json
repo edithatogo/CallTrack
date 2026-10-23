@@ -1,0 +1,19 @@
+{
+  "track_id": "destinations_20261020",
+  "type": "research-led-development",
+  "status": "completed",
+  "milestone": "Post-M3",
+  "created_at": "2026-10-20",
+  "updated_at": "2026-10-21",
+  "depends_on": [
+    "parity_20261020"
+  ],
+  "requirements": "R12, R19, R20, R25",
+  "implementation_status": "deferred; no new connector or endpoint",
+  "archived": true,
+  "archived_at": "2026-10-21",
+  "research_outcome": "retain-native-provider-first; defer-direct-connectors",
+  "provider_cloud_qualified": false,
+  "prototype_run": false,
+  "prerequisite_disposition": "research-only; Track4 implementation remains incomplete"
+}

@@ -118,3 +118,11 @@ No shared-core or second-platform application was implemented in this phase.
 UI experiment and defers production sharing. The M8 gate remains unchanged; reopen
 when a feasible companion workflow, common contracts and Android UI/state ownership
 are qualified. Desktop offscreen tests do not qualify iOS or native distribution.
+
+## Integration discovery decision
+
+[Track10 INT-D01](archive/destinations_20261020/decisions.md) retains the native-provider
+route and documents Graph/Google/CalDAV contract, identity and recovery gates.
+Reopen against a selected required destination after a native coverage gap or a
+qualified companion need is demonstrated. Research closure does not satisfy
+provider-cloud readback, direct Graph, endpoint output or fan-out acceptance.

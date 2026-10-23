@@ -110,3 +110,11 @@ R17/R24 have [U01–U08](archive/multiplatform_ui_20261020/requirements.md) for 
 shared UI. A standalone desktop experiment tests synthetic destination choice and
 preview only. Production adoption is deferred under UI-D01; no iOS or shared
 Android/iOS UI, native packaging or manual accessibility acceptance is established.
+
+## Track10 integration research outcome
+
+R12/R19/R20/R25 have [destination contracts](archive/destinations_20261020/requirements.md)
+and a staged provider qualification protocol. INT-D01 retains native CalendarContract
+first and defers direct clients until a required route gap is measured and Track4
+contracts stabilize. Outlook/Google/CalDAV cloud readback remains unqualified; no
+new endpoint, multi-destination routing or auth library was implemented.

@@ -11,3 +11,5 @@
 - [KMP shared core and second-platform requirements](kmp_20261020/index.md) — research completed, reviewed with fixes and archived2026-10-21. Retain current implementation; extraction deferred. No common module or equivalent second-target tests; M7 production gate remains open.
 
 - [Compose Multiplatform product and UI discovery](multiplatform_ui_20261020/index.md) — research completed, reviewed with fixes and archived2026-10-21. Isolated desktop JVM prototype builds;4 offscreen UI tests pass. Production shared UI remains deferred; no iOS/native packaging/manual accessibility acceptance.
+
+- [Calendar and service integration discovery](destinations_20261020/index.md) — research completed, reviewed with endpoint-contract fix and archived2026-10-21. Retain native-provider-first; direct connectors/optional endpoint deferred. No cloud/provider live acceptance or network dependency added.
