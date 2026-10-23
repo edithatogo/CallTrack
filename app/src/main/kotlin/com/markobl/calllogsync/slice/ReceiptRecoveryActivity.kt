@@ -1,28 +1,33 @@
 package com.markobl.calllogsync.slice
 
 import android.Manifest
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.ContentUris
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.CalendarContract
-import android.view.View
 import android.widget.*
+import androidx.activity.ComponentActivity
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import com.markobl.calllogsync.R
 import java.text.DateFormat
 import java.util.Date
 import java.util.concurrent.Executors
 
 /** Existing-effect checks remain separate from explicitly confirmed never-attempted insertion. */
-class ReceiptRecoveryActivity : Activity() {
+class ReceiptRecoveryActivity : ComponentActivity() {
     private val executor = Executors.newSingleThreadExecutor()
     private val back = ArrayList<SqliteLedger.RecoveryCursor?>()
     private var current: SqliteLedger.RecoveryCursor? = null
     private var next: SqliteLedger.RecoveryCursor? = null
     private var rows: LinearLayout? = null
-    private var feedback: TextView? = null
+    private var feedback: ComposeView? = null
+    private var feedbackText by mutableStateOf("")
     private var previous: Button? = null
     private var more: Button? = null
     private var busy = false
@@ -56,9 +61,14 @@ class ReceiptRecoveryActivity : Activity() {
         layout.addView(retention)
         val expire = button(layout, R.string.retention_run)
         expire.setOnClickListener { expireOldPayloads() }
-        feedback = TextView(this)
-        feedback!!.id = R.id.recovery_feedback
-        feedback!!.accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
+        feedback =
+            ComposeView(this).apply {
+                id = R.id.recovery_feedback
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent { RecoveryStatusPanel(feedbackText) }
+            }
         layout.addView(feedback)
         rows = LinearLayout(this)
         rows!!.id = R.id.recovery_rows
@@ -144,7 +154,7 @@ class ReceiptRecoveryActivity : Activity() {
                 runOnUiThread {
                     if (isDestroyed || ticket != version) return@runOnUiThread
                     busy = false
-                    feedback!!.setText(R.string.recovery_failed)
+                    setFeedback(R.string.recovery_failed)
                     navigation()
                 }
             }
@@ -154,6 +164,14 @@ class ReceiptRecoveryActivity : Activity() {
     private fun navigation() {
         previous?.isEnabled = !busy && back.isNotEmpty()
         more?.isEnabled = !busy && next != null
+    }
+
+    private fun setFeedback(message: Int) {
+        feedbackText = getString(message)
+    }
+
+    private fun setFeedback(text: String) {
+        feedbackText = text
     }
 
     private fun card(intent: DurableDelivery.Intent, calendar: String?) {
@@ -214,7 +232,7 @@ class ReceiptRecoveryActivity : Activity() {
                         )
                     )
                 } catch (unavailable: RuntimeException) {
-                    feedback!!.setText(R.string.recovery_open_failed)
+                    setFeedback(R.string.recovery_open_failed)
                 }
             }
         }
@@ -232,7 +250,7 @@ class ReceiptRecoveryActivity : Activity() {
                     runOnUiThread {
                         if (isDestroyed) return@runOnUiThread
                         busy = false
-                        feedback!!.text = getString(R.string.retention_result, count)
+                        setFeedback(getString(R.string.retention_result, count))
                         load(current)
                     }
                 }
@@ -240,7 +258,7 @@ class ReceiptRecoveryActivity : Activity() {
                 runOnUiThread {
                     if (isDestroyed) return@runOnUiThread
                     busy = false
-                    feedback!!.setText(R.string.recovery_failed)
+                    setFeedback(R.string.recovery_failed)
                     navigation()
                 }
             }
@@ -259,7 +277,7 @@ class ReceiptRecoveryActivity : Activity() {
                 arrayOf(Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR),
                 12,
             )
-            feedback!!.setText(R.string.reapproval_tap_again)
+            setFeedback(R.string.reapproval_tap_again)
             return
         }
         val payload = intent.payload!!
@@ -311,7 +329,7 @@ class ReceiptRecoveryActivity : Activity() {
                         DurableDelivery.Result.PAUSED -> R.string.reapproval_paused
                         else -> R.string.reapproval_failed
                     }
-                feedback!!.setText(label)
+                setFeedback(label)
                 load(current)
             }
         }
@@ -359,7 +377,7 @@ class ReceiptRecoveryActivity : Activity() {
             runOnUiThread {
                 if (isDestroyed) return@runOnUiThread
                 busy = false
-                feedback!!.setText(resultLabel(outcome))
+                setFeedback(resultLabel(outcome))
                 load(current)
             }
         }

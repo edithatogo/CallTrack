@@ -86,3 +86,69 @@ the rendered and existing settings tests on a healthy qualified emulator; test
 permissions/revocation, lifecycle recreation, font scaling, RTL and accessibility;
 verify no provider behavior changed; then complete review and handoff. Tracks5
 and6 remain open under the scoped deferral. Track14 is not complete.
+
+## Manual logging presentation slice — 2026-10-24
+
+The manual “Log latest call” action and feedback moved into a small Compose
+Foundation panel hosted by a lifecycle-disposed ComposeView. The picker and
+permission request remain native. `CalendarSliceActivity` still owns the
+explicit tap callback, call-log permission check, asynchronous delivery, result
+mapping and state updates; composition performs no provider access or writes.
+The original native action was removed and the new host has a stable resource
+ID. The panel exposes a button role, disabled semantics, a 48 dp minimum touch
+height and polite live feedback.
+
+The regression test was added before implementation and initially failed to
+compile because the panel and state type were absent. It now compiles and checks
+that the action is disabled until a destination is available and only invokes
+delivery after an explicit tap. The repo-local JDK 17.0.21+9/SDK 36 run of
+`:app:testDebugUnitTest :app:compileDebugAndroidTestKotlin` passed (50
+actionable tasks; final rerun after formatting executed 6, with 44 up-to-date).
+`:app:assembleDebug :app:assembleDebugAndroidTest` also passed (86 actionable
+tasks; 9 executed, 77 up-to-date). The Kotlin sources were formatted with the
+pinned ktfmt 0.59. The Conductor verifier fault suite passed 19 tests, and
+`scripts/verify_conductor.py` validated 211 documents, 21 tracks and 25
+synthetic scenarios. No AVD was initially present. A local API 36 profile
+was created using the installed arm64 image, but it remained `offline` during
+this checkpoint; the rendered regression has therefore not run. See
+[slice review](review-20261024-manual-logging.md). This checkpoint does not
+qualify lifecycle recreation, permission revocation, RTL/font scaling or
+TalkBack/Switch Access.
+
+## Historical import status slice — 2026-10-24
+
+The import summary and feedback are now separate lifecycle-disposed ComposeViews
+with their original `import_summary` and `import_feedback` resource IDs. Compose
+Foundation `BasicText` renders Activity-owned strings with polite live-region
+semantics. The selected destination, date fields, call-type filters, history
+navigation, preview/confirmation dialogs, bounded delivery loop, stop/cancel
+behavior and saved session remain in `HistoricalImportActivity`; this slice
+does not change import authority or persistence.
+
+`HistoricalImportStatusPanelTest` checks summary/feedback rendering and state
+updates. The first focused compile failed because the panel types were missing;
+after implementation, `:app:compileDebugKotlin :app:compileDebugAndroidTestKotlin`
+passed. The final targeted run of `:app:testDebugUnitTest
+:app:compileDebugAndroidTestKotlin :app:assembleDebug
+:app:assembleDebugAndroidTest` passed: 91 actionable tasks, 15 executed and 76
+up-to-date. After all slice records were added, the 19-test Conductor fault
+suite passed and `scripts/verify_conductor.py` validated 213 documents, 21
+tracks and 25 synthetic scenarios. The rendered panel test and existing
+synthetic import effect tests remain unexecuted because the new API 36 emulator profile
+does not reach `adb online`.
+
+## Receipt recovery feedback slice — 2026-10-24
+
+The read-only recovery feedback text moved into a lifecycle-disposed
+ComposeView with the existing `recovery_feedback` ID and polite live-region
+semantics. All record reads, calendar lookups, check/suppress/reapproval actions,
+confirmation dialogs, retention operations and pagination remain in
+`ReceiptRecoveryActivity`; composition performs no recovery or calendar work.
+
+The regression test initially failed because `RecoveryStatusPanel` did not
+exist. After implementation and ktfmt 0.59 formatting, the selected JDK17.0.21+9
+/ SDK36 run of `:app:testDebugUnitTest :app:compileDebugAndroidTestKotlin
+:app:assembleDebug :app:assembleDebugAndroidTest` passed (91 actionable tasks;
+15 executed, 76 up-to-date). Rendered feedback and synthetic recovery workflows
+remain unexecuted because the API36 emulator profile stays offline. See the
+[slice review](review-20261024-recovery-status.md).

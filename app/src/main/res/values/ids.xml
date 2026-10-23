@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="slice_calendar_picker" type="id" />
+    <item name="slice_manual_panel" type="id" />
     <item name="open_automatic" type="id" />
     <item name="auto_permissions" type="id" />
     <item name="auto_calendar_picker" type="id" />
@@ -19,6 +20,7 @@
     <item name="import_to" type="id" />
     <item name="import_create" type="id" />
     <item name="import_summary" type="id" />
+    <item name="import_actions" type="id" />
     <item name="import_continue" type="id" />
     <item name="import_confirm" type="id" />
     <item name="import_stop" type="id" />

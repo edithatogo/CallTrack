@@ -4,7 +4,7 @@
   "status": "in_progress",
   "milestone": "M6",
   "created_at": "2026-10-21",
-  "updated_at": "2026-10-23",
+  "updated_at": "2026-10-24",
   "depends_on": [
     "kotlin_20261020",
     "release_20261020"
@@ -13,6 +13,6 @@
   "track_number": 14,
   "execution_stage": 3,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
-  "implementation_status": "read-only-status-slice-reviewed-and-api36-qualified; manual-import-recovery-screens-and-full-matrix-pending",
+  "implementation_status": "automatic-status-api36-qualified; manual-log-import-status-and-recovery-feedback-compose-panels-implemented-reviewed-locally-rendered-tests-pending; import-controls-recovery-cards-and-full-matrix-pending",
   "production_adopted": false
 }
