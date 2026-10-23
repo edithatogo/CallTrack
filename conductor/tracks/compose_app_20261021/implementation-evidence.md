@@ -359,3 +359,22 @@ compilation, pinned ktfmt0.59 and `git diff --check` passed.
 Provider-backed calendar selection, permission grant/denial/revocation,
 TalkBack/Switch Access, wider font/RTL and OS matrix acceptance remain pending.
 See the [intro review](review-20261024-import-intro.md).
+
+## Recovery explanatory copy — 2026-10-24
+
+The recovery introduction and retention-policy TextViews now render through
+separate lifecycle-disposed ComposeViews with stable `recovery_intro_panel`
+and `recovery_retention_copy` host IDs. The Activity still supplies the exact
+localized resource text and owns permission prompts, recovery queries, expiry
+work and calendar access. No dependency or persisted data changed.
+
+On API36 `calltrack-track14-api36`, the focused pure-panel test verified both
+strings and the focused Activity journey verified exact resource text and
+both host IDs. `:app:testDebugUnitTest`, `:app:lintDebug`, Android-test
+Kotlin/Java compilation, ktfmt0.59 and `git diff --check` passed. An initial
+full `RecoveryUiTest` class run without its fixture failed seven fixture-backed
+journeys; it is recorded as an invalid broad invocation rather than passing
+acceptance. See the [recovery copy review](review-20261024-recovery-copy.md).
+
+Screen-reader, large-font/RTL, permission and provider journeys, retention
+execution, and wider OS acceptance remain pending.

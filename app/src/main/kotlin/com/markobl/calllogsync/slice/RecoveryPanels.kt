@@ -21,6 +21,11 @@ internal fun RecoveryEmptyPanel(visible: Boolean, message: String) {
     }
 }
 
+@Composable
+internal fun RecoveryCopyPanel(text: String, tag: String) {
+    BasicText(text = text, modifier = Modifier.fillMaxWidth().testTag(tag))
+}
+
 internal data class RecoveryCardUiState(
     val token: Long,
     val detail: String,

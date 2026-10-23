@@ -181,3 +181,21 @@ screen-reader acceptance remain open.
 
 **Rollback:** Restore the TextView with its existing formatted resource string
 and remove the Compose host/panel. No data or state migration is required.
+
+## D14-9: Render recovery explanation and retention policy with Compose
+
+**Decision:** Replace the recovery intro and retention-policy TextViews with
+lifecycle-disposed ComposeViews, each using a stable host ID and read-only
+localized text from existing resources. Keep permission prompts, recovery
+queries, retention execution and the recovery action button in the Activity.
+
+**Alternatives:** Leave static explanatory copy in Views (rejected for the
+incremental recovery presentation migration); move expiration policy or ledger
+work into composition (rejected); add a UI dependency (unnecessary).
+
+**Promotion/removal:** Component tests verify both supplied strings render;
+API36 Activity acceptance verifies exact resource text and host IDs. This does
+not qualify scrolling, font/RTL, screen readers or the retention action itself.
+
+**Rollback:** Restore both TextViews and remove the new host IDs. No state,
+permission, data or expiry semantics change.
