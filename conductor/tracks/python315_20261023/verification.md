@@ -77,3 +77,33 @@ The durable goal remains active and this track remains in_progress. Do not creat
 an external repository or mutate the retained Linux host/container/native bindings
 to manufacture that proof. Android's138-artifact trust qualification is a separate
 Track5 dependency concern, not a Python test failure.
+
+## Linux execution and CI finding
+
+The previously qualified physical Linux host's Docker engine is live. A new
+owned container `calltrack-python315-20261023`, without mounts/ports/privilege,
+uses the retained Temurin image digest from release reproduction. No retained
+release container or native device is modified. Installed the existing workflow's
+Linux prerequisites only inside this container, then disconnected its network.
+The official actions/python-versions Ubuntu22.04 x64 CPython3.15.1 archive
+(release3.15.1-39619321210) matched GitHub asset SHA256
+`d5089a4a7ab6cea9664fb26cdae5c6379f880edc368a5be81999455c25cda556`.
+Actual local-prefix runtime guard passed on `/work/calltrack/.venv/bin/python`.
+
+The first archive-only snapshot correctly failed a historical-schema test:
+`git show` could not resolve frozen schema commits absent from that snapshot.
+This exposed the regular CI jobs' default shallow-checkout bug. Full history
+was transferred in a local Git bundle; HEAD and tree matched the original source
+exactly. The unchanged151-test suite and Conductor then passed on Linux.
+Qualification CI now requests full history on all three checkouts. A regression
+failed against the old configuration and passes with the fix. No historical
+schema assertion was weakened and no interpreter compatibility fallback was used.
+
+The new regression raises the suite count to152. Final integrated-head Mac/Linux
+rechecks and safe owned-container stop are recorded in private receipts after
+commit. This is actual Linux container execution using the same Python binary
+release family as setup-python, not a hosted GitHub Actions run or an execution
+of its installation action. Hosted dispatch remains unavailable for this separate
+CallTrack history until its contribution target is selected. The original-upstream
+checksum PR is [assessed separately](../../../qualification/upstream-contribution-assessment-20261023.md)
+and does not establish Python CI acceptance for this repository.

@@ -27,3 +27,12 @@ class HistoricalSchemaTest(unittest.TestCase):
             self.assertEqual(row['fixture_sha256'], hashlib.sha256(fixture).hexdigest())
             self.assertEqual('\n'.join(statements) + '\n', fixture.decode())
             self.assertEqual(row['statement_count'], len(statements))
+
+    def test_qualification_checkouts_keep_schema_history(self):
+        workflow = (ROOT / '.github/workflows/qualification.yml').read_text()
+        checkouts = workflow.split('      - uses: actions/checkout@')[1:]
+        self.assertGreaterEqual(len(checkouts), 3)
+        for checkout in checkouts:
+            step = checkout.split('\n      - ', 1)[0]
+            self.assertRegex(step, r'(?m)^\s+fetch-depth:\s*0\s*$',
+                             'Schema-provenance tests require committed history')
