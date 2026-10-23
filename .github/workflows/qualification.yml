@@ -96,7 +96,13 @@ jobs:
           mkdir -p .local/toolchain
           curl --fail --location --silent --show-error https://repo.maven.apache.org/maven2/com/facebook/ktfmt/0.59/ktfmt-0.59-with-dependencies.jar -o .local/toolchain/ktfmt-0.59.jar
           echo "a493271c137074436a133d72e9e323f91604c97e0c40555629ec39598efead54  .local/toolchain/ktfmt-0.59.jar" | sha256sum --check
+<<<<<<< HEAD
           find app/src prototypes/compose/src prototypes/multiplatform-ui/src -type f -name '*.kt' -print0 | xargs -0 java -jar .local/toolchain/ktfmt-0.59.jar --kotlinlang-style --dry-run --set-exit-if-changed
+||||||| parent of 32ae39b (feat(kmp): Share call selection and time range rules)
+          rg --files app/src prototypes/compose/src -g '*.kt' -0 | xargs -0 java -jar .local/toolchain/ktfmt-0.59.jar --kotlinlang-style --dry-run --set-exit-if-changed
+=======
+          rg --files app/src prototypes/compose/src shared-core/src -g '*.kt' -0 | xargs -0 java -jar .local/toolchain/ktfmt-0.59.jar --kotlinlang-style --dry-run --set-exit-if-changed
+>>>>>>> 32ae39b (feat(kmp): Share call selection and time range rules)
       - name: Build and verify development slice
         run: .venv/bin/python scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"
       - name: Compile and package unsigned release variant

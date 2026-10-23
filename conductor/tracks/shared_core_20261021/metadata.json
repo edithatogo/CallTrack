@@ -1,16 +1,17 @@
 {
   "track_id": "shared_core_20261021",
   "type": "research-led-development",
-  "status": "new",
+  "status": "in_progress",
   "milestone": "M7",
   "created_at": "2026-10-21",
-  "updated_at": "2026-10-21",
+  "updated_at": "2026-10-24",
   "depends_on": [
     "compose_app_20261021"
   ],
   "requirements": "R16, R24, R26",
   "track_number": 15,
   "execution_stage": 4,
-  "implementation_status": "pending",
+  "prerequisite_deferral_document": "prerequisite-deferral.md",
+  "implementation_status": "bounded-selection-range-shared-jvm-android-qualified-macos-native-pending",
   "production_adopted": false
 }
