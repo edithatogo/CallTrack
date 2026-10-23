@@ -29,8 +29,19 @@
 ## Python infrastructure
 
 - [Track21 — Python3.15 migration and qualification](tracks/python315_20261023/index.md) — completed and reviewed 2026-10-24; archived in the completed-track index.
+- [Current Python runtime selection policy](python-runtime-policy.md) — newest qualified stable version preferred; compatibility-based alternatives are allowed and must be documented and qualified.
 
 ## Current checkpoint
+
+### Runtime selection policy — 2026-10-24
+
+The completed Track21 evidence shows Python3.15.1 was qualified for the prior
+runtime migration. Current work prefers the newest qualified stable version,
+but permits a different version when a concrete compatibility need requires it.
+`.python-version` now drives local and hosted selection, and the guard verifies
+that the actual repo-local interpreter matches that selection. Record any
+exception's reason, scope, and qualification in the active track. Historical
+Track21 decisions remain unchanged; see the [current policy](python-runtime-policy.md).
 
 ### Live gate refresh — 2026-10-24
 

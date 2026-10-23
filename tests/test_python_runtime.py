@@ -28,12 +28,12 @@ class RuntimeAdmission(unittest.TestCase):
     def test_selected_local_runtime_passes(self):
         self.assertEqual(self.check_runtime()['version'], '3.15.1')
 
-    def test_older_minor_rejected(self):
-        with self.assertRaisesRegex(RuntimeError, 'Python3.15.1 required'):
-            self.check_runtime(version=(3, 14, 9))
+    def test_explicit_compatible_runtime_selection_is_allowed(self):
+        (self.root / '.python-version').write_text('3.14.9\n')
+        self.assertEqual(self.check_runtime(version=(3, 14, 9))['version'], '3.14.9')
 
-    def test_older_patch_rejected(self):
-        with self.assertRaisesRegex(RuntimeError, 'Python3.15.1 required'):
+    def test_actual_runtime_must_match_selected_version(self):
+        with self.assertRaisesRegex(RuntimeError, '3.15.1 selected; actual'):
             self.check_runtime(version=(3, 15, 0))
 
     def test_system_python_rejected_even_with_correct_version(self):
@@ -45,8 +45,13 @@ class RuntimeAdmission(unittest.TestCase):
             self.check_runtime(executable=Path('/opt/bin/python3.15'))
 
     def test_stale_version_manifest_rejected(self):
-        (self.root / '.python-version').write_text('3.14.9\n')
-        with self.assertRaisesRegex(RuntimeError, 'manifest'):
+        (self.root / '.python-version').write_text('3.15\n')
+        with self.assertRaisesRegex(RuntimeError, 'stable X.Y.Z'):
+            self.check_runtime()
+
+    def test_noncanonical_manifest_rejected(self):
+        (self.root / '.python-version').write_text('03.15.1\n')
+        with self.assertRaisesRegex(RuntimeError, 'canonical'):
             self.check_runtime()
 
     def test_prerelease_is_not_qualified(self):

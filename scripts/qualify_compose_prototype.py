@@ -1,4 +1,4 @@
-#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
+#!/usr/bin/env -S uv run python
 """Build or qualify the isolated synthetic Compose app; never use a physical device."""
 import argparse
 import hashlib

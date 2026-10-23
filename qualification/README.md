@@ -22,10 +22,16 @@ prerequisite; tools and keys are not committed.
 
 ## Build
 
-Run from repository root with Python3.15.1 and Git installed. Use
-`uv venv --python 3.15.1 .venv` and `source .venv/bin/activate` first:
+Run from repository root with the Python version in `.python-version` and Git
+installed. Python3.15.1 is the current preferred selection; a different version
+may be selected when compatibility requires it, with the reason and scope
+recorded under the [runtime policy](../conductor/python-runtime-policy.md).
+Create and verify the repo-local environment first:
 
 ```sh
+python_version="$(cat .python-version)"
+uv venv --python "$python_version" .venv
+test "$(.venv/bin/python --version)" = "Python $python_version"
 .venv/bin/python scripts/bootstrap_qualification.py
 .venv/bin/python scripts/prepare_qualification.py --modern
 .venv/bin/python scripts/run_qualification.py --variant modern --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME" --clean

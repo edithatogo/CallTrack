@@ -1,4 +1,4 @@
-#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
+#!/usr/bin/env -S uv run python
 """Fetch the audited public upstream revision into the excluded reference checkout."""
 from pathlib import Path
 import subprocess

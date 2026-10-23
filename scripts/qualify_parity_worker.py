@@ -1,4 +1,4 @@
-#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
+#!/usr/bin/env -S uv run python
 """Dedicated-emulator real CallLog/CalendarContract and positive WorkManager acceptance.
 
 Requires selected device, matching build receipt and absent test packages. On native

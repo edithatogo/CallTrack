@@ -1,4 +1,4 @@
-#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
+#!/usr/bin/env -S uv run python
 """Qualify unsigned release artifacts from two clean same-host source checkouts.
 
 No signing, installation or publication. This is not independent-host reproduction.

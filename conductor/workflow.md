@@ -42,12 +42,30 @@ Build qualification commands and prerequisites are maintained in [qualification 
 
 Research outputs: source-pinned findings, mapped requirements, option comparison, decision and handoff. Implementation outputs: tests, code, migration/recovery evidence and updated documentation. Distribution is a separate release track.
 
+## Dependency and runtime versions
+
+Prefer the newest qualified stable version for app/provider dependencies,
+tooling, builds and runtimes. Use another version when a concrete compatibility
+or task requirement calls for it; choose the newest suitable version and record
+the reason, affected scope, and qualification evidence in the owning track.
+Necessary alternates are allowed without extra user permission. This preference
+does not relax security, functional, packaging, or release acceptance.
+
 ## Python runtime
 
-All active Python development, builds, tests, automation and CI use Python3.15.1.
-Create `.venv` with `uv venv --python 3.15.1 .venv`; verify
-`.venv/bin/python -V` and invoke `.venv/bin/python` explicitly. Do not use an
-older system interpreter or compatibility runner. Keep immutable historical
-evidence and deliberate synthetic version fixtures unchanged. Finish running
-operations before handing over environments. No email or external message is
-authorised for runtime migration.
+Prefer the newest qualified stable Python patch for active development, builds,
+tests, automation and CI. `.python-version` is the repository's single runtime
+selection; it currently selects Python3.15.1. A different version is allowed
+when a concrete compatibility or task requirement calls for it: choose the
+newest suitable version, record the reason and affected scope in the existing
+Conductor evidence, and qualify its actual repo-local interpreter and relevant
+dependencies/tests. Do not treat a necessary alternate as a policy failure or
+ask for extra permission.
+
+Create `.venv` from `.python-version`, verify its actual version and path, and
+invoke `.venv/bin/python` explicitly. The runtime guard checks that actual
+interpreter against the selection and still rejects system/global environments
+and prereleases. CI reads `.python-version` rather than duplicating a version
+literal. Preserve working latest-version environments and in-flight operations;
+do not downgrade or rebuild them unnecessarily. Keep immutable historical
+evidence intact. No email or external message is authorised for runtime work.

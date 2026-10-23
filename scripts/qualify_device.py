@@ -1,4 +1,4 @@
-#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
+#!/usr/bin/env -S uv run python
 """Run bounded, zero-row checks on a dedicated qualification app; clean up afterward.
 
 Requires explicit --serial. Never configures an endpoint or sync and refuses to

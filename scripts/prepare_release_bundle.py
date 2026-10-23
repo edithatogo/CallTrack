@@ -1,4 +1,4 @@
-#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
+#!/usr/bin/env -S uv run python
 """Prepare a local source/licence/notices candidate; never sign, install or publish.
 
 Requires a clean committed source, matching successful unsigned builds, freshly

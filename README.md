@@ -30,10 +30,16 @@ calendar account software controls remote sync.
 Use JDK17, Android SDK platform36/build-tools35.0.0 and the included Gradle8.13
 wrapper and Kotlin/KGP2.3.21. Set `JAVA_HOME` and `ANDROID_HOME` to those installed toolchains, then:
 
-Create the selected Python runtime with `uv venv --python 3.15.1 .venv` and
-verify `.venv/bin/python -V` before running these commands.
+Create the selected Python runtime from `.python-version` and verify the actual
+interpreter before running these commands. The current preferred selection is
+Python 3.15.1; choose another version only for a concrete compatibility or task need,
+record the reason and scope, and qualify it as described in the
+[runtime policy](conductor/python-runtime-policy.md).
 
 ```sh
+python_version="$(cat .python-version)"
+uv venv --python "$python_version" .venv
+test "$(.venv/bin/python --version)" = "Python $python_version"
 .venv/bin/python scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"
 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python scripts/verify_conductor.py

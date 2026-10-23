@@ -1,4 +1,4 @@
-#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
+#!/usr/bin/env -S uv run python
 """Prepare an isolated, traceable upstream build; reference checkout stays untouched."""
 import argparse
 import io
