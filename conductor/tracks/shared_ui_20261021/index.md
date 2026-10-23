@@ -3,6 +3,7 @@
 - [Specification](spec.md)
 - [Plan](plan.md)
 - [Verification](verification-20261024.md)
+- [Review](review-20261024.md)
 - [Metadata](metadata.json)
 - [Findings](findings.md)
 - [Decisions](decisions.md)
