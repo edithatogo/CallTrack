@@ -141,4 +141,4 @@ jobs:
           echo "a493271c137074436a133d72e9e323f91604c97e0c40555629ec39598efead54  .local/toolchain/ktfmt-0.59.jar" | sha256sum --check
           find prototypes/multiplatform-ui/src -type f -name '*.kt' -print0 | xargs -0 java -jar .local/toolchain/ktfmt-0.59.jar --kotlinlang-style --dry-run --set-exit-if-changed
       - name: Test headless desktop UI and package JAR
-        run: sh gradlew --no-daemon --console=plain -p prototypes/multiplatform-ui desktopTest jar
+        run: sh gradlew --no-daemon --console=plain -p prototypes/multiplatform-ui desktopTest desktopJar
