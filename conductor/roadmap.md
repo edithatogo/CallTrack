@@ -134,3 +134,14 @@ notes/tags/search with recovery gates, then callback/routing/time summaries as
 validated needs emerge. This is provisional ordering, not an adopted product
 commitment. Reopen after selected workflow/retention/recovery decisions and
 Track4/5 acceptance; existing parity/release work remains prior scope.
+
+## Platform feasibility refresh
+
+[Track12 PLAT-D01](archive/platform_feasibility_20261020/decisions.md) recommends ordinary
+manual/import companion scope, starting native integration experiments on macOS.
+This is a research candidate, not a committed production target. iOS26+ entitled
+default-dialer recent history is a separate conditional option with documented EU
+testing requirements and coverage starting at default-role activation. It neither
+establishes project eligibility nor universal pre-existing history. Reopen Track8/9
+only after actual native workflow/contract/packaging tests; research closure does
+not fulfill those implementation prerequisites.
