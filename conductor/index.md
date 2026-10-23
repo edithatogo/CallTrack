@@ -32,14 +32,15 @@
 
 ## Current checkpoint
 
-### Live gate refresh — 2026-10-23
+### Live gate refresh — 2026-10-24
 
-The selected private successor repository is [edithatogo/CallTrack](https://github.com/edithatogo/CallTrack).
-Its eighteen feature/research PRs are open as drafts; the [PR index](../qualification/successor-pr-series-20261023.md)
-links each stage, including the reviewed Track14 status slice. Hosted GitHub Actions jobs fail before runner allocation because
-the account billing/spending limit blocks them. This is not a passing hosted CI
-result. [Track21](tracks/python315_20261023/index.md) remains locally qualified
-on macOS and isolated Linux but open for this hosted gate.
+[edithatogo/CallTrack](https://github.com/edithatogo/CallTrack) is public and
+GitHub Actions now runs successfully. The exact unsigned `15998ba`
+candidate passed the hosted cold-Linux release workflow and its uploaded APK
+matched the recorded macOS artifact; see [Track5 hosted evidence](tracks/release_20261020/hosted-reproduction-evidence-20261024.json).
+That older candidate does not include later Track14 UI changes, so the current app
+needs a fresh release refreeze and qualification. Track21's hosted checks also
+pass; its final Conductor checkpoint remains open.
 
 [Track6](tracks/kotlin_20261020/active-migration-handoff.md) has completed the
 active Kotlin code migration and selected emulator acceptance; no further Kotlin
@@ -51,15 +52,12 @@ is unstarted with null dates and zero accepted days/hours. The user previously
 chose to retain the development identity, leaving production signing/key custody
 pending.
 
-Track14 has begun under a scoped development-only prerequisite deferral. Its first
-read-only automatic-settings status slice now uses lifecycle-bound ComposeViews;
-the Activity retains every provider, permission and action effect. Local build,
-JVM tests and APK packaging pass. The reviewed status component and its host
-Activity tests now pass on the API36 AVD; review fixed the required lifecycle
-owner and test-manifest setup. Manual logging, import, recovery and broader
-native accessibility/lifecycle acceptance remain. The [draft implementation PR](https://github.com/edithatogo/CallTrack/pull/18)
-is stacked on Track17. Tracks15–20 are still planned
-in the approved order, with iOS last.
+Track14's merged Compose work now covers automatic status, manual logging, import
+status/actions and recovery feedback presentations, while provider, permission,
+confirmation and delivery effects remain owned by Activities. Native rendered
+acceptance for the newly merged panels, remaining import/recovery controls and
+broader accessibility/lifecycle parity remain open. Tracks15–20 continue in the
+approved order, with iOS last.
 
 Tracks1–4 and research Tracks7–13 are complete, reviewed and archived. The
 [Track4 parity implementation](archive/parity_20261020/index.md) passes P01–P10 for
@@ -71,10 +69,10 @@ binding; fixtures/packages are removed and original environment restored.
 reviewed verification entries. The [independent Linux follow-up](tracks/release_20261020/linux-reproduction-qualification-20261022.md)
 qualifies9464408 on a separate native x86-64 host with fresh tools/caches, matching
 two Mac builds exactly.115 JVM tests per build and131 Python tests on both systems
-pass; the source/notices bundle is refreshed. Hosted CI is prepared; current
-execution is blocked by the account billing/spending limit before runner assignment.
-Original signing, native/platform, conveyance and operational
-requirements remain; the [isolated JDK](tracks/release_20261020/isolated-jdk-qualification-20261022.md)
+pass; the source/notices bundle is refreshed. The hosted cold-Linux workflow now
+reproduces unsigned candidate `15998ba` exactly; newer Track14 app changes require
+a fresh release refreeze. Original signing, native/platform, conveyance and
+operational requirements remain; the [isolated JDK](tracks/release_20261020/isolated-jdk-qualification-20261022.md)
 remains qualified while the original Homebrew defect is retained as history.
 [Track6 Kotlin migration](tracks/kotlin_20261020/index.md) now has36 production Kotlin files and one documented Java nullable-label
 bridge after33 active conversions and14 unreachable inherited-file removals.
