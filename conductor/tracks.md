@@ -15,7 +15,7 @@ the archived research decisions; research Tracks7–13 remain unchanged.
   *Link: [Track](tracks/release_20261020/index.md)*
 
 ---
-- [ ] **Track: Jetpack Compose Android implementation** (Track14)
+- [~] **Track: Jetpack Compose Android implementation** (Track14)
   *Link: [Track](tracks/compose_app_20261021/index.md)*
 
 ---
