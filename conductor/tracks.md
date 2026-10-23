@@ -23,7 +23,7 @@ the archived research decisions; research Tracks7–13 remain unchanged.
   *Link: [Track](tracks/shared_core_20261021/index.md)*
 
 ---
-- [ ] **Track: macOS import and calendar companion** (Track16)
+- [~] **Track: macOS import and calendar companion** (Track16)
   *Link: [Track](tracks/macos_companion_20261021/index.md)*
 
 ---

@@ -1,16 +1,24 @@
 {
   "track_id": "macos_companion_20261021",
   "type": "research-led-development",
-  "status": "new",
+  "status": "in_progress",
   "milestone": "M7-companion",
   "created_at": "2026-10-21",
-  "updated_at": "2026-10-21",
+  "updated_at": "2026-10-24",
   "depends_on": [
     "shared_core_20261021"
   ],
   "requirements": "R19, R24, R25, R26",
   "track_number": 16,
   "execution_stage": 5,
-  "implementation_status": "pending",
-  "production_adopted": false
+  "production_adopted": false,
+  "prerequisite_deferral_document": "prerequisite-deferral.md",
+  "implementation_status": "preview-parser-prototype-native-acceptance-pending",
+  "native_eventkit_accepted": false,
+  "macos_app_packaging_accepted": false,
+  "pull_request": "https://github.com/edithatogo/CallTrack/pull/20",
+  "pull_request_state": "open-draft-hosted-checks-blocked-before-runner",
+  "implementation_commit": "64935d1",
+  "review_commit": "64935d1",
+  "review_status": "preview-parser-slice-reviewed-native-acceptance-pending"
 }

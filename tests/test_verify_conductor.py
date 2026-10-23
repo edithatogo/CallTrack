@@ -135,8 +135,34 @@ class VerificationFailures(unittest.TestCase):
         macos = self.root / 'conductor/tracks/macos_companion_20261021/metadata.json'
         data = json.loads(macos.read_text())
         data['status'] = 'in_progress'
+        data.pop('prerequisite_deferral_document', None)
         macos.write_text(json.dumps(data))
         with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
+            self.run_verifier()
+
+    def test_scoped_track16_deferral_allows_only_bounded_stage5_work(self):
+        macos = self.root / 'conductor/tracks/macos_companion_20261021'
+        path = macos / 'metadata.json'
+        data = json.loads(path.read_text())
+        data['status'] = 'in_progress'
+        data['prerequisite_deferral_document'] = 'prerequisite-deferral.md'
+        path.write_text(json.dumps(data))
+        (macos / 'prerequisite-deferral.md').write_text(
+            'Synthetic bounded stage5 scope; no previous stage is resolved.'
+        )
+        self.run_verifier()
+
+        shared_ui = self.root / 'conductor/tracks/shared_ui_20261021/metadata.json'
+        data = json.loads(shared_ui.read_text())
+        data['status'] = 'in_progress'
+        shared_ui.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
+            self.run_verifier()
+
+        data = json.loads(path.read_text())
+        data['status'] = 'completed'
+        path.write_text(json.dumps(data))
+        with self.assertRaisesRegex(AssertionError, 'cannot complete the track'):
             self.run_verifier()
 
     def test_ios_can_start_after_explicit_documented_earlier_deferrals(self):
