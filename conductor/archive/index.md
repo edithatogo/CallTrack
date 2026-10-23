@@ -21,3 +21,5 @@
 - [Rust and reusable component evaluation](rust_20261020/index.md) — research completed, reviewed with provenance fix and archived2026-10-21. Signature subset passes4 golden cases/3 Rust tests; host measurement favors trial, but full Java/FFI/native packaging/product benefit unproved. Retain Kotlin/native; production Rust deferred.
 
 - [Parity and durable synchronisation](parity_20261020/index.md) — implemented, reviewed with fixes and archived2026-10-21 for the selected API36 emulator scope.110 JVM/73 host tests,89 successful native invocations plus1 expected process termination across10 suites;40 screenshot/tree pairs and final cleanup/restoration readback. Physical/cloud/release/wider-platform gates remain in the handoff.
+
+- [Python3.15 migration and qualification](../tracks/python315_20261023/index.md) — completed and reviewed 2026-10-24. Python3.15.1 is enforced for active Python paths; 152 tests pass on macOS and isolated Linux, and merged PR #31 passes hosted qualification. The repository goal and independent release tracks remain active.

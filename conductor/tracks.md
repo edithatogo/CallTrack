@@ -45,5 +45,5 @@ the archived research decisions; research Tracks7–13 remain unchanged.
 Completed tracks are retained in the [archive index](archive/index.md).
 
 ---
-- [~] **Track: Python3.15 migration and qualification** (Track21)
+- [x] **Track: Python3.15 migration and qualification** (Track21; completed and reviewed 2026-10-24)
   *Link: [Track](tracks/python315_20261023/index.md)*

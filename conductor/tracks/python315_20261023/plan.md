@@ -18,5 +18,5 @@
 
 - [x] Task9: Commit implementation to main, then verify actual HEAD, clean source, real interpreter path/version, runtime guard, full suite and Conductor; retain commit-bound evidence.
 - [x] Task10: Qualify the isolated Linux container and record the hosted runner blocker. Final Mac/Linux code revision442e680 passes152 tests; the earlier GitHub Actions dispatch was blocked before runner assignment by account billing/spending-limit state.
-- [x] Task11: Review current Python runtime requirements, public successor PR #31, hosted run results, historical receipts and integration status; update stale target/CI statements and verify affected Conductor documents. Hosted PR checks now pass; final checkpoint remains.
-- [ ] Task12: Phase checkpoint: record consolidated repo/track/index/commit/PR/actual goal status/blockers; close/archive only after full acceptance.
+- [x] Task11: Review current Python runtime requirements, public successor PR #31, hosted run results, historical receipts and integration status; update stale target/CI statements and verify affected Conductor documents. Hosted PR checks pass; Task12 records final checkpoint completion.
+- [x] Task12: Phase checkpoint: repository Python3.15.1 is enforced across active local/CI paths; 152 Mac/Linux tests and hosted PR #31 qualification pass; implementation commit256eff0e, hosted run39998333902, PR #31 merged, goal remains active for other tracks. Final review: review-final-checkpoint-20261024.md; no Track21 blockers remain.

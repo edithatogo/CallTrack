@@ -16,5 +16,8 @@ replacement goal implementation.
 The public [CallTrack repository](https://github.com/edithatogo/CallTrack) now
 executes hosted GitHub Actions. The merged Python 3.15.1 change on PR #31 passed
 its qualification workflow; see [hosted evidence](hosted-ci-evidence-20261024.json).
-The billing/spending-limit blocker is cleared. Track21 remains active only for its
-final Conductor checkpoint; this CI result does not close unrelated release gates.
+The billing/spending-limit blocker is cleared. Track21 is complete and archived
+in the [completed-track index](../../archive/index.md); unrelated release gates
+remain assigned to Track5.
+
+- [Final checkpoint review](review-final-checkpoint-20261024.md)

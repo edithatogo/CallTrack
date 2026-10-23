@@ -28,7 +28,7 @@
 
 ## Python infrastructure
 
-- [Track21 — Python3.15 migration and qualification](tracks/python315_20261023/index.md)
+- [Track21 — Python3.15 migration and qualification](tracks/python315_20261023/index.md) — completed and reviewed 2026-10-24; archived in the completed-track index.
 
 ## Current checkpoint
 
@@ -39,8 +39,8 @@ GitHub Actions now runs successfully. The exact unsigned `15998ba`
 candidate passed the hosted cold-Linux release workflow and its uploaded APK
 matched the recorded macOS artifact; see [Track5 hosted evidence](tracks/release_20261020/hosted-reproduction-evidence-20261024.json).
 That older candidate does not include later Track14 UI changes, so the current app
-needs a fresh release refreeze and qualification. Track21's hosted checks also
-pass; its final Conductor checkpoint remains open.
+needs a fresh release refreeze and qualification. Track21's Python 3.15.1 migration
+and hosted checks are complete; its final checkpoint is recorded in the archive index.
 
 [Track6](tracks/kotlin_20261020/active-migration-handoff.md) has completed the
 active Kotlin code migration and selected emulator acceptance; no further Kotlin
