@@ -15,6 +15,7 @@ cards/actions](review-20261024-recovery-cards.md). The
 [historical-import access review](review-20261024-import-access.md),
 [historical-import intro review](review-20261024-import-intro.md),
 [recovery copy review](review-20261024-recovery-copy.md),
+[settings access review](review-20261024-settings-access.md),
 [current findings](findings.md), refined [requirements](requirements.md),
 [decisions](decisions.md), prerequisite [deferral](prerequisite-deferral.md),
 [runtime/licence audit](dependency-runtime-audit.json) and

@@ -199,3 +199,24 @@ not qualify scrolling, font/RTL, screen readers or the retention action itself.
 
 **Rollback:** Restore both TextViews and remove the new host IDs. No state,
 permission, data or expiry semantics change.
+
+## D14-10: Render automatic-settings introduction and access action with Compose
+
+**Decision:** Move the automatic-settings intro and permission-access button
+to lifecycle-disposed ComposeViews, preserving the existing `auto_permissions`
+host and adding `auto_intro_panel`. Compose receives the localized intro and
+button label; only an explicit button tap dispatches the existing Activity
+`requestPermissions` call. Calendar selection, call-type filters, activation
+confirmation and scheduling remain unchanged.
+
+**Alternatives:** Keep these first-screen items in Views (rejected for the
+ordered settings-first migration); move permission checks or activation policy
+into Compose (rejected); add a dependency (unnecessary).
+
+**Promotion/removal:** Component tests verify pure text rendering and explicit
+callback behavior. API36 Activity acceptance checks both hosts and rendered
+copy without granting permissions or enabling logging. Runtime system-dialog
+grant/denial/revocation remains outside this slice.
+
+**Rollback:** Restore the TextView and Button while preserving their labels and
+permission request code; remove the intro host ID and Compose panels.

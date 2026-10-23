@@ -16,6 +16,7 @@
 | C14-12 | The historical-import permission-access action may move to Compose while runtime permission requests remain platform- and Activity-owned. | A lifecycle-disposed Compose host exposes an accessible 48 dp action and dispatches no request during composition; an explicit tap enters the existing Activity `requestPermissions` path and leaves the Android system dialog in charge of consent. |
 | C14-13 | The historical-import explanation may move to Compose without changing the Activity-selected time zone or starting import work. | The stable `import_intro_panel` renders the same localized, zone-formatted text supplied by the Activity and creates no session or provider effect. |
 | C14-14 | Recovery explanations remain read-only when moved to Compose. | Stable intro and retention-copy hosts render the existing localized resources supplied by the Activity; Compose performs no permission, ledger, calendar or retention work. |
+| C14-15 | Automatic-settings introduction and permission access can migrate independently of policy controls. | Stable Compose hosts render the localized introduction and accessible access action; only an explicit tap calls the existing Activity permission request, while destination, filters and activation remain Activity-owned. |
 
 Historical-import controls and any remaining recovery parity work stay gated on
 their own lifecycle, accessibility and behavior acceptance. Completed slices do
