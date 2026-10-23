@@ -15,6 +15,7 @@
   "implementation_status": "bounded-evidence-reconciliation; cross-platform-native-acceptance-pending",
   "implementation_commit": "57fce24",
   "reviewed_at": "2026-10-24",
+  "review_commit": "be22967",
   "review_document": "review-20261024.md",
   "review_status": "bounded-slice-reviewed-prerequisites-open",
   "draft_pr": 23,
