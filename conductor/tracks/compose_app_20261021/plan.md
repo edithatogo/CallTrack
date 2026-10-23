@@ -22,7 +22,7 @@
 - [x] Task: Migrate historical import summary and feedback to separate lifecycle-disposed ComposeViews with Compose Foundation text and polite announcements. Keep date/type inputs, destination selection, history navigation, confirmations and bounded delivery under the Activity; preserve `import_summary` and `import_feedback` IDs.
 - [x] Task: Migrate receipt recovery feedback to a lifecycle-disposed ComposeView using the existing Compose Foundation stack. Keep calendar reads, existing-effect reconciliation, suppression, reapproval confirmation and retention work under the Activity; preserve `recovery_feedback`.
 - [x] Task: Migrate bounded recovery cards, explicit check/suppress/reapprove/open-event controls, refresh/retention actions and previous/more pagination to lifecycle-disposed ComposeViews; preserve Activity-owned effects and compatibility view IDs (see [recovery cards review](review-20261024-recovery-cards.md)).
-- [x] Task: Migrate historical import history title, bounded session rows and empty state into a lifecycle-disposed ComposeView; keep query, cursors and session identity in the Activity, preserve `import_history`, and verify explicit opening on API36.
+- [x] Task: Migrate historical import history title, bounded session rows and empty state into a lifecycle-disposed ComposeView; keep query, cursors and session identity in the Activity, preserve `import_history`, and verify explicit opening on API36 (66a73b1).
 - [ ] Task: Migrate historical import and recovery screen by screen; preserve IDs, destination binding, operation ownership and saved-state semantics.
 - [ ] Task: Qualify real permission/revocation, destination disappearance, cancellation/recreation/process restore, font/RTL, TalkBack/Switch Access and no synchronization regression; remove replaced Views only after parity.
 - [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md).
@@ -39,7 +39,7 @@
 - [x] Task: Migrate historical import date and call-type filters to a lifecycle-disposed ComposeView; preserve filter IDs and Activity-saved filter values, and qualify explicit edits/toggles plus Activity recreation on API36 (see [review](review-20261024-import-filters.md)).
 - [x] Task: Qualify filter date labels, checkbox role/state, large-font visibility, RTL rendering and 48 dp touch target semantics in the Compose test harness (see [review](review-20261024-import-accessibility.md)).
 - [x] Task: Migrate the recovery empty-state message into a lifecycle-disposed ComposeView, preserving `recovery_empty` and Activity-owned query state; qualify its visibility transition and no-side-effect behavior (see [review](review-20261024-recovery-empty.md)).
-- [x] Task: Review and fix the historical import history Compose slice; qualify empty and populated panels plus explicit rendered session opening on the API36 emulator (see [review](review-20261024-import-history.md)).
+- [x] Task: Review and fix the historical import history Compose slice; qualify empty and populated panels plus explicit rendered session opening on the API36 emulator (66a73b1; see [review](review-20261024-import-history.md)).
 - [ ] Task: Perform Conductor review, apply fixes and rerun affected checks.
 - [ ] Task: Update requirements, decisions, remaining limitations and next-track inputs; retire superseded code/prototypes only after parity.
 - [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger.
