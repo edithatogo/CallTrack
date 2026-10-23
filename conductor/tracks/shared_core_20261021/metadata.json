@@ -17,5 +17,7 @@
   "review_commit": "32ae39b",
   "review_status": "bounded-slice-reviewed-macos-native-pending",
   "macos_native_accepted": false,
+  "pull_request": "https://github.com/edithatogo/CallTrack/pull/19",
+  "pull_request_state": "open-draft-hosted-checks-blocked-before-runner",
   "production_adopted": false
 }
