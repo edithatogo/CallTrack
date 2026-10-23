@@ -1,6 +1,6 @@
 # iOS companion implementation — last
 
-Track 20; execution stage 9; milestone M9. Status: pending implementation.
+Track 20; execution stage 9; milestone M9. Status: scoped readiness research only; product implementation remains pending stages 1–8.
 
 ## Objective
 
@@ -42,3 +42,7 @@ working outputs until parity/recovery. Windows/Linux are outside this sequence.
 iOS implementation is stage9 and cannot be advanced past unresolved stages1–8.
 A justified deferral must state reason, evidence, consequences and reconsideration
 trigger; it cannot turn unavailable features into supported claims.
+
+Current implementation boundary: [scoped prerequisite record](prerequisite-deferral.md).
+The [readiness report](readiness.md) refines the later implementation choices but
+does not resolve a stage-1–8 gate, adopt a dependency or authorize iOS source code.
