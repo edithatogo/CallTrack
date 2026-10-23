@@ -47,6 +47,10 @@ def run(jdk, sdk):
                'elapsed_seconds': round(time.monotonic() - start, 1)}
     (evidence / 'build-receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
     print(json.dumps({k: receipt[k] for k in ('exit_code', 'inputs_unchanged', 'elapsed_seconds')}))
+    if result.returncode:
+        print('Gradle build failed; final build log lines follow:')
+        lines = (evidence / 'build.log').read_text(errors='replace').splitlines()
+        print('\n'.join(lines[-100:]))
     return result.returncode if result.returncode else (0 if unchanged else 1)
 
 
