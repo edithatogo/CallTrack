@@ -2,8 +2,10 @@
 
 ## Dependency refresh — 2026-10-23
 
-Python3.15.1 passed all144 local helper tests and Conductor validation; the
-development interpreter file and regular qualification CI now pin3.15.1.
+Python3.15.1 passed all144 local helper tests and Conductor validation and
+remains the current preferred selection. The runtime preference is now the
+newest qualified stable version, with compatibility-based alternatives allowed
+when their reason and scope are recorded; see the current [runtime policy](python-runtime-policy.md).
 The [dependency refresh report](../qualification/dependency-refresh-20261023.md)
 records current stable Android/tool versions and isolated qualification results.
 The AGP9.3.1/Kotlin2.4.21/Gradle9.7.0 candidate stopped at138 untrusted classpath

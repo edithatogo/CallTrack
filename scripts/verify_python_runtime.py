@@ -1,11 +1,21 @@
-#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
-"""Fail closed unless the actual helper process uses the selected local runtime."""
+#!/usr/bin/env -S uv run python
+"""Require the actual helper process to match this repo's selected local runtime."""
 import json
 from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-REQUIRED = (3, 15, 1)
+
+
+def selected_version(root):
+    raw = (root / '.python-version').read_text().strip()
+    parts = raw.split('.')
+    if len(parts) != 3 or any(not part.isdigit() for part in parts):
+        raise RuntimeError('Python version manifest must select a stable X.Y.Z release')
+    version = tuple(map(int, parts))
+    if '.'.join(map(str, version)) != raw:
+        raise RuntimeError('Python version manifest must use canonical X.Y.Z form')
+    return raw, version
 
 
 def verify(root=ROOT, version=None, prefix=None, executable=None, releaselevel=None):
@@ -13,10 +23,9 @@ def verify(root=ROOT, version=None, prefix=None, executable=None, releaselevel=N
     version = tuple(sys.version_info[:3] if version is None else version)
     prefix = Path(sys.prefix if prefix is None else prefix).resolve()
     executable = Path(sys.executable if executable is None else executable).absolute()
-    if (root / '.python-version').read_text().strip() != '3.15.1':
-        raise RuntimeError('Python version manifest must select3.15.1')
-    if version != REQUIRED:
-        raise RuntimeError(f'Python3.15.1 required; actual {version}')
+    selected, required = selected_version(root)
+    if version != required:
+        raise RuntimeError(f'Python {selected} selected; actual {version}')
     releaselevel = sys.version_info.releaselevel if releaselevel is None else releaselevel
     if releaselevel != 'final':
         raise RuntimeError('A qualified final Python release is required')

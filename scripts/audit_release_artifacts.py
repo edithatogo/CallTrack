@@ -1,4 +1,4 @@
-#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
+#!/usr/bin/env -S uv run python
 """Compare runtime inventory with fresh canonical HTTPS repository downloads.
 
 Repository byte agreement and POM declarations are evidence, not legal clearance,

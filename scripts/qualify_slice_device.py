@@ -1,4 +1,4 @@
-#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
+#!/usr/bin/env -S uv run python
 """Synthetic local-calendar acceptance; no calls, personal call queries or cloud sync.
 
 Requires selected device, matching build receipt and absent test packages. On native

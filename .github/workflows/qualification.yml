@@ -21,10 +21,10 @@ jobs:
             platform: '36'
             build_tools: '35.0.0'
     steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
-          python-version: '3.15.1'
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+          python-version-file: .python-version
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
         with:
           distribution: temurin
@@ -38,7 +38,7 @@ jobs:
       - name: Add Android SDK command-line tools to PATH
         run: |
           python -m venv .venv
-          test "$(.venv/bin/python --version)" = "Python 3.15.1"
+          test "$(.venv/bin/python --version)" = "Python $(cat .python-version)"
           test -n "$ANDROID_HOME"
           sdkmanager_path="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager -print -quit)"
           test -n "$sdkmanager_path"
@@ -63,10 +63,10 @@ jobs:
   slice:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
-          python-version: '3.15.1'
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+          python-version-file: .python-version
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
         with:
           distribution: temurin
@@ -74,7 +74,7 @@ jobs:
       - name: Select repository Python runtime
         run: |
           python -m venv .venv
-          test "$(.venv/bin/python --version)" = "Python 3.15.1"
+          test "$(.venv/bin/python --version)" = "Python $(cat .python-version)"
       - name: Add Android SDK command-line tools to PATH
         run: |
           test -n "$ANDROID_HOME"
@@ -104,10 +104,10 @@ jobs:
   compose-prototype:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
-          python-version: '3.15.1'
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+          python-version-file: .python-version
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
         with:
           distribution: temurin
@@ -115,7 +115,7 @@ jobs:
       - name: Select repository Python runtime
         run: |
           python -m venv .venv
-          test "$(.venv/bin/python --version)" = "Python 3.15.1"
+          test "$(.venv/bin/python --version)" = "Python $(cat .python-version)"
       - name: Add Android SDK command-line tools to PATH
         run: |
           test -n "$ANDROID_HOME"

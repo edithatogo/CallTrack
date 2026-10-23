@@ -7,16 +7,21 @@ The current package is disposable; there is no supported public release yet.
 ## Reproduce the development build
 
 Use a fresh checkout of the exact commit being reviewed. Install the qualified Temurin17.0.21+9
-runtime, Python3.15.1 standard library and Android SDK platform36/build-tools35.0.0.
+runtime, the Python version selected by `.python-version` and Android SDK platform36/build-tools35.0.0.
 The wrapper pins Gradle8.13 and its distribution checksum; AGP is 8.13.2.
 The Kotlin implementation retains one Java nullable-label bridge and Java interop
 tests, pins Kotlin/KGP2.3.21 and targets Java8 bytecode.
-Install the selected interpreter with `uv python install 3.15.1`, then create
-`.venv` using `uv venv --python 3.15.1 .venv`. Verify `.venv/bin/python -V`.
+Read the selection with `python_version="$(cat .python-version)"`, install it
+with `uv python install "$python_version"`, then create `.venv` using
+`uv venv --python "$python_version" .venv`. Verify `.venv/bin/python -V` and run
+`uv run scripts/verify_python_runtime.py`.
 No third-party Python packages are needed for the helper/test suite. All active
-qualification workflows, including cold Linux reproduction, pin Python3.15.1
-and create a local virtual environment. Historical receipts retain their original
-interpreter. See the [dependency refresh](qualification/dependency-refresh-20261023.md)
+qualification workflows, including cold Linux reproduction, read `.python-version`
+and create a local virtual environment. Python3.15.1 is the currently qualified
+default; another stable version may be selected for a specific compatibility or
+task need and must be qualified against the relevant behavior. Historical receipts retain their original
+interpreter. See the [runtime policy](conductor/python-runtime-policy.md) and
+[dependency refresh](qualification/dependency-refresh-20261023.md)
 for isolated Android upgrade blockers; the qualified APK remains unchanged.
 
 Set JAVA_HOME and ANDROID_HOME to those installations. SDK licences must be accepted

@@ -1,4 +1,4 @@
-#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
+#!/usr/bin/env -S uv run python
 """Private-state development APK replacement on the authorised dedicated emulator.
 
 No version-increase, production-signing, provider, cloud or physical-device proof.

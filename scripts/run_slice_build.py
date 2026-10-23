@@ -1,4 +1,4 @@
-#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
+#!/usr/bin/env -S uv run python
 """Build/test the root development slice and bind native acceptance to exact inputs/APKs."""
 import argparse
 import hashlib
