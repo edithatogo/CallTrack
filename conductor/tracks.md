@@ -35,7 +35,7 @@ the archived research decisions; research Tracks7–13 remain unchanged.
   *Link: [Track](tracks/rust_component_20261021/index.md)*
 
 ---
-- [ ] **Track: Consolidated Android and macOS qualification** (Track19)
+- [~] **Track: Consolidated Android and macOS qualification** (Track19)
   *Link: [Track](tracks/cross_platform_20261021/index.md)*
 
 ---
