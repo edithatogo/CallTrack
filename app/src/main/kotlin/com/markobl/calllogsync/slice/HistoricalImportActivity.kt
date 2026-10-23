@@ -18,7 +18,9 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Collections
+import java.util.HashMap
 import java.util.TimeZone
+import java.util.UUID
 import java.util.concurrent.Executors
 
 /** Foreground bounded runs; opening/resuming never confirms historical delivery. */
@@ -36,7 +38,8 @@ class HistoricalImportActivity : ComponentActivity() {
     private var feedback: ComposeView? = null
     private var summaryText by mutableStateOf("")
     private var feedbackText by mutableStateOf("")
-    private var history: LinearLayout? = null
+    private var historyState by mutableStateOf(HistoricalImportHistoryUiState())
+    private val historyTargets = HashMap<String, String>()
     private var choices: List<AndroidCalendarSink.Choice> = Collections.emptyList()
     private var selected = -1L
     private var historyCursor = -1L
@@ -192,13 +195,22 @@ class HistoricalImportActivity : ComponentActivity() {
                 setContent { HistoricalImportFeedbackText(feedbackText) }
             }
         layout.addView(feedback)
-        val historyLabel = TextView(this)
-        historyLabel.setText(R.string.import_history)
-        layout.addView(historyLabel)
-        history = LinearLayout(this)
-        history!!.orientation = LinearLayout.VERTICAL
-        history!!.id = R.id.import_history
-        layout.addView(history)
+        val historyPanel =
+            ComposeView(this).apply {
+                id = R.id.import_history
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    HistoricalImportHistoryPanel(
+                        state = historyState,
+                        title = stringResource(R.string.import_history),
+                        emptyMessage = stringResource(R.string.import_empty_history),
+                        onOpen = ::openHistorySession,
+                    )
+                }
+            }
+        layout.addView(historyPanel)
         val historyNavigation =
             ComposeView(this).apply {
                 setViewCompositionStrategy(
@@ -532,26 +544,30 @@ class HistoricalImportActivity : ComponentActivity() {
                     runOnUiThread {
                         if (isDestroyed) return@runOnUiThread
                         historyCursor = before
-                        history!!.removeAllViews()
                         val size = minOf(10, records.size)
-                        for (i in 0 until size) {
-                            val item = records[i].session!!
-                            val open = Button(this)
-                            open.text =
-                                getString(
-                                    R.string.import_history_item,
-                                    dates(item),
-                                    getString(phaseLabel(item.phase)),
+                        historyTargets.clear()
+                        val items =
+                            (0 until size).map { index ->
+                                val item = records[index].session!!
+                                val token = UUID.randomUUID().toString()
+                                historyTargets[token] = item.id
+                                HistoricalImportHistoryItem(
+                                    token = token,
+                                    label =
+                                        getString(
+                                            R.string.import_history_item,
+                                            dates(item),
+                                            getString(phaseLabel(item.phase)),
+                                        ),
                                 )
-                            open.setOnClickListener { loadSession(item.id) }
-                            history!!.addView(open)
+                            }
+                        historyState = HistoricalImportHistoryUiState(items)
+                        if (size > 0) {
+                            val lastVisible = records[size - 1]
+                            nextHistoryCursor = if (records.size > size) lastVisible.cursor else -1
+                        } else {
+                            nextHistoryCursor = -1
                         }
-                        if (size == 0) {
-                            val empty = TextView(this)
-                            empty.setText(R.string.import_empty_history)
-                            history!!.addView(empty)
-                        }
-                        nextHistoryCursor = if (records.size > 10) records[9].cursor else -1
                         buttons()
                     }
                 }
@@ -559,6 +575,11 @@ class HistoricalImportActivity : ComponentActivity() {
                 showFailure()
             }
         }
+    }
+
+    private fun openHistorySession(token: String) {
+        val id = historyTargets[token] ?: return
+        loadSession(id)
     }
 
     private fun showFailure() {

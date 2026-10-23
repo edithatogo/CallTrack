@@ -86,3 +86,28 @@ Activity boundary until broader UI and provider acceptance pass.
 
 **Rollback:** Restore the `TextView` and its visibility update; no persisted
 state, schema or calendar behavior changes.
+
+## D14-5: Render historical import session history with Compose
+
+**Decision:** Replace the import-history title, bounded session rows and empty
+message with one lifecycle-disposed `ComposeView` that retains the
+`import_history` ID. The Activity continues querying `SqliteImportStore`,
+formatting localized labels, maintaining pagination cursors and owning session
+IDs. Each rendered row receives an opaque per-query token; the Activity maps a
+current token back to a session ID and ignores stale tokens. Opening a row still
+uses the existing `loadSession` path and never confirms or resumes delivery.
+
+**Alternatives:** Keep the history list native (no presentation parity); pass
+session IDs into Compose (unneeded identity exposure); move database reads,
+cursor rules or resume behavior into a composable (rejected); change import
+schema or session ordering (out of scope).
+
+**Promotion/removal:** This is a presentation-only migration. Retain the
+`import_history` host ID, SQLite schema and Activity-owned query/resume logic.
+History component tests and an API36 rendered Activity test cover empty state,
+ordered rows and explicit row opening; broader permissions, lifecycle and OS
+acceptance remain open.
+
+**Rollback:** Restore the existing `TextView`/`LinearLayout` history rendering
+and row listeners. No session, candidate, receipt or calendar data migration is
+required.

@@ -57,6 +57,34 @@ tests. This completes the remaining native presentation inside the recovery
 list; recovery intro and permission prompts stay Activity/native-owned. See
 [the recovery empty-state review](review-20261024-recovery-empty.md).
 
+## Historical import session history Compose slice — 2026-10-24
+
+The history heading, at most ten session buttons and localized empty message
+now render in a lifecycle-disposed `ComposeView` retaining `import_history`.
+The Activity still queries `SqliteImportStore`, decides the page/cursor,
+formats labels and maps random per-query UI tokens back to session IDs. Stale
+tokens are ignored, and the existing `loadSession` path remains the only resume
+action. Rendering a row does not read or write provider data, confirm an import
+or resume delivery.
+
+The API36 `calltrack-track14-api36` emulator run used the qualified JDK
+17.0.21+9 and SDK36. The focused command
+`:app:testDebugUnitTest :app:lintDebug :app:compileDebugAndroidTestKotlin
+:app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.markobl.calllogsync.slice.HistoricalImportHistoryPanelTest,com.markobl.calllogsync.slice.HistoricalImportHistoryActivityTest,com.markobl.calllogsync.slice.AutomaticSettingsTest`
+passed. All six selected instrumentation tests passed, including empty and
+populated panel behavior, an actual rendered history-row touch that loads one
+synthetic SQLite session, and the Activity empty-host assertion. JVM tests,
+lint, Android-test Kotlin/Java compilation, ktfmt0.59, google-java-format1.24.0
+AOSP mode and `git diff --check` passed.
+
+The fixture-backed `ImportUiTest` was also invoked without its required
+`fixtureToken` and calendar permission setup; it failed before fixture setup
+and is not counted as acceptance. The new standalone history Activity test
+uses a synthetic database session and no CallLog/calendar permissions. Wider
+font/RTL, TalkBack/Switch Access, permission/revocation, process restoration,
+other Android versions, full provider journeys and release acceptance remain
+open. See [the import history review](review-20261024-import-history.md).
+
 ## Change
 
 The automatic settings screen now renders its four read-only state/counts/action

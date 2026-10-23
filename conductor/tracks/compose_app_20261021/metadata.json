@@ -13,6 +13,6 @@
   "track_number": 14,
   "execution_stage": 3,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
-  "implementation_status": "automatic-status-and-recovery-cards-and-empty-state-api36-qualified; import-date-and-type-filters-api36-compose-activity-recreation-large-font-rtl-semantics-qualified; manual-log-and-import-status-panels-implemented; remaining-live-accessibility-permission-lifecycle-and-os-matrix-pending",
+  "implementation_status": "automatic-status-and-recovery-cards-and-empty-state-api36-qualified; import-date-and-type-filters-api36-compose-activity-recreation-large-font-rtl-semantics-qualified; import-history-api36-rendered-explicit-resume-qualified; manual-log-and-import-status-panels-implemented; remaining-live-accessibility-permission-lifecycle-and-os-matrix-pending",
   "production_adopted": false
 }

@@ -10,6 +10,7 @@ incremental reviews cover [manual logging](review-20261024-manual-logging.md),
 [historical-import status](review-20261024-import-status.md), [recovery
 feedback](review-20261024-recovery-status.md) and [recovery
 cards/actions](review-20261024-recovery-cards.md). The
+[historical-import history review](review-20261024-import-history.md),
 [current findings](findings.md), refined [requirements](requirements.md),
 [decisions](decisions.md), prerequisite [deferral](prerequisite-deferral.md),
 [runtime/licence audit](dependency-runtime-audit.json) and
