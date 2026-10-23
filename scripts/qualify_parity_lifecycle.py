@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
 """Dedicated-emulator launcher, reboot, offline and Doze recovery acceptance.
 
 Requires selected device, matching build receipt and absent test packages. On native

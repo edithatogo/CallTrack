@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
 """Retired Java-only retained-class fallback; use qualified mixed Kotlin/Java Gradle tests."""
 from pathlib import Path
 
