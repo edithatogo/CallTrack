@@ -43,7 +43,7 @@ track's scope; use a separately authorised execution after these gates pass.
 After committing the source, run:
 
 ```sh
-python3 scripts/qualify_release_build.py --output .local/release-evidence/UNIQUE-RUN \
+.venv/bin/python scripts/qualify_release_build.py --output .local/release-evidence/UNIQUE-RUN \
   --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"
 ```
 
@@ -61,7 +61,7 @@ development identity remains unchanged.
 ## Local development upgrade probe
 
 ```sh
-python3 scripts/qualify_release_upgrade.py --serial emulator-5582 \
+.venv/bin/python scripts/qualify_release_upgrade.py --serial emulator-5582 \
   --output "$PWD/.local/release-evidence/UNIQUE-UPGRADE-RUN"
 ```
 
@@ -85,7 +85,7 @@ full matrix below before supported release acceptance.
 ## Local runtime repository and asset audit
 
 ```sh
-python3 scripts/audit_release_artifacts.py \
+.venv/bin/python scripts/audit_release_artifacts.py \
   --inventory conductor/tracks/kotlin_20261020/runtime-artifacts-20261021.json \
   --output .local/release-evidence/UNIQUE-RUNTIME-AUDIT
 ```
@@ -208,11 +208,11 @@ The new development label does not choose a permanent release identity.
 After freezing the source and completing matching unsigned builds:
 
 ```sh
-python3 scripts/prepare_release_bundle.py --fetch-sources .local/release-source-cache
+.venv/bin/python scripts/prepare_release_bundle.py --fetch-sources .local/release-source-cache
 CALLTRACK_RUNTIME_OUT="$PWD/.local/release-runtime.json" \
   sh gradlew --no-daemon --console=plain \
   -I qualification/release/runtime-inventory.init.gradle releaseBundleRuntimeInventory
-python3 scripts/prepare_release_bundle.py --output .local/release-evidence/UNIQUE-SOURCE-BUNDLE \
+.venv/bin/python scripts/prepare_release_bundle.py --output .local/release-evidence/UNIQUE-SOURCE-BUNDLE \
   --build-receipt .local/release-evidence/MATCHING-BUILDS/receipt.json \
   --runtime-inventory .local/release-runtime.json --source-cache .local/release-source-cache
 ```

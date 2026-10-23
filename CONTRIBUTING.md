@@ -6,18 +6,26 @@ The current package is disposable; there is no supported public release yet.
 
 ## Reproduce the development build
 
-Use a fresh checkout of the exact commit being reviewed. Install an OpenJDK17
-runtime, Python3 standard library and Android SDK platform36/build-tools35.0.0.
+Use a fresh checkout of the exact commit being reviewed. Install the qualified Temurin17.0.21+9
+runtime, Python3.15.1 standard library and Android SDK platform36/build-tools35.0.0.
 The wrapper pins Gradle8.13 and its distribution checksum; AGP is 8.13.2.
 The Kotlin implementation retains one Java nullable-label bridge and Java interop
 tests, pins Kotlin/KGP2.3.21 and targets Java8 bytecode.
+Install the selected interpreter with `uv python install 3.15.1`, then create
+`.venv` using `uv venv --python 3.15.1 .venv`. Verify `.venv/bin/python -V`.
+No third-party Python packages are needed for the helper/test suite. All active
+qualification workflows, including cold Linux reproduction, pin Python3.15.1
+and create a local virtual environment. Historical receipts retain their original
+interpreter. See the [dependency refresh](qualification/dependency-refresh-20261023.md)
+for isolated Android upgrade blockers; the qualified APK remains unchanged.
+
 Set JAVA_HOME and ANDROID_HOME to those installations. SDK licences must be accepted
 by the person operating the build environment. Run from the repository root:
 
 ```sh
-python3 scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"
-python3 -m unittest discover -s tests -v
-python3 scripts/verify_conductor.py
+.venv/bin/python scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"
+.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python scripts/verify_conductor.py
 ```
 
 No private APK or reference checkout is needed for the root build. Private-source
@@ -47,7 +55,7 @@ The CI workflow is configured, but no hosted run has been observed in this proje
 For the dedicated parity emulator, use the source-bound build followed by:
 
 ```sh
-python3 scripts/qualify_parity_emulator.py --serial emulator-5582
+.venv/bin/python scripts/qualify_parity_emulator.py --serial emulator-5582
 ```
 
 This requires the exact dedicated AVD described in Track4, and refuses physical or
@@ -76,7 +84,7 @@ these instructions do not submit anything automatically.
 
 The [standalone synthetic prototype](prototypes/compose/README.md) is not part of
 the root app dependency graph. Its optional build uses
-`python3 scripts/qualify_compose_prototype.py build --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"`.
+`.venv/bin/python scripts/qualify_compose_prototype.py build --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"`.
 Device mode accepts only the dedicated emulator; it installs a separate no-data
 fixture app and verifies cleanup. It is not a way to try Compose against personal
 calls/calendars. Production UI adoption remains a separate behavioural/accessibility

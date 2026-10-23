@@ -22,7 +22,15 @@ jobs:
       - name: Install Linux prerequisites
         run: |
           apt-get update
-          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends python3 git unzip ca-certificates
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends git unzip ca-certificates
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.15.1'
+      - name: Select repository Python runtime
+        run: |
+          python -m venv .venv
+          .venv/bin/python -c "import sys; assert sys.version_info[:3] == (3, 15, 1), sys.version"
+          echo "CALLTRACK_PYTHON=$GITHUB_WORKSPACE/.venv/bin/python" >> "$GITHUB_ENV"
       - name: Checkout qualification tooling
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -39,14 +47,14 @@ jobs:
       - name: Verify tooling and Conductor
         working-directory: qualification-tools
         run: |
-          python3 -m unittest discover -s tests -v
-          python3 scripts/verify_conductor.py
+          "$CALLTRACK_PYTHON" -m unittest discover -s tests -v
+          "$CALLTRACK_PYTHON" scripts/verify_conductor.py
       - name: Build with fresh SDK and Gradle home
         env:
           CANDIDATE_SHA: ${{ inputs.candidate_sha }}
           EXPECTED_APK_SHA256: ${{ inputs.expected_apk_sha256 }}
         run: |
-          python3 qualification-tools/scripts/qualify_linux_build.py \
+          "$CALLTRACK_PYTHON" qualification-tools/scripts/qualify_linux_build.py \
             --source "$GITHUB_WORKSPACE/candidate" \
             --output "$RUNNER_TEMP/calltrack-cold-linux" \
             --expected-revision "$CANDIDATE_SHA" \

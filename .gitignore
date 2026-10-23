@@ -15,3 +15,6 @@ local.properties
 
 # Kotlin compiler project state
 .kotlin/
+
+# Task-local Python development environment
+.venv/

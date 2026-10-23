@@ -22,14 +22,15 @@ prerequisite; tools and keys are not committed.
 
 ## Build
 
-Run from repository root with Python3.12+ and Git installed:
+Run from repository root with Python3.15.1 and Git installed. Use
+`uv venv --python 3.15.1 .venv` and `source .venv/bin/activate` first:
 
 ```sh
-python3 scripts/bootstrap_qualification.py
-python3 scripts/prepare_qualification.py --modern
-python3 scripts/run_qualification.py --variant modern --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME" --clean
-python3 -m unittest discover -s tests -v
-python3 scripts/verify_conductor.py
+.venv/bin/python scripts/bootstrap_qualification.py
+.venv/bin/python scripts/prepare_qualification.py --modern
+.venv/bin/python scripts/run_qualification.py --variant modern --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME" --clean
+.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python scripts/verify_conductor.py
 ```
 
 Preparation deliberately refuses to overwrite an existing copy. Reuse that copy
@@ -55,7 +56,7 @@ No call data, contacts or calendar records are collected. The ADB path does not
 establish normal user-consent UX or store eligibility.
 
 ```sh
-python3 scripts/qualify_device.py --serial YOUR_AUTHORISED_DEVICE_SERIAL
+.venv/bin/python scripts/qualify_device.py --serial YOUR_AUTHORISED_DEVICE_SERIAL
 ```
 
 The harness uses the project's local SDK build-tools35.0.0/aapt for identity checks.
@@ -100,10 +101,10 @@ fixture cleanup and package absence. They preserve cleanup code if external fixt
 removal cannot be verified. Inspect the saved receipt before retrying a failure.
 
 ```sh
-python3 scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk .local/android-sdk
-python3 scripts/qualify_parity_emulator.py --serial emulator-5580
-python3 scripts/qualify_parity_provider.py --serial emulator-5580
-python3 scripts/qualify_parity_worker.py --serial emulator-5580
+.venv/bin/python scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk .local/android-sdk
+.venv/bin/python scripts/qualify_parity_emulator.py --serial emulator-5580
+.venv/bin/python scripts/qualify_parity_provider.py --serial emulator-5580
+.venv/bin/python scripts/qualify_parity_worker.py --serial emulator-5580
 ```
 
 Use the currently verified dedicated emulator serial if it changes. The store suite
@@ -122,7 +123,7 @@ actual process termination between provider insertion and ID persistence, a gues
 reboot, local offline delivery and deferred Doze recovery:
 
 ```sh
-python3 scripts/qualify_parity_lifecycle.py --serial emulator-5580
+.venv/bin/python scripts/qualify_parity_lifecycle.py --serial emulator-5580
 ```
 
 It requires a qualified initial emulator power/network snapshot and refuses existing
@@ -152,7 +153,7 @@ performed by the retired command.
 
 ### Development package replacement fixture
 
-`python3 scripts/qualify_kotlin_update.py --serial emulator-5582` verifies a
+`.venv/bin/python scripts/qualify_kotlin_update.py --serial emulator-5582` verifies a
 same-version, same-debug-key development replacement with private synthetic state.
 It requires absent packages, a verified dedicated guest, a retained Java baseline
 source/APK receipt at commitc7c3d91 and a current source-bound app/test build. It
@@ -182,7 +183,7 @@ fresh writable files, with the original guest/storage left untouched. Recovery
 identity/config evidence is saved in `.local/parity-evidence/recovery-avd-identity.json`.
 
 For the isolated source-identity preferences fault suite, use
-`python3 scripts/qualify_parity_emulator.py --serial emulator-5582 --suite source-identity`.
+`.venv/bin/python scripts/qualify_parity_emulator.py --serial emulator-5582 --suite source-identity`.
 It runs three methods in separate instrumentation processes and writes
 `.local/parity-evidence/source-identity-device-receipt.json`; the default store suite
 continues to write its own store receipt. False/thrown identity outcomes deliberately
@@ -190,7 +191,7 @@ latch for the app process, so this suite must not be collapsed into one shared p
 
 ### Protected emulator call-end acceptance
 
-Run `python3 scripts/qualify_parity_telephony.py --serial emulator-5582` only on the
+Run `.venv/bin/python scripts/qualify_parity_telephony.py --serial emulator-5582` only on the
 qualified dedicated guest with matching build/APKs and absent fixture packages.
 It requires an empty source provider and idle Android radio, creates one fictional
 incoming call, observes actual Android RINGING/IDLE and a background event/status
@@ -204,7 +205,7 @@ existing calls and unrelated AVDs are refused; this tests no outgoing real calls
 
 ### Rendered settings acceptance
 
-Run `python3 scripts/qualify_parity_ui.py --serial emulator-5582` against the matching
+Run `.venv/bin/python scripts/qualify_parity_ui.py --serial emulator-5582` against the matching
 build and dedicated guest. Native tests use visible accessibility selectors and
 injected touch events, wait for permission-dialog progression, and verify committed
 settings/provider effects. This is separate from constructing or testing controllers.
@@ -237,9 +238,9 @@ default receipt. Core harnesses use fixed receipt files and must run serially.
 UI runs may use unique new receipt directories:
 
 ```sh
-python3 scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk .local/android-sdk
-python3 scripts/qualify_parity_ui.py --serial emulator-5584 --suite accessibility --receipt-dir .local/matrix-new/api33-accessibility
-python3 scripts/qualify_release_upgrade.py --serial emulator-5584 --provider-schema --output .local/matrix-new/api33-upgrade
+.venv/bin/python scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk .local/android-sdk
+.venv/bin/python scripts/qualify_parity_ui.py --serial emulator-5584 --suite accessibility --receipt-dir .local/matrix-new/api33-accessibility
+.venv/bin/python scripts/qualify_release_upgrade.py --serial emulator-5584 --provider-schema --output .local/matrix-new/api33-upgrade
 ```
 
 Accessibility checks cover four rendered screens, labels,48dp targets, scroll

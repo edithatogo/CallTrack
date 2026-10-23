@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
 """Dedicated-emulator durable CalendarContract/SQLite acceptance with synthetic sources.
 
 Requires selected device, matching build receipt and absent test packages. On native

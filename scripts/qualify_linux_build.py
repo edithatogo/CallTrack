@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
 """Cold Linux release reproduction; no signing, device access or shared build cache.
 
 Run in an isolated Linux guest/container or hosted runner. The SDK/JDK licensing

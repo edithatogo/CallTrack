@@ -1,5 +1,16 @@
 # Technology stack and decision status
 
+## Dependency refresh — 2026-10-23
+
+Python3.15.1 passed all144 local helper tests and Conductor validation; the
+development interpreter file and regular qualification CI now pin3.15.1.
+The [dependency refresh report](../qualification/dependency-refresh-20261023.md)
+records current stable Android/tool versions and isolated qualification results.
+The AGP9.3.1/Kotlin2.4.21/Gradle9.7.0 candidate stopped at138 untrusted classpath
+artifacts under strict verification. The JDK17.0.21+9 patch passed115 JVM tests, APK builds and lint in isolation;
+regular modern CI selects that patch. Root Android dependency pins and the frozen
+release APK remain unchanged. Newer versions are not promoted by this audit.
+
 ## Observed baseline
 
 Reference only: AndroidCallLogSync is Java/XML, AndroidX/View Binding/WorkManager, target SDK 32, AGP 7.2.2 at the pinned revision in the [audit](research/baseline-audit.md). Track 3 adopts the audited fork into the root app workspace with the qualified modern build configuration. These versions are not endorsed for the successor.

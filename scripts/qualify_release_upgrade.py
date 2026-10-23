@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --python 3.15.1 --no-project python
 """Version-increasing, existing-debug-key release-mode probe on the dedicated emulator.
 
 Default scope is private state only; --provider-schema adds explicit synthetic LOCAL
