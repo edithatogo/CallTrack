@@ -1,6 +1,8 @@
 # Compose Multiplatform Android and macOS UI
 
-Track 17; execution stage 6; milestone M8. Status: pending implementation.
+Track 17; execution stage 6; milestone M8. Status: bounded prototype in progress;
+native Android/macOS integration and acceptance remain pending under a scoped
+prerequisite deferral.
 
 ## Objective
 
