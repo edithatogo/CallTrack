@@ -17,5 +17,9 @@
   "reviewed_at": "2026-10-24",
   "review_document": "review-20261024.md",
   "review_status": "bounded-slice-reviewed-prerequisites-open",
+  "draft_pr": 23,
+  "draft_pr_url": "https://github.com/edithatogo/CallTrack/pull/23",
+  "draft_pr_base": "codex/track18-rust-evaluation",
+  "draft_pr_hosted_ci": "failed-before-job-steps-no-logs",
   "production_adopted": false
 }
