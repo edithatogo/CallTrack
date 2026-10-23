@@ -111,8 +111,7 @@ public class AutomaticSettingsTest {
             ui.await(
                     () -> ui.shown("recovery_empty_message", true) != null,
                     "Recovery empty state did not render after the query");
-            assertTrue(
-                    activity.findViewById(R.id.recovery_empty) instanceof ComposeView);
+            assertTrue(activity.findViewById(R.id.recovery_empty) instanceof ComposeView);
             assertEquals(
                     context.getString(R.string.recovery_empty),
                     ui.shown("recovery_empty_message", true).getText().toString());
