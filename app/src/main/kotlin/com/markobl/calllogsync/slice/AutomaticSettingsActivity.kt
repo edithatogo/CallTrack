@@ -10,6 +10,9 @@ import android.widget.*
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -50,9 +53,6 @@ internal fun AutomaticStatusPanel(state: AutomaticStatusUiState) {
 class AutomaticSettingsActivity : ComponentActivity() {
     private val executor = Executors.newSingleThreadExecutor()
     private var destination: Spinner? = null
-    private var incoming: CheckBox? = null
-    private var outgoing: CheckBox? = null
-    private var missed: CheckBox? = null
     private var enable: Button? = null
     private var pause: Button? = null
     private var statePanel: ComposeView? = null
@@ -70,9 +70,17 @@ class AutomaticSettingsActivity : ComponentActivity() {
     private var initialised = false
     private var reloadRequested = false
     private var reloadReconcile = false
+    private var callTypesState by mutableStateOf(AutomaticCallTypesUiState())
+    private var callTypesEnabled by mutableStateOf(true)
 
     public override fun onCreate(saved: Bundle?) {
         super.onCreate(saved)
+        callTypesState =
+            AutomaticCallTypesUiState(
+                incoming = saved?.getBoolean(STATE_INCOMING, true) ?: true,
+                outgoing = saved?.getBoolean(STATE_OUTGOING, true) ?: true,
+                missed = saved?.getBoolean(STATE_MISSED, true) ?: true,
+            )
         val layout = LinearLayout(this)
         layout.orientation = LinearLayout.VERTICAL
         val pad = (16 * resources.displayMetrics.density).toInt()
@@ -139,9 +147,27 @@ class AutomaticSettingsActivity : ComponentActivity() {
                     buttons()
                 }
             }
-        incoming = check(layout, R.string.auto_incoming, R.id.auto_incoming)
-        outgoing = check(layout, R.string.auto_outgoing, R.id.auto_outgoing)
-        missed = check(layout, R.string.auto_missed, R.id.auto_missed)
+        val callTypes =
+            ComposeView(this).apply {
+                id = R.id.auto_call_types
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    AutomaticCallTypesPanel(
+                        state = callTypesState,
+                        incomingLabel = getString(R.string.auto_incoming),
+                        outgoingLabel = getString(R.string.auto_outgoing),
+                        missedLabel = getString(R.string.auto_missed),
+                        enabled = callTypesEnabled,
+                        onStateChange = {
+                            callTypesState = it
+                            buttons()
+                        },
+                    )
+                }
+            }
+        layout.addView(callTypes)
         enable = Button(this)
         enable!!.id = R.id.auto_enable
         enable!!.setText(R.string.auto_enable)
@@ -182,16 +208,6 @@ class AutomaticSettingsActivity : ComponentActivity() {
         buttons()
     }
 
-    private fun check(layout: LinearLayout, text: Int, id: Int): CheckBox {
-        val box = CheckBox(this)
-        box.id = id
-        box.setText(text)
-        box.isChecked = true
-        layout.addView(box)
-        box.setOnCheckedChangeListener { _, _ -> buttons() }
-        return box
-    }
-
     public override fun onResume() {
         super.onResume()
         load(true)
@@ -213,20 +229,18 @@ class AutomaticSettingsActivity : ComponentActivity() {
                     selected >= 0 &&
                     calendarAccess() &&
                     callAccess() &&
-                    (incoming!!.isChecked || outgoing!!.isChecked || missed!!.isChecked)
+                    (callTypesState.incoming || callTypesState.outgoing || callTypesState.missed)
         pause?.isEnabled = !busy
         destination?.isEnabled = !busy && calendarAccess()
-        incoming?.isEnabled = !busy
-        outgoing?.isEnabled = !busy
-        missed?.isEnabled = !busy
+        callTypesEnabled = !busy
     }
 
     private fun confirmEnable() {
         if (selected < 0 || busy) return
         val calendar = selected
-        val inCalls = incoming!!.isChecked
-        val outCalls = outgoing!!.isChecked
-        val missedCalls = missed!!.isChecked
+        val inCalls = callTypesState.incoming
+        val outCalls = callTypesState.outgoing
+        val missedCalls = callTypesState.missed
         AlertDialog.Builder(this)
             .setTitle(R.string.auto_enable)
             .setMessage(R.string.auto_confirm)
@@ -396,6 +410,13 @@ class AutomaticSettingsActivity : ComponentActivity() {
             parent.addView(this)
         }
 
+    public override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(STATE_INCOMING, callTypesState.incoming)
+        outState.putBoolean(STATE_OUTGOING, callTypesState.outgoing)
+        outState.putBoolean(STATE_MISSED, callTypesState.missed)
+        super.onSaveInstanceState(outState)
+    }
+
     private fun renderStatus() {
         statePanel?.setContent { AutomaticStatusLine(stateText, "auto_state", true) }
         countsPanel?.setContent { AutomaticStatusLine(countsText, "auto_counts") }
@@ -417,5 +438,11 @@ class AutomaticSettingsActivity : ComponentActivity() {
     public override fun onDestroy() {
         executor.shutdown()
         super.onDestroy()
+    }
+
+    private companion object {
+        const val STATE_INCOMING = "automatic-call-types-incoming"
+        const val STATE_OUTGOING = "automatic-call-types-outgoing"
+        const val STATE_MISSED = "automatic-call-types-missed"
     }
 }
