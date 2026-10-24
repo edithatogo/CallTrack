@@ -71,7 +71,13 @@ The native compiler's separate LLVM archive matches its published SHA-256 sideca
 
 Added `.github/workflows/shared-core-native.yml`, scoped to shared-core/build configuration changes and manual dispatch. It selects the public `macos-15` ARM64 runner, Temurin 17.0.20+101, and the currently listed Xcode 26.1.1 (build 17B100), verifies Android SDK36/build-tools35 are present, and runs `:shared-core:macosArm64Test`. The workflow requires generated JUnit XML. The current hosted image manifest lists this Xcode, Android SDK and ARM64 runner; see [runner image manifest](https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md) and [GitHub-hosted runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).
 
-This is a CI mechanism, not native acceptance evidence. The workflow has not yet run; the test result, actual toolchain compatibility, test count and artifacts remain pending. `macos_native_accepted=false` and the Track 15 milestone remains open until an observed successful hosted run and its outputs are reviewed.
+At preparation time this was only a CI mechanism, with native acceptance still pending. The actual hosted result and reviewed test report are recorded below.
+
+## Hosted Kotlin/Native acceptance — 2026-10-24
+
+The pull-request workflow completed successfully on commit `58341ddbf2878c2f2040862b38eed6c44b2246d3`: [GitHub Actions run 40083986461](https://github.com/edithatogo/CallTrack/actions/runs/40083986461). It ran on GitHub's `macos-15-arm64` image (macOS 15.7.9, image `20260907.0337.1`), selected Xcode 26.1.1 / build `17B100`, and used Temurin 17.0.20.1+1. The workflow verified Android platform 36 and build-tools 35.0.0, then ran `:shared-core:macosArm64Test` successfully (6 Gradle tasks executed; 3 fixture tests). The exact JUnit report records `tests=3`, `skipped=0`, `failures=0`, `errors=0` for `CallSelectionRulesTest`.
+
+This proves the bounded common call-selection and timestamp-range fixtures run on Kotlin/Native ARM64 with the selected hosted toolchain. It does not prove UI, Apple provider, Android device, calendar, release, or operational behavior. Track 15 remains in progress for its broader cross-target artifact/compatibility review and prerequisite sequencing; production adoption remains false.
 
 
 ## Local verification after compiler checksum update — 2026-10-24

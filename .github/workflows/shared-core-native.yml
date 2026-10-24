@@ -51,7 +51,13 @@ jobs:
             reports=$(find "$result_dir" -type f -name '*.xml' -print)
             test -n "$reports" || { echo 'No Kotlin/Native JUnit XML report was produced.'; exit 1; }
             printf '%s\n' "$reports"
-            find "$result_dir" -type f -name '*.xml' -exec grep -h '<testsuite' {} +
+            summaries=$(find "$result_dir" -type f -name '*.xml' -exec grep -h '<testsuite' {} +)
+            printf '%s\n' "$summaries"
+            printf '%s\n' "$summaries" | grep -Eq 'tests="[1-9][0-9]*"' || { echo 'JUnit reports contain no executed tests.'; exit 1; }
+            if printf '%s\n' "$summaries" | grep -Eq '(skipped|failures|errors)="[1-9][0-9]*"'; then
+              echo 'Kotlin/Native JUnit reports contain skipped or failing tests.'
+              exit 1
+            fi
           else
             echo 'Kotlin/Native test report directory was not produced.'
             exit 1

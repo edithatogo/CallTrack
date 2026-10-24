@@ -34,4 +34,4 @@
 
 ## Phase: Hosted macOS Kotlin/Native acceptance (2026-10-24)
 - [x] Task: Add a path-scoped public GitHub Actions job selecting an explicit macOS ARM64 runner, JDK and Xcode; require JUnit reports (shared-core-native.yml).
-- [ ] Task: Run `:shared-core:macosArm64Test` on the hosted runner and inspect the exact JUnit results and build outputs before updating native acceptance status.
+- [x] Task: Run `:shared-core:macosArm64Test` on the hosted runner and inspect the exact JUnit results and build outputs (PR CI run 40083986461; 3 tests, zero skipped/failures/errors; reviewed in implementation-evidence.md).
