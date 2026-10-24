@@ -505,8 +505,9 @@ checks read/write access, and requires `emulator -accel-check` to pass before
 continuing. The affected CI run is not emulator acceptance; the corrected run
 must build, boot and pass all four suites before results are recorded.
 
-On the second hosted attempt, KVM acceleration and the source-bound build both
-passed, but the API36 emulator step exited before UI tests. The runner log did
-not expose which final boot/identity check failed. Added explicit boot-state,
-ADB-device, AVD-name and SDK-level diagnostics (including emulator-log tails)
-for the next run. No rendered acceptance result is claimed yet.
+On the next hosted attempt, KVM acceleration and the source-bound build passed,
+and the API36 emulator booted successfully in about 52 seconds. The final AVD
+identity comparison failed because the emulator console response included a
+carriage-return line ending. The workflow now normalizes that response before
+comparison and avoids printing raw emulator logs into public Actions output.
+No rendered acceptance result is claimed yet.

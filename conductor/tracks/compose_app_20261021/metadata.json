@@ -13,6 +13,6 @@
   "track_number": 14,
   "execution_stage": 3,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
-  "implementation_status": "current-main-source-bound-build-and-119-jvm-tests-lint-and-19-host-safety-tests-passed-2026-10-24; prior-api36-rendered-slices-retained-at-their-exact-candidate; local-arm64-emulator-hang-and-sigsegv-reproduced; first-hosted-api36-attempt-blocked-before-build-by-ephemeral-runner-kvm-permissions; second-hosted-kvm-and-source-bound-build-passed-but-emulator-step-exited-before-ui-suites; explicit-boot-and-identity-diagnostics-added-next-rerun-pending; provider-backed-destination-restoration-permission-process-lifecycle-live-accessibility-and-os-matrix-pending",
+  "implementation_status": "current-main-source-bound-build-and-119-jvm-tests-lint-and-19-host-safety-tests-passed-2026-10-24; prior-api36-rendered-slices-retained-at-their-exact-candidate; local-arm64-emulator-hang-and-sigsegv-reproduced; first-hosted-api36-attempt-blocked-before-build-by-ephemeral-runner-kvm-permissions; hosted-api36-emulator-now-boots-and-source-bound-build-passes-but-avd-identity-check-failed-on-carriage-return; normalization-fix-pushed-ui-rerun-pending; provider-backed-destination-restoration-permission-process-lifecycle-live-accessibility-and-os-matrix-pending",
   "production_adopted": false
 }
