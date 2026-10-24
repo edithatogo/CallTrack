@@ -105,10 +105,10 @@ class UiSafety(unittest.TestCase):
 
     def test_runtime_diagnostic_keeps_only_failure_categories_and_exception_class(self):
         logcat = (
-            'FATAL EXCEPTION: main\n'
-            'Process: org.calltrack.community.dev.test, PID: 4321\n'
-            'java.lang.SecurityException: private number 0000000000\n'
-            '\tat org.calltrack.community.dev.test.slice.ImportUiTest.run(ImportUiTest.java:120)\n'
+            'E AndroidRuntime: FATAL EXCEPTION: main\n'
+            'E AndroidRuntime: Process: org.calltrack.community.dev.test, PID: 4321\n'
+            'E AndroidRuntime: java.lang.SecurityException: private number 0000000000\n'
+            'E AndroidRuntime: \tat org.calltrack.community.dev.test.slice.ImportUiTest.run(ImportUiTest.java:120)\n'
             'ANR in org.calltrack.community.dev\n'
             'Permission Denial: private account details\n'
             'GrantPermissionsActivity visible\n'
@@ -127,10 +127,10 @@ class UiSafety(unittest.TestCase):
 
     def test_runtime_diagnostic_classifies_input_method_without_retaining_stack_text(self):
         diagnostic = device.runtime_failure_summary(
-            'FATAL EXCEPTION: main\n'
-            'Process: com.google.android.inputmethod.latin, PID: 4321\n'
-            'java.lang.IllegalStateException: private text\n'
-            '\tat com.google.android.inputmethod.latin.SomeClass.run(SomeClass.java:12)\n'
+            'E AndroidRuntime: FATAL EXCEPTION: main\n'
+            'E AndroidRuntime: Process: com.google.android.inputmethod.latin, PID: 4321\n'
+            'E AndroidRuntime: java.lang.IllegalStateException: private text\n'
+            'E AndroidRuntime: \tat com.google.android.inputmethod.latin.SomeClass.run(SomeClass.java:12)\n'
         )
         self.assertIn('runtime-fatal-process=input-method', diagnostic)
         self.assertIn('runtime-fatal-source=input-method', diagnostic)

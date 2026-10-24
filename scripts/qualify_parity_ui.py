@@ -272,7 +272,9 @@ def runtime_failure_summary(logcat):
     )
     if fatal:
         body = fatal.group('body')
-        process = re.search(r'^Process:\s*([A-Za-z0-9_.]+)(?:,|\s|$)', body, re.MULTILINE)
+        process = re.search(
+            r'^[^\n]*\bProcess:\s*([A-Za-z0-9_.]+)(?:,|\s|$)', body, re.MULTILINE
+        )
         if process:
             package = process.group(1)
             if package == TEST_PACKAGE:
@@ -287,7 +289,7 @@ def runtime_failure_summary(logcat):
                 categories.append('runtime-fatal-process=input-method')
             elif package.startswith(('android.', 'com.android.')):
                 categories.append('runtime-fatal-process=platform')
-        frame = re.search(r'^\s*at\s+([A-Za-z0-9_.$]+)\(', body, re.MULTILINE)
+        frame = re.search(r'^[^\n]*\bat\s+([A-Za-z0-9_.$]+)\(', body, re.MULTILINE)
         if frame:
             owner = frame.group(1)
             if owner.startswith(TEST_PACKAGE + '.'):
