@@ -268,6 +268,14 @@ def runtime_failure_summary(logcat):
     return ' '.join(categories)
 
 
+def instrumentation_failure_summary(method, output, activity_dump='', logcat='',
+                                    declared_permissions=None):
+    """Combine raw local output with only bounded platform diagnostics."""
+    augmented = (output + '\n' + permission_activity_launcher_summary(activity_dump)
+                 + '\n' + runtime_failure_summary(logcat))
+    return native_failure_summary(method, augmented, declared_permissions)
+
+
 def qualify(serial, suite="settings", receipt_dir=None):
     if suite not in ("settings", "imports", "recovery", "accessibility"):
         raise ValueError("Unknown UI suite")
@@ -343,12 +351,9 @@ def qualify(serial, suite="settings", receipt_dir=None):
                 logcat = command('logcat', '-d', '-t', '800')
             except Exception:
                 logcat = ''
-            output = (step.get('output', '') + '\n'
-                      + permission_activity_launcher_summary(activity_dump) + '\n'
-                      + runtime_failure_summary(logcat))
             apk_permissions = apk_runtime_permission_summary(apks[0], apks[1], aapt)
-            raise RuntimeError(native_failure_summary(
-                method, step.get('output', ''), declared_permissions=apk_permissions
+            raise RuntimeError(instrumentation_failure_summary(
+                method, step.get('output', ''), activity_dump, logcat, apk_permissions
             )) from failure
         if 'OK (1 test)' not in output or 'FAILURES' in output or 'INSTRUMENTATION_FAILED' in output:
             # The full output stays in the ignored receipt; public CI only gets

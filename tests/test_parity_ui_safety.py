@@ -122,6 +122,32 @@ class UiSafety(unittest.TestCase):
         self.assertNotIn('0000000000', diagnostic)
         self.assertNotIn('private account details', diagnostic)
 
+    def test_nonzero_instrumentation_failure_uses_bounded_host_diagnostics(self):
+        activity_dump = (
+            '* Hist #0: ActivityRecord{prompt '
+            'com.android.packageinstaller/.permission.ui.GrantPermissionsActivity}\n'
+            'launchedFromUid=10123 launchedFromPackage=com.markobl.calllogsync userId=0\n'
+        )
+        logcat = (
+            'FATAL EXCEPTION: main\n'
+            'Process: org.calltrack.community.dev.test, PID: 4321\n'
+            'java.lang.SecurityException: private test detail\n'
+        )
+        summary = device.instrumentation_failure_summary(
+            'renderedRangePreviewCancelConfirmAndRepeat',
+            'INSTRUMENTATION_STATUS: stream=private runner output\n',
+            activity_dump,
+            logcat,
+            'READ_CALL_LOG|instrumentation:',
+        )
+        self.assertIn('permission-launcher=com.markobl.calllogsync', summary)
+        self.assertIn('runtime-fatal-exception', summary)
+        self.assertIn('runtime-test-process-died', summary)
+        self.assertIn('runtime-exception=java.lang.SecurityException', summary)
+        self.assertIn('instrumentation-protocol=status', summary)
+        self.assertNotIn('private runner output', summary)
+        self.assertNotIn('private test detail', summary)
+
     def test_failure_summary_exposes_source_location_not_rendered_content(self):
         summary = device.native_failure_summary(
             'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
