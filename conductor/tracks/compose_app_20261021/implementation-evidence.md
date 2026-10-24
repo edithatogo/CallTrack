@@ -657,3 +657,11 @@ app-permission and permission-purpose categories, but did not retain the newly
 added declared-permission summary. The diagnostic therefore did not identify
 which manifest, if any, owns the Contacts request. API26 and API33 remain open;
 the added diagnostic did not justify changing app permission behavior.
+
+The follow-up now derives the same bounded permission list from the validated
+app and instrumentation APK manifests with `aapt`, then adds only the five
+relevant Android permission names to sanitized failures. This avoids depending
+on accessibility exception text to carry the instrumentation-side declaration
+summary. Focused safety tests and direct readback of the current APKs pass; the
+hosted matrix for this diagnostic revision is pending, so the API26 cause is
+still unverified.

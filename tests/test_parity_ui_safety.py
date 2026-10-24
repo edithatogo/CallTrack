@@ -12,6 +12,34 @@ from parity_targets import RECOVERY_AVD, TRACK14_UI_AVD
 
 
 class UiSafety(unittest.TestCase):
+    def test_apk_permission_summary_reports_only_allowlisted_manifest_names(self):
+        outputs = [
+            "package: org.calltrack.community.dev\n"
+            "uses-permission: name='android.permission.READ_CALL_LOG'\n"
+            "uses-permission: name='android.permission.READ_PHONE_STATE'\n"
+            "uses-permission: name='android.permission.READ_SMS'\n",
+            "package: org.calltrack.community.dev.test\n"
+            "uses-permission: name='android.permission.READ_CONTACTS'\n",
+        ]
+        with patch.object(device.subprocess, 'check_output', side_effect=outputs):
+            summary = device.apk_runtime_permission_summary(
+                Path('app.apk'), Path('test.apk'), Path('aapt'))
+        self.assertEqual(
+            summary,
+            'READ_CALL_LOG,READ_PHONE_STATE|instrumentation:READ_CONTACTS',
+        )
+
+    def test_apk_permission_summary_suppresses_other_permission_names(self):
+        with patch.object(
+                device.subprocess, 'check_output',
+                side_effect=[
+                    "uses-permission: name='android.permission.READ_SMS'\n",
+                    "uses-permission: name='android.permission.ACCESS_NETWORK_STATE'\n",
+                ]):
+            summary = device.apk_runtime_permission_summary(
+                Path('app.apk'), Path('test.apk'), Path('aapt'))
+        self.assertEqual(summary, '|instrumentation:')
+
     def test_failure_summary_exposes_source_location_not_rendered_content(self):
         summary = device.native_failure_summary(
             'renderedAccessibilityLabelsTargetsAndKeyboardFocus',

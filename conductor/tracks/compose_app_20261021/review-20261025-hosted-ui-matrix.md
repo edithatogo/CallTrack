@@ -85,3 +85,10 @@ request to either installed package. The source-bound build qualification on
 the same commit passed as run `40116441902`. Keep permission behavior unchanged
 until the diagnostic is made observable or another bounded evidence source
 identifies the requesting package; API26/API33 acceptance remain open.
+
+The next diagnostic revision reads declared permissions from the already
+validated app and instrumentation APKs using `aapt`, and retains only
+`READ_CONTACTS`, `READ_CALL_LOG`, `READ_PHONE_STATE`, `READ_CALENDAR` and
+`WRITE_CALENDAR` in failure summaries. This is independent of system-dialog
+labels and instrumentation exception formatting. Focused Python safety tests
+and local APK manifest readback pass; hosted API26/API33 rerun remains required.

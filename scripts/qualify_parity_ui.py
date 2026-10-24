@@ -22,7 +22,7 @@ TEST_PACKAGE = PACKAGE + '.test'
 TEST_CLASS = 'com.markobl.calllogsync.slice.PositiveUiTest'
 
 
-def native_failure_summary(method, output):
+def native_failure_summary(method, output, declared_permissions=None):
     """Return source locations and allowlisted numeric/platform diagnostics."""
     frames = []
     for line in output.splitlines():
@@ -112,6 +112,9 @@ def native_failure_summary(method, output):
             detail = (detail + '; ' if detail else '') + (
                 'declared-runtime-permissions=app:' + ','.join(app_declared)
                 + '|instrumentation:' + ','.join(test_declared))
+    if declared_permissions is not None:
+        detail = (detail + '; ' if detail else '') + (
+            'apk-runtime-permissions=' + declared_permissions)
     permission_purpose = re.search(
         r'permission-purpose=(call-log|calendar|phone-state|contacts|location|camera|'
         r'microphone|notifications|other|unavailable)', output)
@@ -142,6 +145,29 @@ def native_failure_summary(method, output):
                     for control, widget, enabled in safe_controls))
     suffix = ' (' + detail + ')' if detail else ''
     return 'Native acceptance failed: ' + method + suffix
+
+
+def apk_runtime_permission_summary(app_apk, test_apk, aapt):
+    """Read only fixed permission names from the already-validated APK manifests."""
+    allowed = {
+        'READ_CONTACTS',
+        'READ_CALL_LOG',
+        'READ_PHONE_STATE',
+        'READ_CALENDAR',
+        'WRITE_CALENDAR',
+    }
+
+    def names(apk):
+        output = subprocess.check_output(
+            [str(aapt), 'dump', 'permissions', str(apk)],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        )
+        declared = set(re.findall(
+            r"uses-permission: name='android\.permission\.([A-Z_]+)'", output))
+        return ','.join(sorted(declared & allowed))
+
+    return names(app_apk) + '|instrumentation:' + names(test_apk)
 
 
 def qualify(serial, suite="settings", receipt_dir=None):
@@ -202,7 +228,10 @@ def qualify(serial, suite="settings", receipt_dir=None):
         if 'OK (1 test)' not in output or 'FAILURES' in output or 'INSTRUMENTATION_FAILED' in output:
             # The full output stays in the ignored receipt; public CI only gets
             # source locations, never rendered labels or fixture values.
-            raise RuntimeError(native_failure_summary(method, output))
+            apk_permissions = apk_runtime_permission_summary(
+                apks[0], apks[1], aapt)
+            raise RuntimeError(native_failure_summary(
+                method, output, declared_permissions=apk_permissions))
 
     def capture_ui():
         directory = evidence / ('ui-' + receipt['fixture_token'])
