@@ -54,6 +54,16 @@ class UiSafety(unittest.TestCase):
         self.assertIn('ParityProviderTest.java:109', summary)
         self.assertNotIn('private fixture detail', summary)
 
+    def test_failure_summary_uses_fixed_import_dialog_category(self):
+        summary = device.native_failure_summary(
+            'renderedRangePreviewCancelConfirmAndRepeat',
+            'java.lang.AssertionError: Visible enabled control missing: button1\n'
+            '    at com.markobl.calllogsync.slice.RenderedUi.tap(RenderedUi.java:154)\n'
+            '    at com.markobl.calllogsync.slice.ImportUiTest.confirm(ImportUiTest.java:104)\n',
+        )
+        self.assertIn('import-confirmation-dialog-action-missing', summary)
+        self.assertIn('ImportUiTest.java:104', summary)
+
     def test_failure_summary_retains_only_allowlisted_permission_diagnostic(self):
         summary = device.native_failure_summary(
             'renderedPermissionsFiltersConfirmPauseAndReopen',

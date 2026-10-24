@@ -606,3 +606,10 @@ then failed because `FixtureCallLog.asShell` requires explicit temporary ADB
 root, which the new AVD setup had not enabled. The workflow now runs `adb root`
 only on the disposable API26 guest and verifies `service.adb.root=1` before
 tests. API26 import/recovery/accessibility rerun is still required.
+
+Run 40100856513 then confirmed the temporary root setup worked: API26 passed
+its settings journey and `prepareCalendarAndTaggedHistory`, with fixture and
+package cleanup verified, but the rendered import-confirmation dialog action
+was not found. API33/API36 passed their four synthetic UI suites. A fixed
+failure category is now retained for the missing `button1` action; the
+instrumentation rerun remains pending.

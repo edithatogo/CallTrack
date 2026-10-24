@@ -66,6 +66,10 @@ def native_failure_summary(method, output):
         detail = (detail + '; ' if detail else '') + 'synthetic-calllog-provider-not-empty'
     if 'java.lang.AssertionError: expected non-null' in output:
         detail = (detail + '; ' if detail else '') + 'expected-provider-result-was-null'
+    if 'Visible enabled control missing: button1' in output:
+        detail = (detail + '; ' if detail else '') + 'import-confirmation-dialog-action-missing'
+    if 'Refusing a control in an unexpected package:' in output:
+        detail = (detail + '; ' if detail else '') + 'dialog-action-owned-by-unexpected-window'
     missing_permission = re.search(
         r'Visible enabled control missing: (permission_(?:deny|allow)_button)', output)
     if missing_permission:
