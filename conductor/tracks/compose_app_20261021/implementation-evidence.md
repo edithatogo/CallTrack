@@ -806,3 +806,13 @@ the API33 permission-controller issue is intermittent (run 40142395588 passed
 API33), while API26 focus remains non-repeatable locally and consistently red
 in hosted runs. No product permission behavior or acceptance assertion was
 changed; both UI findings remain open.
+
+## Hosted matrix rerun `195d9ff` — 2026-10-25
+
+Hosted UI rerun [40144075982](https://github.com/edithatogo/CallTrack/actions/runs/40144075982)
+passed API33 and API36. API26 again passed settings/imports/recovery and failed
+`renderedAccessibilityLabelsTargetsAndKeyboardFocus`; cleanup and package
+removal passed. Build qualification runs [40144075971](https://github.com/edithatogo/CallTrack/actions/runs/40144075971)
+and [40144073285](https://github.com/edithatogo/CallTrack/actions/runs/40144073285)
+passed. This confirms the API33 permission-control failure is intermittent;
+API26 focus remains the blocking hosted check.

@@ -95,3 +95,14 @@ permission-controller symptom after one successful API33 run. Build
 qualification runs 40143215932 and 40143212903 passed. No app permission
 requests or acceptance assertions were changed. Treat both API26 focus and
 API33 permission-controller interaction as unresolved and keep PR #78 open.
+
+## Hosted matrix rerun `195d9ff` — 2026-10-25
+
+Hosted UI rerun [40144075982](https://github.com/edithatogo/CallTrack/actions/runs/40144075982)
+passed API33 and API36. API26 again passed settings, imports and recovery,
+then failed `renderedAccessibilityLabelsTargetsAndKeyboardFocus` at the
+visible app-owned keyboard-focus assertion; fixture cleanup and package
+removal passed. This API33 pass follows the failure in 40143215905, confirming
+the permission-controller test is intermittent. Build qualification runs
+40144075971 and 40144073285 passed. API26 remains the repeatable hosted blocker;
+keep PR #78 open and unmerged.
