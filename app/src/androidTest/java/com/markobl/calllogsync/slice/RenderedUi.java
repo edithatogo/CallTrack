@@ -6,6 +6,8 @@ import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.Instrumentation;
 import android.app.UiAutomation;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.os.SystemClock;
@@ -24,9 +26,11 @@ import java.util.function.BooleanSupplier;
 final class RenderedUi {
     final UiAutomation automation;
     private final Context context;
+    private final String instrumentationPackage;
 
     RenderedUi(Instrumentation instrumentation) {
         context = instrumentation.getTargetContext();
+        instrumentationPackage = instrumentation.getContext().getPackageName();
         automation = instrumentation.getUiAutomation();
         AccessibilityServiceInfo info = automation.getServiceInfo();
         info.flags |=
@@ -254,7 +258,44 @@ final class RenderedUi {
                 + windows
                 + " app-permissions="
                 + appPermissionState()
+                + " declared-runtime-permissions="
+                + declaredRuntimePermissionSummary()
                 + permissionPurposeSummary();
+    }
+
+    @SuppressWarnings("deprecation")
+    private String declaredRuntimePermissionSummary() {
+        String[] permissions = {
+            android.Manifest.permission.READ_CONTACTS,
+            android.Manifest.permission.READ_CALL_LOG,
+            android.Manifest.permission.READ_PHONE_STATE,
+            android.Manifest.permission.READ_CALENDAR,
+            android.Manifest.permission.WRITE_CALENDAR
+        };
+        return "{app="
+                + declaredRuntimePermissions(context.getPackageName(), permissions)
+                + ",instrumentation="
+                + declaredRuntimePermissions(instrumentationPackage, permissions)
+                + "}";
+    }
+
+    @SuppressWarnings("deprecation")
+    private String declaredRuntimePermissions(String packageName, String[] permissions) {
+        try {
+            PackageInfo info =
+                    context.getPackageManager()
+                            .getPackageInfo(packageName, PackageManager.GET_PERMISSIONS);
+            java.util.Set<String> declared = new java.util.HashSet<>();
+            if (info.requestedPermissions != null)
+                java.util.Collections.addAll(declared, info.requestedPermissions);
+            java.util.List<String> matches = new java.util.ArrayList<>();
+            for (String permission : permissions)
+                if (declared.contains(permission))
+                    matches.add(permission.substring(permission.lastIndexOf('.') + 1));
+            return matches.toString();
+        } catch (PackageManager.NameNotFoundException missing) {
+            return "unavailable";
+        }
     }
 
     private String permissionPurposeSummary() {
