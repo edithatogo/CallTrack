@@ -20,7 +20,8 @@
   "pull_request": "https://github.com/edithatogo/CallTrack/pull/55",
   "pull_request_state": "merged-implementation-pr-hosted-native-fixtures-qualified-by-follow-up",
   "acceptance_follow_up_pull_request": "https://github.com/edithatogo/CallTrack/pull/75",
-  "acceptance_follow_up_state": "open-checks-pending",
+  "acceptance_follow_up_state": "merged",
+  "acceptance_follow_up_merge_commit": "22e66c1b9c3905f2016efc1e6c20763056163f27",
   "production_adopted": false,
   "previous_pull_requests": [
     {

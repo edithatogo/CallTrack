@@ -79,6 +79,8 @@ The pull-request workflow completed successfully on commit `58341ddbf2878c2f2040
 
 This proves the bounded common call-selection and timestamp-range fixtures run on Kotlin/Native ARM64 with the selected hosted toolchain. It does not prove UI, Apple provider, Android device, calendar, release, or operational behavior. Track 15 remains in progress for its broader cross-target artifact/compatibility review and prerequisite sequencing; production adoption remains false.
 
+The final PR head, `a078705d1593dcd01017e150b18c6a80b5852d65`, reran the workflow with the stricter JUnit assertions enabled: [run 40084343991](https://github.com/edithatogo/CallTrack/actions/runs/40084343991). That pull-request run again used Xcode 26.1.1 / `17B100` and Temurin 17.0.20.1+1, succeeded in 2m01s, and reported the same 3 tests with zero skips, failures or errors. All other required repository checks also passed on this head; PR #75 was squash-merged as `22e66c1b9c3905f2016efc1e6c20763056163f27`.
+
 
 ## Local verification after compiler checksum update — 2026-10-24
 
