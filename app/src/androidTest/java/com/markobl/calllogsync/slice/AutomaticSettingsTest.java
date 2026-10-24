@@ -48,11 +48,17 @@ public class AutomaticSettingsTest {
             assertTrue(activity.findViewById(R.id.auto_permissions) instanceof ComposeView);
             assertTrue(activity.findViewById(R.id.auto_calendar_picker) instanceof ComposeView);
             assertTrue(activity.findViewById(R.id.auto_actions) instanceof ComposeView);
+            assertTrue(activity.findViewById(R.id.auto_navigation) instanceof ComposeView);
             assertTrue(activity.findViewById(R.id.auto_call_types) instanceof ComposeView);
             RenderedUi rendered = new RenderedUi(instrumentation);
             assertNotNull(rendered.shown("auto_intro_text", true));
             assertNotNull(rendered.shown(context.getString(R.string.auto_intro), false));
             assertNotNull(rendered.shown("auto_access_action", true));
+            rendered.await(
+                    () ->
+                            rendered.shown("open_imports", true) != null
+                                    && rendered.shown("open_recovery", true) != null,
+                    "Automatic settings navigation actions did not render");
             rendered.await(
                     () ->
                             rendered.shown("auto_enable", true) != null

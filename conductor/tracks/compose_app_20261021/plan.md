@@ -59,5 +59,7 @@
 - [x] Task: Review automatic-settings actions for state parity, explicit callback dispatch and no composition effects; record hosted build and emulator-runtime boundaries in [review](review-20261024-auto-actions.md).
 - [x] Task: Replace the recovery calendar-access View button with a lifecycle-disposed Compose action panel; keep the permission request in the Activity and preserve explicit user activation (see [review](review-20261024-recovery-access.md)).
 - [x] Task: Review recovery access action rendering and callback ownership; verify composition does not request permission and record hosted/emulator acceptance boundaries (see [review](review-20261024-recovery-access.md)).
+- [x] Task: Replace the automatic-settings import and recovery navigation Views with a lifecycle-disposed Compose action panel; preserve navigation IDs and keep `startActivity` in Activity callbacks (see [review](review-20261024-settings-navigation.md)).
+- [x] Task: Review explicit navigation callbacks and rendered IDs; record hosted build and emulator runtime boundaries in [review](review-20261024-settings-navigation.md).
 - [ ] Task: Update requirements, decisions, remaining limitations and next-track inputs; retire superseded code/prototypes only after parity.
 - [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger.
