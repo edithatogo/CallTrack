@@ -197,3 +197,17 @@ Observation preparation review: review-observation-preparation-20261022.md;144
 host tests and169-document/20-track/25-scenario Conductor checks pass. Readback
 confirms one active daily09:00 AEST heartbeat, null observation dates, seven pending
 intervals and zero accepted days/hours. Final runtime review is not yet performed.
+
+
+## Current unsigned candidate refreeze — 2026-10-24
+
+- [x] Task: Refresh the Compose/KMP release runtime inventory, canonical repository/POM audit and all published dependency source coordinates — `canonical-runtime-audit-20261024.json`; 92 unique binaries match published bytes and all 92 POMs have effective licence declarations. Legal clearance remains separate.
+- [x] Task: Fix KMP project variant selection and explicitly qualify metadata-only source archives — `runtime-inventory.init.gradle`, `prepare_release_bundle.py`; focused release-tool tests pass.
+- [x] Task: Freeze and reproduce the current unsigned candidate locally — revision `ae39ef9e109158191b33d7047e93bc3ae39a8fbd`; two byte-identical APKs,119 JVM tests/build,zero failures/errors/skips,zero lint Error/Fatal findings.
+- [x] Task: Build and read back a corresponding-source/licence/notices archive for the frozen candidate — 92 runtime coordinates,87 source-code archives,five metadata-only archives,877 files; deterministic archive hash and complete member readback pass.
+- [x] Task: Reproduce the exact candidate on hosted cold Linux and review/fix the qualification baseline — workflow run40081001647; exact APK match,119 JVM tests and zero lint Error/Fatal findings; `review-current-candidate-20261024.md`.
+- [ ] Task: Complete permanent production identity/signing custody, legal/source-conveyance and publication gates.
+- [ ] Task: Complete physical calls and each selected calendar route with the participant/device/accounts.
+- [ ] Task: Start only after actual installation, baselines and explicit scope are ready; then complete the seven-day operational observation.
+
+This refresh does not complete Track5 or close M4. Emulator/UI/native behavior, production, physical, calendar and operational evidence remain source-bound to their own qualified revisions and acceptance conditions.
