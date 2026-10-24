@@ -5,6 +5,8 @@
 - [Track 17 evidence refresh review](review-20261024-track17-refresh.md)
 - [Portable export prototype review](review-20261024-portable-export.md)
 - [Canonical JSON hardening review](review-20261024-schema-hardening.md)
+- [Prototype v1 contract and capability matrix](prototype-v1-contract.md)
+- [Prototype contract review](review-20261024-prototype-contract-freeze.md)
 - [Metadata](metadata.json)
 - [Execution sequence](../../future-architecture.md)
 

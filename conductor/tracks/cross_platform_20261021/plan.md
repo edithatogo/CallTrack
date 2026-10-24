@@ -17,7 +17,7 @@
 
 - [x] Task: Establish a bounded synthetic schema-v1 Android producer/macOS preview golden and checksum/count regressions; production format acceptance remains open.
 - [x] Task: Make the Swift preview reject duplicate keys, unknown fields and alternate JSON encodings; retain one optional final LF/CRLF and cover the rule with hostile-input fixtures.
-- [ ] Task: Freeze exact source/toolchain/format/capability matrix and acceptance scope; distinguish native persistence from actual remote synchronization.
+- [x] Task: Freeze the prototype-v1 schema, exact source/toolchain, capability matrix and acceptance boundary; keep public-format and native/remote acceptance pending.
 - [ ] Task: Run compatible import/export/restore fixtures with inactive foreign receipts, redaction, deliberate delivery and one actual destination writer.
 - [ ] Task: Execute preserving package upgrades, process/permission/account failures, edited/deleted events and real provider-cloud readback where claimed; retain unobserved routes as unsupported.
 - [ ] Task: Review Android/macOS source/artifact/licence/signing/operational evidence, resolve Rust disposition, remove only superseded experiments/implementations and produce iOS handoff.
@@ -69,3 +69,13 @@
 - Kept UI/file export, public schema adoption, restore semantics, native
   packaging, cross-platform upgrades, provider/cloud readback and operational
   acceptance open. Track 19 remains in progress and Track 20/iOS remains locked.
+
+## Prototype contract matrix — 2026-10-24
+
+- Recorded the exact prototype-v1 bytes, source-key derivation, checksum,
+  ordering, bounds, validation, privacy/authority boundary and current
+  Android/JVM, Swift source, KMP/Native, UI/file, provider and recovery evidence
+  in `prototype-v1-contract.md`.
+- The freeze applies only to synthetic producer/parser compatibility at source
+  revision `b3e8717fda6239b2a30c556d8f013121c3ff9f7f`; it does not make v1 a
+  public/stable format or imply product integration.

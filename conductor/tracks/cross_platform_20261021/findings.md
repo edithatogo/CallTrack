@@ -3,6 +3,9 @@
 This is a bounded prerequisite reconciliation, not cross-platform acceptance.
 Sources are the current Track 14–18 metadata, plans, findings, decisions,
 verification and scoped prerequisite records.
+The prototype-only schema, toolchain and capability snapshot is frozen in
+[`prototype-v1-contract.md`](prototype-v1-contract.md); it is not a stable
+product interchange format.
 
 | Qualification area | Current evidence and owner | Gap / acceptance needed |
 |---|---|---|
