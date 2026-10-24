@@ -118,11 +118,7 @@ private fun ImportTypeFilter(
         modifier =
             Modifier.fillMaxWidth()
                 .heightIn(min = 48.dp)
-                .toggleable(
-                    value = checked,
-                    role = Role.Checkbox,
-                    onValueChange = onCheckedChange,
-                )
+                .toggleable(value = checked, role = Role.Checkbox, onValueChange = onCheckedChange)
                 .clearAndSetSemantics {
                     testTagsAsResourceId = true
                     testTag = tag

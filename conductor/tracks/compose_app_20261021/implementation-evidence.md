@@ -529,4 +529,7 @@ now receive the same explicit checkbox semantics; the Compose test asserts
 their label too. JDK17/SDK36 unit tests and Android-test Kotlin compilation
 passed before this import-panel change; its focused build/test and the hosted
 native rerun are pending. The 17 Python 3.15.1 UI-safety tests and Conductor
-integrity checks pass. No full accessibility parity is claimed yet.
+integrity checks pass. The hosted repository-slice job also caught a ktfmt
+formatting issue in the new import-filter modifier; it was formatted with the
+workflow's pinned ktfmt0.59 checksum. Full formatting and the next hosted run
+remain pending. No full accessibility parity is claimed yet.
