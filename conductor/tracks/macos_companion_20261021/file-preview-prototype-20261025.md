@@ -43,6 +43,20 @@ the version-1 interchange format.
   keyboard navigation, large text, interruption, or package upgrade. Those
   remain open native acceptance tasks.
 
+## Hosted PR qualification and integration
+
+PR [#80](https://github.com/edithatogo/CallTrack/pull/80) was merged on
+2026-10-24 at `4824ed091f35f9c73223a69450b9787b2ee1a2e4`, after the required
+checks passed on the PR head and merged revision. On the merged revision,
+source-build qualification run
+[40115184152](https://github.com/edithatogo/CallTrack/actions/runs/40115184152)
+and macOS preview XCTest run
+[40115184153](https://github.com/edithatogo/CallTrack/actions/runs/40115184153)
+both completed successfully. The macOS tests cover the bounded preview file
+reader; this does not establish AppKit rendering, VoiceOver, packaging, EventKit
+permission, event delivery or native-device acceptance. Track16 remains open,
+and calendar delivery remains disabled in the prototype.
+
 ## Reconsideration
 
 Continue to EventKit only after Track 14's acceptance issue is resolved and the

@@ -13,12 +13,16 @@
   "execution_stage": 5,
   "production_adopted": false,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
-  "implementation_status": "file-preview-prototype-hosted-qualification-pending",
+  "implementation_status": "file-preview-prototype-merged-hosted-qualified-native-acceptance-pending",
   "native_eventkit_accepted": false,
   "macos_app_packaging_accepted": false,
   "pull_request": "https://github.com/edithatogo/CallTrack/pull/80",
-  "pull_request_state": "open-draft",
-  "implementation_commit": "33c9a7a",
-  "review_commit": "33c9a7a",
-  "review_status": "file-preview-slice-reviewed-hosted-and-native-acceptance-pending"
+  "pull_request_state": "merged",
+  "implementation_commit": "4824ed091f35f9c73223a69450b9787b2ee1a2e4",
+  "review_commit": "0744011a17503ad1e50f8a66b7af3cb65b16d314",
+  "review_status": "file-preview-slice-reviewed-hosted-qualified-native-acceptance-pending",
+  "hosted_qualification_run_ids": [
+    40115184152,
+    40115184153
+  ]
 }
