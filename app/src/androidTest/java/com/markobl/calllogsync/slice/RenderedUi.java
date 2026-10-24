@@ -199,8 +199,10 @@ final class RenderedUi {
     private AccessibilityNodeInfo findClickableText(AccessibilityNodeInfo node, String text) {
         if (node == null || !node.refresh() || !node.isVisibleToUser()) return null;
         CharSequence actual = node.getText();
-        if (node.isClickable() && node.isEnabled() && actual != null && text.contentEquals(actual))
-            return node;
+        if (node.isClickable()
+                && node.isEnabled()
+                && actual != null
+                && text.equalsIgnoreCase(actual.toString())) return node;
         for (int i = 0; i < node.getChildCount(); i++) {
             AccessibilityNodeInfo found = findClickableText(node.getChild(i), text);
             if (found != null) return found;
