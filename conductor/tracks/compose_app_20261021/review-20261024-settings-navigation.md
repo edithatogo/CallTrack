@@ -20,7 +20,10 @@ waits for both accessible actions without opening either destination.
 - Python3.15.1 `test_verify_conductor.py`: 19 tests passed.
 - Python3.15.1 `scripts/verify_conductor.py`: passed, 244 documents, 21 tracks,
   25 synthetic scenarios; `git diff --check` passed.
-- Android compile/package checks: pending hosted workflow.
+- Hosted GitHub Actions runs `40077733636` and `40077737812`: all qualification,
+  slice, Compose prototype and multiplatform UI checks passed. Android development
+  slice build and unsigned release packaging passed; instrumentation was compiled
+  but not run on an emulator.
 - Emulator rendering and navigation acceptance: pending emulator execution.
 
 ## Remaining acceptance
