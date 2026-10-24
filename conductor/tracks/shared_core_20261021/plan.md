@@ -19,7 +19,8 @@
 - [x] Task: Map Android/JVM dependencies and native target/toolchain constraints; compare retained code, common libraries and minimal native facades for hashing/time/overflow (findings.md).
 - [x] Task: Extract only raw call-type selection and half-open timestamp rules; native adapters remain authoritative for platform behavior (32ae39b).
 - [x] Task: Preserve stored signatures, schema, namespace, receipts and Java facade; existing contract suite and common boundary tests pass; no writer or ledger change (32ae39b).
-- [ ] Task: Run common golden/fault fixtures on Android/JVM and macOS Kotlin/Native, inspect target artifacts and preserve upgrade/recovery; JVM/Android build evidence passes, macOS Kotlin/Native is pending full Xcode.
+- [x] Task: Expand the shared call-type fixture to cover all eight filter masks, known numeric types, unknown/extended values, and the `Long.MIN_VALUE` timestamp boundary; the shared JVM/Android and Java facade test selectors pass locally. A hosted Kotlin/Native rerun of this expanded source is required before the cross-target task above can close.
+- [ ] Task: Run the expanded common golden/fault fixtures on Android/JVM and macOS Kotlin/Native, inspect target artifacts and preserve upgrade/recovery; JVM/Android test selectors pass locally, but the Native rerun on the expanded source is pending hosted CI.
 - [ ] Task: Phase Verification & Checkpoint (JVM/Android tests and APK packaging pass; macOS Native acceptance remains pending).
 
 ## Phase 4: Review, acceptance and handoff
