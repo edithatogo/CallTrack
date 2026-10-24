@@ -30,8 +30,12 @@ then verifies the host, rendered enabled states and absence of automatic activat
 - Python3.15.1 `test_verify_conductor.py`: 19 tests passed.
 - Python3.15.1 `scripts/verify_conductor.py`: passed, 242 documents, 21 tracks,
   25 synthetic scenarios.
-- Android build and instrumentation: local Android SDK/emulator unavailable;
-  hosted pull-request checks pending. A green Android compile/package job does
+- Hosted GitHub Actions runs `40075923959` and `40075933266`: all qualification,
+  slice, Compose prototype and multiplatform UI checks passed. The slice job built
+  and verified the Android development artifact and packaged the unsigned release
+  variant. Android instrumentation sources compiled as part of the build but were
+  not executed on an emulator.
+- Local Android SDK/emulator unavailable. Green hosted compile/package checks do
   not establish rendered emulator acceptance.
 
 ## Remaining acceptance
