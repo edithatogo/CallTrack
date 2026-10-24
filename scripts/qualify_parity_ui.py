@@ -23,7 +23,7 @@ TEST_CLASS = 'com.markobl.calllogsync.slice.PositiveUiTest'
 
 
 def native_failure_summary(method, output):
-    """Return source locations without exposing rendered device content."""
+    """Return source locations and allowlisted numeric/platform diagnostics."""
     frames = []
     for line in output.splitlines():
         frame = line.strip()
@@ -46,6 +46,27 @@ def native_failure_summary(method, output):
         detail = (detail + '; ' if detail else '') + (
             'non-focusable anchor id=' + anchor.group(1) +
             ' enabled=' + anchor.group(2))
+    # Keep only numeric geometry from the system-bars assertion; screenshot or
+    # arbitrary rendered strings remain private in the ignored local receipt.
+    geometry = re.search(
+        r'(settings|manual|imports|recovery) first content begins at (-?\d+) beneath system area (\d+)',
+        output)
+    if geometry:
+        detail = (detail + '; ' if detail else '') + (
+            'system-inset screen=' + geometry.group(1) +
+            ' content_top=' + geometry.group(2) +
+            ' required_top=' + geometry.group(3))
+    # Permission-controller UI text varies by Android release. Surface only
+    # known assertion categories and allowlisted control IDs, never dialog text.
+    if 'Permission choice did not advance the actual dialog' in output:
+        detail = (detail + '; ' if detail else '') + 'permission-dialog-choice-did-not-advance'
+    elif 'Permission dialog sequence did not complete' in output:
+        detail = (detail + '; ' if detail else '') + 'permission-dialog-sequence-incomplete'
+    missing_permission = re.search(
+        r'Visible enabled control missing: (permission_(?:deny|allow)_button)', output)
+    if missing_permission:
+        detail = (detail + '; ' if detail else '') + (
+            'missing-permission-control=' + missing_permission.group(1))
     suffix = ' (' + detail + ')' if detail else ''
     return 'Native acceptance failed: ' + method + suffix
 

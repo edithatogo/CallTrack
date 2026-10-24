@@ -583,3 +583,14 @@ The phone remains absent from ADB and the only local guest is still offline.
 This evidence does not qualify API26/API33 UI, local ARM64 emulator health,
 manual TalkBack/Switch Access, physical calls, real account calendars or
 operational observation.
+
+The first API26/API33 matrix run ([#78](https://github.com/edithatogo/CallTrack/pull/78),
+workflow run [40097121504](https://github.com/edithatogo/CallTrack/actions/runs/40097121504))
+passed API36. API26 failed the rendered system-bars assertion and API33 failed
+the permission/filter/pause/reopen journey. Both failures reported fixture
+cleanup and package removal as verified. The public workflow summary retained
+only source lines and hid the numeric inset and permission-dialog category, so
+the runner now exposes allowlisted numeric geometry and fixed permission
+assertion categories while keeping arbitrary labels and dialog text private.
+Focused Python safety tests pass; the full hosted rerun is pending. No
+API26/API33 pass is claimed.

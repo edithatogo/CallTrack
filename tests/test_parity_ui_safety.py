@@ -33,6 +33,25 @@ class UiSafety(unittest.TestCase):
         )
         self.assertIn('non-focusable anchor id=auto_access_action enabled=true', anchor_summary)
 
+    def test_failure_summary_retains_safe_system_inset_measurements(self):
+        summary = device.native_failure_summary(
+            'renderedActivitiesRespectSystemBars',
+            'java.lang.AssertionError: manual first content begins at 17 beneath system area 24\n'
+            '    at com.markobl.calllogsync.slice.PositiveUiTest.renderedActivitiesRespectSystemBars(PositiveUiTest.java:114)\n'
+            'private rendered label must remain hidden\n',
+        )
+        self.assertIn('system-inset screen=manual content_top=17 required_top=24', summary)
+        self.assertNotIn('private rendered label', summary)
+
+    def test_failure_summary_retains_only_allowlisted_permission_diagnostic(self):
+        summary = device.native_failure_summary(
+            'renderedPermissionsFiltersConfirmPauseAndReopen',
+            'java.lang.AssertionError: Permission choice did not advance the actual dialog: private label\n'
+            '    at com.markobl.calllogsync.slice.PositiveUiTest.renderedPermissionsFiltersConfirmPauseAndReopen(PositiveUiTest.java:233)\n',
+        )
+        self.assertIn('permission-dialog-choice-did-not-advance', summary)
+        self.assertNotIn('private label', summary)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
