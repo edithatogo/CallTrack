@@ -613,3 +613,25 @@ package cleanup verified, but the rendered import-confirmation dialog action
 was not found. API33/API36 passed their four synthetic UI suites. A fixed
 failure category is now retained for the missing `button1` action; the
 instrumentation rerun remains pending.
+
+Run [40101679905](https://github.com/edithatogo/CallTrack/actions/runs/40101679905)
+passed API36, but API26 again failed at the import confirmation action and API33
+failed because its PermissionController exposed a different denial ID. The
+follow-up review fixed the API26 test to locate the exact localized clickable
+positive label and recognize the API33 combined denial selector. AOSP defines
+that API33 control as permanent denial, so the rendered test asserts denial and
+inactive logging, then uses isolated `UiAutomation` grants only to continue the
+remaining settings journey. This does not claim user-driven API33 regrant; the
+API36 source from this run passed its rendered re-request-and-grant journey.
+
+Commit `ac42f2a` passed a fresh source-bound build with the qualified JDK17 and
+SDK36, launched by the repository-local CPython3.15.1 virtual environment. The
+build completed JVM tests, app and instrumentation APK assembly and lint with
+unchanged input hashes. The instrumentation APK SHA-256 is
+`f3a471049c8c935abe43ca59ac7ceea4393504908a1ab3203c12751ca6992dd8`. All21
+focused Python safety tests, `actionlint`, the248-document/21-track/25-scenario
+Conductor verifier, pinned Java formatting and `git diff --check` pass. The
+hosted API26/API33/API36 rerun on this commit remains required; see the
+[review](review-20261025-hosted-ui-matrix.md). The native phone is absent and
+physical, manual assistive-technology, remote-calendar and operational gates
+remain pending.
