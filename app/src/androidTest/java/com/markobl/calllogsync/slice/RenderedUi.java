@@ -461,7 +461,10 @@ final class RenderedUi {
                         SystemClock.sleep(100);
                     } while (SystemClock.elapsedRealtime() < transition);
                 }
-                assertTrue("Permission choice did not advance the actual dialog", changed);
+                assertTrue(
+                        "Permission choice did not advance the actual dialog; "
+                                + dialogActionSummary(),
+                        changed);
                 handled++;
             } else if (handled > 0 || !denyFirst && complete.getAsBoolean()) {
                 settle();
@@ -472,7 +475,8 @@ final class RenderedUi {
                         && permissionMessage() == null) return requiresSettingsGrant;
             } else SystemClock.sleep(100);
         }
-        throw new AssertionError("Permission dialog sequence did not complete");
+        throw new AssertionError(
+                "Permission dialog sequence did not complete; " + dialogActionSummary());
     }
 
     private void settle() {
