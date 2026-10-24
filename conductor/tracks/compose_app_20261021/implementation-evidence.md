@@ -518,5 +518,10 @@ output remains in the ignored runner-local receipt and was not retained in the
 public log, so the failing assertion is not yet known. Added a safe failure
 summary that reports app test source frames and, for unlabeled controls, only
 the resource ID and widget class. It suppresses rendered text and descriptions.
-Focused host safety tests pass. The failing control is not identified yet; no
-accessibility or full hosted UI acceptance result is claimed.
+The failing control is the automatic incoming-call checkbox (`auto_incoming`,
+`android.view.View`). It now uses Compose's standard `toggleable` checkbox
+semantics, and its focused Compose test asserts the localized content
+description. The local JDK17/SDK36 build passed unit tests, Android-test Kotlin
+compilation and lint (85 actionable tasks, 14 executed); the 17 Python 3.15.1
+UI-safety tests and Conductor integrity checks pass. The native accessibility
+journey must rerun on the hosted emulator before claiming parity.

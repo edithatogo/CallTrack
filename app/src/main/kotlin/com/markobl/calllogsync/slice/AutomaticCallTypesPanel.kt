@@ -1,7 +1,6 @@
 package com.markobl.calllogsync.slice
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -70,8 +70,13 @@ private fun CallTypeOption(
         modifier =
             Modifier.fillMaxWidth()
                 .heightIn(min = 48.dp)
-                .clickable(enabled = enabled, role = Role.Checkbox) { onCheckedChange(!checked) }
-                .semantics(mergeDescendants = true) {
+                .toggleable(
+                    value = checked,
+                    enabled = enabled,
+                    role = Role.Checkbox,
+                    onValueChange = onCheckedChange,
+                )
+                .semantics {
                     testTagsAsResourceId = true
                     testTag = tag
                     contentDescription = label
