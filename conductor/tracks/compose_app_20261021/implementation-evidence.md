@@ -702,8 +702,22 @@ result and `IllegalStateException`. A new sanitizer was added to classify the
 fatal process and top stack-frame owner without exposing exception messages or
 stack text. Its first run showed that logcat prefixes fatal lines with priority
 and tag text; the parser was corrected and its tests now use this actual format.
-The hosted rerun for that correction is run 46 and remains pending at this
-checkpoint.
+Run [40130610357](https://github.com/edithatogo/CallTrack/actions/runs/40130610357)
+on `51170b6` passed API36 but repeated failures on API26/API33. The API26
+summary still could not classify the fatal process/frame; API33 again lost the
+deny control with the app window active and permission root unavailable.
+
+The next diagnostic added a category-only readback of the resumed activity
+owner. Build qualification [40131471215](https://github.com/edithatogo/CallTrack/actions/runs/40131471215)
+passed all five jobs. UI run [40131471355](https://github.com/edithatogo/CallTrack/actions/runs/40131471355)
+passed API36. API26 again exited the rendered import journey without an
+instrumentation result marker; this time the bounded summary identified the
+resumed owner as `permission-controller`, the permission activity launcher as
+`com.google.android.inputmethod.latin`, and the exception class as
+`java.net.SocketException`, but no process or stack owner. API33 again failed
+to find the deny control while only the app window was active and all four app
+permissions remained denied. This does not prove which external permission
+prompt was requested or why the runner connection closed.
 
 Focused review on the latest source passed 34 `tests.test_parity_ui_safety`
 tests, the Conductor verifier (249 documents, 21 tracks, 25 synthetic

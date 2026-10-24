@@ -70,5 +70,6 @@
 - [x] Task: Review explicit navigation callbacks and rendered IDs; record hosted build and emulator runtime boundaries in [review](review-20261024-settings-navigation.md).
 - [x] Task: Refresh current-main source-bound Android build, JVM, lint, Conductor and host safety-test evidence; leave new rendered acceptance pending while the authorized emulator is offline (see [implementation evidence](implementation-evidence.md)).
 - [x] Task: Review the current-main evidence refresh, verify its source/artifact and test references, and preserve explicit emulator acceptance limits (see [review](review-20261024-current-main-refresh.md)).
+- [x] Task: Review and refine sanitized hosted diagnostics for fatal logcat and resumed activity ownership; rerun the hosted matrix and keep API26/API33 acceptance open (see [review](review-20261025-diagnostics.md); commit `0a140e7`).
 - [ ] Task: Update requirements, decisions, remaining limitations and next-track inputs; retire superseded code/prototypes only after parity.
 - [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger.
