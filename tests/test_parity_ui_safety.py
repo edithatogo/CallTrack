@@ -40,6 +40,33 @@ class UiSafety(unittest.TestCase):
                 Path('app.apk'), Path('test.apk'), Path('aapt'))
         self.assertEqual(summary, '|instrumentation:')
 
+    def test_permission_activity_diagnostic_retains_only_its_launcher_package(self):
+        dump = (
+            '* Hist #0: ActivityRecord{launcher com.example.unrelated/.MainActivity}\n'
+            'launchedFromPackage=com.example.unrelated userId=0\n'
+            '* Hist #1: ActivityRecord{prompt '
+            'com.android.packageinstaller/.permission.ui.GrantPermissionsActivity}\n'
+            'packageName=com.android.packageinstaller\n'
+            'launchedFromUid=10123 launchedFromPackage=com.markobl.calllogsync userId=0\n'
+            '* Hist #2: ActivityRecord{other com.example.other/.MainActivity}\n'
+            'launchedFromPackage=com.example.other userId=0\n'
+        )
+        summary = device.permission_activity_launcher_summary(dump)
+        self.assertEqual(summary, 'permission-launcher=com.markobl.calllogsync')
+        self.assertNotIn('com.example.unrelated', summary)
+        self.assertNotIn('com.example.other', summary)
+
+    def test_permission_activity_diagnostic_does_not_retain_arbitrary_text(self):
+        dump = (
+            '* Hist #0: ActivityRecord{prompt '
+            'com.android.packageinstaller/.permission.ui.GrantPermissionsActivity}\n'
+            'launchedFromPackage=+15551234567 account@example.test\n'
+        )
+        self.assertEqual(
+            device.permission_activity_launcher_summary(dump),
+            'permission-launcher=unavailable',
+        )
+
     def test_failure_summary_exposes_source_location_not_rendered_content(self):
         summary = device.native_failure_summary(
             'renderedAccessibilityLabelsTargetsAndKeyboardFocus',

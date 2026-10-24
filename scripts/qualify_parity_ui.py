@@ -182,6 +182,25 @@ def apk_runtime_permission_summary(app_apk, test_apk, aapt):
     return names(app_apk) + '|instrumentation:' + names(test_apk)
 
 
+def permission_activity_launcher_summary(activity_dump):
+    """Retain only the launcher package from a GrantPermissionsActivity record."""
+    in_permission_record = False
+    for line in activity_dump.splitlines():
+        if 'GrantPermissionsActivity' in line:
+            in_permission_record = True
+        elif line.lstrip().startswith('* Hist #'):
+            in_permission_record = False
+        if not in_permission_record:
+            continue
+        launcher = re.search(
+            r'launchedFromPackage=([A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z][A-Za-z0-9_]*){1,15})',
+            line,
+        )
+        if launcher:
+            return 'permission-launcher=' + launcher.group(1)
+    return 'permission-launcher=unavailable'
+
+
 def qualify(serial, suite="settings", receipt_dir=None):
     if suite not in ("settings", "imports", "recovery", "accessibility"):
         raise ValueError("Unknown UI suite")
@@ -249,6 +268,12 @@ def qualify(serial, suite="settings", receipt_dir=None):
             # Nonzero instrumentation exits can still contain a useful JUnit
             # failure. Keep raw output in the ignored receipt; only emit the
             # same allowlisted summary used for normal assertion failures.
+            try:
+                activity_dump = command('shell', 'dumpsys', 'activity', 'activities')
+            except Exception:
+                activity_dump = ''
+            output = (step.get('output', '') + '\n'
+                      + permission_activity_launcher_summary(activity_dump))
             apk_permissions = apk_runtime_permission_summary(apks[0], apks[1], aapt)
             raise RuntimeError(native_failure_summary(
                 method, step.get('output', ''), declared_permissions=apk_permissions
