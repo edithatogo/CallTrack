@@ -14,6 +14,16 @@ final class CallLogImportTests: XCTestCase {
         return Data((String(payload.dropLast()) + ",\"content_sha256\":\"\(checksum ?? digest)\"}").utf8)
     }
 
+    private func androidGoldenFixture() throws -> Data {
+        let repoRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let fixture = repoRoot.appending(path: "app/src/test/resources/call-log-v1.json")
+        return try Data(contentsOf: fixture)
+    }
+
     func testPreviewsMinimalSyntheticRecordWithoutWriting() throws {
         let preview = try CallLogImporter.preview(data: document(
             "{\"id\":\"\(callID)\",\"direction\":\"missed\",\"started_at_ms\":1800000000000,\"duration_seconds\":0}"
@@ -25,14 +35,17 @@ final class CallLogImportTests: XCTestCase {
     }
 
     func testAcceptsAndroidProducerGoldenFixture() throws {
-        let repoRoot = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-        let fixture = repoRoot.appending(path: "app/src/test/resources/call-log-v1.json")
-        let preview = try CallLogImporter.preview(data: Data(contentsOf: fixture))
+        let preview = try CallLogImporter.preview(data: androidGoldenFixture())
         XCTAssertEqual(preview.calls.count, 2)
+    }
+
+    func testRejectsEverySingleByteMutationOfAndroidGolden() throws {
+        let golden = try androidGoldenFixture()
+        for offset in golden.indices {
+            var mutated = golden
+            mutated[offset] = mutated[offset] ^ 0x01
+            XCTAssertThrowsError(try CallLogImporter.preview(data: mutated), "mutation at byte \(offset)")
+        }
     }
 
     func testRejectsRecordCountAndChecksumMismatch() {

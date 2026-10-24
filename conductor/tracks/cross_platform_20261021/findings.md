@@ -58,6 +58,11 @@ authenticity control. Contract tests cover repeated `schema_version` and an
 unknown root field using otherwise checksum-valid payloads. Fuzzing and broader
 malformed-input campaigns remain outstanding.
 
+After the contract freeze, the direct Swift harness also performed a
+deterministic single-bit mutation sweep over all 422 bytes of the shared golden;
+all 422 altered documents were rejected. This is a narrow corruption smoke test,
+not coverage-guided fuzzing or adversarial-security qualification.
+
 ## Conditional end-to-end acceptance matrix
 
 1. **Contract:** freeze versioned Android export/macOS import schema and golden

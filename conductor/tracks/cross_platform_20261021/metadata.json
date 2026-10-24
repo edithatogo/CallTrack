@@ -42,6 +42,11 @@
     "source_harness_passed": true,
     "canonical_json_policy": "exact-v1-field-order-and-number-spelling; no-unknown-or-duplicate-keys; optional-final-LF-or-CRLF",
     "canonical_json_hostile_cases_passed": true,
+    "single_byte_golden_mutation_sweep": {
+      "total_bytes": 422,
+      "rejected_mutations": 422,
+      "coverage_guided_fuzzing": false
+    },
     "swiftpm_xctest_status": "blocked-before-source-compilation-unknown-error-parsing-property-list",
     "review_document": "review-20261024-portable-export.md",
     "latest_slice_review_document": "review-20261024-schema-hardening.md",
