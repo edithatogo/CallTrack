@@ -103,12 +103,22 @@ jobs:
             attempt=$((attempt + 1))
             sleep 2
           done
-          if [ "$(timeout 15 adb -s emulator-5554 shell getprop sys.boot_completed | tr -d '\r')" != 1 ]; then
+          boot_completed="$(timeout 15 adb -s emulator-5554 shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)"
+          if [ "$boot_completed" != 1 ]; then
+            echo "Emulator boot did not complete; sys.boot_completed='$boot_completed'"
+            adb devices -l || true
             tail -n 120 .local/slice-evidence/track14-hosted-emulator.log
             exit 1
           fi
-          test "$(adb -s emulator-5554 emu avd name | sed -n '1p')" = calltrack-track14-api36
-          test "$(adb -s emulator-5554 shell getprop ro.build.version.sdk | tr -d '\r')" = 36
+          avd_name="$(adb -s emulator-5554 emu avd name | sed -n '1p')"
+          android_sdk="$(adb -s emulator-5554 shell getprop ro.build.version.sdk | tr -d '\r')"
+          printf 'Booted AVD: %s; Android SDK: %s\n' "$avd_name" "$android_sdk"
+          if [ "$avd_name" != calltrack-track14-api36 ] || [ "$android_sdk" != 36 ]; then
+            echo 'Emulator identity or API-level verification failed.'
+            adb devices -l || true
+            tail -n 120 .local/slice-evidence/track14-hosted-emulator.log
+            exit 1
+          fi
       - name: Run settings, import, recovery and accessibility journeys
         env:
           RUN_ATTEMPT: ${{ github.run_attempt }}
