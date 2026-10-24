@@ -67,6 +67,12 @@ The raw Maven and JetBrains GitHub release tarball hashes differ, but an indepen
 
 The native compiler's separate LLVM archive matches its published SHA-256 sidecar. The LLDB archive does not: downloaded SHA-256 `069193359103d4e4a4653f236e7a963e266a4a366905e858d4a68e701f43866e`; publisher sidecar `6c97f0a4755b83282b037800ac4c0591ebb8e7a3517bb53924bcb61684243d45`. Its contents are not treated as trusted native-test evidence. In addition, `xcodebuild -version` fails because only Command Line Tools are selected; Kotlin/Native 2.3.21's version-pinned `konan.properties` sets `minimalXcodeVersion=12.5` and its `macosArm64` toolchain entries reference `xcode_26.0.1_17A400`. Therefore `macosArm64Test` remains not accepted and the KMP milestone remains open. See [toolchain review](review-20261024-kotlin-native-toolchain.md) and [dependency audit](dependency-verification-audit.json).
 
+## Hosted Kotlin/Native acceptance job prepared — 2026-10-24
+
+Added `.github/workflows/shared-core-native.yml`, scoped to shared-core/build configuration changes and manual dispatch. It selects the public `macos-15` ARM64 runner, Temurin 17.0.20+101, and the currently listed Xcode 26.1.1 (build 17B100), verifies Android SDK36/build-tools35 are present, and runs `:shared-core:macosArm64Test`. The workflow requires generated JUnit XML. The current hosted image manifest lists this Xcode, Android SDK and ARM64 runner; see [runner image manifest](https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md) and [GitHub-hosted runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).
+
+This is a CI mechanism, not native acceptance evidence. The workflow has not yet run; the test result, actual toolchain compatibility, test count and artifacts remain pending. `macos_native_accepted=false` and the Track 15 milestone remains open until an observed successful hosted run and its outputs are reviewed.
+
 
 ## Local verification after compiler checksum update — 2026-10-24
 
