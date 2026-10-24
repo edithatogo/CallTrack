@@ -32,6 +32,9 @@ the version-1 interchange format.
   validating existing schema, identity, timestamp, duration, checksum, and
   10,000-record boundaries.
 - `actionlint .github/workflows/macos-companion.yml` passes.
+- The first hosted XCTest run passed both new file-preview tests and exposed a
+  pre-existing golden-fixture root calculation that was one directory too
+  shallow in two tests. The path was corrected; a clean hosted rerun is pending.
 - SwiftPM package tests remain unavailable locally. The native build-system
   path reaches the test target but fails because this Command Line Tools-only
   installation has no `XCTest` module. Full Xcode is absent; the hosted macOS

@@ -20,6 +20,7 @@ final class CallLogImportTests: XCTestCase {
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .deletingLastPathComponent()
+            .deletingLastPathComponent()
         let fixture = repoRoot.appending(path: "app/src/test/resources/call-log-v1.json")
         return try Data(contentsOf: fixture)
     }
