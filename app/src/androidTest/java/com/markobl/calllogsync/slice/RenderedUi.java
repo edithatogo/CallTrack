@@ -166,14 +166,43 @@ final class RenderedUi {
     /** Select a visible permission-controller action using only known resource IDs. */
     String tapAnyId(String... ids) {
         for (String id : ids) {
-            AccessibilityNodeInfo node = shown(id, true);
-            if (node != null && node.isEnabled()) {
-                tapId(id);
+            AccessibilityNodeInfo node = findPermissionControl(id);
+            if (node != null) {
+                tapPermissionId(id);
                 return id;
             }
         }
-        tapId(ids[0]); // Preserve the usual bounded diagnostic when no known ID is present.
+        tapPermissionId(ids[0]); // Preserve the bounded diagnostic when no known ID is present.
         return ids[0];
+    }
+
+    private AccessibilityNodeInfo findPermissionControl(String id) {
+        for (android.view.accessibility.AccessibilityWindowInfo window : automation.getWindows()) {
+            AccessibilityNodeInfo root = window.getRoot();
+            CharSequence owner = root == null ? null : root.getPackageName();
+            if (owner == null || !permissionPackage(owner.toString())) continue;
+            AccessibilityNodeInfo node = find(root, id, true);
+            if (node != null && node.isEnabled()) return node;
+        }
+        return null;
+    }
+
+    private void tapPermissionId(String id) {
+        final AccessibilityNodeInfo[] found = new AccessibilityNodeInfo[1];
+        try {
+            await(
+                    () -> {
+                        found[0] = findPermissionControl(id);
+                        return found[0] != null;
+                    },
+                    "Visible enabled control missing: " + id);
+        } catch (AssertionError missing) {
+            throw new AssertionError(missing.getMessage() + "; " + dialogActionSummary(), missing);
+        }
+        settle();
+        found[0] = findPermissionControl(id);
+        assertNotNull("Permission control disappeared before touch", found[0]);
+        touch(found[0], id);
     }
 
     void tapIdWhileBusy(String id) {
@@ -491,7 +520,7 @@ final class RenderedUi {
                                         "permission_deny_and_dont_ask_again_button");
                         requiresSettingsGrant = selected.contains("and_dont_ask_again");
                     } else {
-                        tapId("permission_allow_button");
+                        tapPermissionId("permission_allow_button");
                     }
                     long transition = SystemClock.elapsedRealtime() + 3000;
                     do {

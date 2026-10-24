@@ -92,3 +92,18 @@ validated app and instrumentation APKs using `aapt`, and retains only
 `WRITE_CALENDAR` in failure summaries. This is independent of system-dialog
 labels and instrumentation exception formatting. Focused Python safety tests
 and local APK manifest readback pass; hosted API26/API33 rerun remains required.
+
+Run [40117601783](https://github.com/edithatogo/CallTrack/actions/runs/40117601783)
+on `5fdff4d` passed API36 and failed API26/API33. The API26 diagnostic now
+reads permissions from the actual validated APKs: the app declares
+`READ_CALENDAR`, `READ_CALL_LOG`, `READ_PHONE_STATE` and `WRITE_CALENDAR`; the
+instrumentation APK declares none of the allowlisted permissions. The active
+dialog text classifier still says `contacts`, so neither APK manifest
+declares `READ_CONTACTS`, and the origin of the permission UI remains unknown.
+API33 again failed to locate the deny control. The next test-only fix searches
+all visible accessibility windows for known PermissionController-package
+controls and retains package ownership checks before touch. Its hosted matrix
+is pending. A local Gradle compile could not start because the host has JDK11;
+Android Gradle Plugin requires JDK17. Direct Java 8-compatibility compilation
+of the changed helper against API36 `android.jar` and cached JUnit, the pinned
+Java formatter, and the Python safety suite passed.

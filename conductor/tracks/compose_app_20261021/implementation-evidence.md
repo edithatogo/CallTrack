@@ -665,3 +665,19 @@ on accessibility exception text to carry the instrumentation-side declaration
 summary. Focused safety tests and direct readback of the current APKs pass; the
 hosted matrix for this diagnostic revision is pending, so the API26 cause is
 still unverified.
+
+Diagnostic revision `5fdff4d` completed hosted run
+[40117601783](https://github.com/edithatogo/CallTrack/actions/runs/40117601783):
+API36 passed; API26 failed again during import with the dialog classified as
+`contacts`, but the validated APKs reported only calendar, call-log and
+phone-state permissions and the instrumentation APK declared none of the
+allowlisted permissions. This rules out `READ_CONTACTS` in either installed
+APK manifest, while leaving the dialog's originating request unresolved.
+API33 failed to find the deny control. The test selector now searches the
+current accessibility windows for controls owned by the known Android
+PermissionController packages, rechecks the control before touch, and keeps
+the same ID allowlist. The hosted rerun is pending; local Gradle validation is
+unavailable because this host currently has JDK11 while the Android Gradle
+Plugin requires JDK17. Direct `javac -source 8 -target 8` compilation of the
+changed helper against the installed API36 `android.jar` and cached JUnit passes;
+the pinned Java formatter and focused Python safety checks also pass.
