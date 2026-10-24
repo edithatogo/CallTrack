@@ -74,6 +74,31 @@ struct ParserContractHarness {
             fatalError("checksum mismatch was accepted")
         } catch ImportFailure.checksumMismatch { }
 
-        print("PASS: bounded preview, golden interchange, identity, checksum, timestamp, duration, count, and size contracts")
+        let canonical = String(decoding: document(record), as: UTF8.self)
+        _ = try CallLogImporter.preview(data: Data((canonical + "\r\n").utf8))
+        do {
+            _ = try CallLogImporter.preview(data: Data((canonical + "\n\n").utf8))
+            fatalError("multiple trailing line endings were accepted")
+        } catch ImportFailure.nonCanonicalDocument { }
+
+        let duplicateKey = canonical.replacingOccurrences(
+            of: "\"schema_version\":1,",
+            with: "\"schema_version\":1,\"schema_version\":1,"
+        )
+        do {
+            _ = try CallLogImporter.preview(data: Data(duplicateKey.utf8))
+            fatalError("duplicate JSON key was accepted")
+        } catch ImportFailure.nonCanonicalDocument { }
+
+        let unknownField = canonical.replacingOccurrences(
+            of: "\"schema_version\":1,",
+            with: "\"schema_version\":1,\"unexpected\":true,"
+        )
+        do {
+            _ = try CallLogImporter.preview(data: Data(unknownField.utf8))
+            fatalError("unknown JSON field was accepted")
+        } catch ImportFailure.nonCanonicalDocument { }
+
+        print("PASS: bounded preview, golden interchange, canonical JSON, identity, checksum, timestamp, duration, count, and size contracts")
     }
 }

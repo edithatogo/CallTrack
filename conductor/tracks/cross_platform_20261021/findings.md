@@ -8,7 +8,7 @@ verification and scoped prerequisite records.
 |---|---|---|
 | Android app and event ledger | Root Android app remains the qualified native owner for CallLog acquisition, identity/receipt, SQLite ledger, scheduling and CalendarContract delivery. Track 14 replaced only a read-only settings/status slice. | Finish Track 14 UI parity/lifecycle/accessibility and Track 5/6-linked release acceptance; do not treat Android state as a shared portable receipt. |
 | Shared domain | Track 15 shares bounded call-type selection and half-open time-range rules on JVM/Android. | Run the same golden/fault fixtures on macOS Kotlin/Native and document ABI/serialization boundaries before claiming portable core parity. |
-| macOS import | Track 16 has a bounded Foundation JSON preview parser, now exercised against a prototype Android encoder and shared golden: schema v1, 5 MiB, 10,000 records, opaque UUIDs, direction, epoch-millisecond timestamps, durations, record count and canonical SHA-256 corruption checksum. | The Android exporter is not integrated and this is not an accepted interchange specification. Define version evolution, hostile-input/JSON ambiguity rules, provenance, foreign-receipt handling and restore/recovery before compatibility claims. |
+| macOS import | Track 16 has a bounded Foundation JSON preview parser, now exercised against a prototype Android encoder and shared golden: schema v1, 5 MiB, 10,000 records, opaque UUIDs, direction, epoch-millisecond timestamps, durations, record count and canonical SHA-256 corruption checksum. It rejects duplicate JSON keys, unknown fields and noncanonical encodings while allowing one final LF/CRLF. | The Android exporter is not integrated and this is not an accepted interchange specification. Define version evolution, provenance, foreign-receipt handling and restore/recovery before compatibility claims. |
 | macOS calendar | EventKit API declaration probe only; no permission, destination enumeration, event write or exact readback. | Native app, user-selected calendar, permission/denial handling, durable intent, one writer, exact local readback, edit/delete recovery and cloud-route evidence are absent. |
 | Shared UI | Track 17 now has a shared synthetic screen, a KMP Android target and a debug Android Activity host. PR #60 merged the compile/package evidence. Android KMP/host and desktop graphs were audited; production adoption remains false. | The API36 emulator is offline, so Android rendering/accessibility/lifecycle acceptance remains false. There is no production app integration or native macOS package. Qualify rendered Android and macOS-native workflows, accessibility/focus/keyboard/scaling/RTL and lifecycle recreation; prove rendering causes no writes. |
 | Package and upgrade | Android has separate release evidence under Track 5; no packaged macOS companion or common update contract exists. | Freeze exact per-platform candidates and provenance; perform fresh install, preserving upgrade, interrupted update/restore, identity and rollback checks on each packaged product. |
@@ -43,9 +43,17 @@ to their separately recorded results.
 The golden UUIDs are synthetic. Stable portable IDs are scoped to the Android
 source-install namespace and source row identity, so they support deterministic
 export comparisons without revealing either input. A foreign export ID or row
-ID does not authorize replay. Schema evolution, unknown/duplicate JSON-key
-handling, restore semantics, hostile-input fuzzing, native file selection,
+ID does not authorize replay. Schema evolution, restore semantics,
+hostile-input fuzzing, native file selection,
 packaging, and native/remote calendar acceptance remain open.
+
+The parser now requires the exact schema-v1 canonical field/order/number
+representation, with at most one final LF or CRLF. This closes JSON duplicate-key
+and hidden-unknown-field ambiguity without a second custom JSON parser. The
+checksum still only detects accidental payload corruption; it is not an
+authenticity control. Contract tests cover repeated `schema_version` and an
+unknown root field using otherwise checksum-valid payloads. Fuzzing and broader
+malformed-input campaigns remain outstanding.
 
 ## Conditional end-to-end acceptance matrix
 
