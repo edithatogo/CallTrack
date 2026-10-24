@@ -67,17 +67,15 @@ class UiSafety(unittest.TestCase):
     def test_failure_summary_retains_only_allowlisted_dialog_action_metadata(self):
         summary = device.native_failure_summary(
             'renderedRangePreviewCancelConfirmAndRepeat',
-            'Visible enabled dialog action missing; dialog-root=app '
-            'dialog-controls=[button1:android.widget.Button:enabled=false:'
-            'clickable=true:label-match=false]\n'
+            'Visible enabled positive dialog action missing; dialog-active=input-method '
+            'dialog-windows=[app:application:[button1:android.widget.Button:'
+            'enabled=false:clickable=true], input-method:input-method:[]]\n'
             'private dialog title and message must remain hidden\n'
             '    at com.markobl.calllogsync.slice.ImportUiTest.confirm(ImportUiTest.java:104)\n',
         )
-        self.assertIn('dialog-root=app', summary)
-        self.assertIn(
-            'button1:android.widget.Button:false:true:false',
-            summary,
-        )
+        self.assertIn('dialog-active=input-method', summary)
+        self.assertIn('dialog-windows=app:application,input-method:input-method', summary)
+        self.assertIn('dialog-controls=button1:android.widget.Button:false', summary)
         self.assertNotIn('private dialog title', summary)
 
     def test_failure_summary_retains_only_allowlisted_permission_diagnostic(self):

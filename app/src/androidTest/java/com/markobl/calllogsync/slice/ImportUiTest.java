@@ -101,7 +101,7 @@ public class ImportUiTest {
 
     private void confirm(RenderedUi ui) {
         ui.tapId("import_confirm");
-        ui.tapClickableText(context().getString(R.string.import_confirm));
+        ui.tapDialogPositive();
         ui.await(
                 () -> phase(HistoricalImport.Phase.COMPLETE),
                 "Confirmed UI import did not complete");
