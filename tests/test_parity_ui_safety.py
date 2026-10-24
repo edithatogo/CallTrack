@@ -141,6 +141,20 @@ class UiSafety(unittest.TestCase):
         self.assertIn('permission_deny_and_dont_ask_again_button:android.widget.Button:enabled=true', summary)
         self.assertNotIn('private label', summary)
 
+    def test_failure_summary_reports_safe_controls_from_all_permission_windows(self):
+        summary = device.native_failure_summary(
+            'renderedPermissionsFiltersConfirmPauseAndReopen',
+            'Visible enabled control missing: permission_allow_button; '
+            'permission-root=com.android.permissioncontroller '
+            'permission-controls=[com.android.permissioncontroller:id/'
+            'permission_allow_foreground_only_button:android.widget.Button:enabled=true]\n',
+        )
+        self.assertIn('permission-root=com.android.permissioncontroller', summary)
+        self.assertIn(
+            'permission_allow_foreground_only_button:android.widget.Button:enabled=true',
+            summary,
+        )
+
     def test_failure_summary_reports_only_permission_requester_label_visibility(self):
         summary = device.native_failure_summary(
             'renderedRangePreviewCancelConfirmAndRepeat',

@@ -155,7 +155,13 @@ final class RenderedUi {
                     },
                     "Visible enabled positive dialog action missing");
         } catch (AssertionError missing) {
-            throw new AssertionError(missing.getMessage() + "; " + dialogActionSummary(), missing);
+            throw new AssertionError(
+                    missing.getMessage()
+                            + "; "
+                            + permissionControlSummary()
+                            + "; "
+                            + dialogActionSummary(),
+                    missing);
         }
         settle();
         found[0] = findDialogPositive(automation.getWindows());
@@ -197,7 +203,13 @@ final class RenderedUi {
                     },
                     "Visible enabled control missing: " + id);
         } catch (AssertionError missing) {
-            throw new AssertionError(missing.getMessage() + "; " + dialogActionSummary(), missing);
+            throw new AssertionError(
+                    missing.getMessage()
+                            + "; "
+                            + permissionControlSummary()
+                            + "; "
+                            + dialogActionSummary(),
+                    missing);
         }
         settle();
         found[0] = findPermissionControl(id);
@@ -489,11 +501,18 @@ final class RenderedUi {
     }
 
     private String permissionControlSummary() {
-        AccessibilityNodeInfo root = automation.getRootInActiveWindow();
-        if (root == null || root.getPackageName() == null) return "permission-root=unavailable";
+        java.util.List<String> owners = new java.util.ArrayList<>();
         java.util.List<String> controls = new java.util.ArrayList<>();
-        collectPermissionControls(root, controls);
-        return "permission-root=" + root.getPackageName() + " controls=" + controls;
+        for (android.view.accessibility.AccessibilityWindowInfo window : automation.getWindows()) {
+            AccessibilityNodeInfo root = window.getRoot();
+            CharSequence owner = root == null ? null : root.getPackageName();
+            if (owner != null && permissionPackage(owner.toString())) owners.add(owner.toString());
+            collectPermissionControls(root, controls);
+        }
+        return "permission-root="
+                + (owners.isEmpty() ? "unavailable" : owners.get(0))
+                + " permission-controls="
+                + controls;
     }
 
     private void collectPermissionControls(
