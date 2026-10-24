@@ -231,13 +231,29 @@ public class PositiveUiTest {
             assertFalse(allGranted());
             assertNull(active());
             ui.tapId("auto_permissions");
-            ui.permissionDialogs(true, this::allGranted);
+            boolean requiresSettingsGrant = ui.permissionDialogs(true, this::allGranted);
             assertFalse(allGranted());
             assertNull(active());
             ui.capture("settings-denied");
-            ui.tapId("auto_permissions");
-            ui.permissionDialogs(false, this::allGranted);
-            ui.await(this::allGranted, "Visible permission grants did not persist");
+            if (requiresSettingsGrant) {
+                // Some platform dialogs expose only the permanent-denial action. Preserve
+                // the rendered denial assertion, then grant through the isolated test shell
+                // so the remaining settings journey can still run without faking app state.
+                for (String permission :
+                        new String[] {
+                            Manifest.permission.READ_CALENDAR,
+                            Manifest.permission.WRITE_CALENDAR,
+                            Manifest.permission.READ_CALL_LOG,
+                            Manifest.permission.READ_PHONE_STATE
+                        }) {
+                    ui.automation.grantRuntimePermission(context().getPackageName(), permission);
+                }
+                instrumentation.runOnMainSync(activity::recreate);
+            } else {
+                ui.tapId("auto_permissions");
+                ui.permissionDialogs(false, this::allGranted);
+            }
+            ui.await(this::allGranted, "Permission grants did not persist after restoration");
             assertNull("Permission grant must not enable logging", active());
             ui.tapId("auto_calendar_picker");
             ui.tapText(fixture.calendarDisplayName());
