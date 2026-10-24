@@ -28,3 +28,6 @@
 - [x] Task: Perform Conductor review, fix the synthetic prerequisite test fixture and rerun affected checks (32ae39b; review-20261024.md).
 - [x] Task: Update requirements, decisions, remaining limitations and next-track inputs; no superseded writer or ledger code is retired.
 - [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger; macOS Kotlin/Native acceptance is still pending.
+
+## Phase: Kotlin/Native toolchain trust audit review (2026-10-24)
+- [x] Task: Verify the pinned KGP 2.3.21 compiler bundle and POM, record LLVM/LLDB checksum evidence and leave macOS native acceptance open (5092e9c; review-20261024-kotlin-native-toolchain.md).
