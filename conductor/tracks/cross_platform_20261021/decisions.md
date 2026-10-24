@@ -11,11 +11,17 @@ and prototype-only. Do not add an interchange library or Rust component before
 an Android producer and accepted format make a real compatibility test possible.
 
 This choice avoids selecting dependencies against an unowned format and avoids
-duplicating calendar writers or synchronization receipts. Reassess native versus
-library support after the format contract exists; record exact versions,
+duplicating calendar writers or synchronization receipts. A synthetic schema-v1
+producer/parser contract now exists as a bounded prototype under
+`app/src/main/kotlin/com/markobl/calllogsync/slice/CallLogExport.kt` and the
+Track 16 parser. It is not integrated into the Android product or a stable
+interchange API. Reassess native versus library support after product use cases
+and restore semantics are specified; record exact versions,
 licences, transitives, maintenance, migration, rollback and removal criteria
 before implementation. Track 18's Rust deferral remains valid until a real
 cross-platform consumer and measurable end-to-end benefit exist.
 
+The prototype checksum detects accidental corruption but is not authentication.
+No portable receipts or destination authority cross the format boundary.
 This bounded decision neither passes Track 19's package/provider/upgrade matrix
 nor resolves Tracks 14–17. It does not unlock iOS.

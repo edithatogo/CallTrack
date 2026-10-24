@@ -8,12 +8,44 @@ verification and scoped prerequisite records.
 |---|---|---|
 | Android app and event ledger | Root Android app remains the qualified native owner for CallLog acquisition, identity/receipt, SQLite ledger, scheduling and CalendarContract delivery. Track 14 replaced only a read-only settings/status slice. | Finish Track 14 UI parity/lifecycle/accessibility and Track 5/6-linked release acceptance; do not treat Android state as a shared portable receipt. |
 | Shared domain | Track 15 shares bounded call-type selection and half-open time-range rules on JVM/Android. | Run the same golden/fault fixtures on macOS Kotlin/Native and document ABI/serialization boundaries before claiming portable core parity. |
-| macOS import | Track 16 has a bounded Foundation JSON preview parser: schema v1, 5 MiB, 10,000 records, UUID identities, direction, epoch-millisecond timestamps and bounded durations. Unknown fields are ignored; malformed records fail closed. It excludes contact/phone/account data and foreign receipts. | No Android exporter or accepted interchange specification exists. Establish producer-owned export, canonical fixtures, version evolution, redaction, checksums/provenance, duplicate/ambiguity rules, and restore/recovery before compatibility claims. |
+| macOS import | Track 16 has a bounded Foundation JSON preview parser, now exercised against a prototype Android encoder and shared golden: schema v1, 5 MiB, 10,000 records, opaque UUIDs, direction, epoch-millisecond timestamps, durations, record count and canonical SHA-256 corruption checksum. | The Android exporter is not integrated and this is not an accepted interchange specification. Define version evolution, hostile-input/JSON ambiguity rules, provenance, foreign-receipt handling and restore/recovery before compatibility claims. |
 | macOS calendar | EventKit API declaration probe only; no permission, destination enumeration, event write or exact readback. | Native app, user-selected calendar, permission/denial handling, durable intent, one writer, exact local readback, edit/delete recovery and cloud-route evidence are absent. |
 | Shared UI | Track 17 now has a shared synthetic screen, a KMP Android target and a debug Android Activity host. PR #60 merged the compile/package evidence. Android KMP/host and desktop graphs were audited; production adoption remains false. | The API36 emulator is offline, so Android rendering/accessibility/lifecycle acceptance remains false. There is no production app integration or native macOS package. Qualify rendered Android and macOS-native workflows, accessibility/focus/keyboard/scaling/RTL and lifecycle recreation; prove rendering causes no writes. |
 | Package and upgrade | Android has separate release evidence under Track 5; no packaged macOS companion or common update contract exists. | Freeze exact per-platform candidates and provenance; perform fresh install, preserving upgrade, interrupted update/restore, identity and rollback checks on each packaged product. |
 | Calendar route | Android provider-local behavior has selected emulator evidence; user has not selected Google/Outlook for live qualification. macOS EventKit has no selected destination. | Keep Google/Outlook and actual account-cloud synchronization unclaimed until explicitly selected and exact local plus remote readback is authorized and captured. |
-| Rust | Track 18's reviewed decision defers production Rust: no shared accepted format, actual second consumer or measured bottleneck. | Keep Rust out of production. Reconsider only after an Android producer and a real second-platform consumer exercise the same format. |
+| Rust | Track 18's reviewed decision defers production Rust: the current shared format is prototype-only, with no app-integrated producer, qualified workflow or measured bottleneck. | Keep Rust out of production. Reconsider only after a real cross-platform workflow establishes a stable format and measurable need. |
+
+## Prototype interchange contract — 2026-10-24
+
+A bounded prototype now connects `CallRecord` to Track 16's preview parser using
+one synthetic schema-v1 golden fixture. The Kotlin producer emits only opaque
+per-source-row UUIDv8 identifiers, direction, epoch-millisecond start,
+duration, export UUID, record count and a SHA-256 corruption checksum. Names,
+numbers, account fields, raw source namespace/row IDs and calendar receipts are
+excluded. Unknown call directions, malformed source IDs, duplicate identities,
+time overflow, over-10,000 rows and output over 5 MiB fail closed. The checksum
+covers the producer's canonical JSON without the checksum member; it detects
+accidental corruption and is not a signature or authenticity guarantee. Call
+times and directions are still sensitive personal data; any eventual export
+workflow needs explicit user choice, safe storage/sharing guidance and deletion
+behavior.
+
+The Swift preview validates the same canonical checksum and record count before
+returning records. `ParserContractHarness.swift` compiled with the installed
+Swift 6.4 command-line toolchain and passed its synthetic cross-language golden,
+duplicate, version, timestamp, duration, count, checksum and size checks. This is
+source-level parsing evidence only. The producer is not exposed by the Android
+app, the file is not saved or delivered by a UI, the format is not a stable
+public API, and the importer still grants no receipt authority or calendar-write
+permission. Android JVM unit tests and the SwiftPM/XCTest runner remain subject
+to their separately recorded results.
+
+The golden UUIDs are synthetic. Stable portable IDs are scoped to the Android
+source-install namespace and source row identity, so they support deterministic
+export comparisons without revealing either input. A foreign export ID or row
+ID does not authorize replay. Schema evolution, unknown/duplicate JSON-key
+handling, restore semantics, hostile-input fuzzing, native file selection,
+packaging, and native/remote calendar acceptance remain open.
 
 ## Conditional end-to-end acceptance matrix
 

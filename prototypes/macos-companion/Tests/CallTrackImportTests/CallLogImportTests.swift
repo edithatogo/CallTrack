@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 import XCTest
 @testable import CallTrackImport
 
@@ -6,10 +7,11 @@ final class CallLogImportTests: XCTestCase {
     private let exportID = UUID(uuidString: "00000000-0000-4000-8000-000000000001")!
     private let callID = UUID(uuidString: "00000000-0000-4000-8000-000000000002")!
 
-    private func document(_ calls: String, version: Int = 1) -> Data {
-        Data("""
-        {"schema_version":\(version),"export_id":"\(exportID)","calls":[\(calls)]}
-        """.utf8)
+    private func document(_ calls: String, version: Int = 1, count: Int? = nil, checksum: String? = nil) -> Data {
+        let actualCount = count ?? (calls.isEmpty ? 0 : calls.components(separatedBy: "},{").count)
+        let payload = "{\"schema_version\":\(version),\"export_id\":\"\(exportID.uuidString.lowercased())\",\"record_count\":\(actualCount),\"calls\":[\(calls)]}"
+        let digest = SHA256.hash(data: Data(payload.utf8)).map { String(format: "%02x", $0) }.joined()
+        return Data((String(payload.dropLast()) + ",\"content_sha256\":\"\(checksum ?? digest)\"}").utf8)
     }
 
     func testPreviewsMinimalSyntheticRecordWithoutWriting() throws {
@@ -20,6 +22,27 @@ final class CallLogImportTests: XCTestCase {
         XCTAssertEqual(preview.calls.count, 1)
         XCTAssertEqual(preview.calls[0].direction, .missed)
         XCTAssertEqual(preview.calls[0].durationSeconds, 0)
+    }
+
+    func testAcceptsAndroidProducerGoldenFixture() throws {
+        let repoRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let fixture = repoRoot.appending(path: "app/src/test/resources/call-log-v1.json")
+        let preview = try CallLogImporter.preview(data: Data(contentsOf: fixture))
+        XCTAssertEqual(preview.calls.count, 2)
+    }
+
+    func testRejectsRecordCountAndChecksumMismatch() {
+        let record = "{\"id\":\"\(callID)\",\"direction\":\"incoming\",\"started_at_ms\":1800000000000,\"duration_seconds\":1}"
+        XCTAssertThrowsError(try CallLogImporter.preview(data: document(record, count: 2))) {
+            XCTAssertEqual($0 as? ImportFailure, .recordCountMismatch)
+        }
+        XCTAssertThrowsError(try CallLogImporter.preview(data: document(record, checksum: String(repeating: "0", count: 64)))) {
+            XCTAssertEqual($0 as? ImportFailure, .checksumMismatch)
+        }
     }
 
     func testRejectsUnsupportedVersionAndMalformedInput() {

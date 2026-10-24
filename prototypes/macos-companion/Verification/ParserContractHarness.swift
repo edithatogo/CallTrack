@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 
 @main
@@ -5,12 +6,24 @@ struct ParserContractHarness {
     static func main() throws {
         let exportID = "00000000-0000-4000-8000-000000000001"
         let callID = "00000000-0000-4000-8000-000000000002"
-        func document(_ calls: String, version: Int = 1) -> Data {
-            Data("{\"schema_version\":\(version),\"export_id\":\"\(exportID)\",\"calls\":[\(calls)]}".utf8)
+        func payload(_ calls: String, version: Int = 1, count: Int? = nil) -> String {
+            let actualCount = count ?? (calls.isEmpty ? 0 : calls.components(separatedBy: "},{").count)
+            return "{\"schema_version\":\(version),\"export_id\":\"\(exportID)\",\"record_count\":\(actualCount),\"calls\":[\(calls)]}"
+        }
+        func document(_ calls: String, version: Int = 1, count: Int? = nil, checksum: String? = nil) -> Data {
+            let body = payload(calls, version: version, count: count)
+            let digest = SHA256.hash(data: Data(body.utf8)).map { String(format: "%02x", $0) }.joined()
+            return Data((String(body.dropLast()) + ",\"content_sha256\":\"\(checksum ?? digest)\"}").utf8)
         }
         let record = "{\"id\":\"\(callID)\",\"direction\":\"missed\",\"started_at_ms\":1800000000000,\"duration_seconds\":0}"
         let preview = try CallLogImporter.preview(data: document(record))
         precondition(preview.calls.count == 1 && preview.calls[0].direction == .missed)
+
+        if CommandLine.arguments.count > 1 {
+            let golden = try Data(contentsOf: URL(fileURLWithPath: CommandLine.arguments[1]))
+            let goldenPreview = try CallLogImporter.preview(data: golden)
+            precondition(goldenPreview.calls.count == 2)
+        }
 
         do {
             _ = try CallLogImporter.preview(data: document("\(record),\(record)"))
@@ -34,10 +47,9 @@ struct ParserContractHarness {
             fatalError("timestamp overflow was accepted")
         } catch ImportFailure.invalidTimestamp { }
 
-        let tooManyCalls = Array(repeating: record, count: CallLogImporter.maximumCalls + 1)
-            .joined(separator: ",")
+        let tooManyCalls = Array(repeating: record, count: CallLogImporter.maximumCalls + 1).joined(separator: ",")
         do {
-            _ = try CallLogImporter.preview(data: document(tooManyCalls))
+            _ = try CallLogImporter.preview(data: document(tooManyCalls, count: CallLogImporter.maximumCalls + 1))
             fatalError("too many calls were accepted")
         } catch ImportFailure.tooManyCalls { }
 
@@ -52,6 +64,16 @@ struct ParserContractHarness {
             fatalError("overflowing duration was accepted")
         } catch ImportFailure.invalidDuration { }
 
-        print("PASS: preview, identity, version, timestamp, duration, count, and size contracts")
+        do {
+            _ = try CallLogImporter.preview(data: document(record, count: 2))
+            fatalError("record-count mismatch was accepted")
+        } catch ImportFailure.recordCountMismatch { }
+
+        do {
+            _ = try CallLogImporter.preview(data: document(record, checksum: String(repeating: "0", count: 64)))
+            fatalError("checksum mismatch was accepted")
+        } catch ImportFailure.checksumMismatch { }
+
+        print("PASS: bounded preview, golden interchange, identity, checksum, timestamp, duration, count, and size contracts")
     }
 }

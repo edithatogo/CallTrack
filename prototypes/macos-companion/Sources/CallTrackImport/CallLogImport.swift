@@ -1,14 +1,19 @@
 import Foundation
+import CryptoKit
 
 public struct CallLogDocument: Decodable, Sendable {
     public let schemaVersion: Int
     public let exportID: UUID
+    public let recordCount: Int
     public let calls: [CallRecord]
+    public let contentSHA256: String
 
     enum CodingKeys: String, CodingKey {
         case schemaVersion = "schema_version"
         case exportID = "export_id"
+        case recordCount = "record_count"
         case calls
+        case contentSHA256 = "content_sha256"
     }
 }
 
@@ -43,13 +48,15 @@ public enum ImportFailure: Error, Equatable {
     case invalidDocument
     case unsupportedVersion(Int)
     case tooManyCalls
+    case recordCountMismatch
+    case checksumMismatch
     case duplicateCallID(UUID)
     case invalidTimestamp(UUID)
     case invalidDuration(UUID)
 }
 
 /// Decodes a deliberately bounded, metadata-minimal JSON interchange document.
-/// This is a prototype contract; no Android exporter currently claims to emit it.
+/// This is a prototype contract; the Android producer is not integrated into the app.
 public enum CallLogImporter {
     public static let maximumFileBytes = 5 * 1024 * 1024
     public static let maximumCalls = 10_000
@@ -66,6 +73,7 @@ public enum CallLogImporter {
             throw ImportFailure.unsupportedVersion(document.schemaVersion)
         }
         guard document.calls.count <= maximumCalls else { throw ImportFailure.tooManyCalls }
+        guard document.recordCount == document.calls.count else { throw ImportFailure.recordCountMismatch }
 
         var seen = Set<UUID>()
         for call in document.calls {
@@ -77,6 +85,18 @@ public enum CallLogImporter {
             let end = call.startedAtMilliseconds.addingReportingOverflow(durationMilliseconds.partialValue)
             guard !end.overflow else { throw ImportFailure.invalidTimestamp(call.id) }
         }
+        let canonical = canonicalPayload(document)
+        let digest = SHA256.hash(data: Data(canonical.utf8))
+            .map { String(format: "%02x", $0) }
+            .joined()
+        guard digest == document.contentSHA256 else { throw ImportFailure.checksumMismatch }
         return ImportPreview(exportID: document.exportID, calls: document.calls)
+    }
+
+    private static func canonicalPayload(_ document: CallLogDocument) -> String {
+        let calls = document.calls.map { call in
+            "{\"id\":\"\(call.id.uuidString.lowercased())\",\"direction\":\"\(call.direction.rawValue)\",\"started_at_ms\":\(call.startedAtMilliseconds),\"duration_seconds\":\(call.durationSeconds)}"
+        }.joined(separator: ",")
+        return "{\"schema_version\":\(document.schemaVersion),\"export_id\":\"\(document.exportID.uuidString.lowercased())\",\"record_count\":\(document.recordCount),\"calls\":[\(calls)]}"
     }
 }
