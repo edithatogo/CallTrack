@@ -441,3 +441,28 @@ Android-test Kotlin/Java compilation, ktfmt0.59 and `git diff --check` passed.
 System permission grant/denial/revocation, provider access, full settings
 parity, accessibility and lifecycle acceptance remain pending. See the
 [settings access review](review-20261024-settings-access.md).
+
+## Current-main local verification refresh — 2026-10-24
+
+Rechecked the merged Track14 source at `046624cf1a8b286f27eb08386e3da23071fac9c3`
+in a clean managed worktree. The source-bound `scripts/run_slice_build.py`
+receipt reports exit code 0, unchanged inputs and matching debug app and
+instrumentation APK hashes. It used qualified JDK17.0.21.0.2 and Android SDK36;
+the local receipt and Gradle log are retained under ignored `.local/` evidence.
+The accompanying direct Gradle run passed `:app:testDebugUnitTest`,
+`:app:compileDebugAndroidTestKotlin`, both debug APK assemblies and
+`:app:lintDebug` (123 actionable tasks, all executed). The JVM report contains
+119 tests, with zero failures, errors or skips. Lint reports 26 warnings and
+3 hints, with no lint errors. Python3.15.1 `tests.test_parity_targets` and
+`tests.test_parity_ui_safety` passed all 19 tests, and
+`scripts/verify_conductor.py` accepted 246 documents, 21 tracks and 25
+synthetic scenarios. `git diff --check` passed.
+
+The current ADB readback lists only `emulator-5554` as offline; no healthy
+authorized emulator is available for a new rendered run. The earlier
+source-bound API36 rendered receipts remain evidence for their exact earlier
+candidate and are not promoted to this candidate. Provider-backed destination
+selection/restoration, permission revocation, process/lifecycle recovery,
+TalkBack/Switch Access and the broader OS matrix therefore remain pending.
+This refresh does not close Track14 or change any physical, remote-calendar or
+release gate.

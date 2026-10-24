@@ -61,5 +61,7 @@
 - [x] Task: Review recovery access action rendering and callback ownership; verify composition does not request permission and record hosted/emulator acceptance boundaries (see [review](review-20261024-recovery-access.md)).
 - [x] Task: Replace the automatic-settings import and recovery navigation Views with a lifecycle-disposed Compose action panel; preserve navigation IDs and keep `startActivity` in Activity callbacks (see [review](review-20261024-settings-navigation.md)).
 - [x] Task: Review explicit navigation callbacks and rendered IDs; record hosted build and emulator runtime boundaries in [review](review-20261024-settings-navigation.md).
+- [x] Task: Refresh current-main source-bound Android build, JVM, lint, Conductor and host safety-test evidence; leave new rendered acceptance pending while the authorized emulator is offline (see [implementation evidence](implementation-evidence.md)).
+- [x] Task: Review the current-main evidence refresh, verify its source/artifact and test references, and preserve explicit emulator acceptance limits (see [review](review-20261024-current-main-refresh.md)).
 - [ ] Task: Update requirements, decisions, remaining limitations and next-track inputs; retire superseded code/prototypes only after parity.
 - [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger.
