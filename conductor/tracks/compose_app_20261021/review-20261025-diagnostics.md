@@ -46,3 +46,24 @@ permission-controller controls.
 The API26 cause remains unassigned. The keyboard launcher suggests an external
 permission flow but does not prove which permission was requested or why the
 instrumentation channel closed. No product behavior change is justified.
+
+## Follow-up review: local API26 acceptance — 2026-10-25
+
+The isolated API26 rerun resolved the local harness finding. The four
+source-bound journeys (settings, import, recovery and accessibility) now pass
+on Android 8.0 / SDK26. Each receipt verifies fixture cleanup and package
+removal. APK manifest readback confirms the app and test APK do not request
+contacts permission. The local import harness handles only the observed
+Gboard-owned contacts prompt, and only with an explicit deny action. The
+keyboard test focuses the visible Compose host and enabled app anchor before a
+real Tab event, then requires visible app-owned input focus; the traversal
+assertion remains enabled.
+
+The final current-build validation passed `tests.test_parity_ui_safety` (35
+tests), the 250-document Conductor verifier, pinned Java formatting and
+`git diff --check`. No app permission request or runtime behavior changed.
+**Finding status: locally resolved; hosted verification pending.** Rerun the
+hosted API26/API33/API36 matrix on the pushed revision and retain API33 as an
+open issue until that exact run passes. The physical phone, manual
+TalkBack/Switch Access, provider, process/lifecycle and operational acceptance
+gates remain separate and unqualified.

@@ -23,6 +23,44 @@ import java.util.concurrent.TimeUnit;
 public class PositiveUiTest {
     private final ParityProviderTest fixture = new ParityProviderTest();
 
+    private android.view.View firstVisibleFocusable(android.view.View view) {
+        if (view instanceof android.view.ViewGroup) {
+            android.view.ViewGroup group = (android.view.ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                android.view.View candidate = firstVisibleFocusable(group.getChildAt(i));
+                if (candidate != null) return candidate;
+            }
+        }
+        android.graphics.Rect visible = new android.graphics.Rect();
+        return view.isShown()
+                        && view.isEnabled()
+                        && view.isFocusable()
+                        && view.getGlobalVisibleRect(visible)
+                        && !visible.isEmpty()
+                ? view
+                : null;
+    }
+
+    private android.view.View composeHost(android.view.View view) {
+        if (view.getClass().getName().equals("androidx.compose.ui.platform.ComposeView")) {
+            return view;
+        }
+        if (view instanceof android.view.ViewGroup) {
+            android.view.ViewGroup group = (android.view.ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                android.view.View candidate = composeHost(group.getChildAt(i));
+                if (candidate != null) return candidate;
+            }
+        }
+        return null;
+    }
+
+    private boolean focusComposeHost(android.view.View view) {
+        view.setFocusable(true);
+        view.setFocusableInTouchMode(true);
+        return view.requestFocus();
+    }
+
     private Context context() {
         return fixture.context();
     }
@@ -164,7 +202,36 @@ public class PositiveUiTest {
                                 + " enabled="
                                 + node.isEnabled(),
                         !node.isEnabled() || node.isFocusable());
+                android.view.View windowRoot = activity.getWindow().getDecorView();
+                final android.view.View[] initialFocus = {null};
+                final boolean[] inputFocusRequested = {false};
+                instrumentation.runOnMainSync(
+                        () -> {
+                            initialFocus[0] = composeHost(windowRoot);
+                            if (initialFocus[0] != null && initialFocus[0].isShown()) {
+                                inputFocusRequested[0] = focusComposeHost(initialFocus[0]);
+                            }
+                            if (!inputFocusRequested[0]) {
+                                initialFocus[0] = firstVisibleFocusable(windowRoot);
+                                inputFocusRequested[0] =
+                                        initialFocus[0] != null && initialFocus[0].requestFocus();
+                            }
+                        });
+                assertTrue(
+                        "Screen has no visible focusable view to accept keyboard input; host="
+                                + (initialFocus[0] == null
+                                        ? "missing"
+                                        : initialFocus[0].getClass().getName()
+                                                + ", shown="
+                                                + initialFocus[0].isShown()
+                                                + ", focusable="
+                                                + initialFocus[0].isFocusable()),
+                        inputFocusRequested[0]);
+                if (node.isEnabled())
+                    node.performAction(
+                            android.view.accessibility.AccessibilityNodeInfo.ACTION_FOCUS);
                 instrumentation.sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_TAB);
+                ui.capture("accessibility-after-tab-" + i);
                 ui.await(
                         () -> {
                             android.view.accessibility.AccessibilityNodeInfo root =

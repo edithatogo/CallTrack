@@ -741,3 +741,35 @@ Focused host verification after the run passed: 26 `tests.test_parity_ui_safety`
 tests and `scripts/verify_conductor.py` (249 documents, 21 tracks, 25 synthetic
 scenarios); `git diff --check` passed. The rendered matrix is not accepted
 because API26 remains unresolved. The PR remains open and unmerged.
+
+## Local API26 rendered matrix and Gboard prompt fix — 2026-10-25
+
+The isolated PortableSSD API26 emulator `calltrack-release-api26-20261022`
+(Android 8.0.0 / SDK26, emulator serial `emulator-5560`) completed the
+source-bound four-suite matrix on the current test APK. The exact build receipt
+under ignored `.local/slice-evidence/build-receipt.json` reports JDK
+17.0.21.0.2, SDK under `/Volumes/PortableSSD/cache/calltrack-sdk-20261020`,
+`exit_code: 0`, `inputs_unchanged: true`, and app/test APK SHA-256 values
+`2f505e79…583a` and `9d506885…07a76`. Settings, imports, recovery and
+accessibility receipts all report `passed` against those APK hashes, with
+fixture cleanup verified and test packages removed. Gboard readback confirms
+`READ_CONTACTS` remains denied. Local receipt directories are under
+`.local/slice-evidence/track14-local-api26-20261025/` and are not committed.
+
+The rendered import flow exposed an Android 8/Gboard contacts prompt when a
+date field was edited. Both validated APK manifests request calendar,
+call-log and phone-state permissions only; the harness now dismisses this
+prompt only when its launcher is exactly Gboard, and only by denying the
+contacts request. It does not grant contacts access or alter app permission
+behavior. The accessibility journey now applies input focus to the visible
+Compose host and enabled anchor before sending a real Tab key, then requires a
+visible app-owned input-focus node. This addresses the API26 focus startup gap
+without weakening the traversal assertion. Hosted API26/API33/API36 rerun on
+the exact pushed revision is still required; this local result does not replace
+the hosted matrix or physical/manual assistive-technology acceptance.
+
+Focused review passed 35 `tests.test_parity_ui_safety` tests,
+`scripts/verify_conductor.py` (250 documents, 21 tracks, 25 synthetic
+scenarios), pinned `google-java-format 1.24.0`, and `git diff --check`. The
+track remains active pending hosted rerun, API33 acceptance, broader parity,
+and separate device/provider/operational gates.

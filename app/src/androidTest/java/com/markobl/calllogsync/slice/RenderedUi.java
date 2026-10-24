@@ -117,6 +117,36 @@ final class RenderedUi {
                 "Edited text did not persist: " + id);
     }
 
+    /** Deny only Gboard's own contacts prompt on the isolated emulator test. */
+    private void dismissKeyboardContactsPromptIfVisible() {
+        if (denyKeyboardContactsPrompt()) return;
+        if (!keyboardVisible()) return;
+        long deadline = SystemClock.elapsedRealtime() + 5000;
+        do {
+            if (denyKeyboardContactsPrompt()) return;
+            if (!keyboardVisible()) return;
+            SystemClock.sleep(100);
+        } while (SystemClock.elapsedRealtime() < deadline);
+    }
+
+    private boolean denyKeyboardContactsPrompt() {
+        if (!" permission-purpose=contacts".equals(permissionPurposeSummary())) return false;
+        String launcher = permissionActivityLauncherSummary().trim();
+        if (!launcher.equals("permission-launcher=com.google.android.inputmethod.latin"))
+            throw new AssertionError(
+                    "Contacts permission prompt is not owned by the expected input method; "
+                            + permissionControlSummary());
+        String denyId =
+                findPermissionControl("permission_deny_button") != null
+                        ? "permission_deny_button"
+                        : "permission_deny_and_dont_ask_again_button";
+        tapPermissionId(denyId);
+        await(
+                () -> permissionMessage() == null,
+                "Gboard contacts permission prompt did not dismiss");
+        return true;
+    }
+
     boolean keyboardVisible() {
         for (android.view.accessibility.AccessibilityWindowInfo window : automation.getWindows())
             if (window.getType()
@@ -150,6 +180,7 @@ final class RenderedUi {
 
     /** Tap the app-owned positive dialog action across interactive windows. */
     void tapDialogPositive() {
+        dismissKeyboardContactsPromptIfVisible();
         final AccessibilityNodeInfo[] found = new AccessibilityNodeInfo[1];
         try {
             await(
@@ -242,6 +273,12 @@ final class RenderedUi {
     }
 
     private void tap(String value, boolean id, boolean waitForIdle) {
+        if (id && (value.equals("button1") || value.equals("button2")))
+            dismissKeyboardContactsPromptIfVisible();
+        if (id && value.equals("import_confirm")) {
+            dismissKeyboardContactsPromptIfVisible();
+            dismissKeyboard();
+        }
         final AccessibilityNodeInfo[] found = new AccessibilityNodeInfo[1];
         try {
             await(
@@ -259,6 +296,8 @@ final class RenderedUi {
         found[0] = waitForIdle ? shown(value, id) : find(value, id);
         assertNotNull("Control disappeared before touch", found[0]);
         touch(found[0], value);
+        if (id && (value.equals("import_from") || value.equals("import_to")))
+            dismissKeyboardContactsPromptIfVisible();
     }
 
     private AccessibilityNodeInfo findDialogPositive(
@@ -386,10 +425,9 @@ final class RenderedUi {
     }
 
     private String permissionPurposeSummary() {
-        AccessibilityNodeInfo root = automation.getRootInActiveWindow();
+        AccessibilityNodeInfo root = permissionRoot();
         if (root == null || root.getPackageName() == null) return "";
-        if (!permissionPackage(root.getPackageName().toString())) return "";
-        AccessibilityNodeInfo message = find("permission_message", true);
+        AccessibilityNodeInfo message = find(root, "permission_message", true);
         CharSequence value = message == null ? null : message.getText();
         if (value == null) return " permission-purpose=unavailable";
         String text = value.toString().toLowerCase(java.util.Locale.ROOT);
@@ -592,12 +630,26 @@ final class RenderedUi {
     }
 
     private String permissionMessage() {
-        AccessibilityNodeInfo root = automation.getRootInActiveWindow();
+        AccessibilityNodeInfo root = permissionRoot();
         if (root == null
                 || root.getPackageName() == null
                 || !permissionPackage(root.getPackageName().toString())) return null;
-        AccessibilityNodeInfo message = find("permission_message", true);
+        AccessibilityNodeInfo message = find(root, "permission_message", true);
         return message == null || message.getText() == null ? "" : message.getText().toString();
+    }
+
+    private AccessibilityNodeInfo permissionRoot() {
+        AccessibilityNodeInfo active = automation.getRootInActiveWindow();
+        if (active != null
+                && active.getPackageName() != null
+                && permissionPackage(active.getPackageName().toString())) return active;
+        for (android.view.accessibility.AccessibilityWindowInfo window : automation.getWindows()) {
+            AccessibilityNodeInfo root = window.getRoot();
+            if (root != null
+                    && root.getPackageName() != null
+                    && permissionPackage(root.getPackageName().toString())) return root;
+        }
+        return null;
     }
 
     boolean permissionDialogs(boolean denyFirst, BooleanSupplier complete) {
