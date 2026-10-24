@@ -119,7 +119,12 @@ passed locally:
 
 Each suite reported three tests with zero skips, failures or errors. The
 updated Kotlin source passed pinned ktfmt0.59 and `git diff --check`. The
-previous hosted Kotlin/Native run [40084777973](https://github.com/edithatogo/CallTrack/actions/runs/40084777973)
-passed the prior three-case common suite; a hosted rerun of this expanded
-fixture is pending. Track15 remains open, and the native gate is not promoted
-from the old test-source result.
+pull-request Kotlin/Native job [40111068972](https://github.com/edithatogo/CallTrack/actions/runs/40111068972)
+ran this exact source at head `27a55384ff3bacc253defafd43081dc41f5511ff`
+on GitHub's `macos-15-arm64` runner with Xcode 26.1.1 and Temurin 17.0.20.1+1.
+`:shared-core:macosArm64Test` completed successfully; the inspected JUnit report
+for `CallSelectionRulesTest` records `tests=3`, `skipped=0`, `failures=0`, and
+`errors=0`. This is evidence for the expanded common fixture only. The two full
+qualification workflow runs for this PR are still packaging the unsigned
+release variant; Track 15 remains open for those checks, final review/merge,
+and its Track 14 sequencing gate.
