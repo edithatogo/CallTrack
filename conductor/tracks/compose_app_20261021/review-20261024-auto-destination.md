@@ -14,10 +14,10 @@ The Activity still owns calendar discovery, permission checks, current provider 
 - [x] **Style compliance**: Pass — uses the existing Foundation-only action button and lifecycle-disposed ComposeView patterns.
 - [x] **New tests**: Yes — explicit token selection and Activity host/placeholder semantics; the existing provider-backed UI journey continues to exercise selecting a calendar before activation.
 - [x] **Test coverage**: Partial — provider UI journey and new Compose test are defined; this slice alone does not qualify permission revocation, provider churn, or activation persistence.
-- [ ] **Test results**: Pending hosted Android instrumentation compilation and workflow checks.
+- [ ] **Test results**: The first hosted slice compile found that calendar display names are nullable; the Compose label mapping now uses the same established fallback as historical import. A rerun is pending.
 
 ## Findings
 
-No defect found in static review. Stale or superseded option tokens are ignored when they are not present in the current loaded choice list. The screen still cannot select a calendar until the Activity has permission and a provider choice.
+Review fix: the first hosted compile found that `AndroidCalendarSink.Choice.name` is nullable while the Compose option label is non-null. The mapping now uses the established historical-import fallback for a null label. Stale or superseded option tokens are ignored when they are not present in the current loaded choice list. The screen still cannot select a calendar until the Activity has permission and a provider choice.
 
 Native rendered execution remains pending when no Android emulator is available locally.

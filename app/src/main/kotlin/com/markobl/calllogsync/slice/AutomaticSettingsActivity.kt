@@ -343,7 +343,8 @@ class AutomaticSettingsActivity : ComponentActivity() {
                                 loaded.mapIndexed { index, choice ->
                                     AutomaticDestinationOption(
                                         destinationOptionTokens[index],
-                                        choice.name,
+                                        choice.name
+                                            ?: getString(R.string.auto_destination_unavailable),
                                     )
                                 },
                             selectedToken =
