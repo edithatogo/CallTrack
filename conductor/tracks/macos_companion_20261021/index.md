@@ -6,6 +6,7 @@
 - [Findings](findings.md)
 - [Decisions](decisions.md)
 - [Local-slice review](review-20261024.md)
+- [File-preview prototype](file-preview-prototype-20261025.md)
 - [Scoped prerequisite deferral](prerequisite-deferral.md)
 - [Execution sequence](../../future-architecture.md)
 

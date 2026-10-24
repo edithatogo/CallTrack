@@ -18,6 +18,7 @@
 - [x] Task: Establish parser contract cases and meaningful regression coverage before behaviour changes.
 - [x] Task: Map a bounded prototype import format/provenance, preview/approval, capability and privacy requirements before choosing parser/storage dependencies.
 - [x] Task: Implement and review a bounded, preview-only Foundation parser; test byte/count, schema, identity, timestamp, and duration boundaries with synthetic inputs (see [parser boundary review](review-20261024-parser-boundaries.md)).
+- [x] Task: Add an isolated AppKit JSON file picker and aggregate-only preview using a bounded security-scoped reader; keep delivery disabled and add synthetic regular-file, directory, and oversized-file checks (see [file-preview prototype evidence](file-preview-prototype-20261025.md)).
 - [ ] Task: Implement native file selection and explicit approval UI with no write during preview; imported foreign receipts remain inactive and never confer replay authority.
 - [ ] Task: Implement EventKit permission/list/select/insert/exact-readback with durable intent and one destination writer; denial/write-only cannot be called reconciled.
 - [ ] Task: Qualify interruption/restart/uncertain insert, edited/deleted events, missing/recreated calendar, scoped cleanup, native accessibility and packaged upgrade/recovery using synthetic data.
