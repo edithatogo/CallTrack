@@ -34,11 +34,27 @@
   },
   "android_host_dependency_versions_are_prototype_only": true,
   "implementation_commit": "bea8385",
+  "latest_implementation_commit": "6bdd3b4efc99d281f2d6d231a75bdfc14363d80a",
   "previous_pull_requests": [
     {
       "url": "https://github.com/edithatogo/CallTrack/pull/21",
       "state": "closed-draft-hosted-checks-failed",
       "note": "Superseded by a current-main follow-up for dependency audit evidence; the bounded prototype remains on main."
+    },
+    {
+      "url": "https://github.com/edithatogo/CallTrack/pull/58",
+      "state": "merged",
+      "note": "Audited the initial desktop runtime and test dependency graph."
+    },
+    {
+      "url": "https://github.com/edithatogo/CallTrack/pull/59",
+      "state": "merged",
+      "note": "Recorded PR 58 merge state and retained the closed draft history."
+    },
+    {
+      "url": "https://github.com/edithatogo/CallTrack/pull/60",
+      "state": "merged",
+      "note": "Added the synthetic Android KMP target and host compile/package evidence."
     }
   ],
   "pull_request": "https://github.com/edithatogo/CallTrack/pull/58",
