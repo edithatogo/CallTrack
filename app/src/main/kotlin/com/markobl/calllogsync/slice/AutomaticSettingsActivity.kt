@@ -178,20 +178,36 @@ class AutomaticSettingsActivity : ComponentActivity() {
         countsPanel = statusView(layout, R.id.auto_counts)
         feedbackPanel = statusView(layout, R.id.auto_feedback)
         lastPanel = statusView(layout, R.id.auto_last)
-        val imports = Button(this)
-        imports.id = R.id.open_imports
-        imports.setText(R.string.import_open)
-        imports.setOnClickListener {
-            startActivity(Intent(this, HistoricalImportActivity::class.java))
-        }
-        layout.addView(imports)
-        val recovery = Button(this)
-        recovery.id = R.id.open_recovery
-        recovery.setText(R.string.recovery_open)
-        recovery.setOnClickListener {
-            startActivity(Intent(this, ReceiptRecoveryActivity::class.java))
-        }
-        layout.addView(recovery)
+        val navigation =
+            ComposeView(this).apply {
+                id = R.id.auto_navigation
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    AutomaticSettingsNavigationPanel(
+                        importLabel = getString(R.string.import_open),
+                        recoveryLabel = getString(R.string.recovery_open),
+                        onOpenImports = {
+                            startActivity(
+                                Intent(
+                                    this@AutomaticSettingsActivity,
+                                    HistoricalImportActivity::class.java,
+                                )
+                            )
+                        },
+                        onOpenRecovery = {
+                            startActivity(
+                                Intent(
+                                    this@AutomaticSettingsActivity,
+                                    ReceiptRecoveryActivity::class.java,
+                                )
+                            )
+                        },
+                    )
+                }
+            }
+        layout.addView(navigation)
         val scroll = ScrollView(this)
         scroll.addView(layout)
         ActivityInsets.apply(scroll)

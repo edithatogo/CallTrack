@@ -7,6 +7,7 @@
     <item name="auto_intro_panel" type="id" />
     <item name="auto_calendar_picker" type="id" />
     <item name="auto_actions" type="id" />
+    <item name="auto_navigation" type="id" />
     <item name="auto_call_types" type="id" />
     <item name="auto_incoming" type="id" />
     <item name="auto_outgoing" type="id" />
