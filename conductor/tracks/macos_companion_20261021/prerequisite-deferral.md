@@ -30,3 +30,30 @@ calendar qualification remain open. Reconsider this deferral after Track 14 and
 explicitly selected synthetic test calendar are available. The sequence verifier
 keeps Track 16 unresolved for downstream stages even while this bounded work is
 active.
+
+## Evidence and scope refresh — 2026-10-25
+
+Track 15's expanded common selection fixture now passes on JVM/Android locally
+and on hosted macOS ARM64 Kotlin/Native (3 tests, zero skips/failures/errors);
+PR #79 merged as `e6070cc`. Track 15 remains in progress because its broader
+acceptance is sequenced behind Track 14.
+
+Track 14 PR #78 remains open. Hosted API 33 and API 36 UI jobs pass; API 26
+fails at import confirmation with an unexpected PermissionController window
+whose displayed text was classified by the test helper as `contacts`. The app
+manifest requests no Contacts permission. That text is a UI observation, not
+proof that `READ_CONTACTS` was requested; Android 8.0 assigns `READ_CALL_LOG`
+to the Phone permission group. The local API 36 emulator is offline, so no
+local rerun is claimed. See [PR #78](https://github.com/edithatogo/CallTrack/pull/78)
+and the [AOSP Android 8.0 manifest](https://android.googlesource.com/platform/frameworks/base/%2B/android-8.0.0_r1/core/res/AndroidManifest.xml).
+
+Under the current user instruction to continue locally actionable work, a
+bounded AppKit file-selection and aggregate-preview prototype was added. It
+uses the existing preview parser, limits reads to 5 MiB, shows no call times,
+phone numbers, or row IDs, and keeps calendar delivery disabled. The SwiftUI
+path was not adopted because the installed Command Line Tools lack the SwiftUI
+macro plugin; the AppKit target type-checks locally instead. Full Xcode,
+rendered accessibility/lifecycle/package acceptance, EventKit authorization,
+an explicitly selected synthetic calendar, durable write/recovery design, and
+Track 14 completion remain prerequisites for broader implementation. No
+EventKit permission was requested and no calendar was read or written.

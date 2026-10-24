@@ -1,0 +1,45 @@
+name: macOS companion preview
+on:
+  push:
+    paths:
+      - '.github/workflows/macos-companion.yml'
+      - 'prototypes/macos-companion/**'
+      - 'app/src/test/resources/call-log-v1.json'
+  pull_request:
+    paths:
+      - '.github/workflows/macos-companion.yml'
+      - 'prototypes/macos-companion/**'
+      - 'app/src/test/resources/call-log-v1.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  macos-preview:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Select and verify Xcode
+        run: |
+          sudo xcode-select --switch /Applications/Xcode_26.1.1.app/Contents/Developer
+          test "$(xcodebuild -version | sed -n '1p')" = 'Xcode 26.1.1'
+          test "$(uname -m)" = arm64
+          swift --version
+          xcodebuild -version
+      - name: Build native preview target
+        run: swift build --package-path prototypes/macos-companion --target CallTrackCompanionUI
+      - name: Run Foundation parser and file-selection contract tests
+        run: |
+          set -o pipefail
+          swift test --package-path prototypes/macos-companion 2>&1 | tee "$RUNNER_TEMP/calltrack-swift-tests.log"
+          grep -Eq 'Executed [1-9][0-9]* tests?' "$RUNNER_TEMP/calltrack-swift-tests.log"
+          grep -Eq 'Executed [1-9][0-9]* tests?, with 0 failures' "$RUNNER_TEMP/calltrack-swift-tests.log"
+      - name: Run the synthetic parser/file harness
+        run: |
+          mkdir -p "$RUNNER_TEMP/calltrack16"
+          swiftc -warnings-as-errors -target arm64-apple-macosx14.0 \
+            prototypes/macos-companion/Sources/CallTrackImport/CallLogImport.swift \
+            prototypes/macos-companion/Sources/CallTrackImport/CallLogFilePreviewer.swift \
+            prototypes/macos-companion/Verification/ParserContractHarness.swift \
+            -o "$RUNNER_TEMP/calltrack16/parser-harness"
+          "$RUNNER_TEMP/calltrack16/parser-harness" app/src/test/resources/call-log-v1.json

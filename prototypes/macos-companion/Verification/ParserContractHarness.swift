@@ -19,6 +19,36 @@ struct ParserContractHarness {
         let preview = try CallLogImporter.preview(data: document(record))
         precondition(preview.calls.count == 1 && preview.calls[0].direction == .missed)
 
+        let temporaryDirectory = FileManager.default.temporaryDirectory
+            .appending(path: "calltrack-file-preview-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: temporaryDirectory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: temporaryDirectory) }
+        let selectedFile = temporaryDirectory.appending(path: "synthetic.json")
+        let selectedBytes = document(record)
+        try selectedBytes.write(to: selectedFile)
+        let originalModificationDate = try selectedFile
+            .resourceValues(forKeys: [.contentModificationDateKey])
+            .contentModificationDate
+        let filePreview = try CallLogFilePreviewer.preview(fileAt: selectedFile)
+        precondition(filePreview.calls == preview.calls)
+        let preservedBytes = try Data(contentsOf: selectedFile)
+        let finalModificationDate = try selectedFile
+            .resourceValues(forKeys: [.contentModificationDateKey])
+            .contentModificationDate
+        precondition(preservedBytes == selectedBytes)
+        precondition(finalModificationDate == originalModificationDate)
+        do {
+            _ = try CallLogFilePreviewer.preview(fileAt: temporaryDirectory)
+            fatalError("a directory was accepted as an import file")
+        } catch ImportFailure.invalidDocument { }
+
+        let oversizedFile = temporaryDirectory.appending(path: "oversized.json")
+        try Data(repeating: 0, count: CallLogImporter.maximumFileBytes + 1).write(to: oversizedFile)
+        do {
+            _ = try CallLogFilePreviewer.preview(fileAt: oversizedFile)
+            fatalError("an oversized file was accepted")
+        } catch ImportFailure.fileTooLarge { }
+
         if CommandLine.arguments.count > 1 {
             let golden = try Data(contentsOf: URL(fileURLWithPath: CommandLine.arguments[1]))
             let goldenPreview = try CallLogImporter.preview(data: golden)

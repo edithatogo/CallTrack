@@ -20,6 +20,7 @@ final class CallLogImportTests: XCTestCase {
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .deletingLastPathComponent()
+            .deletingLastPathComponent()
         let fixture = repoRoot.appending(path: "app/src/test/resources/call-log-v1.json")
         return try Data(contentsOf: fixture)
     }
@@ -143,6 +144,47 @@ final class CallLogImportTests: XCTestCase {
         XCTAssertThrowsError(try CallLogImporter.preview(
             data: Data(repeating: 0x20, count: CallLogImporter.maximumFileBytes + 1)
         )) {
+            XCTAssertEqual($0 as? ImportFailure, .fileTooLarge)
+        }
+    }
+
+    func testPreviewsSelectedRegularFileWithoutChangingIt() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appending(path: "calltrack-file-preview-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+
+        let file = directory.appending(path: "synthetic.json")
+        let contents = document(
+            "{\"id\":\"\(callID.uuidString.lowercased())\",\"direction\":\"missed\",\"started_at_ms\":1800000000000,\"duration_seconds\":0}"
+        )
+        try contents.write(to: file)
+        let modificationDate = try file.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate
+
+        let preview = try CallLogFilePreviewer.preview(fileAt: file)
+
+        XCTAssertEqual(preview.exportID, exportID)
+        XCTAssertEqual(preview.calls.count, 1)
+        XCTAssertEqual(preview.calls[0].direction, .missed)
+        XCTAssertEqual(
+            try file.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate,
+            modificationDate
+        )
+    }
+
+    func testRejectsDirectoriesAndOversizedFilesBeforeParsing() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appending(path: "calltrack-file-preview-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+
+        XCTAssertThrowsError(try CallLogFilePreviewer.preview(fileAt: directory)) {
+            XCTAssertEqual($0 as? ImportFailure, .invalidDocument)
+        }
+
+        let oversized = directory.appending(path: "oversized.json")
+        try Data(repeating: 0, count: CallLogImporter.maximumFileBytes + 1).write(to: oversized)
+        XCTAssertThrowsError(try CallLogFilePreviewer.preview(fileAt: oversized)) {
             XCTAssertEqual($0 as? ImportFailure, .fileTooLarge)
         }
     }
