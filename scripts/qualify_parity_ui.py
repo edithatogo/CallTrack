@@ -60,6 +60,19 @@ def native_failure_summary(method, output, declared_permissions=None):
     )
     if status_codes:
         detail += '; instrumentation-status-codes=' + ','.join(status_codes[:12])
+    for diagnostic in (
+        'runtime-fatal-exception', 'runtime-anr', 'runtime-test-process-died',
+        'runtime-app-process-died', 'runtime-permission-denial',
+        'runtime-permission-controller',
+    ):
+        if diagnostic + '=true' in output:
+            detail += '; ' + diagnostic
+    runtime_exception = re.search(
+        r'runtime-exception=(java\.[A-Za-z0-9_.$]+|android\.[A-Za-z0-9_.$]+|'
+        r'androidx\.[A-Za-z0-9_.$]+)', output
+    )
+    if runtime_exception:
+        detail += '; runtime-exception=' + runtime_exception.group(1)
     # The rendered accessibility gate may fail on an unlabeled control. Retain
     # only its resource ID and widget class; suppress its visible text/label.
     control = re.search(
@@ -230,6 +243,31 @@ def permission_activity_launcher_summary(activity_dump):
     return 'permission-launcher=unavailable'
 
 
+def runtime_failure_summary(logcat):
+    """Summarize known runtime failures without retaining log text or app data."""
+    categories = []
+    lowered = logcat.lower()
+    if 'fatal exception' in lowered:
+        categories.append('runtime-fatal-exception=true')
+    if 'anr in ' in lowered or 'application not responding' in lowered:
+        categories.append('runtime-anr=true')
+    if 'permission denial' in lowered:
+        categories.append('runtime-permission-denial=true')
+    if 'grantpermissionsactivity' in lowered:
+        categories.append('runtime-permission-controller=true')
+    if re.search(r'Process:\s*' + re.escape(TEST_PACKAGE) + r'(?:\s|,)', logcat):
+        categories.append('runtime-test-process-died=true')
+    if re.search(r'Process:\s*' + re.escape(PACKAGE) + r'(?:\s|,)', logcat):
+        categories.append('runtime-app-process-died=true')
+    exception = re.search(
+        r'\b((?:java|android|androidx)\.[A-Za-z0-9_.$]+(?:Exception|Error))\b',
+        logcat,
+    )
+    if exception:
+        categories.append('runtime-exception=' + exception.group(1))
+    return ' '.join(categories)
+
+
 def qualify(serial, suite="settings", receipt_dir=None):
     if suite not in ("settings", "imports", "recovery", "accessibility"):
         raise ValueError("Unknown UI suite")
@@ -301,8 +339,13 @@ def qualify(serial, suite="settings", receipt_dir=None):
                 activity_dump = command('shell', 'dumpsys', 'activity', 'activities')
             except Exception:
                 activity_dump = ''
+            try:
+                logcat = command('logcat', '-d', '-t', '800')
+            except Exception:
+                logcat = ''
             output = (step.get('output', '') + '\n'
-                      + permission_activity_launcher_summary(activity_dump))
+                      + permission_activity_launcher_summary(activity_dump) + '\n'
+                      + runtime_failure_summary(logcat))
             apk_permissions = apk_runtime_permission_summary(apks[0], apks[1], aapt)
             raise RuntimeError(native_failure_summary(
                 method, step.get('output', ''), declared_permissions=apk_permissions

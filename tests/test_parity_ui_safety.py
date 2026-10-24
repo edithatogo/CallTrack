@@ -103,6 +103,25 @@ class UiSafety(unittest.TestCase):
             'permission-launcher=unavailable',
         )
 
+    def test_runtime_diagnostic_keeps_only_failure_categories_and_exception_class(self):
+        logcat = (
+            'FATAL EXCEPTION: main\n'
+            'Process: org.calltrack.community.dev.test, PID: 4321\n'
+            'java.lang.SecurityException: private number 0000000000\n'
+            'ANR in org.calltrack.community.dev\n'
+            'Permission Denial: private account details\n'
+            'GrantPermissionsActivity visible\n'
+        )
+        diagnostic = device.runtime_failure_summary(logcat)
+        self.assertIn('runtime-fatal-exception=true', diagnostic)
+        self.assertIn('runtime-anr=true', diagnostic)
+        self.assertIn('runtime-test-process-died=true', diagnostic)
+        self.assertIn('runtime-permission-denial=true', diagnostic)
+        self.assertIn('runtime-permission-controller=true', diagnostic)
+        self.assertIn('runtime-exception=java.lang.SecurityException', diagnostic)
+        self.assertNotIn('0000000000', diagnostic)
+        self.assertNotIn('private account details', diagnostic)
+
     def test_failure_summary_exposes_source_location_not_rendered_content(self):
         summary = device.native_failure_summary(
             'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
