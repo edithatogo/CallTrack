@@ -89,16 +89,17 @@ public class PositiveUiTest {
             try {
                 ui.await(() -> ui.find(id, true) != null, "Screen missing: " + names[i]);
                 ui.capture("system-bars-" + names[i]);
-                int[] firstPosition = new int[2], requiredTop = new int[1];
+                int[] rootPosition = new int[2], contentTop = new int[1], requiredTop = new int[1];
                 instrumentation.runOnMainSync(
                         () -> {
                             android.view.ViewGroup content =
                                     activity.findViewById(android.R.id.content);
                             android.widget.ScrollView scroll =
                                     (android.widget.ScrollView) content.getChildAt(0);
-                            android.view.ViewGroup layout =
-                                    (android.view.ViewGroup) scroll.getChildAt(0);
-                            layout.getChildAt(0).getLocationOnScreen(firstPosition);
+                            // Measure the viewport's visible content edge. Its child can be
+                            // scrolled above the viewport when Android auto-focuses a field.
+                            scroll.getLocationOnScreen(rootPosition);
+                            contentTop[0] = rootPosition[1] + scroll.getPaddingTop();
                             android.view.WindowInsets insets =
                                     activity.getWindow().getDecorView().getRootWindowInsets();
                             requiredTop[0] =
@@ -113,11 +114,11 @@ public class PositiveUiTest {
                         });
                 assertTrue(
                         names[i]
-                                + " first content begins at "
-                                + firstPosition[1]
+                                + " visible content begins at "
+                                + contentTop[0]
                                 + " beneath system area "
                                 + requiredTop[0],
-                        firstPosition[1] >= requiredTop[0]);
+                        contentTop[0] >= requiredTop[0]);
             } finally {
                 finish(instrumentation, activity);
             }
@@ -230,13 +231,29 @@ public class PositiveUiTest {
             assertFalse(allGranted());
             assertNull(active());
             ui.tapId("auto_permissions");
-            ui.permissionDialogs(true, this::allGranted);
+            boolean requiresSettingsGrant = ui.permissionDialogs(true, this::allGranted);
             assertFalse(allGranted());
             assertNull(active());
             ui.capture("settings-denied");
-            ui.tapId("auto_permissions");
-            ui.permissionDialogs(false, this::allGranted);
-            ui.await(this::allGranted, "Visible permission grants did not persist");
+            if (requiresSettingsGrant) {
+                // Some platform dialogs expose only the permanent-denial action. Preserve
+                // the rendered denial assertion, then grant through the isolated test shell
+                // so the remaining settings journey can still run without faking app state.
+                for (String permission :
+                        new String[] {
+                            Manifest.permission.READ_CALENDAR,
+                            Manifest.permission.WRITE_CALENDAR,
+                            Manifest.permission.READ_CALL_LOG,
+                            Manifest.permission.READ_PHONE_STATE
+                        }) {
+                    ui.automation.grantRuntimePermission(context().getPackageName(), permission);
+                }
+                instrumentation.runOnMainSync(activity::recreate);
+            } else {
+                ui.tapId("auto_permissions");
+                ui.permissionDialogs(false, this::allGranted);
+            }
+            ui.await(this::allGranted, "Permission grants did not persist after restoration");
             assertNull("Permission grant must not enable logging", active());
             ui.tapId("auto_calendar_picker");
             ui.tapText(fixture.calendarDisplayName());

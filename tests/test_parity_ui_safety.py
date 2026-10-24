@@ -33,6 +33,77 @@ class UiSafety(unittest.TestCase):
         )
         self.assertIn('non-focusable anchor id=auto_access_action enabled=true', anchor_summary)
 
+    def test_failure_summary_retains_safe_system_inset_measurements(self):
+        summary = device.native_failure_summary(
+            'renderedActivitiesRespectSystemBars',
+            'java.lang.AssertionError: manual visible content begins at 17 beneath system area 24\n'
+            '    at com.markobl.calllogsync.slice.PositiveUiTest.renderedActivitiesRespectSystemBars(PositiveUiTest.java:114)\n'
+            'private rendered label must remain hidden\n',
+        )
+        self.assertIn('system-inset screen=manual content_top=17 required_top=24', summary)
+        self.assertNotIn('private rendered label', summary)
+
+    def test_failure_summary_exposes_fixture_source_frame_without_call_details(self):
+        summary = device.native_failure_summary(
+            'prepareCalendarAndTaggedHistory',
+            'java.lang.AssertionError: private fixture detail\n'
+            '    at com.markobl.calllogsync.slice.ImportUiTest.prepareCalendarAndTaggedHistory(ImportUiTest.java:124)\n'
+            '    at com.markobl.calllogsync.slice.ParityProviderTest.createCalendar(ParityProviderTest.java:109)\n',
+        )
+        self.assertIn('ImportUiTest.java:124', summary)
+        self.assertIn('ParityProviderTest.java:109', summary)
+        self.assertNotIn('private fixture detail', summary)
+
+    def test_failure_summary_uses_fixed_import_dialog_category(self):
+        summary = device.native_failure_summary(
+            'renderedRangePreviewCancelConfirmAndRepeat',
+            'java.lang.AssertionError: Visible enabled control missing: button1\n'
+            '    at com.markobl.calllogsync.slice.RenderedUi.tap(RenderedUi.java:154)\n'
+            '    at com.markobl.calllogsync.slice.ImportUiTest.confirm(ImportUiTest.java:104)\n',
+        )
+        self.assertIn('import-confirmation-dialog-action-missing', summary)
+        self.assertIn('ImportUiTest.java:104', summary)
+
+    def test_failure_summary_retains_only_allowlisted_dialog_action_metadata(self):
+        summary = device.native_failure_summary(
+            'renderedRangePreviewCancelConfirmAndRepeat',
+            'Visible enabled positive dialog action missing; dialog-active=input-method '
+            'dialog-windows=[app:application:[button1:android.widget.Button:'
+            'enabled=false:clickable=true], permission:application:'
+            '[permission_allow_button:android.widget.Button:enabled=true:clickable=true], '
+            'input-method:input-method:[]] app-permissions=[calendar-read=granted,'
+            'calendar-write=granted,call-log-read=denied,phone-state-read=denied] '
+            'permission-purpose=calendar\n'
+            'private dialog title and message must remain hidden\n'
+            '    at com.markobl.calllogsync.slice.ImportUiTest.confirm(ImportUiTest.java:104)\n',
+        )
+        self.assertIn('dialog-active=input-method', summary)
+        self.assertIn(
+            'dialog-windows=app:application,permission:application,input-method:input-method',
+            summary,
+        )
+        self.assertIn('dialog-controls=button1:android.widget.Button:false', summary)
+        self.assertIn(
+            'permission_allow_button:android.widget.Button:true', summary)
+        self.assertIn('app-permissions=calendar-read:granted,calendar-write:granted,'
+                      'call-log-read:denied,phone-state-read:denied', summary)
+        self.assertIn('permission-purpose=calendar', summary)
+        self.assertNotIn('private dialog title', summary)
+
+    def test_failure_summary_retains_only_allowlisted_permission_diagnostic(self):
+        summary = device.native_failure_summary(
+            'renderedPermissionsFiltersConfirmPauseAndReopen',
+            'java.lang.AssertionError: Visible enabled control missing: permission_deny_button; '
+            'permission-root=com.android.permissioncontroller controls='
+            '[com.android.permissioncontroller:id/permission_deny_and_dont_ask_again_button:'
+            'android.widget.Button:enabled=true]\n'
+            '    at com.markobl.calllogsync.slice.PositiveUiTest.renderedPermissionsFiltersConfirmPauseAndReopen(PositiveUiTest.java:233)\n',
+        )
+        self.assertIn('missing-permission-control=permission_deny_button', summary)
+        self.assertIn('permission-root=com.android.permissioncontroller', summary)
+        self.assertIn('permission_deny_and_dont_ask_again_button:android.widget.Button:enabled=true', summary)
+        self.assertNotIn('private label', summary)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)

@@ -33,8 +33,9 @@
 ## Phase: Hosted API36 UI acceptance fallback (2026-10-24)
 - [x] Task: Reconcile the reattached SSD, verify the current source-bound build receipt and diagnose a fresh isolated ARM64 emulator boot failure without touching the retained process.
 - [x] Task: Add a scoped Linux/KVM workflow for the existing API36 synthetic settings, import, recovery and accessibility journeys; require cleanup and package removal evidence.
-- [ ] Task: Run hosted UI acceptance, inspect sanitized suite/method/screenshot-hash evidence, fix findings and repeat affected checks.
-- [ ] Task: Review the hosted acceptance slice and update only the gates supported by its API36 x86_64 evidence; physical, local ARM64, remote-calendar and operational acceptance remain separate.
+- [x] Task: Run hosted API36 UI acceptance, inspect sanitized suite/method/screenshot-hash evidence, fix the host/tag and recovery-anchor findings, and repeat affected checks (PR #77; run 40095495432; see `review-20261024-hosted-ui.md`).
+- [x] Task: Review the hosted API36 x86_64 acceptance slice and update only the gates supported by its evidence; physical, local ARM64, remote-calendar and operational acceptance remain separate (see `review-20261024-hosted-ui.md`).
+- [~] Task: Extend the hosted source-bound UI journeys to API26/API33 and rerun API36 on the current merged source; inspect every suite result, accessibility receipt and cleanup proof. Run 40101679905: API36 passed; API26 reached the import confirmation but its `button1` selector was absent; API33's denial control was absent under the generic ID. Fixes are recorded in [review](review-20261025-hosted-ui-matrix.md); rerun the full hosted matrix before closing this task.
 
 ## Phase 4: Review, acceptance and handoff
 
@@ -49,7 +50,7 @@
 - [x] Task: Qualify filter date labels, checkbox role/state, large-font visibility, RTL rendering and 48 dp touch target semantics in the Compose test harness (see [review](review-20261024-import-accessibility.md)).
 - [x] Task: Migrate the recovery empty-state message into a lifecycle-disposed ComposeView, preserving `recovery_empty` and Activity-owned query state; qualify its visibility transition and no-side-effect behavior (see [review](review-20261024-recovery-empty.md)).
 - [x] Task: Review and fix the historical import history Compose slice; qualify empty and populated panels plus explicit rendered session opening on the API36 emulator (66a73b1; see [review](review-20261024-import-history.md)).
-- [ ] Task: Perform Conductor review, apply fixes and rerun affected checks.
+- [x] Task: Perform Conductor review, apply fixes and rerun affected local checks; retain hosted matrix rerun as a separate acceptance gate (see [review](review-20261025-hosted-ui-matrix.md), commit `ac42f2a`).
 - [x] Task: Review the historical-import destination selector slice; verify host/permission-denied rendering, explicit opaque-token selection, and no import side effects; record provider-backed selection and restored-calendar acceptance as pending in [review](review-20261024-import-destination.md).
 - [x] Task: Review the historical-import access-action slice; verify explicit callback dispatch, stable host and no permission request during composition; keep runtime grant/deny/revocation checks pending in [review](review-20261024-import-access.md).
 - [x] Task: Review the historical-import introductory-text slice; verify exact zone-formatted copy, stable host and no import side effects in [review](review-20261024-import-intro.md).

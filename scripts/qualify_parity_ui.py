@@ -23,14 +23,14 @@ TEST_CLASS = 'com.markobl.calllogsync.slice.PositiveUiTest'
 
 
 def native_failure_summary(method, output):
-    """Return source locations without exposing rendered device content."""
+    """Return source locations and allowlisted numeric/platform diagnostics."""
     frames = []
     for line in output.splitlines():
         frame = line.strip()
-        if (frame.startswith('at com.markobl.calllogsync.slice.PositiveUiTest.')
-                and 'PositiveUiTest.java:' in frame):
+        if (frame.startswith('at com.markobl.calllogsync.slice.')
+                and re.search(r'(?:PositiveUiTest|ImportUiTest|RecoveryUiTest|ParityProviderTest|RenderedUi)\.java:\d+', frame)):
             frames.append(frame)
-    detail = '; '.join(frames[:3])
+    detail = '; '.join(frames[:6])
     # The rendered accessibility gate may fail on an unlabeled control. Retain
     # only its resource ID and widget class; suppress its visible text/label.
     control = re.search(
@@ -46,6 +46,81 @@ def native_failure_summary(method, output):
         detail = (detail + '; ' if detail else '') + (
             'non-focusable anchor id=' + anchor.group(1) +
             ' enabled=' + anchor.group(2))
+    # Keep only numeric geometry from the system-bars assertion; screenshot or
+    # arbitrary rendered strings remain private in the ignored local receipt.
+    geometry = re.search(
+        r'(settings|manual|imports|recovery) visible content begins at (-?\d+) beneath system area (\d+)',
+        output)
+    if geometry:
+        detail = (detail + '; ' if detail else '') + (
+            'system-inset screen=' + geometry.group(1) +
+            ' content_top=' + geometry.group(2) +
+            ' required_top=' + geometry.group(3))
+    # Permission-controller UI text varies by Android release. Surface only
+    # known assertion categories and allowlisted control IDs, never dialog text.
+    if 'Permission choice did not advance the actual dialog' in output:
+        detail = (detail + '; ' if detail else '') + 'permission-dialog-choice-did-not-advance'
+    elif 'Permission dialog sequence did not complete' in output:
+        detail = (detail + '; ' if detail else '') + 'permission-dialog-sequence-incomplete'
+    if 'Refusing nonempty call provider' in output:
+        detail = (detail + '; ' if detail else '') + 'synthetic-calllog-provider-not-empty'
+    if 'java.lang.AssertionError: expected non-null' in output:
+        detail = (detail + '; ' if detail else '') + 'expected-provider-result-was-null'
+    if 'Visible enabled control missing: button1' in output:
+        detail = (detail + '; ' if detail else '') + 'import-confirmation-dialog-action-missing'
+    if 'Refusing a control in an unexpected package:' in output:
+        detail = (detail + '; ' if detail else '') + 'dialog-action-owned-by-unexpected-window'
+    dialog_active = re.search(
+        r'dialog-active=(app|permission|system-ui|input-method|other|unavailable)', output)
+    if dialog_active:
+        detail = (detail + '; ' if detail else '') + 'dialog-active=' + dialog_active.group(1)
+    dialog_windows = re.findall(
+        r'(app|permission|system-ui|input-method|other|unavailable):'
+        r'(application|input-method|other):', output)
+    if dialog_windows:
+        detail = (detail + '; ' if detail else '') + 'dialog-windows=' + ','.join(
+            owner + ':' + kind for owner, kind in dialog_windows[:8])
+    dialog_controls = re.findall(
+        r'(button[1-3]|permission_(?:allow|allow_one_time|allow_foreground_only|deny|deny_and_dont_ask_again)_button|other):'
+        r'(android\.widget\.Button|other):enabled=(true|false):'
+        r'clickable=true', output)
+    if dialog_controls:
+        detail = (detail + '; ' if detail else '') + 'dialog-controls=' + ','.join(
+            ':'.join(control) for control in dialog_controls[:12])
+    app_permissions = re.findall(
+        r'(calendar-read|calendar-write|call-log-read|phone-state-read)=(granted|denied)',
+        output)
+    if app_permissions:
+        detail = (detail + '; ' if detail else '') + 'app-permissions=' + ','.join(
+            ':'.join(permission) for permission in app_permissions[:4])
+    permission_purpose = re.search(
+        r'permission-purpose=(call-log|calendar|phone-state|contacts|location|camera|'
+        r'microphone|notifications|other|unavailable)', output)
+    if permission_purpose:
+        detail = (detail + '; ' if detail else '') + (
+            'permission-purpose=' + permission_purpose.group(1))
+    missing_permission = re.search(
+        r'Visible enabled control missing: (permission_(?:deny|allow)_button)', output)
+    if missing_permission:
+        detail = (detail + '; ' if detail else '') + (
+            'missing-permission-control=' + missing_permission.group(1))
+    permission_root = re.search(
+        r'permission-root=(com\.android\.permissioncontroller|com\.google\.android\.permissioncontroller|com\.android\.packageinstaller|com\.google\.android\.packageinstaller|unavailable|diagnostic-unavailable)',
+        output)
+    if permission_root:
+        detail = (detail + '; ' if detail else '') + 'permission-root=' + permission_root.group(1)
+    system_controls = re.findall(
+        r':id/([a-z0-9_]+):(android\.[A-Za-z0-9_.$]+):enabled=(true|false)', output)
+    if system_controls:
+        safe_controls = [
+            item for item in system_controls[:16]
+            if item[0].startswith('permission_') or item[0] in ('button1', 'button2', 'button3')
+        ]
+        if safe_controls:
+            detail = (detail + '; ' if detail else '') + (
+                'permission-controls=' + ','.join(
+                    control + ':' + widget + ':enabled=' + enabled
+                    for control, widget, enabled in safe_controls))
     suffix = ' (' + detail + ')' if detail else ''
     return 'Native acceptance failed: ' + method + suffix
 
