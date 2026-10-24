@@ -33,6 +33,21 @@ class UiSafety(unittest.TestCase):
                 self.assertIn(protocol, summary)
                 self.assertNotIn('arbitrary private text', summary)
 
+    def test_instrumentation_status_summary_keeps_only_keys_and_numeric_codes(self):
+        output = (
+            'INSTRUMENTATION_STATUS: id=AndroidJUnitRunner\n'
+            'INSTRUMENTATION_STATUS: stream=private assertion text\n'
+            'INSTRUMENTATION_STATUS: Error=private exception detail\n'
+            'INSTRUMENTATION_STATUS_CODE: 1\n'
+            'INSTRUMENTATION_STATUS_CODE: -1\n'
+        )
+        summary = device.native_failure_summary(
+            'renderedRangePreviewCancelConfirmAndRepeat', output)
+        self.assertIn('instrumentation-status-keys=Error,id,stream', summary)
+        self.assertIn('instrumentation-status-codes=1,-1', summary)
+        self.assertNotIn('private assertion text', summary)
+        self.assertNotIn('private exception detail', summary)
+
     def test_apk_permission_summary_reports_only_allowlisted_manifest_names(self):
         outputs = [
             "package: org.calltrack.community.dev\n"

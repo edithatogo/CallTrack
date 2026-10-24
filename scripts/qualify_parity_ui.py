@@ -50,6 +50,16 @@ def native_failure_summary(method, output, declared_permissions=None):
     }
     protocol = ','.join(name for name, present in protocol_markers.items() if present) or 'none'
     detail = (detail + '; ' if detail else '') + 'instrumentation-protocol=' + protocol
+    status_keys = sorted(set(re.findall(
+        r'^INSTRUMENTATION_STATUS: ([A-Za-z_]+)=', output, re.MULTILINE
+    )) & {'id', 'test', 'class', 'numtests', 'current', 'stream', 'stack', 'Error'})
+    if status_keys:
+        detail += '; instrumentation-status-keys=' + ','.join(status_keys)
+    status_codes = re.findall(
+        r'^INSTRUMENTATION_STATUS_CODE: (-?\d+)$', output, re.MULTILINE
+    )
+    if status_codes:
+        detail += '; instrumentation-status-codes=' + ','.join(status_codes[:12])
     # The rendered accessibility gate may fail on an unlabeled control. Retain
     # only its resource ID and widget class; suppress its visible text/label.
     control = re.search(
