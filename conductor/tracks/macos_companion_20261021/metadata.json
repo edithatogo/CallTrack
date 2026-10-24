@@ -4,7 +4,7 @@
   "status": "in_progress",
   "milestone": "M7-companion",
   "created_at": "2026-10-21",
-  "updated_at": "2026-10-24",
+  "updated_at": "2026-10-25",
   "depends_on": [
     "shared_core_20261021"
   ],
@@ -17,7 +17,7 @@
   "native_eventkit_accepted": false,
   "macos_app_packaging_accepted": false,
   "pull_request": "https://github.com/edithatogo/CallTrack/pull/20",
-  "pull_request_state": "open-draft-hosted-checks-blocked-before-runner",
+  "pull_request_state": "closed-unmerged",
   "implementation_commit": "64935d1",
   "review_commit": "64935d1",
   "review_status": "preview-parser-slice-reviewed-native-acceptance-pending"

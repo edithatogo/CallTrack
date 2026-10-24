@@ -10,6 +10,7 @@ local.properties
 
 # Android build products
 **/build/
+.build/
 .idea/
 *.iml
 

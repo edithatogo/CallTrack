@@ -4,7 +4,7 @@
 
 | Need | Existing evidence / owner | Track 16 decision and remaining acceptance |
 |---|---|---|
-| Deliberate import, preview and approval | Track 16 R19/R24/R26; current Android modules do not define a desktop interchange export | Prototype a versioned, metadata-minimal JSON document and preview parser. No Android exporter currently claims this schema; interoperability is not accepted. Native file selection and review UI remain. |
+| Deliberate import, preview and approval | Track 16 R19/R24/R26; current Android modules do not define a desktop interchange export | A bounded schema prototype and AppKit file-selection/aggregate-preview slice exist. No Android exporter claims this schema; interoperability, user approval for delivery, and packaged UI are not accepted. |
 | Calendar destination | macOS EventKit surface probe in Track 12; Android provider ledger is separate | Use native EventKit as the eventual adapter; preserve platform-local ownership. Permission, writable destination discovery/selection and cancellation remain unqualified. |
 | One writer and safe retries | Android `CalendarSink`/ledger patterns are implementation evidence, not a portable receipt contract | Do not insert events in this slice. Before writes, define durable intent/identity, readback comparison, uncertain-write recovery, and edit/delete preservation with golden contracts. |
 | Imported history authority | Requirements and Track 15 handoff state foreign receipts do not authorize replay | Parsed records are preview values only. No receipt import, activation, sync, or write occurs. |
