@@ -30,6 +30,12 @@
 - [ ] Task: Qualify real permission/revocation, destination disappearance, cancellation/recreation/process restore, font/RTL, TalkBack/Switch Access and no synchronization regression; remove replaced Views only after parity.
 - [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md).
 
+## Phase: Hosted API36 UI acceptance fallback (2026-10-24)
+- [x] Task: Reconcile the reattached SSD, verify the current source-bound build receipt and diagnose a fresh isolated ARM64 emulator boot failure without touching the retained process.
+- [x] Task: Add a scoped Linux/KVM workflow for the existing API36 synthetic settings, import, recovery and accessibility journeys; require cleanup and package removal evidence.
+- [ ] Task: Run hosted UI acceptance, inspect sanitized suite/method/screenshot-hash evidence, fix findings and repeat affected checks.
+- [ ] Task: Review the hosted acceptance slice and update only the gates supported by its API36 x86_64 evidence; physical, local ARM64, remote-calendar and operational acceptance remain separate.
+
 ## Phase 4: Review, acceptance and handoff
 
 - [ ] Task: Run applicable shared/rendered/native/cloud/package/operational acceptance with exact source/artifact evidence; verify cleanup and preserving upgrade/recovery.

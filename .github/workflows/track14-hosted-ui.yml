@@ -1,0 +1,133 @@
+name: Track 14 hosted Android UI acceptance
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/track14-hosted-ui.yml'
+      - '.github/workflows/qualification.yml'
+      - '.python-version'
+      - 'app/**'
+      - 'build.gradle'
+      - 'gradle/**'
+      - 'gradle.properties'
+      - 'gradlew'
+      - 'scripts/parity_environment.py'
+      - 'scripts/parity_health.py'
+      - 'scripts/parity_targets.py'
+      - 'scripts/qualify_parity_ui.py'
+      - 'scripts/run_slice_build.py'
+      - 'settings.gradle'
+      - 'conductor/tracks/compose_app_20261021/**'
+  pull_request:
+    paths:
+      - '.github/workflows/track14-hosted-ui.yml'
+      - '.github/workflows/qualification.yml'
+      - '.python-version'
+      - 'app/**'
+      - 'build.gradle'
+      - 'gradle/**'
+      - 'gradle.properties'
+      - 'gradlew'
+      - 'scripts/parity_environment.py'
+      - 'scripts/parity_health.py'
+      - 'scripts/parity_targets.py'
+      - 'scripts/qualify_parity_ui.py'
+      - 'scripts/run_slice_build.py'
+      - 'settings.gradle'
+      - 'conductor/tracks/compose_app_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  api36-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version-file: .python-version
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '17.0.21+9'
+      - name: Create the repository Python environment
+        run: |
+          python -m venv .venv
+          test "$(.venv/bin/python --version)" = "Python $(cat .python-version)"
+      - name: Install API 36 emulator packages
+        run: |
+          set -euo pipefail
+          test -e /dev/kvm
+          sdkmanager_path="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          test -n "$sdkmanager_path"
+          tools_dir="$(dirname "$sdkmanager_path")"
+          {
+            echo "$tools_dir"
+            echo "$ANDROID_HOME/platform-tools"
+            echo "$ANDROID_HOME/emulator"
+          } >> "$GITHUB_PATH"
+          "$sdkmanager_path" "platforms;android-36" "build-tools;35.0.0" "system-images;android-36;google_apis;x86_64"
+          "$ANDROID_HOME/emulator/emulator" -accel-check
+      - name: Build source-bound app and test APKs
+        run: |
+          set -euo pipefail
+          mkdir -p .local/slice-evidence
+          ln -s "$ANDROID_HOME" .local/android-sdk
+          .venv/bin/python scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"
+      - name: Create and boot a fresh API 36 Pixel 6 emulator
+        env:
+          ANDROID_AVD_HOME: ${{ runner.temp }}/calltrack-track14-avd
+        run: |
+          set -euo pipefail
+          mkdir -p "$ANDROID_AVD_HOME"
+          avdmanager create avd --name calltrack-track14-api36 \
+            --package 'system-images;android-36;google_apis;x86_64' \
+            --device pixel_6 --path "$ANDROID_AVD_HOME/calltrack-track14-api36.avd"
+          emulator -avd calltrack-track14-api36 -port 5554 \
+            -no-window -no-audio -no-snapshot -no-boot-anim -gpu swiftshader_indirect \
+            > .local/slice-evidence/track14-hosted-emulator.log 2>&1 &
+          echo "$!" > .local/slice-evidence/track14-hosted-emulator.pid
+          if ! timeout 180 adb -s emulator-5554 wait-for-device; then
+            tail -n 120 .local/slice-evidence/track14-hosted-emulator.log
+            exit 1
+          fi
+          attempt=0
+          while [ "$attempt" -lt 180 ]; do
+            if [ "$(timeout 15 adb -s emulator-5554 shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = 1 ]; then
+              break
+            fi
+            attempt=$((attempt + 1))
+            sleep 2
+          done
+          if [ "$(timeout 15 adb -s emulator-5554 shell getprop sys.boot_completed | tr -d '\r')" != 1 ]; then
+            tail -n 120 .local/slice-evidence/track14-hosted-emulator.log
+            exit 1
+          fi
+          test "$(adb -s emulator-5554 emu avd name | sed -n '1p')" = calltrack-track14-api36
+          test "$(adb -s emulator-5554 shell getprop ro.build.version.sdk | tr -d '\r')" = 36
+      - name: Run settings, import, recovery and accessibility journeys
+        env:
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          receipt_root=".local/slice-evidence/track14-hosted-${RUN_ID}-${RUN_ATTEMPT}"
+          mkdir -p "$receipt_root"
+          for suite in settings imports recovery accessibility; do
+            .venv/bin/python scripts/qualify_parity_ui.py \
+              --serial emulator-5554 --suite "$suite" \
+              --receipt-dir "$receipt_root/$suite"
+          done
+          for suite in settings imports recovery accessibility; do
+            receipt="$receipt_root/$suite/parity-ui-${suite}-receipt.json"
+            if [ "$suite" = settings ]; then receipt="$receipt_root/$suite/parity-ui-receipt.json"; fi
+            jq -e --arg suite "$suite" \
+              '.suite == $suite and .result == "passed" and .fixture_cleanup_verified == true and .packages_removed == true and ((.ui_files // {} | to_entries | map(select(.key | endswith(".png"))) | length) > 0)' \
+              "$receipt" >/dev/null
+            jq -c '{suite, result, android, sdk, fixture_cleanup_verified, packages_removed, instrumented_methods: [.steps[] | select(.args[0:3] == ["shell", "am", "instrument"]) | .args[(.args | index("class")) + 1]], screenshot_hashes: [(.ui_files // {} | to_entries[] | select(.key | endswith(".png")) | .value.sha256)]}' "$receipt"
+          done
+      - name: Stop the job-owned emulator
+        if: always()
+        run: |
+          timeout 10 adb -s emulator-5554 emu kill || true
