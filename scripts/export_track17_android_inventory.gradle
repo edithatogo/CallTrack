@@ -1,0 +1,58 @@
+// Export the Android host compile/runtime artifact graph after Gradle resolves it.
+// Build plugins and SDK packages are outside this application-library inventory.
+gradle.projectsEvaluated {
+    def host = gradle.rootProject.project(':android-host')
+    gradle.rootProject.tasks.register('exportTrack17AndroidInventory') {
+        doLast {
+            if (!System.getProperties().containsKey('track17.inventory')) {
+                throw new GradleException('Set -Dtrack17.inventory to a local output path')
+            }
+            def output = new File(System.getProperty('track17.inventory'))
+            if (output.exists()) {
+                throw new GradleException("Refusing to overwrite inventory: ${output}")
+            }
+            def rows = []
+            [
+                [project: host, name: 'debugCompileClasspath', omitProjectEdges: true],
+                [project: host, name: 'debugRuntimeClasspath', omitProjectEdges: true],
+                [project: gradle.rootProject, name: 'androidCompileClasspath', omitProjectEdges: false],
+                [project: gradle.rootProject, name: 'androidRuntimeClasspath', omitProjectEdges: false],
+            ].each { request ->
+                def name = "${request.project.path}:${request.name}"
+                def configuration = request.project.configurations.findByName(request.name)
+                if (configuration == null) throw new GradleException("Missing configuration: ${name}")
+                // Resolve host-only external dependencies without the local KMP
+                // project edge; capture shared Android dependencies from the
+                // KMP Android target configurations below. This works around a
+                // Gradle 8.13 ambiguity in resolving the host config directly.
+                def external = request.omitProjectEdges
+                    ? configuration.copyRecursive {
+                        !(it instanceof org.gradle.api.artifacts.ProjectDependency)
+                    }
+                    : configuration
+                external.incoming.artifacts.artifacts.each { artifact ->
+                    def file = artifact.file
+                    def id = artifact.id.componentIdentifier
+                    if (!(id instanceof org.gradle.api.artifacts.component.ModuleComponentIdentifier)) {
+                        return
+                    }
+                    def digest = java.security.MessageDigest.getInstance('SHA-256')
+                    file.withInputStream { stream ->
+                        byte[] buffer = new byte[65536]
+                        int count
+                        while ((count = stream.read(buffer)) > 0) digest.update(buffer, 0, count)
+                    }
+                    rows << [configuration: name, coordinate: "${id.group}:${id.module}:${id.version}",
+                             name: file.name, sha256: digest.digest().encodeHex().toString()]
+                }
+            }
+            output.parentFile.mkdirs()
+            output.text = groovy.json.JsonOutput.prettyPrint(
+                groovy.json.JsonOutput.toJson([artifacts: rows.unique {
+                    it.configuration + it.coordinate + it.name
+                }])
+            ) + '\n'
+            println "Wrote ${rows.size()} Android host configuration artifacts to ${output}"
+        }
+    }
+}

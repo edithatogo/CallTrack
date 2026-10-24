@@ -1,0 +1,41 @@
+{
+  "audit_date": "2026-10-24",
+  "purpose": "Prototype-only dependency provenance and declared-license metadata for the current Android host and desktop shared UI candidate.",
+  "android_host": {
+    "scope": "Android host external compile/runtime graph plus KMP Android target compile/runtime graph; Gradle plugins, compiler/toolchain and SDK packages are excluded.",
+    "inventory_sha256": "3e0a4027df0a8aa1f874fbc84998210587406b9f23680657656309b2703ca32b",
+    "configuration_rows": 185,
+    "unique_artifacts": 91,
+    "canonical_https_artifact_bytes_match": true,
+    "artifacts_without_effective_pom_license": 0,
+    "embedded_license_notice_files_fingerprinted": 55,
+    "effective_license_metadata": {
+      "Apache-2.0": 91
+    }
+  },
+  "desktop": {
+    "scope": "Compose Multiplatform desktop runtime and desktop test runtime.",
+    "inventory_sha256": "f797ca14e8044b60624dd73a2d52fc3f0a1f95a0bc15f3f9162e0a1de0a893fa",
+    "configuration_rows": 108,
+    "unique_artifacts": 63,
+    "canonical_https_artifact_bytes_match": true,
+    "artifacts_without_effective_pom_license": 0,
+    "embedded_license_notice_files_fingerprinted": 16,
+    "effective_license_metadata": {
+      "Apache-2.0": 59,
+      "EPL-1.0": 1,
+      "BSD": 1,
+      "MIT": 2,
+      "GPL-2.0-with-classpath-exception": 1
+    }
+  },
+  "limitations": {
+    "legal_clearance": false,
+    "vulnerability_assessment": false,
+    "build_tool_and_compiler_trust": false,
+    "complete_notice_text_delivery": false,
+    "production_sbom": false,
+    "production_adoption": false
+  },
+  "receipts_and_raw_publications": "Retained outside Git under .local/track17-android-audit-20261024/; audit inputs and receipts are bound by the inventory hashes above."
+}
