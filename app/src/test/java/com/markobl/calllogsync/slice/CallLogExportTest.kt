@@ -13,9 +13,9 @@ class CallLogExportTest {
     fun emitsTheSwiftPreviewGoldenWithoutContactOrAccountData() {
         val actual = CallLogExport.encode(sampleCalls(), exportId)
         val expected =
-            checkNotNull(javaClass.getResourceAsStream("/call-log-v1.json"))
-                .bufferedReader()
-                .use { it.readText().trim() }
+            checkNotNull(javaClass.getResourceAsStream("/call-log-v1.json")).bufferedReader().use {
+                it.readText().trim()
+            }
 
         assertEquals(expected, actual)
         assertFalse(actual.contains("Alice Example"))
@@ -33,8 +33,10 @@ class CallLogExportTest {
         val second = CallLogExport.encode(calls, secondExport)
 
         val recordBodies = Regex("\\{\\\"id\\\":.*?\\}")
-        assertEquals(recordBodies.findAll(first).map { it.value }.toList(),
-            recordBodies.findAll(second).map { it.value }.toList())
+        assertEquals(
+            recordBodies.findAll(first).map { it.value }.toList(),
+            recordBodies.findAll(second).map { it.value }.toList(),
+        )
         assertTrue(first.contains(exportId.toString()))
         assertTrue(second.contains(secondExport.toString()))
     }
@@ -67,12 +69,26 @@ class CallLogExportTest {
     private fun sampleCalls(): List<CallRecord> =
         listOf(
             CallRecord(
-                "source-install-1", "17", 1_700_000_000_123L, 45, 1,
-                "Alice Example", "+15551234567", 1, "private-account",
+                "source-install-1",
+                "17",
+                1_700_000_000_123L,
+                45,
+                1,
+                "Alice Example",
+                "+15551234567",
+                1,
+                "private-account",
             ),
             CallRecord(
-                "source-install-1", "18", 1_699_999_999_000L, 0, 3,
-                "Alice Example", "+15551234567", 1, "private-account",
+                "source-install-1",
+                "18",
+                1_699_999_999_000L,
+                0,
+                3,
+                "Alice Example",
+                "+15551234567",
+                1,
+                "private-account",
             ),
         )
 }

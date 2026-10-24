@@ -6,8 +6,8 @@ import java.security.MessageDigest
 import java.util.UUID
 
 /**
- * Prototype-only, redacted JSON export for deliberate cross-platform preview.
- * It does not activate foreign receipts or authorize calendar delivery.
+ * Prototype-only, redacted JSON export for deliberate cross-platform preview. It does not activate
+ * foreign receipts or authorize calendar delivery.
  */
 object CallLogExport {
     const val SCHEMA_VERSION = 1
@@ -25,31 +25,37 @@ object CallLogExport {
         require(calls.size <= MAX_CALLS) { "Too many calls" }
 
         val identities = HashSet<UUID>()
-        val records = calls.map { call ->
-            val source = requireNotNull(call) { "Null call" }
-            val sourceId = source.id.toLongOrNull()
-            require(sourceId != null && sourceId >= 0 && sourceId.toString() == source.id) {
-                "Invalid source identity"
-            }
-            val direction =
-                when (source.direction) {
-                    "Incoming" -> "incoming"
-                    "Outgoing" -> "outgoing"
-                    "Missed" -> "missed"
-                    else -> throw IllegalArgumentException("Unsupported call type")
+        val records =
+            calls
+                .map { call ->
+                    val source = requireNotNull(call) { "Null call" }
+                    val sourceId = source.id.toLongOrNull()
+                    require(sourceId != null && sourceId >= 0 && sourceId.toString() == source.id) {
+                        "Invalid source identity"
+                    }
+                    val direction =
+                        when (source.direction) {
+                            "Incoming" -> "incoming"
+                            "Outgoing" -> "outgoing"
+                            "Missed" -> "missed"
+                            else -> throw IllegalArgumentException("Unsupported call type")
+                        }
+                    val durationMilliseconds = Math.multiplyExact(source.seconds, 1_000L)
+                    Math.addExact(source.start, durationMilliseconds)
+                    val id = portableId(source)
+                    require(identities.add(id)) { "Duplicate source identity" }
+                    ExportRecord(id, direction, source.start, source.seconds)
                 }
-            val durationMilliseconds = Math.multiplyExact(source.seconds, 1_000L)
-            Math.addExact(source.start, durationMilliseconds)
-            val id = portableId(source)
-            require(identities.add(id)) { "Duplicate source identity" }
-            ExportRecord(id, direction, source.start, source.seconds)
-        }.sortedWith(compareBy<ExportRecord> { it.startedAtMilliseconds }.thenBy { it.id.toString() })
+                .sortedWith(
+                    compareBy<ExportRecord> { it.startedAtMilliseconds }.thenBy { it.id.toString() }
+                )
 
-        val callsJson = records.joinToString(",", prefix = "[", postfix = "]") { record ->
-            "{\"id\":\"${record.id}\",\"direction\":\"${record.direction}\"," +
-                "\"started_at_ms\":${record.startedAtMilliseconds}," +
-                "\"duration_seconds\":${record.durationSeconds}}"
-        }
+        val callsJson =
+            records.joinToString(",", prefix = "[", postfix = "]") { record ->
+                "{\"id\":\"${record.id}\",\"direction\":\"${record.direction}\"," +
+                    "\"started_at_ms\":${record.startedAtMilliseconds}," +
+                    "\"duration_seconds\":${record.durationSeconds}}"
+            }
         val payload =
             "{\"schema_version\":$SCHEMA_VERSION," +
                 "\"export_id\":\"$exportId\"," +
