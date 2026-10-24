@@ -522,8 +522,11 @@ The failing control is the automatic incoming-call checkbox (`auto_incoming`,
 `android.view.View`). Standard `toggleable` semantics alone did not resolve the
 Android accessibility node, so the row now explicitly clears and sets its
 checkbox role, checked state, content description and test identity while
-retaining the toggle action. The focused Compose test asserts the localized
-content description. JDK17/SDK36 unit tests and Android-test Kotlin compilation
-pass; the earlier lint run passed before the final semantics modifier. The 17
-Python 3.15.1 UI-safety tests and Conductor integrity checks pass. The native
-accessibility journey must rerun on the hosted emulator before claiming parity.
+retaining the toggle action. On the next run the settings screen advanced, then
+the same unlabeled-node check found `import_incoming` on the historical import
+screen. The import call-type filters had the same custom clickable pattern and
+now receive the same explicit checkbox semantics; the Compose test asserts
+their label too. JDK17/SDK36 unit tests and Android-test Kotlin compilation
+passed before this import-panel change; its focused build/test and the hosted
+native rerun are pending. The 17 Python 3.15.1 UI-safety tests and Conductor
+integrity checks pass. No full accessibility parity is claimed yet.
