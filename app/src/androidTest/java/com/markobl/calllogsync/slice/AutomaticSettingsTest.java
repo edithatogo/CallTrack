@@ -47,13 +47,21 @@ public class AutomaticSettingsTest {
             assertTrue(activity.findViewById(R.id.auto_intro_panel) instanceof ComposeView);
             assertTrue(activity.findViewById(R.id.auto_permissions) instanceof ComposeView);
             assertTrue(activity.findViewById(R.id.auto_calendar_picker) instanceof ComposeView);
+            assertTrue(activity.findViewById(R.id.auto_actions) instanceof ComposeView);
             assertTrue(activity.findViewById(R.id.auto_call_types) instanceof ComposeView);
             RenderedUi rendered = new RenderedUi(instrumentation);
             assertNotNull(rendered.shown("auto_intro_text", true));
             assertNotNull(rendered.shown(context.getString(R.string.auto_intro), false));
             assertNotNull(rendered.shown("auto_access_action", true));
-            instrumentation.runOnMainSync(
-                    () -> assertFalse(activity.findViewById(R.id.auto_enable).isEnabled()));
+            rendered.await(
+                    () ->
+                            rendered.shown("auto_enable", true) != null
+                                    && rendered.shown("auto_pause", true) != null
+                                    && rendered.shown("auto_refresh", true) != null,
+                    "Automatic settings actions did not render");
+            assertFalse(rendered.shown("auto_enable", true).isEnabled());
+            assertTrue(rendered.shown("auto_pause", true).isEnabled());
+            assertTrue(rendered.shown("auto_refresh", true).isEnabled());
             assertEquals(
                     context.getString(R.string.slice_choose),
                     rendered.shown("auto_calendar_picker", true).getContentDescription());

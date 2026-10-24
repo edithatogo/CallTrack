@@ -51,8 +51,6 @@ internal fun AutomaticStatusPanel(state: AutomaticStatusUiState) {
 /** Explicit activation controls; reopening can resume enabled policy but never enable it. */
 class AutomaticSettingsActivity : ComponentActivity() {
     private val executor = Executors.newSingleThreadExecutor()
-    private var enable: Button? = null
-    private var pause: Button? = null
     private var statePanel: ComposeView? = null
     private var countsPanel: ComposeView? = null
     private var feedbackPanel: ComposeView? = null
@@ -71,6 +69,7 @@ class AutomaticSettingsActivity : ComponentActivity() {
     private var callTypesState by mutableStateOf(AutomaticCallTypesUiState())
     private var callTypesEnabled by mutableStateOf(true)
     private var destinationUiState by mutableStateOf(AutomaticDestinationUiState())
+    private var actionsUiState by mutableStateOf(AutomaticSettingsActionsUiState())
     private var restoredCallTypes = false
     private var destinationOptionTokens: List<String> = Collections.emptyList()
 
@@ -156,24 +155,29 @@ class AutomaticSettingsActivity : ComponentActivity() {
                 }
             }
         layout.addView(callTypes)
-        enable = Button(this)
-        enable!!.id = R.id.auto_enable
-        enable!!.setText(R.string.auto_enable)
-        layout.addView(enable)
-        enable!!.setOnClickListener { confirmEnable() }
-        pause = Button(this)
-        pause!!.id = R.id.auto_pause
-        pause!!.setText(R.string.auto_pause)
-        layout.addView(pause)
-        pause!!.setOnClickListener { change { AutomaticScheduling.pause(applicationContext) } }
+        val actionsPanel =
+            ComposeView(this).apply {
+                id = R.id.auto_actions
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    AutomaticSettingsActionsPanel(
+                        state = actionsUiState,
+                        enableLabel = getString(R.string.auto_enable),
+                        pauseLabel = getString(R.string.auto_pause),
+                        refreshLabel = getString(R.string.auto_refresh),
+                        onEnable = ::confirmEnable,
+                        onPause = { change { AutomaticScheduling.pause(applicationContext) } },
+                        onRefresh = { load(false) },
+                    )
+                }
+            }
+        layout.addView(actionsPanel)
         statePanel = statusView(layout, R.id.auto_state)
         countsPanel = statusView(layout, R.id.auto_counts)
         feedbackPanel = statusView(layout, R.id.auto_feedback)
         lastPanel = statusView(layout, R.id.auto_last)
-        val refresh = Button(this)
-        refresh.setText(R.string.auto_refresh)
-        layout.addView(refresh)
-        refresh.setOnClickListener { load(false) }
         val imports = Button(this)
         imports.id = R.id.open_imports
         imports.setText(R.string.import_open)
@@ -211,14 +215,19 @@ class AutomaticSettingsActivity : ComponentActivity() {
         checkSelfPermission(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
 
     private fun buttons() {
-        if (enable != null)
-            enable!!.isEnabled =
-                !busy &&
-                    selected >= 0 &&
-                    calendarAccess() &&
-                    callAccess() &&
-                    (callTypesState.incoming || callTypesState.outgoing || callTypesState.missed)
-        pause?.isEnabled = !busy
+        actionsUiState =
+            AutomaticSettingsActionsUiState(
+                enableEnabled =
+                    !busy &&
+                        selected >= 0 &&
+                        calendarAccess() &&
+                        callAccess() &&
+                        (callTypesState.incoming ||
+                            callTypesState.outgoing ||
+                            callTypesState.missed),
+                pauseEnabled = !busy,
+                refreshEnabled = true,
+            )
         destinationUiState = destinationUiState.copy(enabled = !busy && calendarAccess())
         callTypesEnabled = !busy
     }
