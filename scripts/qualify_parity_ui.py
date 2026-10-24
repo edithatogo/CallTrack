@@ -39,10 +39,13 @@ def native_failure_summary(method, output):
         detail = (detail + '; ' if detail else '') + (
             'unlabelled control id=' + control.group(1) +
             ' class=' + control.group(2))
-    anchor = re.search(r'Anchor must expose keyboard focus ([a-z0-9_]+)', output)
+    anchor = re.search(
+        r'Enabled anchor must expose keyboard focus ([a-z0-9_]+) enabled=(true|false)',
+        output)
     if anchor:
         detail = (detail + '; ' if detail else '') + (
-            'non-focusable anchor id=' + anchor.group(1))
+            'non-focusable anchor id=' + anchor.group(1) +
+            ' enabled=' + anchor.group(2))
     suffix = ' (' + detail + ')' if detail else ''
     return 'Native acceptance failed: ' + method + suffix
 

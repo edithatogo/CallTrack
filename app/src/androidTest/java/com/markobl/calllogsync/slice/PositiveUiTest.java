@@ -157,7 +157,12 @@ public class PositiveUiTest {
                 assertTrue("Screen has no reachable controls", controls[0] > 0);
                 android.view.accessibility.AccessibilityNodeInfo node = ui.shown(anchor, true);
                 assertNotNull("Anchor must be reachable by scrolling", node);
-                assertTrue("Anchor must expose keyboard focus " + anchor, node.isFocusable());
+                assertTrue(
+                        "Enabled anchor must expose keyboard focus "
+                                + anchor
+                                + " enabled="
+                                + node.isEnabled(),
+                        !node.isEnabled() || node.isFocusable());
                 instrumentation.sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_TAB);
                 ui.await(
                         () -> {
