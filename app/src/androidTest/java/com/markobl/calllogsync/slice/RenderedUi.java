@@ -289,7 +289,37 @@ final class RenderedUi {
                 + appPermissionState()
                 + " declared-runtime-permissions="
                 + declaredRuntimePermissionSummary()
+                + permissionRequesterLabelSummary()
                 + permissionPurposeSummary();
+    }
+
+    /** Report only whether the permission prompt exposes this app's label; never emit its text. */
+    private String permissionRequesterLabelSummary() {
+        AccessibilityNodeInfo root = automation.getRootInActiveWindow();
+        if (root == null || root.getPackageName() == null)
+            return " permission-app-label=unavailable";
+        if (!permissionPackage(root.getPackageName().toString())) return "";
+        CharSequence label = context.getApplicationInfo().loadLabel(context.getPackageManager());
+        if (label == null || label.length() == 0) return " permission-app-label=unavailable";
+        return " permission-app-label="
+                + (containsVisibleLabel(root, label.toString()) ? "visible" : "not-visible");
+    }
+
+    private boolean containsVisibleLabel(AccessibilityNodeInfo node, String label) {
+        if (node == null || !node.isVisibleToUser()) return false;
+        String normalizedLabel = label.trim().toLowerCase(java.util.Locale.ROOT);
+        CharSequence text = node.getText();
+        CharSequence description = node.getContentDescription();
+        if (containsLabel(text, normalizedLabel) || containsLabel(description, normalizedLabel))
+            return true;
+        for (int i = 0; i < node.getChildCount(); i++)
+            if (containsVisibleLabel(node.getChild(i), label)) return true;
+        return false;
+    }
+
+    private boolean containsLabel(CharSequence value, String normalizedLabel) {
+        return value != null
+                && value.toString().toLowerCase(java.util.Locale.ROOT).contains(normalizedLabel);
     }
 
     @SuppressWarnings("deprecation")

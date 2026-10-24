@@ -121,6 +121,11 @@ def native_failure_summary(method, output, declared_permissions=None):
     if permission_purpose:
         detail = (detail + '; ' if detail else '') + (
             'permission-purpose=' + permission_purpose.group(1))
+    permission_app_label = re.search(
+        r'permission-app-label=(visible|not-visible|unavailable)', output)
+    if permission_app_label:
+        detail = (detail + '; ' if detail else '') + (
+            'permission-app-label=' + permission_app_label.group(1))
     missing_permission = re.search(
         r'Visible enabled control missing: (permission_(?:deny|allow)_button)', output)
     if missing_permission:

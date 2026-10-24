@@ -141,6 +141,16 @@ class UiSafety(unittest.TestCase):
         self.assertIn('permission_deny_and_dont_ask_again_button:android.widget.Button:enabled=true', summary)
         self.assertNotIn('private label', summary)
 
+    def test_failure_summary_reports_only_permission_requester_label_visibility(self):
+        summary = device.native_failure_summary(
+            'renderedRangePreviewCancelConfirmAndRepeat',
+            'Visible enabled positive dialog action missing; permission-purpose=contacts '
+            'permission-app-label=visible app label and private permission message\n',
+        )
+        self.assertIn('permission-app-label=visible', summary)
+        self.assertNotIn('app label', summary)
+        self.assertNotIn('private permission message', summary)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
