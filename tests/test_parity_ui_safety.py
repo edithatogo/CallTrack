@@ -14,17 +14,23 @@ from parity_targets import RECOVERY_AVD, TRACK14_UI_AVD
 class UiSafety(unittest.TestCase):
     def test_instrumentation_failures_keep_only_protocol_state_categories(self):
         cases = (
-            ('', 'instrumentation-output-empty'),
-            ('INSTRUMENTATION_FAILED: Process crashed.', 'instrumentation-process-failed'),
-            ('FAILURES!!!\nINSTRUMENTATION_STATUS_CODE: -1', 'instrumentation-test-failed'),
+            ('', 'instrumentation-output-empty', 'instrumentation-protocol=none'),
+            ('INSTRUMENTATION_FAILED: Process crashed.', 'instrumentation-process-failed',
+             'instrumentation-protocol=none'),
+            ('FAILURES!!!\nINSTRUMENTATION_STATUS_CODE: -1', 'instrumentation-test-failed',
+             'instrumentation-protocol=none'),
             ('INSTRUMENTATION_RESULT: shortMsg=Other failure',
-             'instrumentation-result-without-success-marker'),
-            ('arbitrary private text', 'instrumentation-result-marker-missing'),
+             'instrumentation-result-without-success-marker', 'instrumentation-protocol=result'),
+            ('INSTRUMENTATION_STATUS: stream=private text',
+             'instrumentation-result-marker-missing', 'instrumentation-protocol=status'),
+            ('arbitrary private text', 'instrumentation-result-marker-missing',
+             'instrumentation-protocol=none'),
         )
-        for output, expected in cases:
+        for output, expected, protocol in cases:
             with self.subTest(expected=expected):
                 summary = device.native_failure_summary('renderedRangePreviewCancelConfirmAndRepeat', output)
                 self.assertIn(expected, summary)
+                self.assertIn(protocol, summary)
                 self.assertNotIn('arbitrary private text', summary)
 
     def test_apk_permission_summary_reports_only_allowlisted_manifest_names(self):
