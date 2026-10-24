@@ -779,3 +779,15 @@ Focused review passed 35 `tests.test_parity_ui_safety` tests,
 scenarios), pinned `google-java-format 1.24.0`, and `git diff --check`. The
 track remains active pending repeatable API26 focus, API33 permission-dialog
 acceptance, broader parity, and separate device/provider/operational gates.
+
+## Hosted matrix rerun `c4c8be9` — 2026-10-25
+
+Hosted UI run [40142395588](https://github.com/edithatogo/CallTrack/actions/runs/40142395588)
+passed API33 and API36, including all four rendered suites, cleanup and package
+removal. API26 passed settings, imports and recovery but failed the final
+keyboard-focus assertion; fixture cleanup and package removal still passed.
+Build qualification runs 40142392059 and 40142395580 passed. This supersedes
+the API33 failure from run 40140921320; API26 remains the only hosted UI matrix
+failure. The local accessibility result remains non-repeatable, so the
+track/PR stay open until the minimum-API focus behavior is resolved and the
+updated matrix passes.

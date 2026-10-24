@@ -74,3 +74,10 @@ and hosted emulators and why API33's native permission controls are inaccessible
 before weakening either acceptance assertion. Physical calls, manual
 TalkBack/Switch Access, provider, process/lifecycle and operational acceptance
 remain separate open gates.
+
+Hosted rerun [40142395588](https://github.com/edithatogo/CallTrack/actions/runs/40142395588)
+on `c4c8be9` passes API33 and API36. API26 still fails keyboard-focus
+traversal after device-level Tab input. Both build-qualification runs
+40142392059 and 40142395580 pass; API26 verifies fixture cleanup and package
+removal. The API33 failure is resolved for this run. Keep PR #78 open for the
+repeatable API26 focus issue; do not merge while that check is red.
