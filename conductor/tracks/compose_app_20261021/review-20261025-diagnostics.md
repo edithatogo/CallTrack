@@ -81,3 +81,17 @@ traversal after device-level Tab input. Both build-qualification runs
 40142392059 and 40142395580 pass; API26 verifies fixture cleanup and package
 removal. The API33 failure is resolved for this run. Keep PR #78 open for the
 repeatable API26 focus issue; do not merge while that check is red.
+
+## Hosted matrix rerun `4d512bf` — 2026-10-25
+
+Hosted UI run [40143215905](https://github.com/edithatogo/CallTrack/actions/runs/40143215905)
+passed API36. API26 again passed settings, imports and recovery, then failed
+`renderedAccessibilityLabelsTargetsAndKeyboardFocus` at the visible app-owned
+keyboard-focus assertion; fixture cleanup and package removal passed. API33
+failed `renderedPermissionsFiltersConfirmPauseAndReopen`: the next
+`permission_allow_button` could not be found, with `permission-root=unavailable`
+and calendar permissions still denied. This repeats the earlier inaccessible
+permission-controller symptom after one successful API33 run. Build
+qualification runs 40143215932 and 40143212903 passed. No app permission
+requests or acceptance assertions were changed. Treat both API26 focus and
+API33 permission-controller interaction as unresolved and keep PR #78 open.

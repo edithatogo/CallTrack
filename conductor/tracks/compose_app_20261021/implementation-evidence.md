@@ -791,3 +791,18 @@ the API33 failure from run 40140921320; API26 remains the only hosted UI matrix
 failure. The local accessibility result remains non-repeatable, so the
 track/PR stay open until the minimum-API focus behavior is resolved and the
 updated matrix passes.
+
+## Hosted matrix rerun `4d512bf` — 2026-10-25
+
+Hosted UI rerun [40143215905](https://github.com/edithatogo/CallTrack/actions/runs/40143215905)
+passed API36. API26 again passed settings/imports/recovery and failed
+`renderedAccessibilityLabelsTargetsAndKeyboardFocus` at the final
+visible app-owned keyboard-focus assertion; cleanup and package removal passed.
+API33 failed `renderedPermissionsFiltersConfirmPauseAndReopen` because the
+next `permission_allow_button` was unavailable and diagnostics reported
+`permission-root=unavailable` while calendar permissions remained denied.
+Build qualification runs 40143215932 and 40143212903 passed. This confirms
+the API33 permission-controller issue is intermittent (run 40142395588 passed
+API33), while API26 focus remains non-repeatable locally and consistently red
+in hosted runs. No product permission behavior or acceptance assertion was
+changed; both UI findings remain open.
