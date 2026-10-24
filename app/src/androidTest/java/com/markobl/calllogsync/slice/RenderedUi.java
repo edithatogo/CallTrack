@@ -248,7 +248,63 @@ final class RenderedUi {
             windows.add(owner + ":" + type + ":" + controls);
             if (windows.size() >= 8) break;
         }
-        return "dialog-active=" + activeOwner + " dialog-windows=" + windows;
+        return "dialog-active="
+                + activeOwner
+                + " dialog-windows="
+                + windows
+                + " app-permissions="
+                + appPermissionState()
+                + permissionPurposeSummary();
+    }
+
+    private String permissionPurposeSummary() {
+        AccessibilityNodeInfo root = automation.getRootInActiveWindow();
+        if (root == null || root.getPackageName() == null) return "";
+        if (!permissionPackage(root.getPackageName().toString())) return "";
+        AccessibilityNodeInfo message = find("permission_message", true);
+        CharSequence value = message == null ? null : message.getText();
+        if (value == null) return " permission-purpose=unavailable";
+        String text = value.toString().toLowerCase(java.util.Locale.ROOT);
+        String purpose =
+                text.contains("call log")
+                        ? "call-log"
+                        : text.contains("calendar")
+                                ? "calendar"
+                                : text.contains("phone")
+                                        ? "phone-state"
+                                        : text.contains("contacts")
+                                                ? "contacts"
+                                                : text.contains("location")
+                                                        ? "location"
+                                                        : text.contains("camera")
+                                                                ? "camera"
+                                                                : text.contains("microphone")
+                                                                        ? "microphone"
+                                                                        : text.contains(
+                                                                                        "notification")
+                                                                                ? "notifications"
+                                                                                : "other";
+        return " permission-purpose=" + purpose;
+    }
+
+    private String appPermissionState() {
+        String[] names = {"calendar-read", "calendar-write", "call-log-read", "phone-state-read"};
+        String[] permissions = {
+            android.Manifest.permission.READ_CALENDAR,
+            android.Manifest.permission.WRITE_CALENDAR,
+            android.Manifest.permission.READ_CALL_LOG,
+            android.Manifest.permission.READ_PHONE_STATE
+        };
+        java.util.List<String> states = new java.util.ArrayList<>();
+        for (int i = 0; i < permissions.length; i++)
+            states.add(
+                    names[i]
+                            + "="
+                            + (context.checkSelfPermission(permissions[i])
+                                            == android.content.pm.PackageManager.PERMISSION_GRANTED
+                                    ? "granted"
+                                    : "denied"));
+        return states.toString();
     }
 
     private String packageCategory(CharSequence owner) {
@@ -271,9 +327,13 @@ final class RenderedUi {
                         ? "button1"
                         : id.endsWith(":id/button2")
                                 ? "button2"
-                                : id.endsWith(":id/button3") ? "button3" : "other";
-        if (packageName != null
-                && context.getPackageName().contentEquals(packageName)
+                                : id.endsWith(":id/button3")
+                                        ? "button3"
+                                        : knownPermissionControl(id);
+        boolean appOwner =
+                packageName != null && context.getPackageName().contentEquals(packageName);
+        boolean permissionOwner = packageName != null && permissionPackage(packageName.toString());
+        if ((appOwner || permissionOwner)
                 && node.isVisibleToUser()
                 && node.isClickable()
                 && !control.equals("other")) {
@@ -286,6 +346,18 @@ final class RenderedUi {
         }
         for (int i = 0; i < node.getChildCount() && controls.size() < 12; i++)
             collectDialogControls(node.getChild(i), controls);
+    }
+
+    private String knownPermissionControl(String id) {
+        for (String value :
+                new String[] {
+                    "permission_allow_button",
+                    "permission_allow_one_time_button",
+                    "permission_allow_foreground_only_button",
+                    "permission_deny_button",
+                    "permission_deny_and_dont_ask_again_button"
+                }) if (id.endsWith(":id/" + value)) return value;
+        return "other";
     }
 
     private void touch(AccessibilityNodeInfo node, String selector) {

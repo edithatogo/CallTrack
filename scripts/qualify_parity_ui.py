@@ -81,11 +81,24 @@ def native_failure_summary(method, output):
         detail = (detail + '; ' if detail else '') + 'dialog-windows=' + ','.join(
             owner + ':' + kind for owner, kind in dialog_windows[:8])
     dialog_controls = re.findall(
-        r'(button[1-3]|other):(android\.widget\.Button|other):enabled=(true|false):'
+        r'(button[1-3]|permission_(?:allow|allow_one_time|allow_foreground_only|deny|deny_and_dont_ask_again)_button|other):'
+        r'(android\.widget\.Button|other):enabled=(true|false):'
         r'clickable=true', output)
     if dialog_controls:
         detail = (detail + '; ' if detail else '') + 'dialog-controls=' + ','.join(
             ':'.join(control) for control in dialog_controls[:12])
+    app_permissions = re.findall(
+        r'(calendar-read|calendar-write|call-log-read|phone-state-read)=(granted|denied)',
+        output)
+    if app_permissions:
+        detail = (detail + '; ' if detail else '') + 'app-permissions=' + ','.join(
+            ':'.join(permission) for permission in app_permissions[:4])
+    permission_purpose = re.search(
+        r'permission-purpose=(call-log|calendar|phone-state|contacts|location|camera|'
+        r'microphone|notifications|other|unavailable)', output)
+    if permission_purpose:
+        detail = (detail + '; ' if detail else '') + (
+            'permission-purpose=' + permission_purpose.group(1))
     missing_permission = re.search(
         r'Visible enabled control missing: (permission_(?:deny|allow)_button)', output)
     if missing_permission:

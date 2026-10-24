@@ -69,13 +69,25 @@ class UiSafety(unittest.TestCase):
             'renderedRangePreviewCancelConfirmAndRepeat',
             'Visible enabled positive dialog action missing; dialog-active=input-method '
             'dialog-windows=[app:application:[button1:android.widget.Button:'
-            'enabled=false:clickable=true], input-method:input-method:[]]\n'
+            'enabled=false:clickable=true], permission:application:'
+            '[permission_allow_button:android.widget.Button:enabled=true:clickable=true], '
+            'input-method:input-method:[]] app-permissions=[calendar-read=granted,'
+            'calendar-write=granted,call-log-read=denied,phone-state-read=denied] '
+            'permission-purpose=calendar\n'
             'private dialog title and message must remain hidden\n'
             '    at com.markobl.calllogsync.slice.ImportUiTest.confirm(ImportUiTest.java:104)\n',
         )
         self.assertIn('dialog-active=input-method', summary)
-        self.assertIn('dialog-windows=app:application,input-method:input-method', summary)
+        self.assertIn(
+            'dialog-windows=app:application,permission:application,input-method:input-method',
+            summary,
+        )
         self.assertIn('dialog-controls=button1:android.widget.Button:false', summary)
+        self.assertIn(
+            'permission_allow_button:android.widget.Button:true', summary)
+        self.assertIn('app-permissions=calendar-read:granted,calendar-write:granted,'
+                      'call-log-read:denied,phone-state-read:denied', summary)
+        self.assertIn('permission-purpose=calendar', summary)
         self.assertNotIn('private dialog title', summary)
 
     def test_failure_summary_retains_only_allowlisted_permission_diagnostic(self):
