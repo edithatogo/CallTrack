@@ -23,6 +23,19 @@ struct ParserContractHarness {
             let golden = try Data(contentsOf: URL(fileURLWithPath: CommandLine.arguments[1]))
             let goldenPreview = try CallLogImporter.preview(data: golden)
             precondition(goldenPreview.calls.count == 2)
+            var rejectedMutations = 0
+            for offset in golden.indices {
+                var mutated = golden
+                mutated[offset] = mutated[offset] ^ 0x01
+                do {
+                    _ = try CallLogImporter.preview(data: mutated)
+                    fatalError("single-byte fixture mutation at offset \(offset) was accepted")
+                } catch is ImportFailure {
+                    rejectedMutations += 1
+                }
+            }
+            precondition(rejectedMutations == golden.count)
+            print("PASS: rejected all \(rejectedMutations) single-byte golden mutations")
         }
 
         do {

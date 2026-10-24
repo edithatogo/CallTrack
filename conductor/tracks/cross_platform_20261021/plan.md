@@ -17,6 +17,7 @@
 
 - [x] Task: Establish a bounded synthetic schema-v1 Android producer/macOS preview golden and checksum/count regressions; production format acceptance remains open.
 - [x] Task: Make the Swift preview reject duplicate keys, unknown fields and alternate JSON encodings; retain one optional final LF/CRLF and cover the rule with hostile-input fixtures.
+- [x] Task: Run a deterministic one-bit mutation sweep over the shared Android golden and reject every changed document; keep this bounded smoke check distinct from fuzz qualification.
 - [x] Task: Freeze the prototype-v1 schema, exact source/toolchain, capability matrix and acceptance boundary; keep public-format and native/remote acceptance pending.
 - [ ] Task: Run compatible import/export/restore fixtures with inactive foreign receipts, redaction, deliberate delivery and one actual destination writer.
 - [ ] Task: Execute preserving package upgrades, process/permission/account failures, edited/deleted events and real provider-cloud readback where claimed; retain unobserved routes as unsupported.
@@ -64,6 +65,9 @@
   whitespace spellings. The shared fixture's single final LF and a single CRLF
   remain accepted; no ending is also accepted, while repeated endings fail.
   Direct tests cover duplicate keys and unknown root fields.
+- The Swift source harness flips each of the golden fixture's 422 bytes in turn;
+  all 422 mutated inputs were rejected. This bounded mutation sweep is not
+  coverage-guided fuzzing or broad hostile-input acceptance.
 - Android JVM unit tests were started under the selected repo JDK; the observed
   result is recorded in the review after the process exits.
 - Kept UI/file export, public schema adoption, restore semantics, native
