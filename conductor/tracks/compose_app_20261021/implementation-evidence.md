@@ -519,9 +519,11 @@ public log, so the failing assertion is not yet known. Added a safe failure
 summary that reports app test source frames and, for unlabeled controls, only
 the resource ID and widget class. It suppresses rendered text and descriptions.
 The failing control is the automatic incoming-call checkbox (`auto_incoming`,
-`android.view.View`). It now uses Compose's standard `toggleable` checkbox
-semantics, and its focused Compose test asserts the localized content
-description. The local JDK17/SDK36 build passed unit tests, Android-test Kotlin
-compilation and lint (85 actionable tasks, 14 executed); the 17 Python 3.15.1
-UI-safety tests and Conductor integrity checks pass. The native accessibility
-journey must rerun on the hosted emulator before claiming parity.
+`android.view.View`). Standard `toggleable` semantics alone did not resolve the
+Android accessibility node, so the row now explicitly clears and sets its
+checkbox role, checked state, content description and test identity while
+retaining the toggle action. The focused Compose test asserts the localized
+content description. JDK17/SDK36 unit tests and Android-test Kotlin compilation
+pass; the earlier lint run passed before the final semantics modifier. The 17
+Python 3.15.1 UI-safety tests and Conductor integrity checks pass. The native
+accessibility journey must rerun on the hosted emulator before claiming parity.

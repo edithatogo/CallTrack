@@ -15,7 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -76,10 +78,11 @@ private fun CallTypeOption(
                     role = Role.Checkbox,
                     onValueChange = onCheckedChange,
                 )
-                .semantics {
+                .clearAndSetSemantics {
                     testTagsAsResourceId = true
                     testTag = tag
                     contentDescription = label
+                    role = Role.Checkbox
                     toggleableState = if (checked) ToggleableState.On else ToggleableState.Off
                 }
                 .padding(horizontal = 4.dp),
