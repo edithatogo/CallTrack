@@ -25,5 +25,8 @@
       "state": "closed-draft-hosted-checks-failed",
       "note": "Superseded by a current-main follow-up for dependency audit evidence; the bounded prototype remains on main."
     }
-  ]
+  ],
+  "pull_request": "https://github.com/edithatogo/CallTrack/pull/58",
+  "pull_request_state": "merged-hosted-checks-passed-native-acceptance-pending",
+  "pull_request_merge_commit": "e450229105ff63c658a01ecfeefce4d94336d7ce"
 }
