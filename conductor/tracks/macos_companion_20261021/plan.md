@@ -17,7 +17,8 @@
 
 - [x] Task: Establish parser contract cases and meaningful regression coverage before behaviour changes.
 - [x] Task: Map a bounded prototype import format/provenance, preview/approval, capability and privacy requirements before choosing parser/storage dependencies.
-- [ ] Task: Implement bounded file selection/parsing with no write during preview; imported foreign receipts remain inactive and never confer replay authority. (Parser preview implemented; native selection and app approval UI pending.)
+- [x] Task: Implement and review a bounded, preview-only Foundation parser; test byte/count, schema, identity, timestamp, and duration boundaries with synthetic inputs (see [parser boundary review](review-20261024-parser-boundaries.md)).
+- [ ] Task: Implement native file selection and explicit approval UI with no write during preview; imported foreign receipts remain inactive and never confer replay authority.
 - [ ] Task: Implement EventKit permission/list/select/insert/exact-readback with durable intent and one destination writer; denial/write-only cannot be called reconciled.
 - [ ] Task: Qualify interruption/restart/uncertain insert, edited/deleted events, missing/recreated calendar, scoped cleanup, native accessibility and packaged upgrade/recovery using synthetic data.
 - [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md).
@@ -25,7 +26,7 @@
 ## Phase 4: Review, acceptance and handoff
 
 - [ ] Task: Run applicable shared/rendered/native/cloud/package/operational acceptance with exact source/artifact evidence; verify cleanup and preserving upgrade/recovery.
-- [x] Task: Review the bounded local slice, apply fixes and rerun affected checks. (Track-level review remains open until native acceptance.)
+- [x] Task: Review the bounded local slice, apply fixes and rerun affected checks (including [parser boundary review](review-20261024-parser-boundaries.md)). Track-level review remains open until native acceptance.
 - [x] Task: Update requirements, decisions, remaining limitations and next-track inputs; retire superseded code/prototypes only after parity. (No prototype retired; Track17 remains blocked.)
 - [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger.
 

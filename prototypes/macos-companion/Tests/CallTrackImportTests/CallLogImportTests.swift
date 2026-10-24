@@ -46,6 +46,26 @@ final class CallLogImportTests: XCTestCase {
         }
     }
 
+    func testRejectsNegativeAndOverflowingTimestamps() {
+        let negative = "{\"id\":\"\(callID)\",\"direction\":\"incoming\",\"started_at_ms\":-1,\"duration_seconds\":0}"
+        XCTAssertThrowsError(try CallLogImporter.preview(data: document(negative))) {
+            XCTAssertEqual($0 as? ImportFailure, .invalidTimestamp(callID))
+        }
+        let overflow = "{\"id\":\"\(callID)\",\"direction\":\"incoming\",\"started_at_ms\":9223372036854775807,\"duration_seconds\":1}"
+        XCTAssertThrowsError(try CallLogImporter.preview(data: document(overflow))) {
+            XCTAssertEqual($0 as? ImportFailure, .invalidTimestamp(callID))
+        }
+    }
+
+    func testRejectsMoreThanMaximumCalls() {
+        let record = "{\"id\":\"\(callID)\",\"direction\":\"incoming\",\"started_at_ms\":1800000000000,\"duration_seconds\":1}"
+        let calls = Array(repeating: record, count: CallLogImporter.maximumCalls + 1)
+            .joined(separator: ",")
+        XCTAssertThrowsError(try CallLogImporter.preview(data: document(calls))) {
+            XCTAssertEqual($0 as? ImportFailure, .tooManyCalls)
+        }
+    }
+
     func testRejectsOversizedInputBeforeDecode() {
         XCTAssertThrowsError(try CallLogImporter.preview(
             data: Data(repeating: 0x20, count: CallLogImporter.maximumFileBytes + 1)
