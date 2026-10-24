@@ -56,7 +56,7 @@ removal. APK manifest readback confirms the app and test APK do not request
 contacts permission. The local import harness handles only the observed
 Gboard-owned contacts prompt, and only with an explicit deny action. The
 keyboard test focuses the visible Compose host and enabled app anchor before a
-real Tab event, then requires visible app-owned input focus; the traversal
+real Tab event injected through Android's input dispatcher, then requires visible app-owned input focus; the traversal
 assertion remains enabled.
 
 The final current-build validation passed `tests.test_parity_ui_safety` (35
@@ -67,3 +67,13 @@ hosted API26/API33/API36 matrix on the pushed revision and retain API33 as an
 open issue until that exact run passes. The physical phone, manual
 TalkBack/Switch Access, provider, process/lifecycle and operational acceptance
 gates remain separate and unqualified.
+
+The first hosted rerun on commit `91747e3` passed both build-qualification
+workflows and the API36 rendered matrix. API26 passed settings, import and
+recovery but failed keyboard-focus traversal after instrumentation Tab input;
+API33 again failed to locate permission controls while all four app
+permissions remained denied and the permission root was unavailable. The local
+API26 rerun now uses Android's input dispatcher and passes all four suites on
+one APK hash, but this change has not yet been hosted. Keep the track open and
+rerun API26/API33/API36 after this input change; API33's separate permission
+dialog failure remains unresolved.

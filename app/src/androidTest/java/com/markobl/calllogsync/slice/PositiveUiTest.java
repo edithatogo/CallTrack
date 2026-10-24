@@ -230,7 +230,15 @@ public class PositiveUiTest {
                 if (node.isEnabled())
                     node.performAction(
                             android.view.accessibility.AccessibilityNodeInfo.ACTION_FOCUS);
-                instrumentation.sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_TAB);
+                try (android.os.ParcelFileDescriptor ignored =
+                        instrumentation
+                                .getUiAutomation()
+                                .executeShellCommand("input keyevent KEYCODE_TAB")) {
+                    // Inject through Android's input dispatcher; Instrumentation key events do
+                    // not traverse the Compose host consistently on API26 x86 emulators.
+                } catch (java.io.IOException error) {
+                    throw new AssertionError("Could not inject device Tab key", error);
+                }
                 ui.capture("accessibility-after-tab-" + i);
                 ui.await(
                         () -> {

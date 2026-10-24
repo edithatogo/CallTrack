@@ -750,7 +750,7 @@ source-bound four-suite matrix on the current test APK. The exact build receipt
 under ignored `.local/slice-evidence/build-receipt.json` reports JDK
 17.0.21.0.2, SDK under `/Volumes/PortableSSD/cache/calltrack-sdk-20261020`,
 `exit_code: 0`, `inputs_unchanged: true`, and app/test APK SHA-256 values
-`2f505e79…583a` and `9d506885…07a76`. Settings, imports, recovery and
+`2f505e79…583a` and `1b0e6e45…61d5ef`. Settings, imports, recovery and
 accessibility receipts all report `passed` against those APK hashes, with
 fixture cleanup verified and test packages removed. Gboard readback confirms
 `READ_CONTACTS` remains denied. Local receipt directories are under
@@ -763,10 +763,13 @@ prompt only when its launcher is exactly Gboard, and only by denying the
 contacts request. It does not grant contacts access or alter app permission
 behavior. The accessibility journey now applies input focus to the visible
 Compose host and enabled anchor before sending a real Tab key, then requires a
-visible app-owned input-focus node. This addresses the API26 focus startup gap
-without weakening the traversal assertion. Hosted API26/API33/API36 rerun on
-the exact pushed revision is still required; this local result does not replace
-the hosted matrix or physical/manual assistive-technology acceptance.
+visible app-owned input-focus node. The Tab event is injected through Android's
+input dispatcher; this addresses the hosted-x86/API26 instrumentation-key
+focus gap without weakening the traversal assertion. The local four-suite
+receipts were rerun on this exact APK and report emulator-state restoration.
+Hosted API26/API33/API36 rerun on the exact pushed revision is still required;
+this local result does not replace the hosted matrix or physical/manual
+assistive-technology acceptance.
 
 Focused review passed 35 `tests.test_parity_ui_safety` tests,
 `scripts/verify_conductor.py` (250 documents, 21 tracks, 25 synthetic
