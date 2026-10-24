@@ -3,9 +3,18 @@ gradle.projectsEvaluated {
     gradle.rootProject.tasks.register('releaseBundleRuntimeInventory') {
         doLast {
             def config = gradle.rootProject.project(':app').configurations.releaseRuntimeClasspath
-            def rows = config.resolvedConfiguration.resolvedArtifacts.collect { artifact ->
-                [coordinate: artifact.moduleVersion.id.toString(), name: artifact.file.name,
-                 sha256: java.security.MessageDigest.getInstance('SHA-256').digest(artifact.file.bytes).encodeHex().toString()]
+            // The release classpath now includes the in-repository KMP shared-core
+            // project. Gradle's legacy resolvedArtifacts API tries to select a
+            // published artifact variant for that project and is ambiguous across
+            // Android artifacts. The source bundle already contains project source;
+            // inventory only external Maven components here.
+            def rows = config.incoming.artifactView {
+                componentFilter { id -> id instanceof org.gradle.api.artifacts.component.ModuleComponentIdentifier }
+            }.artifacts.artifacts.collect { artifactResult ->
+                def component = artifactResult.id.componentIdentifier
+                def file = artifactResult.file
+                [coordinate: "${component.group}:${component.module}:${component.version}", name: file.name,
+                 sha256: java.security.MessageDigest.getInstance('SHA-256').digest(file.bytes).encodeHex().toString()]
             }
             new File(System.getenv('CALLTRACK_RUNTIME_OUT')).text = groovy.json.JsonOutput.prettyPrint(
                 groovy.json.JsonOutput.toJson([configuration: config.name, artifacts: rows])) + '\n'
