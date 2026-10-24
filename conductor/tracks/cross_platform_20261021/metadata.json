@@ -12,12 +12,28 @@
   "track_number": 19,
   "execution_stage": 8,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
-  "implementation_status": "bounded-evidence-reconciliation; cross-platform-native-acceptance-pending",
+  "implementation_status": "bounded-evidence-reconciliation-refreshed-with-Track17-Android-host-build; cross-platform-native-acceptance-pending",
   "implementation_commit": "57fce24",
   "reviewed_at": "2026-10-24",
   "review_commit": "be22967",
   "review_document": "review-20261024.md",
   "review_status": "bounded-slice-reviewed-prerequisites-open",
+  "track17_evidence_refresh": {
+    "pull_request": "https://github.com/edithatogo/CallTrack/pull/60",
+    "state": "merged",
+    "android_host_compiled_and_packaged": true,
+    "android_rendered_acceptance": false,
+    "production_app_integration": false,
+    "refreshed_at": "2026-10-24"
+  },
+  "previous_pull_requests": [
+    {
+      "url": "https://github.com/edithatogo/CallTrack/pull/23",
+      "state": "closed",
+      "note": "Historical draft targeted codex/track18-rust-evaluation and hosted checks failed before job steps."
+    }
+  ],
+  "evidence_refresh_review_document": "review-20261024-track17-refresh.md",
   "draft_pr": 23,
   "draft_pr_url": "https://github.com/edithatogo/CallTrack/pull/23",
   "draft_pr_base": "codex/track18-rust-evaluation",

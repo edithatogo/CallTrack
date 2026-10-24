@@ -2,6 +2,7 @@
 
 - [Specification](spec.md)
 - [Plan](plan.md)
+- [Track 17 evidence refresh review](review-20261024-track17-refresh.md)
 - [Metadata](metadata.json)
 - [Execution sequence](../../future-architecture.md)
 
