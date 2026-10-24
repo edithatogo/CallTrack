@@ -49,7 +49,7 @@ def native_failure_summary(method, output):
     # Keep only numeric geometry from the system-bars assertion; screenshot or
     # arbitrary rendered strings remain private in the ignored local receipt.
     geometry = re.search(
-        r'(settings|manual|imports|recovery) first content begins at (-?\d+) beneath system area (\d+)',
+        r'(settings|manual|imports|recovery) visible content begins at (-?\d+) beneath system area (\d+)',
         output)
     if geometry:
         detail = (detail + '; ' if detail else '') + (
@@ -67,6 +67,23 @@ def native_failure_summary(method, output):
     if missing_permission:
         detail = (detail + '; ' if detail else '') + (
             'missing-permission-control=' + missing_permission.group(1))
+    permission_root = re.search(
+        r'permission-root=(com\.android\.permissioncontroller|com\.google\.android\.permissioncontroller|com\.android\.packageinstaller|com\.google\.android\.packageinstaller|unavailable)',
+        output)
+    if permission_root:
+        detail = (detail + '; ' if detail else '') + 'permission-root=' + permission_root.group(1)
+    system_controls = re.findall(
+        r':id/([a-z0-9_]+):(android\.[A-Za-z0-9_.$]+):enabled=(true|false)', output)
+    if system_controls:
+        safe_controls = [
+            item for item in system_controls[:16]
+            if item[0].startswith('permission_') or item[0] in ('button1', 'button2', 'button3')
+        ]
+        if safe_controls:
+            detail = (detail + '; ' if detail else '') + (
+                'permission-controls=' + ','.join(
+                    control + ':' + widget + ':enabled=' + enabled
+                    for control, widget, enabled in safe_controls))
     suffix = ' (' + detail + ')' if detail else ''
     return 'Native acceptance failed: ' + method + suffix
 

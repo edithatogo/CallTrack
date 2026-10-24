@@ -89,16 +89,17 @@ public class PositiveUiTest {
             try {
                 ui.await(() -> ui.find(id, true) != null, "Screen missing: " + names[i]);
                 ui.capture("system-bars-" + names[i]);
-                int[] firstPosition = new int[2], requiredTop = new int[1];
+                int[] rootPosition = new int[2], contentTop = new int[1], requiredTop = new int[1];
                 instrumentation.runOnMainSync(
                         () -> {
                             android.view.ViewGroup content =
                                     activity.findViewById(android.R.id.content);
                             android.widget.ScrollView scroll =
                                     (android.widget.ScrollView) content.getChildAt(0);
-                            android.view.ViewGroup layout =
-                                    (android.view.ViewGroup) scroll.getChildAt(0);
-                            layout.getChildAt(0).getLocationOnScreen(firstPosition);
+                            // Measure the viewport's visible content edge. Its child can be
+                            // scrolled above the viewport when Android auto-focuses a field.
+                            scroll.getLocationOnScreen(rootPosition);
+                            contentTop[0] = rootPosition[1] + scroll.getPaddingTop();
                             android.view.WindowInsets insets =
                                     activity.getWindow().getDecorView().getRootWindowInsets();
                             requiredTop[0] =
@@ -113,11 +114,11 @@ public class PositiveUiTest {
                         });
                 assertTrue(
                         names[i]
-                                + " first content begins at "
-                                + firstPosition[1]
+                                + " visible content begins at "
+                                + contentTop[0]
                                 + " beneath system area "
                                 + requiredTop[0],
-                        firstPosition[1] >= requiredTop[0]);
+                        contentTop[0] >= requiredTop[0]);
             } finally {
                 finish(instrumentation, activity);
             }

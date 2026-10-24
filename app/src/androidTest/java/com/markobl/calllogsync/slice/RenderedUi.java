@@ -150,12 +150,17 @@ final class RenderedUi {
 
     private void tap(String value, boolean id, boolean waitForIdle) {
         final AccessibilityNodeInfo[] found = new AccessibilityNodeInfo[1];
-        await(
-                () -> {
-                    found[0] = waitForIdle ? shown(value, id) : find(value, id);
-                    return found[0] != null && found[0].isEnabled();
-                },
-                "Visible enabled control missing: " + value);
+        try {
+            await(
+                    () -> {
+                        found[0] = waitForIdle ? shown(value, id) : find(value, id);
+                        return found[0] != null && found[0].isEnabled();
+                    },
+                    "Visible enabled control missing: " + value);
+        } catch (AssertionError missing) {
+            if (!value.startsWith("permission_")) throw missing;
+            throw new AssertionError(missing.getMessage() + "; " + permissionControlSummary());
+        }
         if (waitForIdle) settle();
         else SystemClock.sleep(50); // A user can stop work while its progress keeps changing.
         found[0] = waitForIdle ? shown(value, id) : find(value, id);
@@ -185,6 +190,30 @@ final class RenderedUi {
             up.recycle();
         }
         SystemClock.sleep(250);
+    }
+
+    private String permissionControlSummary() {
+        AccessibilityNodeInfo root = automation.getRootInActiveWindow();
+        if (root == null || root.getPackageName() == null) return "permission-root=unavailable";
+        java.util.List<String> controls = new java.util.ArrayList<>();
+        collectPermissionControls(root, controls);
+        return "permission-root=" + root.getPackageName() + " controls=" + controls;
+    }
+
+    private void collectPermissionControls(
+            AccessibilityNodeInfo node, java.util.List<String> controls) {
+        if (node == null || controls.size() >= 16) return;
+        CharSequence owner = node.getPackageName();
+        CharSequence resourceId = node.getViewIdResourceName();
+        if (owner != null
+                && permissionPackage(owner.toString())
+                && node.isVisibleToUser()
+                && node.isClickable()
+                && resourceId != null) {
+            controls.add(resourceId + ":" + node.getClassName() + ":enabled=" + node.isEnabled());
+        }
+        for (int i = 0; i < node.getChildCount() && controls.size() < 16; i++)
+            collectPermissionControls(node.getChild(i), controls);
     }
 
     private boolean permissionPackage(String owner) {

@@ -36,7 +36,7 @@ class UiSafety(unittest.TestCase):
     def test_failure_summary_retains_safe_system_inset_measurements(self):
         summary = device.native_failure_summary(
             'renderedActivitiesRespectSystemBars',
-            'java.lang.AssertionError: manual first content begins at 17 beneath system area 24\n'
+            'java.lang.AssertionError: manual visible content begins at 17 beneath system area 24\n'
             '    at com.markobl.calllogsync.slice.PositiveUiTest.renderedActivitiesRespectSystemBars(PositiveUiTest.java:114)\n'
             'private rendered label must remain hidden\n',
         )
@@ -46,10 +46,15 @@ class UiSafety(unittest.TestCase):
     def test_failure_summary_retains_only_allowlisted_permission_diagnostic(self):
         summary = device.native_failure_summary(
             'renderedPermissionsFiltersConfirmPauseAndReopen',
-            'java.lang.AssertionError: Permission choice did not advance the actual dialog: private label\n'
+            'java.lang.AssertionError: Visible enabled control missing: permission_deny_button; '
+            'permission-root=com.android.permissioncontroller controls='
+            '[com.android.permissioncontroller:id/permission_deny_and_dont_ask_again_button:'
+            'android.widget.Button:enabled=true]\n'
             '    at com.markobl.calllogsync.slice.PositiveUiTest.renderedPermissionsFiltersConfirmPauseAndReopen(PositiveUiTest.java:233)\n',
         )
-        self.assertIn('permission-dialog-choice-did-not-advance', summary)
+        self.assertIn('missing-permission-control=permission_deny_button', summary)
+        self.assertIn('permission-root=com.android.permissioncontroller', summary)
+        self.assertIn('permission_deny_and_dont_ask_again_button:android.widget.Button:enabled=true', summary)
         self.assertNotIn('private label', summary)
 
     def setUp(self):
