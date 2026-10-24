@@ -31,6 +31,14 @@ def native_failure_summary(method, output):
                 and 'PositiveUiTest.java:' in frame):
             frames.append(frame)
     detail = '; '.join(frames[:3])
+    # The rendered accessibility gate may fail on an unlabeled control. Retain
+    # only its resource ID and widget class; suppress its visible text/label.
+    control = re.search(
+        r'Unlabelled interactive control id=([^\s]*) class=([^\s]*)', output)
+    if control:
+        detail = (detail + '; ' if detail else '') + (
+            'unlabelled control id=' + control.group(1) +
+            ' class=' + control.group(2))
     suffix = ' (' + detail + ')' if detail else ''
     return 'Native acceptance failed: ' + method + suffix
 

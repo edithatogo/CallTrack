@@ -516,5 +516,7 @@ readback, but accessibility failed in
 `renderedAccessibilityLabelsTargetsAndKeyboardFocus`. Its full instrumentation
 output remains in the ignored runner-local receipt and was not retained in the
 public log, so the failing assertion is not yet known. Added a safe failure
-summary that reports only app test source frames; focused host safety tests pass.
-No accessibility or full hosted UI acceptance result is claimed yet.
+summary that reports app test source frames and, for unlabeled controls, only
+the resource ID and widget class. It suppresses rendered text and descriptions.
+Focused host safety tests pass. The failing control is not identified yet; no
+accessibility or full hosted UI acceptance result is claimed.
