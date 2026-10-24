@@ -47,9 +47,14 @@
       "rejected_mutations": 422,
       "coverage_guided_fuzzing": false
     },
+    "maximum_call_count_boundary": {
+      "limit": 10000,
+      "limit_accepted": true,
+      "limit_plus_one_rejected": true
+    },
     "swiftpm_xctest_status": "blocked-before-source-compilation-unknown-error-parsing-property-list",
     "review_document": "review-20261024-portable-export.md",
-    "latest_slice_review_document": "review-20261024-schema-hardening.md",
+    "latest_slice_review_document": "review-20261024-count-boundary.md",
     "xctest_module_available_in_local_command_line_tools": false,
     "production_adopted": false,
     "recorded_at": "2026-10-24"
