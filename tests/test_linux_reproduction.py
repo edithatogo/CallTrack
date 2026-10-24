@@ -13,6 +13,15 @@ SPEC.loader.exec_module(linux)
 
 
 class LinuxBoundaries(unittest.TestCase):
+    def test_junit_counts_sum_all_release_result_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            results=root/'app/build/test-results/testReleaseUnitTest'
+            results.mkdir(parents=True)
+            (results/'TEST-one.xml').write_text('<testsuite tests="7" failures="1" errors="0" skipped="2"/>')
+            (results/'TEST-two.xml').write_text('<testsuite tests="5" failures="0" errors="1" skipped="0"/>')
+            self.assertEqual({'tests':12,'failures':1,'errors':1,'skipped':2},linux.junit_counts(root))
+
     def test_existing_work_cache_is_not_reused(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp)/'work'
