@@ -599,5 +599,10 @@ fixture preparation failed; API33 still failed to find its denial control. The
 attempted permission-control detail did not appear in the sanitized job output,
 so the runner now also retains bounded source frames from the synthetic import
 and recovery test classes, plus allowlisted fixture failure categories. The
-Android source-bound build and all 20 focused Python safety tests pass; another
-hosted run is pending. No API26/API33 matrix pass is claimed.
+Android source-bound build and all 20 focused Python safety tests pass;
+another hosted run is pending. Run 40099973359 passed API33 and API36 and
+passed the complete API26 settings suite. API26 import fixture preparation
+then failed because `FixtureCallLog.asShell` requires explicit temporary ADB
+root, which the new AVD setup had not enabled. The workflow now runs `adb root`
+only on the disposable API26 guest and verifies `service.adb.root=1` before
+tests. API26 import/recovery/accessibility rerun is still required.

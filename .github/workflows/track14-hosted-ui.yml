@@ -135,6 +135,15 @@ jobs:
             adb devices -l || true
             exit 1
           fi
+      - name: Enable temporary root for API 26 synthetic call fixtures
+        if: matrix.api-level == 26
+        run: |
+          set -euo pipefail
+          adb -s emulator-5554 root
+          timeout 30 adb -s emulator-5554 wait-for-device
+          root_mode="$(adb -s emulator-5554 shell getprop service.adb.root | tr -d '\r')"
+          test "$root_mode" = 1
+          echo 'API 26 emulator root mode verified for synthetic fixtures.'
       - name: Run API ${{ matrix.api-level }} settings, import, recovery and accessibility journeys
         env:
           RUN_ATTEMPT: ${{ github.run_attempt }}

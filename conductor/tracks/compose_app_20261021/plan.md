@@ -35,7 +35,7 @@
 - [x] Task: Add a scoped Linux/KVM workflow for the existing API36 synthetic settings, import, recovery and accessibility journeys; require cleanup and package removal evidence.
 - [x] Task: Run hosted API36 UI acceptance, inspect sanitized suite/method/screenshot-hash evidence, fix the host/tag and recovery-anchor findings, and repeat affected checks (PR #77; run 40095495432; see `review-20261024-hosted-ui.md`).
 - [x] Task: Review the hosted API36 x86_64 acceptance slice and update only the gates supported by its evidence; physical, local ARM64, remote-calendar and operational acceptance remain separate (see `review-20261024-hosted-ui.md`).
-- [~] Task: Extend the hosted source-bound UI journeys to API26/API33 and rerun API36 on the current merged source; inspect every suite result, accessibility receipt and cleanup proof. PR #78 run 40099074252: API36 passed and the API26 system-bar viewport assertion passed after correction, then API26 synthetic import fixture preparation and API33 denial-control lookup failed. Fixture cleanup/package removal passed. Improve bounded failure traces and resolve the provider/permission variants before closing.
+- [~] Task: Extend the hosted source-bound UI journeys to API26/API33 and rerun API36 on the current merged source; inspect every suite result, accessibility receipt and cleanup proof. Run 40099973359: API33 and API36 passed; API26 settings passed but synthetic import setup requires explicit root mode. Add `adb root` with a property readback only to the disposable API26 hosted guest; rerun before closing.
 
 ## Phase 4: Review, acceptance and handoff
 
