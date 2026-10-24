@@ -55,5 +55,7 @@
 - [x] Task: Review the automatic call-type panel, verify state callbacks and RTL/large-text semantics, and run the focused Android checks (see [review](review-20261024-auto-call-types.md)).
 - [x] Task: Replace the automatic destination Spinner with a lifecycle-disposed Compose selector; keep provider discovery and destination IDs in the Activity and bind selections through per-load opaque tokens (see [review](review-20261024-auto-destination.md)).
 - [x] Task: Review explicit destination choice, stable accessibility selector, and unchanged permission/provider ownership; keep rendered/provider runtime acceptance pending if no emulator is available (see [review](review-20261024-auto-destination.md)).
+- [x] Task: Replace automatic-settings enable, pause and refresh Views with a lifecycle-disposed Compose action panel; keep confirmation, scheduler and refresh effects in the Activity and preserve stable accessibility tags (see [review](review-20261024-auto-actions.md)).
+- [x] Task: Review automatic-settings actions for state parity, explicit callback dispatch and no composition effects; record hosted build and emulator-runtime boundaries in [review](review-20261024-auto-actions.md).
 - [ ] Task: Update requirements, decisions, remaining limitations and next-track inputs; retire superseded code/prototypes only after parity.
 - [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger.
