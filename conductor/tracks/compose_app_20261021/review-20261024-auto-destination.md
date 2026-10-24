@@ -14,7 +14,7 @@ The Activity still owns calendar discovery, permission checks, current provider 
 - [x] **Style compliance**: Pass — uses the existing Foundation-only action button and lifecycle-disposed ComposeView patterns.
 - [x] **New tests**: Yes — explicit token selection and Activity host/placeholder semantics; the existing provider-backed UI journey continues to exercise selecting a calendar before activation.
 - [x] **Test coverage**: Partial — provider UI journey and new Compose test are defined; this slice alone does not qualify permission revocation, provider churn, or activation persistence.
-- [ ] **Test results**: The first hosted slice compile found that calendar display names are nullable; the Compose label mapping now uses the same established fallback as historical import. A rerun is pending.
+- [x] **Test results**: After fixing the nullable display-name mapping, both hosted `slice` jobs and both platform qualification matrices passed for commit `8a58b93`. The Android instrumentation sources compiled and packaged but were not executed. Kotlin/Java formatting, the Python 3.15.1 verifier, 19 targeted Conductor tests, and `git diff --check` passed locally.
 
 ## Findings
 
