@@ -105,6 +105,10 @@ public class ImportUiTest {
         ui.await(
                 () -> phase(HistoricalImport.Phase.COMPLETE),
                 "Confirmed UI import did not complete");
+        assertEquals(
+                "The import must retain its explicitly selected destination",
+                calendar(),
+                latest().calendar);
         assertEquals(3, latest().saved);
         assertEquals(0, latest().review);
         ui.revealId("import_summary");
@@ -142,7 +146,7 @@ public class ImportUiTest {
         try {
             activity = open(instrumentation);
             ui.tapId("import_calendar_picker");
-            ui.tapText("CallTrack parity fixture");
+            ui.tapText(fixture.calendarDisplayName());
             String from = today().minusDays(1).toString(), to = today().toString();
             ui.setTextId("import_from", from);
             ui.setTextId("import_to", to);
@@ -233,6 +237,10 @@ public class ImportUiTest {
                                     R.string.import_history_item,
                                     dates,
                                     context().getString(R.string.import_confirmed)));
+            assertEquals(
+                    "The selected history row must resolve to the prepared session",
+                    state().getString("partial", null),
+                    latest().id);
             assertEquals(HistoricalImport.Phase.CONFIRMED, latest().phase);
             assertEquals(1, latest().saved);
             assertEquals(4, fixture.events(calendar()));
@@ -248,6 +256,7 @@ public class ImportUiTest {
                                     && ui.shown("import_continue", true).isEnabled(),
                     "Stopped run did not settle");
             HistoricalImport.Session stopped = latest();
+            assertEquals(state().getString("partial", null), stopped.id);
             assertEquals(HistoricalImport.Phase.CONFIRMED, stopped.phase);
             assertTrue(stopped.saved >= 2 && stopped.saved < PARTIAL_COUNT);
             assertEquals(3 + stopped.saved, fixture.events(calendar()));

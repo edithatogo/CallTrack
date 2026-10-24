@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch, Mock
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import qualify_parity_ui as device
-from parity_targets import RECOVERY_AVD
+from parity_targets import RECOVERY_AVD, TRACK14_UI_AVD
 
 
 class UiSafety(unittest.TestCase):
@@ -45,6 +45,8 @@ class UiSafety(unittest.TestCase):
         elif args == ['shell', 'dumpsys', 'window']:
             output = 'mCurrentFocus=Window{Application Not Responding: com.android.systemui}' if self.systemui_anr else 'mCurrentFocus=Window{Launcher}'
         elif args[0] in ('install', 'uninstall'):
+            output = 'Success'
+        elif args[:4] == ['shell', 'cmd', 'package', 'compile']:
             output = 'Success'
         elif args[:3] == ['shell', 'am', 'instrument']:
             output = 'FAILURES' if self.fail_cleanup and ('renderedPermissions' in ' '.join(args) or 'cleanupFixture' in ' '.join(args)) else 'OK (1 test)'
@@ -175,3 +177,15 @@ class UiSafety(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'phone service'):
             self.run_fixture()
         self.assertFalse(any(args[0] == 'install' for args in self.calls))
+
+    def test_track14_ui_guest_is_accepted_without_widening_other_harnesses(self):
+        self.avd = TRACK14_UI_AVD
+        self.assertEqual(0, self.run_fixture('imports'))
+        self.assertTrue(any(c[0] == 'install' for c in self.calls))
+
+    def test_installed_packages_are_compiled_before_instrumentation(self):
+        self.assertEqual(0, self.run_fixture('imports'))
+        compile_positions = [i for i, c in enumerate(self.calls) if c[:4] == ['shell', 'cmd', 'package', 'compile']]
+        instrument_position = next(i for i, c in enumerate(self.calls) if c[:3] == ['shell', 'am', 'instrument'])
+        self.assertEqual(2, len(compile_positions))
+        self.assertLess(max(compile_positions), instrument_position)

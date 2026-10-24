@@ -29,6 +29,11 @@ public class ParityProviderTest {
         return "org.calltrack.community.dev.parity." + token;
     }
 
+    String calendarDisplayName() {
+        String token = account();
+        return "CallTrack parity fixture " + token.substring(token.length() - 8);
+    }
+
     private Uri sync(Uri uri) {
         return uri.buildUpon()
                 .appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, "true")
@@ -95,7 +100,7 @@ public class ParityProviderTest {
         values.put(Calendars.ACCOUNT_NAME, account());
         values.put(Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL);
         values.put(Calendars.NAME, account());
-        values.put(Calendars.CALENDAR_DISPLAY_NAME, "CallTrack parity fixture");
+        values.put(Calendars.CALENDAR_DISPLAY_NAME, calendarDisplayName());
         values.put(Calendars.CALENDAR_COLOR, 0xff006699);
         values.put(Calendars.CALENDAR_ACCESS_LEVEL, Calendars.CAL_ACCESS_OWNER);
         values.put(Calendars.OWNER_ACCOUNT, account());
