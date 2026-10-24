@@ -46,7 +46,8 @@ public class AutomaticSettingsTest {
             assertTrue("Compose settings status host did not initialize", ready.get());
             assertTrue(activity.findViewById(R.id.auto_intro_panel) instanceof ComposeView);
             assertTrue(activity.findViewById(R.id.auto_permissions) instanceof ComposeView);
-            assertTrue(activity.findViewById(R.id.auto_calendar_picker) instanceof ComposeView);
+            assertTrue(
+                    activity.findViewById(R.id.auto_calendar_picker_panel) instanceof ComposeView);
             assertTrue(activity.findViewById(R.id.auto_actions) instanceof ComposeView);
             assertTrue(activity.findViewById(R.id.auto_navigation) instanceof ComposeView);
             assertTrue(activity.findViewById(R.id.auto_call_types) instanceof ComposeView);

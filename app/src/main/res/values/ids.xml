@@ -5,6 +5,7 @@
     <item name="open_automatic" type="id" />
     <item name="auto_permissions" type="id" />
     <item name="auto_intro_panel" type="id" />
+    <item name="auto_calendar_picker_panel" type="id" />
     <item name="auto_calendar_picker" type="id" />
     <item name="auto_actions" type="id" />
     <item name="auto_navigation" type="id" />
@@ -19,6 +20,7 @@
     <item name="auto_last" type="id" />
     <item name="auto_feedback" type="id" />
     <item name="open_imports" type="id" />
+    <item name="import_calendar_picker_panel" type="id" />
     <item name="import_calendar_picker" type="id" />
     <item name="import_intro_panel" type="id" />
     <item name="import_access_panel" type="id" />

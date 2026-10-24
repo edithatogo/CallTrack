@@ -220,3 +220,23 @@ grant/denial/revocation remains outside this slice.
 
 **Rollback:** Restore the TextView and Button while preserving their labels and
 permission request code; remove the intro host ID and Compose panels.
+
+## D14-11: Separate calendar picker host IDs from Compose action tags
+
+**Decision:** Give each Activity ComposeView container a distinct
+`*_calendar_picker_panel` resource ID and retain `auto_calendar_picker` /
+`import_calendar_picker` for the actual tagged Compose buttons. Host lookups
+target the container IDs; rendered UI automation and accessibility focus target
+the interactive child tags.
+
+**Rationale:** Hosted API36 accessibility showed the enabled import picker
+anchor as non-focusable. The Compose host and tagged button shared one Android
+resource ID, making rendered-node lookup ambiguous and causing the helper to
+inspect the host. The sanitized diagnostic reported `enabled=true`.
+
+**Promotion/removal:** No user-facing behavior or provider authority changes.
+Re-run all four hosted UI journeys and require rendered-control and Tab-focus
+acceptance before closing Track 14.
+
+**Rollback:** Restore the previous host IDs and matching host lookups. No
+persisted state, calendar identity or event behavior is affected.
