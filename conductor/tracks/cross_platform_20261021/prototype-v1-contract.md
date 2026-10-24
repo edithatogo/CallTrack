@@ -13,10 +13,9 @@ decimal spelling:
 {"schema_version":1,"export_id":"00000000-0000-4000-8000-000000000001","record_count":0,"calls":[],"content_sha256":"<64 lowercase hexadecimal characters>"}
 ```
 
-The example's export ID/checksum are illustrative. The golden fixture at
-[`app/src/test/resources/call-log-v1.json`](../../../app/src/test/resources/call-log-v1.json)
-contains two synthetic rows and is authoritative for the shared producer/parser
-bytes.
+The example's export ID/checksum are illustrative. The repository's
+`app/src/test/resources/call-log-v1.json` golden fixture contains two synthetic
+rows and is authoritative for the shared producer/parser bytes.
 
 | Member | Type and rule |
 |---|---|
