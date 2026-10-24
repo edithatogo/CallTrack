@@ -1,6 +1,7 @@
 package com.markobl.calllogsync.slice
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,7 +21,10 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -113,8 +116,13 @@ private fun ImportTypeFilter(
         modifier =
             Modifier.fillMaxWidth()
                 .heightIn(min = 48.dp)
-                .toggleable(value = checked, role = Role.Checkbox, onValueChange = onCheckedChange)
-                .testTag(tag)
+                .clickable(role = Role.Checkbox) { onCheckedChange(!checked) }
+                .semantics(mergeDescendants = true) {
+                    testTagsAsResourceId = true
+                    testTag = tag
+                    contentDescription = label
+                    toggleableState = if (checked) ToggleableState.On else ToggleableState.Off
+                }
                 .padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),

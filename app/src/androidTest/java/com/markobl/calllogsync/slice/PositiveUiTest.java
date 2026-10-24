@@ -135,7 +135,7 @@ public class PositiveUiTest {
             ReceiptRecoveryActivity.class
         };
         String[] anchors = {
-            "auto_permissions",
+            "auto_access_action",
             "slice_calendar_picker",
             "import_calendar_picker",
             "recovery_refresh"
@@ -150,16 +150,10 @@ public class PositiveUiTest {
                 ui.await(() -> ui.find(anchor, true) != null, "Missing screen " + anchor);
                 ui.capture("accessibility-before-" + i);
                 final int[] controls = {0};
-                instrumentation.runOnMainSync(
-                        () -> {
-                            android.view.ViewGroup content =
-                                    activity.findViewById(android.R.id.content);
-                            android.widget.ScrollView scroll =
-                                    (android.widget.ScrollView) content.getChildAt(0);
-                            android.view.ViewGroup layout =
-                                    (android.view.ViewGroup) scroll.getChildAt(0);
-                            assertAccessibilityControls(layout, controls);
-                        });
+                assertRenderedAccessibilityControls(
+                        ui.automation.getRootInActiveWindow(),
+                        controls,
+                        context().getResources().getDisplayMetrics().density);
                 assertTrue("Screen has no reachable controls", controls[0] > 0);
                 android.view.accessibility.AccessibilityNodeInfo node = ui.shown(anchor, true);
                 assertNotNull("Anchor must be reachable by scrolling", node);
@@ -190,32 +184,33 @@ public class PositiveUiTest {
         assertNull("Reading screens must not enable logging", active());
     }
 
-    private void assertAccessibilityControls(android.view.View view, int[] controls) {
-        if (view.getVisibility() != android.view.View.VISIBLE) return;
-        if ((view instanceof android.widget.Button
-                        || view instanceof android.widget.Spinner
-                        || view instanceof android.widget.EditText)
-                && view.isEnabled()) {
+    private void assertRenderedAccessibilityControls(
+            android.view.accessibility.AccessibilityNodeInfo node, int[] controls, float density) {
+        if (node == null || !node.refresh()) return;
+        if (node.isVisibleToUser() && node.isEnabled() && node.isClickable()) {
             controls[0]++;
-            float density = view.getResources().getDisplayMetrics().density;
+            android.graphics.Rect bounds = new android.graphics.Rect();
+            node.getBoundsInScreen(bounds);
             assertTrue(
-                    "Touch target below 48dp: "
-                            + view.getClass().getSimpleName()
-                            + " height="
-                            + view.getHeight() / density,
-                    view.getHeight() >= 48 * density - 1);
-            assertTrue("Touch target too narrow", view.getWidth() >= 48 * density - 1);
-            CharSequence label = view.getContentDescription();
-            if (view instanceof android.widget.TextView && (label == null || label.length() == 0))
-                label = ((android.widget.TextView) view).getText();
-            assertTrue("Unlabelled interactive control", label != null && label.length() > 0);
-            assertTrue("Enabled control must accept keyboard focus", view.isFocusable());
+                    "Touch target below 48dp: " + node.getViewIdResourceName(),
+                    bounds.height() >= 48 * density - 1);
+            assertTrue("Touch target too narrow", bounds.width() >= 48 * density - 1);
+            CharSequence label = node.getContentDescription();
+            if (label == null || label.length() == 0) label = node.getText();
+            assertTrue(
+                    "Unlabelled interactive control id="
+                            + node.getViewIdResourceName()
+                            + " class="
+                            + node.getClassName()
+                            + " text="
+                            + node.getText()
+                            + " description="
+                            + node.getContentDescription(),
+                    label != null && label.length() > 0);
+            assertTrue("Enabled control must accept keyboard focus", node.isFocusable());
         }
-        if (view instanceof android.view.ViewGroup && !(view instanceof android.widget.Spinner)) {
-            android.view.ViewGroup group = (android.view.ViewGroup) view;
-            for (int i = 0; i < group.getChildCount(); i++)
-                assertAccessibilityControls(group.getChildAt(i), controls);
-        }
+        for (int i = 0; i < node.getChildCount(); i++)
+            assertRenderedAccessibilityControls(node.getChild(i), controls, density);
     }
 
     @Test
@@ -239,7 +234,7 @@ public class PositiveUiTest {
             ui.await(this::allGranted, "Visible permission grants did not persist");
             assertNull("Permission grant must not enable logging", active());
             ui.tapId("auto_calendar_picker");
-            ui.tapText("CallTrack parity fixture");
+            ui.tapText(fixture.calendarDisplayName());
             for (String filter : new String[] {"auto_incoming", "auto_outgoing", "auto_missed"}) {
                 ui.tapId(filter);
                 assertFalse(ui.find(filter, true).isChecked());
@@ -262,7 +257,7 @@ public class PositiveUiTest {
             assertFalse(enabled.outgoing);
             assertTrue(enabled.missed);
             String enabledText =
-                    context().getString(R.string.auto_enabled, "CallTrack parity fixture");
+                    context().getString(R.string.auto_enabled, fixture.calendarDisplayName());
             ui.await(
                     () -> ui.find(enabledText, false) != null,
                     "Enabled state not visibly rendered");

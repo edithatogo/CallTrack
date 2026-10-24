@@ -14,12 +14,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -49,12 +50,13 @@ internal fun ComposeActionButton(
                 .heightIn(min = 48.dp)
                 .clip(RoundedCornerShape(4.dp))
                 .background(background)
-                .semantics {
-                    testTagsAsResourceId = true
-                    accessibilityLabel?.let { contentDescription = it }
-                }
                 .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
-                .testTag(tag)
+                .semantics(mergeDescendants = true) {
+                    testTagsAsResourceId = true
+                    testTag = tag
+                    contentDescription = accessibilityLabel ?: label
+                    text = androidx.compose.ui.text.AnnotatedString(accessibilityLabel ?: label)
+                }
                 .padding(horizontal = 16.dp, vertical = 12.dp),
         contentAlignment = Alignment.Center,
     ) {

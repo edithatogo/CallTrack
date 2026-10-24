@@ -53,7 +53,7 @@ final class RenderedUi {
     }
 
     private AccessibilityNodeInfo find(AccessibilityNodeInfo node, String value, boolean id) {
-        if (node == null) return null;
+        if (node == null || !node.refresh()) return null;
         String actual =
                 id
                         ? node.getViewIdResourceName()
@@ -152,13 +152,13 @@ final class RenderedUi {
         final AccessibilityNodeInfo[] found = new AccessibilityNodeInfo[1];
         await(
                 () -> {
-                    found[0] = shown(value, id);
+                    found[0] = waitForIdle ? shown(value, id) : find(value, id);
                     return found[0] != null && found[0].isEnabled();
                 },
                 "Visible enabled control missing: " + value);
         if (waitForIdle) settle();
         else SystemClock.sleep(50); // A user can stop work while its progress keeps changing.
-        found[0] = shown(value, id);
+        found[0] = waitForIdle ? shown(value, id) : find(value, id);
         assertNotNull("Control disappeared before touch", found[0]);
         String packageName = String.valueOf(found[0].getPackageName());
         assertTrue(
@@ -293,12 +293,18 @@ final class RenderedUi {
                 .append(node.isVisibleToUser())
                 .append(" enabled=")
                 .append(node.isEnabled())
+                .append(" clickable=")
+                .append(node.isClickable())
+                .append(" focusable=")
+                .append(node.isFocusable())
                 .append(" checked=")
                 .append(node.isChecked())
                 .append(' ')
                 .append(bounds)
                 .append(' ')
                 .append(node.getText())
+                .append(" description=")
+                .append(node.getContentDescription())
                 .append('\n');
         for (int i = 0; i < node.getChildCount(); i++) describe(node.getChild(i), out, depth + 1);
     }

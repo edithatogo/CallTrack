@@ -172,6 +172,47 @@ permissions/revocation, lifecycle recreation, font scaling, RTL and accessibilit
 verify no provider behavior changed; then complete review and handoff. Tracks5
 and6 remain open under the scoped deferral. Track14 is not complete.
 
+## Rendered accessibility selectors and import actions — 2026-10-24
+
+Custom Compose action buttons now expose merged button semantics, their visible
+or explicit accessibility label, and stable resource-ID-compatible test tags.
+Historical-import call-type filters expose a merged checkbox role, label,
+checked state and test tag. Tests cover disabled actions, absence of callback
+effects during composition, explicit enabled taps, and filter semantics at
+large font scale/RTL. The rendered accessibility test now inspects
+`AccessibilityNodeInfo` from the active window, checking actual visibility,
+clickability, focusability, label and 48 dp bounds instead of traversing the
+underlying View tree.
+
+The import instrumentation assertions now verify the selected destination and
+that selected/stopped history rows resolve to the prepared session identity.
+The UI harness refreshes accessibility nodes before querying them and avoids
+waiting for global idle when tapping an ongoing stop action. The Track 14 UI
+qualifier accepts only the exact `calltrack-track14-api36` guest, keeps that
+allowlist separate from other harnesses, and compiles only the two freshly
+installed app/test packages before instrumentation.
+
+The local build command `:app:testDebugUnitTest :app:assembleDebug
+:app:assembleDebugAndroidTest :app:lintDebug` completed successfully using the
+isolated JDK17.0.20.1+1 and SDK36. The build receipt records
+`inputs_unchanged=true`, app APK SHA-256
+`53fd751266e25d08e168c6aff359eba25cd8b9ea3b4a8928d80a236d167aad4c`, and
+instrumentation APK SHA-256
+`47d4d55ca30cf6c6fe5347e3341c8c1f61a4f6e54ff94298f4bf30598ac3d161`.
+The focused Python3.15.1 harness tests passed (3 target-selection and 16 UI
+safety tests), as did `git diff --check`.
+
+Rendered instrumentation did not run. ADB first reported the existing
+`emulator-5554` guest as online, but guest property/console requests timed out;
+after an ADB-server reset without restarting the computer, the guest was
+offline. A read-only clone on port5556 exited with status139 and QEMU
+unresponsive-thread diagnostics, then also went offline. The existing QEMU
+process is blocked in uninterruptible I/O; it was left untouched. This is a
+local host/emulator blocker, not an application test result. The exact native
+acceptance and broader permission, process-recovery, accessibility and Android
+version-matrix gates remain pending. See the
+[rendered accessibility review](review-20261024-rendered-accessibility.md).
+
 ## Manual logging presentation slice — 2026-10-24
 
 The manual “Log latest call” action and feedback moved into a small Compose

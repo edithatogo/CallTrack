@@ -4,7 +4,7 @@
 Requires selected device, matching build receipt and absent test packages. On native
 failure attempts scoped fixture recovery BEFORE uninstalling its cleanup code.
 """
-from parity_targets import is_dedicated_avd
+from parity_targets import is_dedicated_ui_avd
 from parity_health import require_healthy_boot
 import argparse
 import hashlib
@@ -104,7 +104,7 @@ def qualify(serial, suite="settings", receipt_dir=None):
 
     if command('shell', 'getprop', 'ro.kernel.qemu') != '1':
         raise RuntimeError('Not an emulator')
-    if not is_dedicated_avd(command('emu', 'avd', 'name')):
+    if not is_dedicated_ui_avd(command('emu', 'avd', 'name')):
         raise RuntimeError('Not the dedicated CallTrack AVD')
     require_healthy_boot(command)
     for package in (PACKAGE, TEST_PACKAGE):
@@ -126,6 +126,11 @@ def qualify(serial, suite="settings", receipt_dir=None):
             installed.append(package)
             if 'Success' not in command('install', str(apk)):
                 raise RuntimeError('Installation not confirmed')
+        # Dex-opt only these exact fresh test packages before UI instrumentation. This
+        # avoids attributing first-launch ART extraction delays to application behavior.
+        for package in (PACKAGE, TEST_PACKAGE):
+            if 'Success' not in command('shell', 'cmd', 'package', 'compile', '-m', 'speed', package):
+                raise RuntimeError('Package dex compilation not confirmed: ' + package)
         for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
             command('shell', 'pm', 'grant', PACKAGE, 'android.permission.' + permission)
         fixture_possible = True
