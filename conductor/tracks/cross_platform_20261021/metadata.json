@@ -12,7 +12,7 @@
   "track_number": 19,
   "execution_stage": 8,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
-  "implementation_status": "bounded-evidence-reconciliation-refreshed-with-Track17-Android-host-build; cross-platform-native-acceptance-pending",
+  "implementation_status": "bounded-evidence-reconciliation-plus-prototype-android-swift-schema-v1-golden; app-integration-and-cross-platform-native-acceptance-pending",
   "implementation_commit": "57fce24",
   "reviewed_at": "2026-10-24",
   "review_commit": "be22967",
@@ -34,6 +34,17 @@
     }
   ],
   "evidence_refresh_review_document": "review-20261024-track17-refresh.md",
+  "portable_export_prototype": {
+    "schema_version": 1,
+    "android_app_integration": false,
+    "swift_preview_only": true,
+    "shared_synthetic_golden": "../../../app/src/test/resources/call-log-v1.json",
+    "source_harness_passed": true,
+    "swiftpm_xctest_status": "blocked-before-source-compilation-unknown-error-parsing-property-list",
+    "review_document": "review-20261024-portable-export.md",
+    "production_adopted": false,
+    "recorded_at": "2026-10-24"
+  },
   "draft_pr": 23,
   "draft_pr_url": "https://github.com/edithatogo/CallTrack/pull/23",
   "draft_pr_base": "codex/track18-rust-evaluation",

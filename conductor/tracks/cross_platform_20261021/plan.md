@@ -15,7 +15,7 @@
 
 ## Phase 3: Conditional implementation
 
-- [ ] Task: Establish golden/contract baseline and meaningful failing regressions before behaviour changes.
+- [x] Task: Establish a bounded synthetic schema-v1 Android producer/macOS preview golden and checksum/count regressions; production format acceptance remains open.
 - [ ] Task: Freeze exact source/toolchain/format/capability matrix and acceptance scope; distinguish native persistence from actual remote synchronization.
 - [ ] Task: Run compatible import/export/restore fixtures with inactive foreign receipts, redaction, deliberate delivery and one actual destination writer.
 - [ ] Task: Execute preserving package upgrades, process/permission/account failures, edited/deleted events and real provider-cloud readback where claimed; retain unobserved routes as unsupported.
@@ -48,3 +48,18 @@
   remote calendar readback remain unavailable.
 - Kept Track 19 and the iOS handoff open. This refresh advances evidence only;
   it does not substitute for a qualifying second-platform workflow.
+
+## Prototype contract — 2026-10-24
+
+- Added a redacted Android `CallRecord` JSON encoder and shared synthetic golden
+  consumed by the Swift preview parser. Validation covers deterministic opaque
+  row IDs, checksum/count, duplicate identity, invalid direction/identity,
+  overflow and size limits.
+- Direct Swift 6.4 source harness compiled and passed, including the shared
+  golden fixture. This does not establish SwiftPM/XCTest execution or native app
+  acceptance.
+- Android JVM unit tests were started under the selected repo JDK; the observed
+  result is recorded in the review after the process exits.
+- Kept UI/file export, public schema adoption, restore semantics, native
+  packaging, cross-platform upgrades, provider/cloud readback and operational
+  acceptance open. Track 19 remains in progress and Track 20/iOS remains locked.
