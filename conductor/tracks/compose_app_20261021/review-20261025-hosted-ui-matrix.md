@@ -50,6 +50,38 @@ exercise the rendered re-request-and-grant route.
 
 ## Remaining limits
 
+### Follow-up matrix results
+
+Subsequent hosted runs 40103198399, 40104130410, 40105121398, 40106212006,
+40107406647 and 40108385701 show API33 and API36 passing on the latest
+source, while API26 continues to fail in the import journey. The final run
+40108385701 failed while `ImportUiTest.renderedRangePreviewCancelConfirmAndRepeat`
+was waiting for the app-owned confirmation action. Safe diagnostics showed an
+active PermissionController dialog categorized as `contacts`; the app's
+calendar and call-log permissions were already granted, and phone-state was
+denied. The app manifest does not request `READ_CONTACTS`. The harness did not
+grant Contacts or inject input into the system dialog. The result therefore
+does not establish whether this is a platform/test-environment artifact or an
+app flow defect. API26 remains an open acceptance blocker and requires an
+identified, reproducible permission sequence before another behavior change is
+made.
+
 No API26/API33 result is inferred from the local build or API36. Physical-device,
 manual TalkBack/Switch Access, provider-account, remote-calendar and operational
 acceptance remain separate gates.
+
+## Diagnostic rerun
+
+Run [40116441898](https://github.com/edithatogo/CallTrack/actions/runs/40116441898)
+on commit `0abcd8787b0388f003f1a6d3b86e1a3e120d346a` passed API36 but failed
+API33 and API26. API33 failed in
+`renderedPermissionsFiltersConfirmPauseAndReopen` because the expected
+`permission_allow_button` was absent. API26 again reached
+`ImportUiTest.renderedRangePreviewCancelConfirmAndRepeat` with a PermissionController
+dialog classified as `contacts`, with calendar and call-log grants present and
+phone-state denied. The run did not include the allowlisted declared-permission
+field in its public failure summary, so it still cannot attribute the Contacts
+request to either installed package. The source-bound build qualification on
+the same commit passed as run `40116441902`. Keep permission behavior unchanged
+until the diagnostic is made observable or another bounded evidence source
+identifies the requesting package; API26/API33 acceptance remain open.

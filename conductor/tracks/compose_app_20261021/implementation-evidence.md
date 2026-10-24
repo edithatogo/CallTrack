@@ -635,3 +635,25 @@ hosted API26/API33/API36 rerun on this commit remains required; see the
 [review](review-20261025-hosted-ui-matrix.md). The native phone is absent and
 physical, manual assistive-technology, remote-calendar and operational gates
 remain pending.
+
+The follow-up hosted matrix run `40108385701` passed API33 and API36. API26
+reached `ImportUiTest.renderedRangePreviewCancelConfirmAndRepeat` but remained
+blocked by an active PermissionController dialog classified by the safe
+harness summary as `contacts`, while the app's calendar and call-log
+permissions were already granted and phone-state was denied. The application
+manifest does not request `READ_CONTACTS`; no Contacts grant or system-dialog
+input was performed. The failure does not distinguish an app issue from a
+hosted platform/test-state issue, so API26 acceptance remains pending
+diagnosis. See [hosted matrix review](review-20261025-hosted-ui-matrix.md).
+
+The diagnostic rerun on PR #78 at commit `0abcd8787b0388f003f1a6d3b86e1a3e120d346a`
+(workflow run [40116441898](https://github.com/edithatogo/CallTrack/actions/runs/40116441898))
+completed with API36 passing, API33 failing in
+`renderedPermissionsFiltersConfirmPauseAndReopen` because the expected
+`permission_allow_button` was absent, and API26 failing again during the
+historical-import journey with the active permission UI classified as
+`contacts`. The API26 summary retained active-window, known-control,
+app-permission and permission-purpose categories, but did not retain the newly
+added declared-permission summary. The diagnostic therefore did not identify
+which manifest, if any, owns the Contacts request. API26 and API33 remain open;
+the added diagnostic did not justify changing app permission behavior.
