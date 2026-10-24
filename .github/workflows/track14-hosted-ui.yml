@@ -59,6 +59,9 @@ jobs:
         run: |
           set -euo pipefail
           test -e /dev/kvm
+          sudo chown "$(id -un)" /dev/kvm
+          test -r /dev/kvm
+          test -w /dev/kvm
           sdkmanager_path="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager -print -quit)"
           test -n "$sdkmanager_path"
           tools_dir="$(dirname "$sdkmanager_path")"

@@ -497,3 +497,10 @@ hashes. Hosted execution is pending. It cannot establish local ARM64 emulator
 health, physical calls, remote calendar behavior or operational acceptance.
 Local `actionlint`, Conductor integrity and the 19 Python 3.15.1 parity-target/UI
 safety tests pass.
+
+The first hosted attempt stopped in emulator-package setup before building the
+app: `/dev/kvm` existed, but the ephemeral runner account lacked access. The
+workflow now gives only the job account ownership of that runner-local device,
+checks read/write access, and requires `emulator -accel-check` to pass before
+continuing. The affected CI run is not emulator acceptance; the corrected run
+must build, boot and pass all four suites before results are recorded.
