@@ -745,15 +745,17 @@ because API26 remains unresolved. The PR remains open and unmerged.
 ## Local API26 rendered matrix and Gboard prompt fix — 2026-10-25
 
 The isolated PortableSSD API26 emulator `calltrack-release-api26-20261022`
-(Android 8.0.0 / SDK26, emulator serial `emulator-5560`) completed the
-source-bound four-suite matrix on the current test APK. The exact build receipt
+(Android 8.0.0 / SDK26, emulator serial `emulator-5560`) passed the
+source-bound four-suite matrix once on test APK SHA-256
+`1b0e6e45…61d5ef`. A subsequent accessibility-only rerun against the same APK
+failed the keyboard-focus assertion, so the result is not repeatable yet. The
+exact build receipt
 under ignored `.local/slice-evidence/build-receipt.json` reports JDK
 17.0.21.0.2, SDK under `/Volumes/PortableSSD/cache/calltrack-sdk-20261020`,
-`exit_code: 0`, `inputs_unchanged: true`, and app/test APK SHA-256 values
-`2f505e79…583a` and `1b0e6e45…61d5ef`. Settings, imports, recovery and
-accessibility receipts all report `passed` against those APK hashes, with
-fixture cleanup verified and test packages removed. Gboard readback confirms
-`READ_CONTACTS` remains denied. Local receipt directories are under
+`exit_code: 0`, `inputs_unchanged: true`; all first-pass receipts match the
+test APK hash and report fixture cleanup, package removal and emulator-state
+restoration. Gboard readback confirms `READ_CONTACTS` remains denied. Local
+receipt directories are under
 `.local/slice-evidence/track14-local-api26-20261025/` and are not committed.
 
 The rendered import flow exposed an Android 8/Gboard contacts prompt when a
@@ -761,18 +763,19 @@ date field was edited. Both validated APK manifests request calendar,
 call-log and phone-state permissions only; the harness now dismisses this
 prompt only when its launcher is exactly Gboard, and only by denying the
 contacts request. It does not grant contacts access or alter app permission
-behavior. The accessibility journey now applies input focus to the visible
-Compose host and enabled anchor before sending a real Tab key, then requires a
-visible app-owned input-focus node. The Tab event is injected through Android's
-input dispatcher; this addresses the hosted-x86/API26 instrumentation-key
-focus gap without weakening the traversal assertion. The local four-suite
-receipts were rerun on this exact APK and report emulator-state restoration.
-Hosted API26/API33/API36 rerun on the exact pushed revision is still required;
-this local result does not replace the hosted matrix or physical/manual
-assistive-technology acceptance.
+behavior. The accessibility journey applies input focus to the visible Compose
+host and enabled anchor, injects Tab through Android's input dispatcher, and
+requires a visible app-owned input-focus node. Hosted run
+[40140921320](https://github.com/edithatogo/CallTrack/actions/runs/40140921320)
+on `81779f9` still failed API26 at that focus assertion; API36 passed. API33
+failed when permission controls were absent, with the permission root
+unavailable and app permissions not fully granted. Build qualification runs
+40140916374 and 40140921324 passed. API26 accessibility and API33 permission
+dialog acceptance remain unresolved, as do physical/manual assistive
+technology and operational gates.
 
 Focused review passed 35 `tests.test_parity_ui_safety` tests,
 `scripts/verify_conductor.py` (250 documents, 21 tracks, 25 synthetic
 scenarios), pinned `google-java-format 1.24.0`, and `git diff --check`. The
-track remains active pending hosted rerun, API33 acceptance, broader parity,
-and separate device/provider/operational gates.
+track remains active pending repeatable API26 focus, API33 permission-dialog
+acceptance, broader parity, and separate device/provider/operational gates.

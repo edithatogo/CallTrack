@@ -47,33 +47,30 @@ The API26 cause remains unassigned. The keyboard launcher suggests an external
 permission flow but does not prove which permission was requested or why the
 instrumentation channel closed. No product behavior change is justified.
 
-## Follow-up review: local API26 acceptance — 2026-10-25
+## Follow-up review: API26 local and hosted acceptance — 2026-10-25
 
-The isolated API26 rerun resolved the local harness finding. The four
-source-bound journeys (settings, import, recovery and accessibility) now pass
-on Android 8.0 / SDK26. Each receipt verifies fixture cleanup and package
-removal. APK manifest readback confirms the app and test APK do not request
-contacts permission. The local import harness handles only the observed
-Gboard-owned contacts prompt, and only with an explicit deny action. The
-keyboard test focuses the visible Compose host and enabled app anchor before a
-real Tab event injected through Android's input dispatcher, then requires visible app-owned input focus; the traversal
-assertion remains enabled.
+The scoped Gboard change is safe: it denies the contacts prompt only when the
+launcher is exactly Gboard, and readback confirms `READ_CONTACTS` remains
+denied. Both app and test APK manifests omit contacts permission. The keyboard
+journey retains its real Tab traversal assertion and injects the key through
+Android's input dispatcher.
 
-The final current-build validation passed `tests.test_parity_ui_safety` (35
-tests), the 250-document Conductor verifier, pinned Java formatting and
-`git diff --check`. No app permission request or runtime behavior changed.
-**Finding status: locally resolved; hosted verification pending.** Rerun the
-hosted API26/API33/API36 matrix on the pushed revision and retain API33 as an
-open issue until that exact run passes. The physical phone, manual
+One local source-bound run passed settings, imports, recovery and accessibility
+on API26 with cleanup, package removal and emulator restoration. A later
+accessibility-only rerun against the same test APK failed at the same
+keyboard-focus assertion. The local result is therefore not repeatable.
+
+Hosted run [40140921320](https://github.com/edithatogo/CallTrack/actions/runs/40140921320)
+on `81779f9` passed API36. API26 passed settings/import/recovery but failed
+keyboard-focus traversal after device-level Tab injection. API33 failed to
+locate the permission control with the permission root unavailable and app
+permissions not fully granted. Build-qualification runs 40140916374 and
+40140921324 passed. Focused Python safety tests (35), the 250-document
+Conductor verifier, pinned Java formatting and `git diff --check` pass.
+
+**Finding status: unresolved.** Do not merge PR #78 while the hosted matrix is
+red. Next work should diagnose why API26 focus is non-repeatable across local
+and hosted emulators and why API33's native permission controls are inaccessible
+before weakening either acceptance assertion. Physical calls, manual
 TalkBack/Switch Access, provider, process/lifecycle and operational acceptance
-gates remain separate and unqualified.
-
-The first hosted rerun on commit `91747e3` passed both build-qualification
-workflows and the API36 rendered matrix. API26 passed settings, import and
-recovery but failed keyboard-focus traversal after instrumentation Tab input;
-API33 again failed to locate permission controls while all four app
-permissions remained denied and the permission root was unavailable. The local
-API26 rerun now uses Android's input dispatcher and passes all four suites on
-one APK hash, but this change has not yet been hosted. Keep the track open and
-rerun API26/API33/API36 after this input change; API33's separate permission
-dialog failure remains unresolved.
+remain separate open gates.
