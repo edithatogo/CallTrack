@@ -11,7 +11,7 @@
 - [x] Task: Compare retained/native/owned/library replacement and deferral, including prototype-only versus long-term responsibilities.
 - [x] Task: Run only uncertainty-resolving bounded experiments; record versions/licences/transitives/toolchain/cleanup and expiry criteria.
 - [x] Task: Record adoption/deferral decision and refine implementation/rollback tasks before production change.
-- [x] Task: Phase Verification & Checkpoint (prototype-only choice; resolved graph captured locally; full licence audit remains before distribution).
+- [x] Task: Phase Verification & Checkpoint (prototype-only choice; desktop runtime/test graph hashes and effective POM licence declarations audited; legal clearance, build-tool trust and distribution notices remain separate gates).
 
 ## Phase 3: Conditional implementation
 

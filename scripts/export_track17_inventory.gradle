@@ -1,0 +1,47 @@
+// Export the exact runtime and test runtime artifacts for the standalone
+// Compose Multiplatform prototype. This is a read-only local inventory task.
+gradle.projectsEvaluated {
+    def project = gradle.rootProject
+    project.tasks.register('exportTrack17Inventory') {
+        doLast {
+            if (!System.getProperties().containsKey('track17.inventory')) {
+                throw new GradleException('Set -Dtrack17.inventory to a local output path')
+            }
+            def output = new File(System.getProperty('track17.inventory'))
+            if (output.exists()) {
+                throw new GradleException("Refusing to overwrite inventory: ${output}")
+            }
+            def digest = java.security.MessageDigest.getInstance('SHA-256')
+            def rows = []
+            ['desktopRuntimeClasspath', 'desktopTestRuntimeClasspath'].each { name ->
+                def configuration = project.configurations.findByName(name)
+                if (configuration == null) {
+                    throw new GradleException("Missing configuration: ${name}")
+                }
+                configuration.resolvedConfiguration.resolvedArtifacts.each { artifact ->
+                    def file = artifact.file
+                    digest.reset()
+                    file.withInputStream { stream ->
+                        byte[] buffer = new byte[65536]
+                        int count
+                        while ((count = stream.read(buffer)) > 0) digest.update(buffer, 0, count)
+                    }
+                    def id = artifact.moduleVersion.id
+                    rows << [
+                        configuration: name,
+                        coordinate: "${id.group}:${id.name}:${id.version}",
+                        name: file.name,
+                        sha256: digest.digest().encodeHex().toString()
+                    ]
+                }
+            }
+            output.parentFile.mkdirs()
+            output.text = groovy.json.JsonOutput.prettyPrint(
+                groovy.json.JsonOutput.toJson([artifacts: rows.unique {
+                    it.configuration + it.coordinate + it.name
+                }])
+            ) + '\n'
+            println "Wrote ${rows.size()} configuration artifacts to ${output}"
+        }
+    }
+}

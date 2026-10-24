@@ -55,9 +55,19 @@ starting at Kotlin2.5 and future use needs Gradle8.14.4 or later. This current
 pin is buildable; do not suppress the warning. Root Android remains on its
 selected AGP8.13.2/Kotlin2.3.21 graph. A future Android/KMP integration needs its
 own version/graph audit and must not silently upgrade the root app. Compose
-artifacts, Skiko natives, AndroidX and test transitive licences/Notices need a
-resolved-graph review before distribution; this prototype graph has not had a
-full licence/security audit.
+artifacts, Skiko natives, AndroidX and test transitive licences/Notices were
+audited from the resolved desktop runtime and test runtime classpaths on
+2026-10-24; see [the runtime audit](dependency-runtime-audit.json). The
+inventory contained 45 runtime and 18 test-only artifacts (63 unique). Fresh
+canonical repository downloads matched all 63 recorded artifact hashes, every
+POM had an effective licence declaration, and 37 embedded licence/notice files
+were fingerprinted. All 45 runtime artifacts declare Apache-2.0. The 18
+test-only artifacts include EPL1.0, BSD-3-Clause, MIT, and GPL-2.0 with the
+Classpath Exception; they are not on the runtime classpath. This is metadata
+and byte-provenance evidence, not legal clearance, a vulnerability assessment,
+or build-tool trust. Gradle plugins/compiler artifacts, actual notice-text
+bundling, future Android/native package graphs, and legal review remain before
+distribution or adoption.
 
 The pre-implementation desktop test run failed as intended on missing common
 state/action/reducer/screen contracts. After implementation, an offline run
