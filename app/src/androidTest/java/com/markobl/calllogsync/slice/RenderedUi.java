@@ -169,7 +169,12 @@ final class RenderedUi {
         }
         settle();
         found[0] = findDialogPositive(automation.getWindows());
-        assertNotNull("Dialog action disappeared before touch", found[0]);
+        if (found[0] == null)
+            throw new AssertionError(
+                    "Dialog action disappeared before touch; "
+                            + permissionControlSummary()
+                            + "; "
+                            + dialogActionSummary());
         touch(found[0], "dialog_positive");
     }
 
@@ -217,7 +222,14 @@ final class RenderedUi {
         }
         settle();
         found[0] = findPermissionControl(id);
-        assertNotNull("Permission control disappeared before touch", found[0]);
+        if (found[0] == null)
+            throw new AssertionError(
+                    "Permission control disappeared before touch: "
+                            + id
+                            + "; "
+                            + permissionControlSummary()
+                            + "; "
+                            + dialogActionSummary());
         touch(found[0], id);
     }
 
