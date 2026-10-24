@@ -11,13 +11,28 @@
   "requirements": "R17, R24, R26",
   "track_number": 17,
   "execution_stage": 6,
-  "implementation_status": "bounded-desktop-common-ui-prototype; desktop-runtime-and-test-dependency-byte-and-licence-metadata-audited; legal-clearance-build-tool-trust-and-native-acceptance-pending",
+  "implementation_status": "bounded-common-ui-prototype; Android KMP target and synthetic Android host compile/package; desktop and Android dependency graphs byte-matched with effective licence metadata; legal-clearance-build-tool-trust-emulator-rendering-and-native-macOS-acceptance-pending",
   "production_adopted": false,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
   "android_target_accepted": false,
+  "android_host_compiled_and_packaged": true,
+  "android_emulator_rendered": false,
   "macos_native_package_accepted": false,
   "reviewed_slice_at": "2026-10-24",
-  "review_document": "review-20261024-dependency-audit.md",
+  "review_document": "review-20261024-android-host.md",
+  "previous_review_documents": [
+    "review-20261024-dependency-audit.md"
+  ],
+  "android_host_review_document": "review-20261024-android-host.md",
+  "android_host_dependency_audit": "android-host-dependency-audit.json",
+  "android_host_compile_sdk": 36,
+  "android_host_min_sdk": 26,
+  "android_host_dependency_versions": {
+    "compose_multiplatform": "1.10.3",
+    "kotlin": "2.4.21",
+    "android_gradle_plugin": "8.13.2"
+  },
+  "android_host_dependency_versions_are_prototype_only": true,
   "implementation_commit": "bea8385",
   "previous_pull_requests": [
     {

@@ -44,9 +44,44 @@ audits. Those remain promotion gates.
 
 ## Acceptance limits
 
-The prototype has only a KMP `desktop` JVM target. It has no Android KMP target,
-Android Activity, real app screen or macOS Native target. No Android SDK/device,
-full Xcode, accessibility inspector/manual keyboard/reader test, native package,
-upgrade, provider, permissions, persistence or production data is involved.
-Tracks14–16 are still unresolved and this bounded Track17 deferral does not
-unlock later stages.
+At the initial bounded desktop implementation, the prototype had only a KMP
+`desktop` JVM target. That statement is superseded by the Android-host follow-up
+below, which adds an Android KMP target and synthetic Activity. There is still
+no production Android screen, macOS Native target, accessibility/manual
+keyboard/reader test, native package, upgrade, provider, persistence or
+production data integration. Tracks14–16 remain in progress and this bounded
+Track17 slice does not unlock later stages.
+
+## Android host follow-up — 2026-10-24
+
+The prior no-SDK statement above is historical and is superseded by this
+follow-up: an explicit local Android SDK path was available. API36 with
+build-tools35.0.0 was selected; the API36 emulator remained offline.
+
+Final source command:
+
+```sh
+JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home \
+ANDROID_HOME=/Users/doughnut/Documents/calltrack/.local/android-sdk \
+GRADLE_USER_HOME=/Users/doughnut/Documents/calltrack/.local/gradle-track17 \
+bash ./gradlew --no-daemon --console=plain -p prototypes/multiplatform-ui \
+  :android-host:assembleDebug desktopTest
+```
+
+Result: `BUILD SUCCESSFUL`; the Android KMP target and synthetic Android
+Activity host compiled, the debug APK assembled, and all seven desktop tests
+passed. APK SHA-256 is
+`3889951175e4654fc2d9ea32bc256d16a1e053d19f561824b55972b97ea667cc`.
+`aapt dump permissions` found only the generated non-exported dynamic receiver
+permission; no call-log, contacts, calendar or storage permission is declared.
+`adb devices -l` reports `emulator-5554 offline`, so no Android launch,
+rendering, instrumentation, accessibility or lifecycle acceptance is claimed.
+
+Python checks used Python3.15.1 with pytest9.0.3, pytest-cov7.1.0 and
+anyio4.11.0: 27 targeted release-audit and Conductor tests passed.
+`scripts/verify_conductor.py` passed with 232 documents, 21 tracks and 25
+scenarios; `git diff --check` passed. Dependency audits for the current desktop
+and Android graphs matched all canonical HTTPS artifact hashes and found
+effective POM license metadata for the 91 Android and 63 desktop artifacts in
+their respective scopes; evidence hashes and scope limitations are recorded in
+[android-host-dependency-audit.json](android-host-dependency-audit.json).

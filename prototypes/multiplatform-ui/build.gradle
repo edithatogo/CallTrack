@@ -1,16 +1,26 @@
 plugins {
     id 'org.jetbrains.kotlin.multiplatform' version '2.4.21'
     id 'org.jetbrains.kotlin.plugin.compose' version '2.4.21'
-    id 'org.jetbrains.compose' version '1.12.2'
+    // 1.12.x requires API 37.1 / AGP 9.1; keep this Android-host prototype
+    // buildable on the qualified API 36 / AGP 8.13 toolchain.
+    id 'org.jetbrains.compose' version '1.10.3'
+    id 'com.android.kotlin.multiplatform.library' version '8.13.2'
+    id 'com.android.application' version '8.13.2' apply false
+    id 'org.jetbrains.kotlin.android' version '2.4.21' apply false
 }
 kotlin {
     jvmToolchain(17)
+    android {
+        namespace 'org.calltrack.companion.shared'
+        compileSdk 36
+        minSdk 26
+    }
     jvm('desktop')
     sourceSets {
         commonMain.dependencies {
-            implementation compose.runtime
-            implementation compose.foundation
-            implementation compose.material
+            api compose.runtime
+            api compose.foundation
+            api compose.material
         }
         commonTest.dependencies { implementation kotlin('test') }
         desktopMain.dependencies { implementation compose.desktop.currentOs }
