@@ -26,6 +26,13 @@ class UiSafety(unittest.TestCase):
         self.assertIn('unlabelled control id=private_id class=android.widget.ImageButton', summary)
         self.assertNotIn('private UI label', summary)
 
+        anchor_summary = device.native_failure_summary(
+            'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
+            'java.lang.AssertionError: Anchor must expose keyboard focus auto_access_action\n'
+            '    at com.markobl.calllogsync.slice.PositiveUiTest.renderedAccessibilityLabelsTargetsAndKeyboardFocus(PositiveUiTest.java:160)\n',
+        )
+        self.assertIn('non-focusable anchor id=auto_access_action', anchor_summary)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
