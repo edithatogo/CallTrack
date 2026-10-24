@@ -121,7 +121,7 @@ class AutomaticSettingsActivity : ComponentActivity() {
         layout.addView(access)
         val destinationPanel =
             ComposeView(this).apply {
-                id = R.id.auto_calendar_picker
+                id = R.id.auto_calendar_picker_panel
                 setViewCompositionStrategy(
                     ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
                 )

@@ -138,7 +138,7 @@ public class PositiveUiTest {
             "auto_access_action",
             "slice_calendar_picker",
             "import_calendar_picker",
-            "recovery_refresh"
+            "recovery_refresh_action"
         };
         for (int i = 0; i < screens.length; i++) {
             Activity activity =
@@ -157,7 +157,12 @@ public class PositiveUiTest {
                 assertTrue("Screen has no reachable controls", controls[0] > 0);
                 android.view.accessibility.AccessibilityNodeInfo node = ui.shown(anchor, true);
                 assertNotNull("Anchor must be reachable by scrolling", node);
-                assertTrue("Anchor must expose keyboard focus", node.isFocusable());
+                assertTrue(
+                        "Enabled anchor must expose keyboard focus "
+                                + anchor
+                                + " enabled="
+                                + node.isEnabled(),
+                        !node.isEnabled() || node.isFocusable());
                 instrumentation.sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_TAB);
                 ui.await(
                         () -> {

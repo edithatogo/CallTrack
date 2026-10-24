@@ -76,6 +76,10 @@ class AutomaticCallTypesPanelTest {
         outgoing.assertIsDisplayed().assertIsOn().assertIsNotEnabled()
         val semantics = outgoing.fetchSemanticsNode()
         assertEquals(Role.Checkbox, semantics.config[SemanticsProperties.Role])
+        assertEquals(
+            listOf("Outgoing calls"),
+            semantics.config[SemanticsProperties.ContentDescription],
+        )
         assertTrue(semantics.boundsInRoot.height >= 48f)
     }
 }

@@ -103,7 +103,7 @@ class HistoricalImportActivity : ComponentActivity() {
         layout.addView(accessPanel)
         val destinationPicker =
             ComposeView(this).apply {
-                id = R.id.import_calendar_picker
+                id = R.id.import_calendar_picker_panel
                 setViewCompositionStrategy(
                     ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
                 )

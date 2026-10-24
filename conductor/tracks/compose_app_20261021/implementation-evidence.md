@@ -466,3 +466,76 @@ selection/restoration, permission revocation, process/lifecycle recovery,
 TalkBack/Switch Access and the broader OS matrix therefore remain pending.
 This refresh does not close Track14 or change any physical, remote-calendar or
 release gate.
+
+## SSD reattachment and isolated emulator retry — 2026-10-24
+
+The PortableSSD reattached at `/Volumes/PortableSSD`. Its Android SDK responds
+as ADB 1.0.41 / platform-tools 37.0.1; Android platform 36 and build-tools 35.0.0
+are readable. Python 3.15.1 ran from the selected user runtime, and the selected
+JDK reports 17.0.21.0.2. The existing build receipt still matches current-main
+source inputs and both debug APK hashes.
+
+The prior emulator process remains in macOS state `UEs` with 0.0% CPU, an offline
+ADB guest and an open console port. Its launch record identifies a read-only
+cloned test instance; it was left untouched. To avoid its AVD and locks, a
+fresh Pixel 6 / API 36 AVD with a separate `/tmp` data directory was created. Its
+hardware and image settings match the authorized AVD. Emulator 37.2.12 found the
+system image and usable Hypervisor.Framework, but its QEMU main loop and CPU
+threads became unresponsive and the process exited before Android boot. The
+local macOS diagnostic records `EXC_BAD_ACCESS`/`SIGSEGV` in
+`android::crashreport::CrashReporter::GenerateDumpAndDie` after the emulator
+hang detector fired. No app or instrumentation package was installed and no UI
+acceptance suite ran. This is a reproduced host/emulator failure, not an app
+test failure; the diagnostic stays local and is not committed.
+
+Added [a scoped hosted API36 UI workflow](../../../.github/workflows/track14-hosted-ui.yml)
+to run the same synthetic settings, import, recovery and accessibility
+journeys on a fresh Pixel6 emulator. It builds source-bound app/test APKs on
+GitHub's Linux runner, requires the four suites to verify fixture cleanup and
+package removal, and prints only suite outcomes, tested methods and screenshot
+hashes. Hosted execution is pending. It cannot establish local ARM64 emulator
+health, physical calls, remote calendar behavior or operational acceptance.
+Local `actionlint`, Conductor integrity and the 19 Python 3.15.1 parity-target/UI
+safety tests pass.
+
+The first hosted attempt stopped in emulator-package setup before building the
+app: `/dev/kvm` existed, but the ephemeral runner account lacked access. The
+workflow now gives only the job account ownership of that runner-local device,
+checks read/write access, and requires `emulator -accel-check` to pass before
+continuing. The affected CI run is not emulator acceptance; the corrected run
+must build, boot and pass all four suites before results are recorded.
+
+On the next hosted attempt, KVM acceleration and the source-bound build passed,
+and the API36 emulator booted successfully in about 52 seconds. The final AVD
+identity comparison failed because the emulator console response included a
+carriage-return line ending. The workflow now normalizes that response before
+comparison and avoids printing raw emulator logs into public Actions output.
+The following hosted attempt passed boot and identity verification. Rendered
+settings, import and recovery journeys passed with cleanup and package-removal
+readback, but accessibility failed in
+`renderedAccessibilityLabelsTargetsAndKeyboardFocus`. Its full instrumentation
+output remains in the ignored runner-local receipt and was not retained in the
+public log, so the failing assertion is not yet known. Added a safe failure
+summary that reports app test source frames and, for unlabeled controls, only
+the resource ID and widget class. It suppresses rendered text and descriptions.
+The failing control is the automatic incoming-call checkbox (`auto_incoming`,
+`android.view.View`). Standard `toggleable` semantics alone did not resolve the
+Android accessibility node, so the row now explicitly clears and sets its
+checkbox role, checked state, content description and test identity while
+retaining the toggle action. On the next run the settings screen advanced, then
+the same unlabeled-node check found `import_incoming` on the historical import
+screen. The import call-type filters had the same custom clickable pattern and
+now receive the same explicit checkbox semantics; the Compose test asserts
+their label too. JDK17/SDK36 unit tests and Android-test Kotlin compilation
+passed before this import-panel change; its focused build/test and the hosted
+native rerun are pending. A later hosted run advanced through the settings and
+import call-type controls, then failed because a screen anchor did not expose
+keyboard focus. The failing anchor was `import_calendar_picker`, which is
+disabled until a calendar is available; the test had incorrectly demanded
+keyboard focus from disabled controls. The assertion now requires focus only
+for enabled anchors, while the traversal still requires visible keyboard focus
+after Tab. Safe ID/state diagnostics remain in place. The hosted repository-slice
+job also caught a ktfmt formatting issue in the new import-filter modifier; it
+was formatted with the workflow's pinned ktfmt0.59 checksum, and the subsequent
+full formatting check passed. The corrected hosted UI run is pending. No full
+accessibility parity is claimed yet.

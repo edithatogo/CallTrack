@@ -22,6 +22,34 @@ TEST_PACKAGE = PACKAGE + '.test'
 TEST_CLASS = 'com.markobl.calllogsync.slice.PositiveUiTest'
 
 
+def native_failure_summary(method, output):
+    """Return source locations without exposing rendered device content."""
+    frames = []
+    for line in output.splitlines():
+        frame = line.strip()
+        if (frame.startswith('at com.markobl.calllogsync.slice.PositiveUiTest.')
+                and 'PositiveUiTest.java:' in frame):
+            frames.append(frame)
+    detail = '; '.join(frames[:3])
+    # The rendered accessibility gate may fail on an unlabeled control. Retain
+    # only its resource ID and widget class; suppress its visible text/label.
+    control = re.search(
+        r'Unlabelled interactive control id=([^\s]*) class=([^\s]*)', output)
+    if control:
+        detail = (detail + '; ' if detail else '') + (
+            'unlabelled control id=' + control.group(1) +
+            ' class=' + control.group(2))
+    anchor = re.search(
+        r'Enabled anchor must expose keyboard focus ([a-z0-9_]+) enabled=(true|false)',
+        output)
+    if anchor:
+        detail = (detail + '; ' if detail else '') + (
+            'non-focusable anchor id=' + anchor.group(1) +
+            ' enabled=' + anchor.group(2))
+    suffix = ' (' + detail + ')' if detail else ''
+    return 'Native acceptance failed: ' + method + suffix
+
+
 def qualify(serial, suite="settings", receipt_dir=None):
     if suite not in ("settings", "imports", "recovery", "accessibility"):
         raise ValueError("Unknown UI suite")
@@ -78,7 +106,9 @@ def qualify(serial, suite="settings", receipt_dir=None):
                          '-e', 'class', test_class + '#' + method,
                          TEST_PACKAGE + '/androidx.test.runner.AndroidJUnitRunner')
         if 'OK (1 test)' not in output or 'FAILURES' in output or 'INSTRUMENTATION_FAILED' in output:
-            raise RuntimeError('Native acceptance failed: ' + method)
+            # The full output stays in the ignored receipt; public CI only gets
+            # source locations, never rendered labels or fixture values.
+            raise RuntimeError(native_failure_summary(method, output))
 
     def capture_ui():
         directory = evidence / ('ui-' + receipt['fixture_token'])

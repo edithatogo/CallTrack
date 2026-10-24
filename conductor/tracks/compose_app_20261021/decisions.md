@@ -220,3 +220,43 @@ grant/denial/revocation remains outside this slice.
 
 **Rollback:** Restore the TextView and Button while preserving their labels and
 permission request code; remove the intro host ID and Compose panels.
+
+## D14-11: Separate calendar picker host IDs from Compose action tags
+
+**Decision:** Give each Activity ComposeView container a distinct
+`*_calendar_picker_panel` resource ID and retain `auto_calendar_picker` /
+`import_calendar_picker` for the actual tagged Compose buttons. Host lookups
+target the container IDs; rendered UI automation and accessibility focus target
+the interactive child tags.
+
+**Rationale:** Hosted API36 accessibility showed the enabled import picker
+anchor as non-focusable. The Compose host and tagged button shared one Android
+resource ID, making rendered-node lookup ambiguous and causing the helper to
+inspect the host. The sanitized diagnostic reported `enabled=true`.
+
+**Promotion/removal:** No user-facing behavior or provider authority changes.
+Re-run all four hosted UI journeys and require rendered-control and Tab-focus
+acceptance before closing Track 14.
+
+**Rollback:** Restore the previous host IDs and matching host lookups. No
+persisted state, calendar identity or event behavior is affected.
+
+## D14-12: Focus the recovery action rather than its Compose host
+
+**Decision:** The rendered accessibility journey targets
+`recovery_refresh_action`, the Compose button tag, for its keyboard-focus
+assertion. Keep `recovery_refresh` as the Activity's ComposeView host ID for
+existing system-bars coverage.
+
+**Rationale:** After the picker host IDs were separated, API36 advanced to the
+recovery screen and reported `recovery_refresh` enabled but non-focusable. That
+identifier names the host container; the actual refresh button has the distinct
+`recovery_refresh_action` tag. Accessibility acceptance must inspect the
+interactive control, while system-window layout checks may inspect its host.
+
+**Promotion/removal:** No runtime code or behavior changes. The hosted
+accessibility journey must pass for the actual action and retain its rendered
+labels, touch-target and Tab-focus checks.
+
+**Rollback:** Restore the previous accessibility anchor if test-tag semantics
+regress. Keep the host ID untouched.
