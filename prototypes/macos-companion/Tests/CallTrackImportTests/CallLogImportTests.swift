@@ -45,6 +45,34 @@ final class CallLogImportTests: XCTestCase {
         }
     }
 
+    func testRejectsDuplicateKeysAndUnknownFields() throws {
+        let record = "{\"id\":\"\(callID)\",\"direction\":\"incoming\",\"started_at_ms\":1800000000000,\"duration_seconds\":1}"
+        let canonical = String(decoding: document(record), as: UTF8.self)
+        let duplicateKey = canonical.replacingOccurrences(
+            of: "\"schema_version\":1,",
+            with: "\"schema_version\":1,\"schema_version\":1,"
+        )
+        XCTAssertThrowsError(try CallLogImporter.preview(data: Data(duplicateKey.utf8))) {
+            XCTAssertEqual($0 as? ImportFailure, .nonCanonicalDocument)
+        }
+        let unknownField = canonical.replacingOccurrences(
+            of: "\"schema_version\":1,",
+            with: "\"schema_version\":1,\"unexpected\":true,"
+        )
+        XCTAssertThrowsError(try CallLogImporter.preview(data: Data(unknownField.utf8))) {
+            XCTAssertEqual($0 as? ImportFailure, .nonCanonicalDocument)
+        }
+    }
+
+    func testAllowsOnlyOneFinalLineEnding() throws {
+        let record = "{\"id\":\"\(callID)\",\"direction\":\"incoming\",\"started_at_ms\":1800000000000,\"duration_seconds\":1}"
+        let canonical = String(decoding: document(record), as: UTF8.self)
+        XCTAssertNoThrow(try CallLogImporter.preview(data: Data((canonical + "\r\n").utf8)))
+        XCTAssertThrowsError(try CallLogImporter.preview(data: Data((canonical + "\n\n").utf8))) {
+            XCTAssertEqual($0 as? ImportFailure, .nonCanonicalDocument)
+        }
+    }
+
     func testRejectsUnsupportedVersionAndMalformedInput() {
         XCTAssertThrowsError(try CallLogImporter.preview(data: document("", version: 2))) {
             XCTAssertEqual($0 as? ImportFailure, .unsupportedVersion(2))

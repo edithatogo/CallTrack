@@ -50,6 +50,7 @@ public enum ImportFailure: Error, Equatable {
     case tooManyCalls
     case recordCountMismatch
     case checksumMismatch
+    case nonCanonicalDocument
     case duplicateCallID(UUID)
     case invalidTimestamp(UUID)
     case invalidDuration(UUID)
@@ -85,11 +86,22 @@ public enum CallLogImporter {
             let end = call.startedAtMilliseconds.addingReportingOverflow(durationMilliseconds.partialValue)
             guard !end.overflow else { throw ImportFailure.invalidTimestamp(call.id) }
         }
-        let canonical = canonicalPayload(document)
-        let digest = SHA256.hash(data: Data(canonical.utf8))
+        let canonicalPayload = canonicalPayload(document)
+        let digest = SHA256.hash(data: Data(canonicalPayload.utf8))
             .map { String(format: "%02x", $0) }
             .joined()
         guard digest == document.contentSHA256 else { throw ImportFailure.checksumMismatch }
+        let canonicalDocument = String(canonicalPayload.dropLast())
+            + ",\"content_sha256\":\"\(document.contentSHA256)\"}"
+        // The producer's exact field/order/number form rejects duplicate keys,
+        // unknown fields, and ambiguous spellings. A single final line ending
+        // is allowed for ordinary text-file handling.
+        let canonicalBytes = Data(canonicalDocument.utf8)
+        let canonicalWithLF = Data((canonicalDocument + "\n").utf8)
+        let canonicalWithCRLF = Data((canonicalDocument + "\r\n").utf8)
+        guard data == canonicalBytes || data == canonicalWithLF || data == canonicalWithCRLF else {
+            throw ImportFailure.nonCanonicalDocument
+        }
         return ImportPreview(exportID: document.exportID, calls: document.calls)
     }
 

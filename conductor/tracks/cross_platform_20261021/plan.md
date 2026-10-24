@@ -16,6 +16,7 @@
 ## Phase 3: Conditional implementation
 
 - [x] Task: Establish a bounded synthetic schema-v1 Android producer/macOS preview golden and checksum/count regressions; production format acceptance remains open.
+- [x] Task: Make the Swift preview reject duplicate keys, unknown fields and alternate JSON encodings; retain one optional final LF/CRLF and cover the rule with hostile-input fixtures.
 - [ ] Task: Freeze exact source/toolchain/format/capability matrix and acceptance scope; distinguish native persistence from actual remote synchronization.
 - [ ] Task: Run compatible import/export/restore fixtures with inactive foreign receipts, redaction, deliberate delivery and one actual destination writer.
 - [ ] Task: Execute preserving package upgrades, process/permission/account failures, edited/deleted events and real provider-cloud readback where claimed; retain unobserved routes as unsupported.
@@ -58,6 +59,11 @@
 - Direct Swift 6.4 source harness compiled and passed, including the shared
   golden fixture. This does not establish SwiftPM/XCTest execution or native app
   acceptance.
+- Hardened the parser to compare checksum-valid input with canonical schema-v1
+  bytes, rejecting duplicate object keys, unknown fields and alternate numeric/
+  whitespace spellings. The shared fixture's single final LF and a single CRLF
+  remain accepted; no ending is also accepted, while repeated endings fail.
+  Direct tests cover duplicate keys and unknown root fields.
 - Android JVM unit tests were started under the selected repo JDK; the observed
   result is recorded in the review after the process exits.
 - Kept UI/file export, public schema adoption, restore semantics, native
