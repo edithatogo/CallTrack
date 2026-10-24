@@ -73,8 +73,11 @@ class UiSafety(unittest.TestCase):
             '[permission_allow_button:android.widget.Button:enabled=true:clickable=true], '
             'input-method:input-method:[]] app-permissions=[calendar-read=granted,'
             'calendar-write=granted,call-log-read=denied,phone-state-read=denied] '
+            'declared-runtime-permissions={app=[READ_CALL_LOG,READ_CALENDAR],'
+            'instrumentation=[READ_CONTACTS]} '
             'permission-purpose=calendar\n'
             'private dialog title and message must remain hidden\n'
+            'android.permission.READ_SMS must remain hidden\n'
             '    at com.markobl.calllogsync.slice.ImportUiTest.confirm(ImportUiTest.java:104)\n',
         )
         self.assertIn('dialog-active=input-method', summary)
@@ -88,6 +91,12 @@ class UiSafety(unittest.TestCase):
         self.assertIn('app-permissions=calendar-read:granted,calendar-write:granted,'
                       'call-log-read:denied,phone-state-read:denied', summary)
         self.assertIn('permission-purpose=calendar', summary)
+        self.assertIn(
+            'declared-runtime-permissions=app:READ_CALL_LOG,READ_CALENDAR'
+            '|instrumentation:READ_CONTACTS',
+            summary,
+        )
+        self.assertNotIn('READ_SMS', summary)
         self.assertNotIn('private dialog title', summary)
 
     def test_failure_summary_retains_only_allowlisted_permission_diagnostic(self):

@@ -93,6 +93,25 @@ def native_failure_summary(method, output):
     if app_permissions:
         detail = (detail + '; ' if detail else '') + 'app-permissions=' + ','.join(
             ':'.join(permission) for permission in app_permissions[:4])
+    declared_runtime_permissions = re.search(
+        r'declared-runtime-permissions=\{app=\[([A-Z_,]*)\],'
+        r'instrumentation=\[([A-Z_,]*)\]\}', output)
+    if declared_runtime_permissions:
+        allowed_permissions = {
+            'READ_CONTACTS',
+            'READ_CALL_LOG',
+            'READ_PHONE_STATE',
+            'READ_CALENDAR',
+            'WRITE_CALENDAR',
+        }
+        app_names = declared_runtime_permissions.group(1)
+        test_names = declared_runtime_permissions.group(2)
+        app_declared = app_names.split(',') if app_names else []
+        test_declared = test_names.split(',') if test_names else []
+        if set(app_declared + test_declared) <= allowed_permissions:
+            detail = (detail + '; ' if detail else '') + (
+                'declared-runtime-permissions=app:' + ','.join(app_declared)
+                + '|instrumentation:' + ','.join(test_declared))
     permission_purpose = re.search(
         r'permission-purpose=(call-log|calendar|phone-state|contacts|location|camera|'
         r'microphone|notifications|other|unavailable)', output)
