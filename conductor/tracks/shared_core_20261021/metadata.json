@@ -18,7 +18,7 @@
   "review_status": "toolchain-audit-slice-reviewed-macos-native-pending",
   "macos_native_accepted": false,
   "pull_request": "https://github.com/edithatogo/CallTrack/pull/55",
-  "pull_request_state": "open-hosted-checks-pending-native-acceptance-pending",
+  "pull_request_state": "merged-hosted-checks-passed-native-acceptance-pending",
   "production_adopted": false,
   "previous_pull_requests": [
     {
@@ -27,5 +27,6 @@
       "base": "codex/track14-compose",
       "note": "Superseded by PR #55 for this bounded checksum and evidence update; original implementation remains on main."
     }
-  ]
+  ],
+  "pull_request_merge_commit": "aebe4e553d4e090d7f0cd310311f4e3d08748542"
 }
