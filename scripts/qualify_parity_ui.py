@@ -234,9 +234,25 @@ def qualify(serial, suite="settings", receipt_dir=None):
         return result.stdout.strip()
 
     def check(method):
-        output = command('shell', 'am', 'instrument', '-w', '-r', '-e', 'fixtureToken', receipt['fixture_token'],
-                         '-e', 'class', test_class + '#' + method,
-                         TEST_PACKAGE + '/androidx.test.runner.AndroidJUnitRunner')
+        instrument_args = (
+            'shell', 'am', 'instrument', '-w', '-r', '-e', 'fixtureToken',
+            receipt['fixture_token'], '-e', 'class', test_class + '#' + method,
+            TEST_PACKAGE + '/androidx.test.runner.AndroidJUnitRunner',
+        )
+        try:
+            output = command(*instrument_args)
+        except RuntimeError as failure:
+            step = receipt['steps'][-1] if receipt['steps'] else {}
+            if (not str(failure).startswith('ADB command failed: shell am instrument')
+                    or step.get('args') != list(instrument_args)):
+                raise
+            # Nonzero instrumentation exits can still contain a useful JUnit
+            # failure. Keep raw output in the ignored receipt; only emit the
+            # same allowlisted summary used for normal assertion failures.
+            apk_permissions = apk_runtime_permission_summary(apks[0], apks[1], aapt)
+            raise RuntimeError(native_failure_summary(
+                method, step.get('output', ''), declared_permissions=apk_permissions
+            )) from failure
         if 'OK (1 test)' not in output or 'FAILURES' in output or 'INSTRUMENTATION_FAILED' in output:
             # The full output stays in the ignored receipt; public CI only gets
             # source locations, never rendered labels or fixture values.
