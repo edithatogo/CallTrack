@@ -13,25 +13,29 @@
 - [Preparation evidence](preparation-evidence.json)
 - [Resolved dependency report](dependency-report.json)
 
-## Live gate refresh — 2026-10-24
+## Current unsigned candidate — 2026-10-24
 
-[edithatogo/CallTrack](https://github.com/edithatogo/CallTrack) is public. The
-exact unsigned candidate `15998ba` was rebuilt by the
-hosted [cold Linux release reproduction](hosted-reproduction-evidence-20261024.json):
-the run passed, uploaded its evidence, and produced an APK matching the recorded
-macOS SHA-256. This clears the Actions billing/runner-access blocker and qualifies
-hosted reproduction for that candidate. The newer mainline includes Track14 app
-changes, so the release artifact must be refrozen and requalified before it can
-represent the current app. Hosted proof does not qualify a physical host or any
-device, signing, calendar, source-conveyance, or operational gate.
+- [Candidate qualification](current-candidate-qualification-20261024.md)
+- [Machine-readable build/runtime/source evidence](candidate-build-evidence-20261024.json)
+- [Canonical runtime audit](canonical-runtime-audit-20261024.json)
+- [Review](review-current-candidate-20261024.md)
 
-Track5 remains not release-ready. The development identity remains selected for
-local qualification; production identity and key custody remain pending. The
-latest read-only device check found no connected Android phone, so physical-call
-and any selected Google/Outlook route acceptance remain pending. Observation
-state remains unstarted: dates null, zero accepted days/hours. A physical phone,
-participating second phone, selected calendar route(s), and explicit usage scope
-are still required before starting that window.
+Candidate `ae39ef9e109158191b33d7047e93bc3ae39a8fbd` produced identical unsigned
+APK hash `22e93744536a08ce8b94050c412e6bd3d5a6839a040d0fd513f25658af961180` in
+two clean same-host builds and hosted cold-Linux run
+[40081001647](https://github.com/edithatogo/CallTrack/actions/runs/40081001647).
+Each completed 119 JVM tests with zero failures/errors/skips and zero lint
+Error/Fatal findings. The refreshed 92-coordinate runtime audit and repeatable
+877-file source/licence/notices archive are documented in the qualification
+record. Published-source declarations and repository-byte matches are evidence,
+not legal clearance or dependency-from-source reproduction.
+
+Track5 remains not release-ready. The development identity is retained for this
+unsigned candidate; production identity and key custody remain pending. Physical
+call and selected Google/Outlook route checks remain pending because no physical
+phone/participant/calendar scope is ready. Seven-day observation remains
+unstarted: dates null and accepted days/hours zero. The previous hosted run for
+`15998ba` remains historical and is not used as current-candidate evidence.
 
 ## Independent Linux build checkpoint — 2026-10-22
 

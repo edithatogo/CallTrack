@@ -1,5 +1,22 @@
 # Verification and readiness boundary
 
+## Current unsigned candidate — 2026-10-24
+
+See [candidate qualification](current-candidate-qualification-20261024.md),
+[candidate evidence](candidate-build-evidence-20261024.json),
+[canonical runtime audit](canonical-runtime-audit-20261024.json) and
+[review](review-current-candidate-20261024.md). Source revision
+`ae39ef9e109158191b33d7047e93bc3ae39a8fbd` produced the same unsigned APK in
+two clean same-host builds and hosted cold-Linux run 40081001647. Each reports
+119 JVM tests, zero failures/errors/skips and zero lint Error/Fatal findings.
+The refreshed runtime audit covers92 artifacts; source/notices packaging covers
+all92 coordinates and passed full archive readback/repeatability.
+
+The hosted workflow does not prove independent native physical-host acceptance.
+The archive has not been published; licence/legal clearance, dependency-from-source
+rebuild, production signing/key custody, physical calls, selected calendar routes
+and seven-day operational observation remain pending. `release_ready=false`.
+
 ## Current trust and schema/provider continuation — 2026-10-21
 
 See [current qualification](licence-tool-upgrade-qualification-20261021.md) and

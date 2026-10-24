@@ -147,7 +147,9 @@ def run(source, output, revision, expected_apk):
         if result.returncode:
             raise RuntimeError('Linux build failed; inspect retained build.log')
         receipt['jvm'] = junit_counts(source)
-        if receipt['jvm'] != dict(tests=115, failures=0, errors=0, skipped=0):
+        # The current Compose/KMP candidate has 119 release JVM tests. Older
+        # frozen candidates retain their separately recorded 115-test baseline.
+        if receipt['jvm'] != dict(tests=119, failures=0, errors=0, skipped=0):
             raise RuntimeError('Candidate JVM acceptance count/outcome changed')
         lint = ET.parse(source / 'app/build/reports/lint-results-release.xml').getroot()
         counts = {}

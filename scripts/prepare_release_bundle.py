@@ -16,7 +16,7 @@ import tarfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-AUDIT = 'conductor/tracks/release_20261020/canonical-runtime-audit-20261021.json'
+AUDIT = 'conductor/tracks/release_20261020/canonical-runtime-audit-20261024.json'
 SOURCES = 'qualification/release/runtime-sources.json'
 
 
@@ -51,7 +51,7 @@ def validate_inventory(actual, expected):
         raise ValueError('Candidate runtime inventory differs from audited binary set')
 
 
-def validate_source_zip(data):
+def validate_source_zip(data, require_source=True):
     with zipfile.ZipFile(io.BytesIO(data)) as archive:
         members = archive.infolist()
         if len(members) > 100000 or sum(m.file_size for m in members) > 512 * 1024 * 1024:
@@ -60,10 +60,12 @@ def validate_source_zip(data):
             safe_path(member.filename)
             if (member.external_attr >> 16) & 0o170000 == 0o120000:
                 raise ValueError('Symlink in dependency source archive')
-        if not any(m.filename.endswith(('.java', '.kt')) for m in members):
+        has_source = any(m.filename.endswith(('.java', '.kt')) for m in members)
+        if require_source and not has_source:
             raise ValueError('No Java/Kotlin source in dependency archive')
         if archive.testzip() is not None:
             raise ValueError('Corrupt dependency source archive')
+        return has_source
 
 
 def write_archive(output, files):
@@ -141,7 +143,12 @@ def run(output, build_receipt, inventory, source_cache):
         if row['runtime_sha256'] != expected[row['coordinate']]:
             raise ValueError('Dependency source row does not bind audited runtime binary')
         data = checked_file(source_cache, row['source_file'], row['source_sha256'])
-        validate_source_zip(data)
+        has_source = validate_source_zip(data, require_source=False)
+        if has_source != row.get('source_code_present', True):
+            raise ValueError('Dependency source-content declaration mismatch: ' + row['coordinate'])
+        with zipfile.ZipFile(io.BytesIO(data)) as source_archive:
+            if len(source_archive.infolist()) != row.get('source_entries'):
+                raise ValueError('Dependency source-entry count mismatch: ' + row['coordinate'])
         files['dependency-sources/' + row['source_file']] = data
         files['dependency-sources/' + row['pom_file']] = checked_file(source_cache, row['pom_file'], row['pom_sha256'])
     prefix = 'source/app/src/main/assets/open_source/'

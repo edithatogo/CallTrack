@@ -42,6 +42,18 @@ class BundleBoundaries(unittest.TestCase):
             with self.subTest(path=path), self.assertRaises(ValueError):
                 bundle.validate_source_zip(data.getvalue())
 
+    def test_metadata_only_source_jars_are_explicitly_qualified(self):
+        data = io.BytesIO()
+        with zipfile.ZipFile(data, 'w') as archive:
+            archive.writestr('META-INF/module.kotlin_module', 'metadata')
+        self.assertFalse(bundle.validate_source_zip(data.getvalue(), require_source=False))
+
+        with_source = io.BytesIO()
+        with zipfile.ZipFile(with_source, 'w') as archive:
+            archive.writestr('META-INF/module.kotlin_module', 'metadata')
+            archive.writestr('src/Example.kt', 'class Example')
+        self.assertTrue(bundle.validate_source_zip(with_source.getvalue()))
+
     def test_reproducible_archive_preserves_manifest_and_never_follows_links(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

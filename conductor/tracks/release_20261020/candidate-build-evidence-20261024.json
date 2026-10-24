@@ -1,0 +1,105 @@
+{
+  "scope": "Current unsigned Android candidate same-host build, hosted cold-Linux reproduction, runtime audit and corresponding-source preparation. This evidence is not release approval.",
+  "candidate_revision": "ae39ef9e109158191b33d7047e93bc3ae39a8fbd",
+  "apk": {
+    "sha256": "22e93744536a08ce8b94050c412e6bd3d5a6839a040d0fd513f25658af961180",
+    "identical_local_builds": true,
+    "package": "org.calltrack.community.dev",
+    "version_name": "0.1.0-dev",
+    "version_code": 10,
+    "signed": false
+  },
+  "local_build": {
+    "build_count": 2,
+    "same_host": true,
+    "shared_dependency_cache": true,
+    "independent_environment_reproduction": false,
+    "jdk": "OpenJDK 17.0.21.0.2",
+    "sdk": "Android platform 36; Build Tools 35.0.0",
+    "elapsed_seconds": 819.1,
+    "builds": [
+      {
+        "exit_code": 0,
+        "build_log_sha256": "c1151a68b34e058201499193d3163d6e246f970ebd6d46c494a31f6ca8bdf795",
+        "apk_sha256": "22e93744536a08ce8b94050c412e6bd3d5a6839a040d0fd513f25658af961180",
+        "unsigned_verified": true,
+        "jvm": {
+          "tests": 119,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "lint": {
+          "Hint": 3,
+          "Warning": 26
+        }
+      },
+      {
+        "exit_code": 0,
+        "build_log_sha256": "6a301a61231b554f6d7591a2fc4e74a05b6a5f7a637a766413736c65ff38bbe3",
+        "apk_sha256": "22e93744536a08ce8b94050c412e6bd3d5a6839a040d0fd513f25658af961180",
+        "unsigned_verified": true,
+        "jvm": {
+          "tests": 119,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "lint": {
+          "Hint": 3,
+          "Warning": 26
+        }
+      }
+    ]
+  },
+  "hosted_cold_linux": {
+    "workflow_run_id": 40081001647,
+    "workflow_url": "https://github.com/edithatogo/CallTrack/actions/runs/40081001647",
+    "result": "success",
+    "candidate_revision": "ae39ef9e109158191b33d7047e93bc3ae39a8fbd",
+    "fresh_sdk_before": true,
+    "fresh_gradle_home_before": true,
+    "source_files_unchanged": true,
+    "jdk": "Temurin 17.0.20.1+1",
+    "jvm": {
+      "tests": 119,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "lint": {
+      "Hint": 3,
+      "Warning": 26
+    },
+    "apk_sha256": "22e93744536a08ce8b94050c412e6bd3d5a6839a040d0fd513f25658af961180",
+    "bitwise_match_to_local": true,
+    "physical_host_independence": false
+  },
+  "runtime_audit": {
+    "inventory_sha256": "6477b61dffbd9db20789f0f0aa42f1a37beca312bb9e22f515e006b72a340362",
+    "resolved_rows": 96,
+    "unique_artifacts": 92,
+    "repository_byte_matches": 92,
+    "artifacts_with_effective_pom_licence_declaration": 92,
+    "licence_clearance": false,
+    "build_tool_trust": false
+  },
+  "source_bundle": {
+    "archive_sha256": "f63334fd2002a01ee18eb93b7242057b007eecf6c0ddba7f954350f866733b38",
+    "file_count": 877,
+    "runtime_sources": 92,
+    "source_archive_code_present": 87,
+    "metadata_only_source_archives": 5,
+    "archive_readback_verified": true,
+    "repeatability_verified": true,
+    "binary_from_source_reproduction_qualified": false,
+    "publication_performed": false
+  },
+  "release_gates": {
+    "release_ready": false,
+    "production_identity_and_key_custody": false,
+    "physical_call_acceptance": false,
+    "selected_calendar_route_acceptance": false,
+    "seven_day_operational_observation_started": false
+  }
+}
