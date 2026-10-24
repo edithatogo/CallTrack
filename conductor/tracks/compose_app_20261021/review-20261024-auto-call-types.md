@@ -13,8 +13,8 @@ The Compose panel preserves explicit user choices and accessibility selectors wh
 - [x] **Plan compliance**: Partial — the call-type control group is migrated; remaining Views and end-to-end acceptance stay in the original Track 14 plan.
 - [x] **Style compliance**: Pass — uses the existing Foundation-only panel pattern and existing resource IDs as Compose test tags.
 - [x] **New tests**: Yes — state/callback, semantic role, 48 dp touch target, large-text RTL, disabled-state, Activity host/initial-state, and selection-preserving Activity recreation regressions.
-- [x] **Test coverage**: Partial — panel and Activity recreation checks are defined; local rendered execution remains dependent on an available emulator.
-- [ ] **Test results**: Hosted builds exposed stale Activity CheckBox references and then a misqualified Compose test-rule import; both are fixed. The next hosted workflow run is pending.
+- [x] **Test coverage**: Partial — hosted qualification builds compile and package the new Android instrumentation tests but do not run them; local rendered execution remains dependent on an available emulator.
+- [x] **Test results**: After fixing the stale Activity state references and Compose test-rule import, both hosted `slice` jobs and both platform qualification matrices passed for commit `c163c53`. Kotlin/Java formatting, the Python 3.15.1 verifier and 19 targeted Conductor tests passed locally. The Android instrumentation tests compiled and packaged but were not executed.
 
 ## Findings
 
