@@ -65,3 +65,7 @@ candidate until JVM/Android parity and macOS Kotlin/Native tests both pass.
 
 These sources describe framework compatibility, not this repository's artifact
 trust, native packaging, or application acceptance.
+
+## Kotlin/Native toolchain refresh — 2026-10-24
+
+The KGP 2.3.21 macOS ARM64 compiler archive now has source-checked Maven SHA-256 entries in Gradle verification metadata; its normalized payload matches the JetBrains GitHub release archive across 26,128 regular files. The publisher's SPDX attachment is empty of package records, so licensing remains incompletely mapped. LLVM's publisher sidecar matches, while the LLDB download's SHA-256 conflicts with its publisher sidecar. Full Xcode is also absent (`xcodebuild` unavailable from the selected Command Line Tools). Keep the native acceptance task open until a trusted matching LLDB artifact and compatible Xcode/SDK are available, then run the actual common fixtures and inspect resulting artifacts. See [the toolchain review](review-20261024-kotlin-native-toolchain.md).

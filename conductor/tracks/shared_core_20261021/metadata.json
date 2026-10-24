@@ -14,10 +14,18 @@
   "prerequisite_deferral_document": "prerequisite-deferral.md",
   "implementation_status": "bounded-selection-range-shared-jvm-android-qualified-macos-native-pending",
   "implementation_commit": "32ae39b",
-  "review_commit": "32ae39b",
-  "review_status": "bounded-slice-reviewed-macos-native-pending",
+  "review_commit": "5092e9c",
+  "review_status": "toolchain-audit-slice-reviewed-macos-native-pending",
   "macos_native_accepted": false,
-  "pull_request": "https://github.com/edithatogo/CallTrack/pull/19",
-  "pull_request_state": "open-draft-hosted-checks-blocked-before-runner",
-  "production_adopted": false
+  "pull_request": "https://github.com/edithatogo/CallTrack/pull/55",
+  "pull_request_state": "open-hosted-checks-pending-native-acceptance-pending",
+  "production_adopted": false,
+  "previous_pull_requests": [
+    {
+      "url": "https://github.com/edithatogo/CallTrack/pull/19",
+      "state": "closed-draft-checks-failed",
+      "base": "codex/track14-compose",
+      "note": "Superseded by PR #55 for this bounded checksum and evidence update; original implementation remains on main."
+    }
+  ]
 }
