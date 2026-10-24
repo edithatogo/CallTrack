@@ -539,3 +539,47 @@ job also caught a ktfmt formatting issue in the new import-filter modifier; it
 was formatted with the workflow's pinned ktfmt0.59 checksum, and the subsequent
 full formatting check passed. The corrected hosted UI run is pending. No full
 accessibility parity is claimed yet.
+
+## Hosted API36 acceptance and wider OS-matrix follow-up — 2026-10-24
+
+The public GitHub Actions run [40095495432](https://github.com/edithatogo/CallTrack/actions/runs/40095495432)
+tested PR head `abecf4db8141f03bfd1b75b1b2d8119d645f204b`, later merged to
+`main` as `7ef258896184f6f1a9b77bf4ce59181399fa4b4d`. A fresh Pixel 6 API36
+x86_64 guest passed the settings, historical-import, recovery and accessibility
+suites. The sanitized output identifies Android16 / SDK36, all four suite
+outcomes, tested methods and 44 screenshot hashes. Every suite receipt reports
+fixture cleanup and test-package removal; the qualifier also gates success on
+restoring the emulator's original display/font configuration.
+
+The first passing run followed two targeted accessibility repairs. The automatic
+and import picker buttons had resource IDs colliding with their ComposeView
+hosts; separate `*_calendar_picker_panel` host IDs let UI lookup target the
+interactive tags. Hosted accessibility then passed those controls. The next
+run passed the picker and showed the recovery accessibility anchor had named
+the host `recovery_refresh` instead of the button `recovery_refresh_action`;
+only the keyboard-focus anchor changed. The subsequent complete four-suite run
+passed.
+
+To extend the same source-bound journeys to minimum/intermediate Android, the
+hosted workflow now has API26, API33 and API36 x86_64 entries. API26 uses the
+Pixel2 profile; API33 and API36 preserve Pixel6. `sdkmanager --list` on the
+qualified SDK confirmed the corresponding Google APIs x86_64 system images
+exist. The matrix is pending hosted execution; no result is inferred from the
+API36 run.
+
+After refreshing to merged `origin/main`,
+`scripts/run_slice_build.py` completed with exit code0, unchanged input hashes
+and exact current-source binding across151 app/build inputs. It used the
+qualified JDK17.0.21.0.2 and SDK36, passed all119 JVM tests with zero
+failures/errors/skips, assembled the debug app and instrumentation APKs and
+completed lint. The receipt records app APK SHA-256
+`2f505e791555f95fb664feb680abba8908cb0eb7d87d0cd898c5f16a35ea583a` and
+instrumentation APK SHA-256
+`f6cf4f6872268e2808acdf648081b8f361b4beea39e375d8d82019c501e8403b`.
+`actionlint`, the Conductor verifier (248 documents,21 tracks,25 scenarios),
+formatting and `git diff --check` pass.
+
+The phone remains absent from ADB and the only local guest is still offline.
+This evidence does not qualify API26/API33 UI, local ARM64 emulator health,
+manual TalkBack/Switch Access, physical calls, real account calendars or
+operational observation.

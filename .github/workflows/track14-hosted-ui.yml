@@ -39,9 +39,22 @@ on:
 permissions:
   contents: read
 jobs:
-  api36-ui:
+  hosted-ui:
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - api-level: 26
+            avd-name: calltrack-release-api26-20261022
+            device-profile: pixel_2
+          - api-level: 33
+            avd-name: calltrack-release-api33-20261022
+            device-profile: pixel_6
+          - api-level: 36
+            avd-name: calltrack-track14-api36
+            device-profile: pixel_6
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -55,7 +68,7 @@ jobs:
         run: |
           python -m venv .venv
           test "$(.venv/bin/python --version)" = "Python $(cat .python-version)"
-      - name: Install API 36 emulator packages
+      - name: Install API ${{ matrix.api-level }} emulator packages
         run: |
           set -euo pipefail
           test -e /dev/kvm
@@ -70,7 +83,9 @@ jobs:
             echo "$ANDROID_HOME/platform-tools"
             echo "$ANDROID_HOME/emulator"
           } >> "$GITHUB_PATH"
-          "$sdkmanager_path" "platforms;android-36" "build-tools;35.0.0" "system-images;android-36;google_apis;x86_64"
+          "$sdkmanager_path" "platforms;android-36" \
+            "build-tools;35.0.0" \
+            "system-images;android-${{ matrix.api-level }};google_apis;x86_64"
           "$ANDROID_HOME/emulator/emulator" -accel-check
       - name: Build source-bound app and test APKs
         run: |
@@ -78,16 +93,19 @@ jobs:
           mkdir -p .local/slice-evidence
           ln -s "$ANDROID_HOME" .local/android-sdk
           .venv/bin/python scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"
-      - name: Create and boot a fresh API 36 Pixel 6 emulator
+      - name: Create and boot a fresh API ${{ matrix.api-level }} emulator
         env:
           ANDROID_AVD_HOME: ${{ runner.temp }}/calltrack-track14-avd
+          API_LEVEL: ${{ matrix.api-level }}
+          AVD_NAME: ${{ matrix.avd-name }}
+          DEVICE_PROFILE: ${{ matrix.device-profile }}
         run: |
           set -euo pipefail
           mkdir -p "$ANDROID_AVD_HOME"
-          avdmanager create avd --name calltrack-track14-api36 \
-            --package 'system-images;android-36;google_apis;x86_64' \
-            --device pixel_6 --path "$ANDROID_AVD_HOME/calltrack-track14-api36.avd"
-          emulator -avd calltrack-track14-api36 -port 5554 \
+          avdmanager create avd --name "$AVD_NAME" \
+            --package "system-images;android-${API_LEVEL};google_apis;x86_64" \
+            --device "$DEVICE_PROFILE" --path "$ANDROID_AVD_HOME/$AVD_NAME.avd"
+          emulator -avd "$AVD_NAME" -port 5554 \
             -no-window -no-audio -no-snapshot -no-boot-anim -gpu swiftshader_indirect \
             > .local/slice-evidence/track14-hosted-emulator.log 2>&1 &
           echo "$!" > .local/slice-evidence/track14-hosted-emulator.pid
@@ -112,12 +130,12 @@ jobs:
           avd_name="$(adb -s emulator-5554 emu avd name | tr -d '\r' | sed -n '1p')"
           android_sdk="$(adb -s emulator-5554 shell getprop ro.build.version.sdk | tr -d '\r')"
           printf 'Booted AVD: %s; Android SDK: %s\n' "$avd_name" "$android_sdk"
-          if [ "$avd_name" != calltrack-track14-api36 ] || [ "$android_sdk" != 36 ]; then
+          if [ "$avd_name" != "$AVD_NAME" ] || [ "$android_sdk" != "$API_LEVEL" ]; then
             echo 'Emulator identity or API-level verification failed.'
             adb devices -l || true
             exit 1
           fi
-      - name: Run settings, import, recovery and accessibility journeys
+      - name: Run API ${{ matrix.api-level }} settings, import, recovery and accessibility journeys
         env:
           RUN_ATTEMPT: ${{ github.run_attempt }}
           RUN_ID: ${{ github.run_id }}

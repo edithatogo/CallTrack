@@ -33,8 +33,9 @@
 ## Phase: Hosted API36 UI acceptance fallback (2026-10-24)
 - [x] Task: Reconcile the reattached SSD, verify the current source-bound build receipt and diagnose a fresh isolated ARM64 emulator boot failure without touching the retained process.
 - [x] Task: Add a scoped Linux/KVM workflow for the existing API36 synthetic settings, import, recovery and accessibility journeys; require cleanup and package removal evidence.
-- [ ] Task: Run hosted UI acceptance, inspect sanitized suite/method/screenshot-hash evidence, fix findings and repeat affected checks.
-- [ ] Task: Review the hosted acceptance slice and update only the gates supported by its API36 x86_64 evidence; physical, local ARM64, remote-calendar and operational acceptance remain separate.
+- [x] Task: Run hosted API36 UI acceptance, inspect sanitized suite/method/screenshot-hash evidence, fix the host/tag and recovery-anchor findings, and repeat affected checks (PR #77; run 40095495432; see `review-20261024-hosted-ui.md`).
+- [x] Task: Review the hosted API36 x86_64 acceptance slice and update only the gates supported by its evidence; physical, local ARM64, remote-calendar and operational acceptance remain separate (see `review-20261024-hosted-ui.md`).
+- [~] Task: Extend the hosted source-bound UI journeys to API26/API33 and rerun API36 on the current merged source; inspect every suite result, accessibility receipt and cleanup proof.
 
 ## Phase 4: Review, acceptance and handoff
 
