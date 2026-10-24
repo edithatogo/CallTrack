@@ -8,6 +8,7 @@
 - [Prototype v1 contract and capability matrix](prototype-v1-contract.md)
 - [Prototype contract review](review-20261024-prototype-contract-freeze.md)
 - [Golden mutation-sweep review](review-20261024-golden-mutation-sweep.md)
+- [Count-boundary review](review-20261024-count-boundary.md)
 - [Metadata](metadata.json)
 - [Execution sequence](../../future-architecture.md)
 

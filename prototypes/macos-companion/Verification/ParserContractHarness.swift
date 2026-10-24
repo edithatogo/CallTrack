@@ -66,6 +66,13 @@ struct ParserContractHarness {
             fatalError("too many calls were accepted")
         } catch ImportFailure.tooManyCalls { }
 
+        let maximumCalls = (0..<CallLogImporter.maximumCalls).map { index in
+            let id = String(format: "00000000-0000-4000-8000-%012d", index)
+            return "{\"id\":\"\(id)\",\"direction\":\"incoming\",\"started_at_ms\":1800000000000,\"duration_seconds\":1}"
+        }.joined(separator: ",")
+        let maximumPreview = try CallLogImporter.preview(data: document(maximumCalls, count: CallLogImporter.maximumCalls))
+        precondition(maximumPreview.calls.count == CallLogImporter.maximumCalls)
+
         do {
             _ = try CallLogImporter.preview(data: Data(repeating: 0, count: CallLogImporter.maximumFileBytes + 1))
             fatalError("oversized document was accepted")
@@ -112,6 +119,6 @@ struct ParserContractHarness {
             fatalError("unknown JSON field was accepted")
         } catch ImportFailure.nonCanonicalDocument { }
 
-        print("PASS: bounded preview, golden interchange, canonical JSON, identity, checksum, timestamp, duration, count, and size contracts")
+        print("PASS: bounded preview, golden interchange, canonical JSON, identity, checksum, timestamp, duration, inclusive call-count boundary, and size contracts")
     }
 }

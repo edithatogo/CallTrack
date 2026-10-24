@@ -63,6 +63,11 @@ deterministic single-bit mutation sweep over all 422 bytes of the shared golden;
 all 422 altered documents were rejected. This is a narrow corruption smoke test,
 not coverage-guided fuzzing or adversarial-security qualification.
 
+The parser source harness also accepts a deterministic canonical document with
+exactly 10,000 unique synthetic records; the adjacent 10,001-record input is
+rejected. This verifies the inclusive count boundary only, not user-facing
+performance or full-file transfer behavior.
+
 ## Conditional end-to-end acceptance matrix
 
 1. **Contract:** freeze versioned Android export/macOS import schema and golden

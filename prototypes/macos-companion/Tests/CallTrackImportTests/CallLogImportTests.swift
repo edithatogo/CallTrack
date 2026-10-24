@@ -130,6 +130,15 @@ final class CallLogImportTests: XCTestCase {
         }
     }
 
+    func testAcceptsMaximumCallCount() throws {
+        let calls = (0..<CallLogImporter.maximumCalls).map { index in
+            let id = String(format: "00000000-0000-4000-8000-%012d", index)
+            return "{\"id\":\"\(id)\",\"direction\":\"incoming\",\"started_at_ms\":1800000000000,\"duration_seconds\":1}"
+        }.joined(separator: ",")
+        let preview = try CallLogImporter.preview(data: document(calls))
+        XCTAssertEqual(preview.calls.count, CallLogImporter.maximumCalls)
+    }
+
     func testRejectsOversizedInputBeforeDecode() {
         XCTAssertThrowsError(try CallLogImporter.preview(
             data: Data(repeating: 0x20, count: CallLogImporter.maximumFileBytes + 1)
