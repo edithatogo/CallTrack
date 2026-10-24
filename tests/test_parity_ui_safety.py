@@ -12,6 +12,21 @@ from parity_targets import RECOVERY_AVD, TRACK14_UI_AVD
 
 
 class UiSafety(unittest.TestCase):
+    def test_instrumentation_failures_keep_only_protocol_state_categories(self):
+        cases = (
+            ('', 'instrumentation-output-empty'),
+            ('INSTRUMENTATION_FAILED: Process crashed.', 'instrumentation-process-failed'),
+            ('FAILURES!!!\nINSTRUMENTATION_STATUS_CODE: -1', 'instrumentation-test-failed'),
+            ('INSTRUMENTATION_RESULT: shortMsg=Other failure',
+             'instrumentation-result-without-success-marker'),
+            ('arbitrary private text', 'instrumentation-result-marker-missing'),
+        )
+        for output, expected in cases:
+            with self.subTest(expected=expected):
+                summary = device.native_failure_summary('renderedRangePreviewCancelConfirmAndRepeat', output)
+                self.assertIn(expected, summary)
+                self.assertNotIn('arbitrary private text', summary)
+
     def test_apk_permission_summary_reports_only_allowlisted_manifest_names(self):
         outputs = [
             "package: org.calltrack.community.dev\n"

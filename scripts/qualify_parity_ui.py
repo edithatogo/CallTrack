@@ -31,6 +31,18 @@ def native_failure_summary(method, output, declared_permissions=None):
                 and re.search(r'(?:PositiveUiTest|ImportUiTest|RecoveryUiTest|ParityProviderTest|RenderedUi)\.java:\d+', frame)):
             frames.append(frame)
     detail = '; '.join(frames[:6])
+    if not output.strip():
+        detail = (detail + '; ' if detail else '') + 'instrumentation-output-empty'
+    elif 'INSTRUMENTATION_FAILED' in output or 'shortMsg=Process crashed' in output:
+        detail = (detail + '; ' if detail else '') + 'instrumentation-process-failed'
+    elif 'FAILURES!!!' in output or 'INSTRUMENTATION_STATUS_CODE: -1' in output:
+        detail = (detail + '; ' if detail else '') + 'instrumentation-test-failed'
+    elif 'OK (1 test)' in output:
+        detail = (detail + '; ' if detail else '') + 'instrumentation-success-marker-without-clean-result'
+    elif 'INSTRUMENTATION_RESULT:' in output:
+        detail = (detail + '; ' if detail else '') + 'instrumentation-result-without-success-marker'
+    else:
+        detail = (detail + '; ' if detail else '') + 'instrumentation-result-marker-missing'
     # The rendered accessibility gate may fail on an unlabeled control. Retain
     # only its resource ID and widget class; suppress its visible text/label.
     control = re.search(
