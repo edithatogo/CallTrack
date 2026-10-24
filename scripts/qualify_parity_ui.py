@@ -70,6 +70,15 @@ def native_failure_summary(method, output):
         detail = (detail + '; ' if detail else '') + 'import-confirmation-dialog-action-missing'
     if 'Refusing a control in an unexpected package:' in output:
         detail = (detail + '; ' if detail else '') + 'dialog-action-owned-by-unexpected-window'
+    dialog_root = re.search(r'dialog-root=(app|other|unavailable)', output)
+    if dialog_root:
+        detail = (detail + '; ' if detail else '') + 'dialog-root=' + dialog_root.group(1)
+    dialog_controls = re.findall(
+        r'(button[1-3]|other):(android\.widget\.Button|other):enabled=(true|false):'
+        r'clickable=(true|false):label-match=(true|false)', output)
+    if dialog_controls:
+        detail = (detail + '; ' if detail else '') + 'dialog-controls=' + ','.join(
+            ':'.join(control) for control in dialog_controls[:12])
     missing_permission = re.search(
         r'Visible enabled control missing: (permission_(?:deny|allow)_button)', output)
     if missing_permission:

@@ -143,12 +143,17 @@ final class RenderedUi {
     /** Tap an exact, enabled clickable label when Android's dialog ID differs by API level. */
     void tapClickableText(String text) {
         final AccessibilityNodeInfo[] found = new AccessibilityNodeInfo[1];
-        await(
-                () -> {
-                    found[0] = findClickableText(automation.getRootInActiveWindow(), text);
-                    return found[0] != null;
-                },
-                "Visible enabled dialog action missing");
+        try {
+            await(
+                    () -> {
+                        found[0] = findClickableText(automation.getRootInActiveWindow(), text);
+                        return found[0] != null;
+                    },
+                    "Visible enabled dialog action missing");
+        } catch (AssertionError missing) {
+            throw new AssertionError(
+                    missing.getMessage() + "; " + dialogActionSummary(text), missing);
+        }
         settle();
         found[0] = findClickableText(automation.getRootInActiveWindow(), text);
         assertNotNull("Dialog action disappeared before touch", found[0]);
@@ -208,6 +213,55 @@ final class RenderedUi {
             if (found != null) return found;
         }
         return null;
+    }
+
+    private String dialogActionSummary(String expected) {
+        AccessibilityNodeInfo root = automation.getRootInActiveWindow();
+        if (root == null) return "dialog-root=unavailable";
+        CharSequence packageName = root.getPackageName();
+        String owner =
+                packageName != null && context.getPackageName().contentEquals(packageName)
+                        ? "app"
+                        : "other";
+        java.util.List<String> controls = new java.util.ArrayList<>();
+        collectDialogControls(root, expected, controls);
+        return "dialog-root=" + owner + " dialog-controls=" + controls;
+    }
+
+    private void collectDialogControls(
+            AccessibilityNodeInfo node, String expected, java.util.List<String> controls) {
+        if (node == null || controls.size() >= 12) return;
+        CharSequence packageName = node.getPackageName();
+        CharSequence resourceId = node.getViewIdResourceName();
+        String id = resourceId == null ? "" : resourceId.toString();
+        String control =
+                id.endsWith(":id/button1")
+                        ? "button1"
+                        : id.endsWith(":id/button2")
+                                ? "button2"
+                                : id.endsWith(":id/button3") ? "button3" : "other";
+        if (packageName != null
+                && context.getPackageName().contentEquals(packageName)
+                && node.isVisibleToUser()
+                && node.isClickable()
+                && !control.equals("other")) {
+            String widget =
+                    "android.widget.Button".contentEquals(node.getClassName())
+                            ? "android.widget.Button"
+                            : "other";
+            CharSequence label = node.getText();
+            boolean matches = label != null && expected.equalsIgnoreCase(label.toString());
+            controls.add(
+                    control
+                            + ":"
+                            + widget
+                            + ":enabled="
+                            + node.isEnabled()
+                            + ":clickable=true:label-match="
+                            + matches);
+        }
+        for (int i = 0; i < node.getChildCount() && controls.size() < 12; i++)
+            collectDialogControls(node.getChild(i), expected, controls);
     }
 
     private void touch(AccessibilityNodeInfo node, String selector) {
