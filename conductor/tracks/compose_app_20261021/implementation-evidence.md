@@ -682,6 +682,36 @@ Plugin requires JDK17. Direct `javac -source 8 -target 8` compilation of the
 changed helper against the installed API36 `android.jar` and cached JUnit passes;
 the pinned Java formatter and focused Python safety checks also pass.
 
+## Track14 hosted matrix diagnostics `ec30be3` to `51170b6`
+
+Hosted run [40129081350](https://github.com/edithatogo/CallTrack/actions/runs/40129081350)
+and paired build qualification [40129081332](https://github.com/edithatogo/CallTrack/actions/runs/40129081332)
+completed on `ec30be3`. The build qualification passed. API36 passed all four
+rendered journeys. API33 failed while searching for the rendered deny control:
+the app's four requested runtime permissions remained denied, the app window was
+active, and the permission-controller root/control were unavailable at failure
+readback. API26 failed during the rendered import journey without an
+instrumentation result marker and reported `IllegalStateException`; its
+permission-activity launcher was the input method. The initial diagnostic
+forwarding defect that discarded these categories was fixed in `ec30be3`.
+
+The next run [40130012910](https://github.com/edithatogo/CallTrack/actions/runs/40130012910)
+on `7f10dae` again passed API36. API33 failed earlier in the system-bar content
+inset assertion, while API26 repeated the incomplete import instrumentation
+result and `IllegalStateException`. A new sanitizer was added to classify the
+fatal process and top stack-frame owner without exposing exception messages or
+stack text. Its first run showed that logcat prefixes fatal lines with priority
+and tag text; the parser was corrected and its tests now use this actual format.
+The hosted rerun for that correction is run 46 and remains pending at this
+checkpoint.
+
+Focused review on the latest source passed 34 `tests.test_parity_ui_safety`
+tests, the Conductor verifier (249 documents, 21 tracks, 25 synthetic
+scenarios), and `git diff --check`. The host emulator is offline and its SDK
+resolves under PortableSSD, so local rendered reruns are unavailable. No app
+permission behavior was changed. The OS matrix is still not accepted; API26 and
+API33 are open, and API36 success does not replace their evidence.
+
 ## Track14 hosted matrix diagnostic `b5c2a90`
 
 The exact-source build qualification passed in runs [40121249281](https://github.com/edithatogo/CallTrack/actions/runs/40121249281)

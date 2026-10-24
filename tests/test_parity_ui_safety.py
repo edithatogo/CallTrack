@@ -103,6 +103,15 @@ class UiSafety(unittest.TestCase):
             'permission-launcher=unavailable',
         )
 
+    def test_activity_top_summary_retains_only_owner_category(self):
+        dump = (
+            'mResumedActivity: ActivityRecord{abc u0 '
+            'com.google.android.inputmethod.latin/.LatinIME t42}\n'
+            'mFocusedActivity: ActivityRecord{def u0 com.example.private/.Screen t43}\n'
+        )
+        self.assertEqual(device.activity_top_summary(dump), 'activity-top=input-method')
+        self.assertNotIn('com.example.private', device.activity_top_summary(dump))
+
     def test_runtime_diagnostic_keeps_only_failure_categories_and_exception_class(self):
         logcat = (
             'E AndroidRuntime: FATAL EXCEPTION: main\n'
@@ -142,6 +151,8 @@ class UiSafety(unittest.TestCase):
             '* Hist #0: ActivityRecord{prompt '
             'com.android.packageinstaller/.permission.ui.GrantPermissionsActivity}\n'
             'launchedFromUid=10123 launchedFromPackage=com.markobl.calllogsync userId=0\n'
+            'mResumedActivity: ActivityRecord{abc u0 '
+            'org.calltrack.community.dev/.MainActivity t4}\n'
         )
         logcat = (
             'FATAL EXCEPTION: main\n'
@@ -156,6 +167,7 @@ class UiSafety(unittest.TestCase):
             'READ_CALL_LOG|instrumentation:',
         )
         self.assertIn('permission-launcher=com.markobl.calllogsync', summary)
+        self.assertIn('activity-top=app', summary)
         self.assertIn('runtime-fatal-exception', summary)
         self.assertIn('runtime-test-process-died', summary)
         self.assertIn('runtime-exception=java.lang.SecurityException', summary)

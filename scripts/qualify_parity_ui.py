@@ -185,6 +185,12 @@ def native_failure_summary(method, output, declared_permissions=None):
     if permission_launcher:
         detail = (detail + '; ' if detail else '') + (
             'permission-launcher=' + permission_launcher.group(1))
+    activity_top = re.search(
+        r'activity-top=(app|test|permission-controller|input-method|system-ui|other|unavailable)',
+        output,
+    )
+    if activity_top:
+        detail = (detail + '; ' if detail else '') + activity_top.group(0)
     system_controls = re.findall(
         r':id/([a-z0-9_]+):(android\.[A-Za-z0-9_.$]+):enabled=(true|false)', output)
     if system_controls:
@@ -241,6 +247,37 @@ def permission_activity_launcher_summary(activity_dump):
         if launcher:
             return 'permission-launcher=' + launcher.group(1)
     return 'permission-launcher=unavailable'
+
+
+def activity_top_summary(activity_dump):
+    """Classify the resumed/focused activity owner without exposing its class."""
+    for line in activity_dump.splitlines():
+        if not re.search(r'(?:mResumedActivity|topResumedActivity|mFocusedActivity)', line):
+            continue
+        component = re.search(
+            r'(?:u\d+\s+)?([A-Za-z][A-Za-z0-9_.]+)/[A-Za-z0-9_.$]+', line
+        )
+        if not component:
+            continue
+        package = component.group(1)
+        if package == PACKAGE:
+            category = 'app'
+        elif package == TEST_PACKAGE:
+            category = 'test'
+        elif package in ('com.android.permissioncontroller',
+                         'com.google.android.permissioncontroller',
+                         'com.android.packageinstaller',
+                         'com.google.android.packageinstaller'):
+            category = 'permission-controller'
+        elif package.startswith(('com.android.inputmethod',
+                                 'com.google.android.inputmethod')):
+            category = 'input-method'
+        elif package == 'com.android.systemui':
+            category = 'system-ui'
+        else:
+            category = 'other'
+        return 'activity-top=' + category
+    return 'activity-top=unavailable'
 
 
 def runtime_failure_summary(logcat):
@@ -311,6 +348,7 @@ def instrumentation_failure_summary(method, output, activity_dump='', logcat='',
                                     declared_permissions=None):
     """Combine raw local output with only bounded platform diagnostics."""
     augmented = (output + '\n' + permission_activity_launcher_summary(activity_dump)
+                 + '\n' + activity_top_summary(activity_dump)
                  + '\n' + runtime_failure_summary(logcat))
     return native_failure_summary(method, augmented, declared_permissions)
 

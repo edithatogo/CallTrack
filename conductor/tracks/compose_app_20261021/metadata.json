@@ -4,7 +4,7 @@
   "status": "in_progress",
   "milestone": "M6",
   "created_at": "2026-10-21",
-  "updated_at": "2026-10-24",
+  "updated_at": "2026-10-25",
   "depends_on": [
     "kotlin_20261020",
     "release_20261020"
@@ -13,6 +13,6 @@
   "track_number": 14,
   "execution_stage": 3,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
-  "implementation_status": "PR77 merged as 7ef2588; current-main source-bound build receipt passes 119 JVM tests, lint, APK packaging and exact 151-input binding; hosted Pixel6/API36 x86_64 run 40095495432 passed settings/import/recovery/accessibility with fixture cleanup, package removal and environment restoration; 44 screenshot hashes; fixed picker host/tag ID collision and focused recovery action anchor; PR78 run 40100856513 API33/API36 passed; API26 root mode, settings and synthetic import preparation passed, but rendered import confirmation could not find its dialog action; fixture cleanup/package removal verified; adding a fixed diagnostic category and rerunning; Android build and 20 UI-safety tests pass; phone absent and local ARM64 guest offline; provider-backed destination restoration, permission revocation, process/lifecycle recovery, manual TalkBack/Switch Access and operational gates remain open",
+  "implementation_status": "PR77 merged as 7ef2588; current-main source-bound build receipt passes 119 JVM tests, lint, APK packaging and exact 151-input binding; hosted Pixel6/API36 x86_64 run 40095495432 passed settings/import/recovery/accessibility with fixture cleanup, package removal and environment restoration; 44 screenshot hashes; PR78 build qualification run 40129081332 passed; hosted run 40129081350 passed API36 while API33 lost the rendered permission-denial control and API26 exited the rendered import without instrumentation result; run 40130012910 again passed API36, failed API33 system-bar inset and repeated API26 incomplete import instrumentation; diagnostic parser now classifies prefixed fatal logcat process/frame owners, latest rerun 40130610357 pending; focused Python safety tests (34), Conductor verifier (249 documents, 21 tracks, 25 scenarios), and diff check pass; host emulator offline and SDK under PortableSSD; phone absent; provider-backed destination restoration, permission revocation, process/lifecycle recovery, manual TalkBack/Switch Access and operational gates remain open",
   "production_adopted": false
 }
