@@ -35,6 +35,7 @@
     <item name="import_history" type="id" />
     <item name="open_recovery" type="id" />
     <item name="recovery_refresh" type="id" />
+    <item name="recovery_access_panel" type="id" />
     <item name="recovery_feedback" type="id" />
     <item name="recovery_intro_panel" type="id" />
     <item name="recovery_rows" type="id" />

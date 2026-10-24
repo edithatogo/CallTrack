@@ -26,6 +26,18 @@ internal fun RecoveryCopyPanel(text: String, tag: String) {
     BasicText(text = text, modifier = Modifier.fillMaxWidth().testTag(tag))
 }
 
+@Composable
+internal fun RecoveryAccessPanel(label: String, onRequestAccess: () -> Unit) {
+    Column(Modifier.fillMaxWidth().semantics { testTagsAsResourceId = true }) {
+        ComposeActionButton(
+            label = label,
+            tag = "recovery_access_action",
+            enabled = true,
+            onClick = onRequestAccess,
+        )
+    }
+}
+
 internal data class RecoveryCardUiState(
     val token: Long,
     val detail: String,

@@ -59,10 +59,22 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                 }
             }
         layout.addView(intro)
-        val access = button(layout, R.string.recovery_access)
-        access.setOnClickListener {
-            requestPermissions(arrayOf(Manifest.permission.READ_CALENDAR), 11)
-        }
+        val access =
+            ComposeView(this).apply {
+                id = R.id.recovery_access_panel
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    RecoveryAccessPanel(
+                        label = stringResource(R.string.recovery_access),
+                        onRequestAccess = {
+                            requestPermissions(arrayOf(Manifest.permission.READ_CALENDAR), 11)
+                        },
+                    )
+                }
+            }
+        layout.addView(access)
         val actions =
             ComposeView(this).apply {
                 id = R.id.recovery_refresh
@@ -198,13 +210,6 @@ class ReceiptRecoveryActivity : ComponentActivity() {
         ActivityInsets.apply(scroll)
         setContentView(scroll)
         load(null)
-    }
-
-    private fun button(layout: LinearLayout, label: Int): Button {
-        val result = Button(this)
-        result.setText(label)
-        layout.addView(result)
-        return result
     }
 
     private fun load(cursor: SqliteLedger.RecoveryCursor?) {
