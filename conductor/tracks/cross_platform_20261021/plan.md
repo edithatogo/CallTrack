@@ -37,3 +37,14 @@
   EventKit/provider readback and selected cloud routes remain prerequisites.
 - This checkpoint does not complete or archive Track 19 and does not unlock
   Track 20/iOS. Continue the original phases once prerequisites are satisfied.
+
+## Evidence refresh — 2026-10-24
+
+- Added Track 17 PR #60's Android KMP target and synthetic host compile/package
+  evidence to the cross-platform matrix. The host remains a prototype; no
+  production integration or Android rendered acceptance is claimed.
+- Kept phase 3 blocked: the Android emulator is offline; macOS native packaging,
+  an accepted Android export contract, preserving app upgrades and native/
+  remote calendar readback remain unavailable.
+- Kept Track 19 and the iOS handoff open. This refresh advances evidence only;
+  it does not substitute for a qualifying second-platform workflow.
