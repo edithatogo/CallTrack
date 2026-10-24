@@ -19,15 +19,16 @@
 - [x] Task: Map Android/JVM dependencies and native target/toolchain constraints; compare retained code, common libraries and minimal native facades for hashing/time/overflow (findings.md).
 - [x] Task: Extract only raw call-type selection and half-open timestamp rules; native adapters remain authoritative for platform behavior (32ae39b).
 - [x] Task: Preserve stored signatures, schema, namespace, receipts and Java facade; existing contract suite and common boundary tests pass; no writer or ledger change (32ae39b).
-- [ ] Task: Run common golden/fault fixtures on Android/JVM and macOS Kotlin/Native, inspect target artifacts and preserve upgrade/recovery; JVM/Android build evidence passes, macOS Kotlin/Native is pending full Xcode.
-- [ ] Task: Phase Verification & Checkpoint (JVM/Android tests and APK packaging pass; macOS Native acceptance remains pending).
+- [x] Task: Expand the shared call-type fixture to cover all eight filter masks, known numeric types, unknown/extended values, and the `Long.MIN_VALUE` timestamp boundary; shared JVM/Android and Java facade selectors pass locally, and hosted Kotlin/Native acceptance is recorded in implementation evidence.
+- [x] Task: Run the expanded common selection fixtures on Android/JVM and macOS Kotlin/Native, inspect target reports and preserve upgrade/recovery; JVM/Android selectors pass locally and hosted Kotlin/Native reports 3 tests with zero skips, failures or errors (run 40111068972; see implementation evidence).
+- [x] Task: Phase Verification & Checkpoint (expanded JVM/Android and hosted Native fixture checks pass; broader Track 15 acceptance remains gated by Track 14 and is tracked below).
 
 ## Phase 4: Review, acceptance and handoff
 
 - [ ] Task: Run applicable shared/rendered/native/cloud/package/operational acceptance with exact source/artifact evidence; verify cleanup and preserving upgrade/recovery.
 - [x] Task: Perform Conductor review, fix the synthetic prerequisite test fixture and rerun affected checks (32ae39b; review-20261024.md).
 - [x] Task: Update requirements, decisions, remaining limitations and next-track inputs; no superseded writer or ledger code is retired.
-- [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger; macOS Kotlin/Native acceptance is still pending.
+- [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger; Track 14 acceptance remains a prerequisite for the next implementation track.
 
 ## Phase: Kotlin/Native toolchain trust audit review (2026-10-24)
 - [x] Task: Verify the pinned KGP 2.3.21 compiler bundle and POM, record LLVM/LLDB checksum evidence and leave macOS native acceptance open (5092e9c; review-20261024-kotlin-native-toolchain.md).

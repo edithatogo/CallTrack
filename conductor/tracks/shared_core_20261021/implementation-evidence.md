@@ -98,3 +98,33 @@ BUILD SUCCESSFUL; 72 actionable tasks
 The test result files report 6 shared-core tests total (3 JVM and 3 Android unit tests) and 115 app JVM tests, with zero failures, errors, or skips. The unsigned debug APK is 12,356,531 bytes with SHA-256 `949084fcb4c7b68ff5f98778cf7309bef2fca98c15215feb6cc5124658eba0bd`. This is local packaging evidence only; it does not satisfy macOS Kotlin/Native acceptance.
 
 The Python 3.15.1 Conductor integrity verifier passed (229 documents, 21 tracks, 25 synthetic scenarios), and the focused `test_verify_conductor.py` unittest module passed 19 tests. `git diff --check` passed. An attempted `pytest` invocation could not run because pytest is not installed in the selected repository environment; the same focused suite was run successfully with its unittest runner, without installing or changing dependencies.
+
+## Shared selection fixture expansion — 2026-10-25
+
+The common Kotlin fixture now exercises all eight combinations of the three
+CallLog type filters, checks that types `0`, `4`–`8`, `-1` and `Int.MAX_VALUE`
+remain excluded, and verifies the half-open time range rejects
+`Long.MIN_VALUE`. This extends the Native/JVM common contract to match the
+existing Android facade matrix without changing production code or persisted
+data.
+
+With JDK17.0.21+9 and the already qualified Android SDK36, all targeted tests
+passed locally:
+
+```text
+:shared-core:jvmTest
+:shared-core:testDebugUnitTest
+:app:testDebugUnitTest --tests com.markobl.calllogsync.slice.CallSelectionTest
+```
+
+Each suite reported three tests with zero skips, failures or errors. The
+updated Kotlin source passed pinned ktfmt0.59 and `git diff --check`. The
+pull-request Kotlin/Native job [40111068972](https://github.com/edithatogo/CallTrack/actions/runs/40111068972)
+ran this exact source at head `27a55384ff3bacc253defafd43081dc41f5511ff`
+on GitHub's `macos-15-arm64` runner with Xcode 26.1.1 and Temurin 17.0.20.1+1.
+`:shared-core:macosArm64Test` completed successfully; the inspected JUnit report
+for `CallSelectionRulesTest` records `tests=3`, `skipped=0`, `failures=0`, and
+`errors=0`. This is evidence for the expanded common fixture only. The two full
+qualification workflow runs for this PR are still packaging the unsigned
+release variant; Track 15 remains open for those checks, final review/merge,
+and its Track 14 sequencing gate.
