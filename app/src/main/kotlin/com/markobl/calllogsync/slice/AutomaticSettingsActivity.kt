@@ -72,6 +72,7 @@ class AutomaticSettingsActivity : ComponentActivity() {
     private var reloadReconcile = false
     private var callTypesState by mutableStateOf(AutomaticCallTypesUiState())
     private var callTypesEnabled by mutableStateOf(true)
+    private var restoredCallTypes = false
 
     public override fun onCreate(saved: Bundle?) {
         super.onCreate(saved)
@@ -81,6 +82,7 @@ class AutomaticSettingsActivity : ComponentActivity() {
                 outgoing = saved?.getBoolean(STATE_OUTGOING, true) ?: true,
                 missed = saved?.getBoolean(STATE_MISSED, true) ?: true,
             )
+        restoredCallTypes = saved != null
         val layout = LinearLayout(this)
         layout.orientation = LinearLayout.VERTICAL
         val pad = (16 * resources.displayMetrics.density).toInt()
@@ -357,10 +359,13 @@ class AutomaticSettingsActivity : ComponentActivity() {
                     destination!!.adapter =
                         ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, labels)
                     destination!!.setSelection(position)
-                    if (!initialised && settings != null) {
-                        incoming!!.isChecked = settings.incoming
-                        outgoing!!.isChecked = settings.outgoing
-                        missed!!.isChecked = settings.missed
+                    if (!initialised && settings != null && !restoredCallTypes) {
+                        callTypesState =
+                            AutomaticCallTypesUiState(
+                                incoming = settings.incoming,
+                                outgoing = settings.outgoing,
+                                missed = settings.missed,
+                            )
                     }
                     initialised = calendarAccess()
                     buttons()

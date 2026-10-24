@@ -14,10 +14,10 @@ The Compose panel preserves explicit user choices and accessibility selectors wh
 - [x] **Style compliance**: Pass — uses the existing Foundation-only panel pattern and existing resource IDs as Compose test tags.
 - [x] **New tests**: Yes — state/callback, semantic role, 48 dp touch target, large-text RTL, disabled-state, Activity host/initial-state, and selection-preserving Activity recreation regressions.
 - [x] **Test coverage**: Partial — panel and Activity recreation checks are defined; local rendered execution remains dependent on an available emulator.
-- [ ] **Test results**: Pending targeted Android build and hosted workflow result.
+- [ ] **Test results**: Initial hosted slice build exposed stale Activity reads of the former CheckBox fields; those references are now replaced with the saved Compose state. A fresh workflow run is pending.
 
 ## Findings
 
-No code defect found in review. Permission requests, provider reads, activation confirmation and scheduling remain Activity-owned. The call-type state is saved by the Activity and restored into Compose on recreation.
+The first hosted compile found six unresolved references to the removed CheckBox fields in the asynchronous settings load. They were replaced by a settings-to-Compose-state update, guarded so saved unsaved selections survive Activity recreation. Permission requests, provider reads, activation confirmation and scheduling remain Activity-owned.
 
 The selected tests do not establish permission revocation, full Activity process death, cloud/calendar delivery, or full Track 14 completion.
