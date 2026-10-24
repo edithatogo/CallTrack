@@ -107,3 +107,24 @@ is pending. A local Gradle compile could not start because the host has JDK11;
 Android Gradle Plugin requires JDK17. Direct Java 8-compatibility compilation
 of the changed helper against API36 `android.jar` and cached JUnit, the pinned
 Java formatter, and the Python safety suite passed.
+
+## Latest bounded diagnostic
+
+The follow-up diagnostic commit `b5c2a90` adds a sanitized app-label visibility
+state and aggregates only known PermissionController roots and allowlisted
+permission control IDs across visible accessibility windows. The exact-source
+build qualification passed in runs `40121249281` and `40121253294`; the PR
+qualification also passed `slice`, Compose prototype and multiplatform UI jobs.
+On hosted UI run [40121253324](https://github.com/edithatogo/CallTrack/actions/runs/40121253324),
+API26 again failed in `renderedRangePreviewCancelConfirmAndRepeat`. Its bounded
+summary reports a PermissionController prompt classified as `contacts`, with
+app-label visibility `not-visible`, calendar and call-log grants present,
+phone-state denied, and no `READ_CONTACTS` declaration in either validated
+APK. It lists only known permission control IDs; no call-log data or dialog
+text is retained. This still does not identify the component that initiated
+the prompt, so no permission or product-flow change is justified.
+
+The matrix completed with API33 and API36 passing and API26 failing, so the
+matrix as a whole is not accepted. API26's unresolved permission prompt remains
+the blocker. Keep the PR open and do not merge. The two passing platform results
+are valid for this source revision; they do not replace API26 acceptance.

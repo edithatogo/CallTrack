@@ -676,8 +676,24 @@ APK manifest, while leaving the dialog's originating request unresolved.
 API33 failed to find the deny control. The test selector now searches the
 current accessibility windows for controls owned by the known Android
 PermissionController packages, rechecks the control before touch, and keeps
-the same ID allowlist. The hosted rerun is pending; local Gradle validation is
+the same ID allowlist. The hosted rerun is recorded below; local Gradle validation is
 unavailable because this host currently has JDK11 while the Android Gradle
 Plugin requires JDK17. Direct `javac -source 8 -target 8` compilation of the
 changed helper against the installed API36 `android.jar` and cached JUnit passes;
 the pinned Java formatter and focused Python safety checks also pass.
+
+## Track14 hosted matrix diagnostic `b5c2a90`
+
+The exact-source build qualification passed in runs [40121249281](https://github.com/edithatogo/CallTrack/actions/runs/40121249281)
+and [40121253294](https://github.com/edithatogo/CallTrack/actions/runs/40121253294).
+The hosted rendered-UI matrix [40121253324](https://github.com/edithatogo/CallTrack/actions/runs/40121253324)
+completed with API33 and API36 passing and API26 failing during
+`ImportUiTest.renderedRangePreviewCancelConfirmAndRepeat`. The safe failure
+summary reports a PermissionController prompt classified as `contacts`,
+app-label visibility `not-visible`, calendar/call-log grants, phone-state
+denied, and no `READ_CONTACTS` declaration in either validated APK. The
+requesting component remains unknown; no permission behavior was changed.
+Focused host verification after the run passed: 26 `tests.test_parity_ui_safety`
+tests and `scripts/verify_conductor.py` (249 documents, 21 tracks, 25 synthetic
+scenarios); `git diff --check` passed. The rendered matrix is not accepted
+because API26 remains unresolved. The PR remains open and unmerged.
