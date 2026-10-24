@@ -45,3 +45,8 @@ trigger; it cannot turn unavailable features into supported claims.
 Current execution is scoped by [prerequisite-deferral.md](prerequisite-deferral.md).
 Its [evidence map](findings.md) and [decision](decisions.md) do not satisfy the
 full acceptance criteria above and do not authorize Track 20.
+
+The schema-v1 implementation is frozen only as a synthetic prototype contract
+and capability snapshot in [prototype-v1-contract.md](prototype-v1-contract.md).
+That contract is not a production format commitment or supported import/export
+claim.

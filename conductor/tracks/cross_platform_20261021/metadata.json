@@ -49,6 +49,14 @@
     "production_adopted": false,
     "recorded_at": "2026-10-24"
   },
+  "prototype_format_contract": {
+    "document": "prototype-v1-contract.md",
+    "source_revision": "b3e8717fda6239b2a30c556d8f013121c3ff9f7f",
+    "scope": "synthetic-android-jvm-to-swift-preview-compatibility-only",
+    "public_or_stable_format": false,
+    "native_or_remote_acceptance": false,
+    "review_document": "review-20261024-prototype-contract-freeze.md"
+  },
   "draft_pr": 23,
   "draft_pr_url": "https://github.com/edithatogo/CallTrack/pull/23",
   "draft_pr_base": "codex/track18-rust-evaluation",
