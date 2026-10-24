@@ -23,7 +23,10 @@ by their existing Compose panels.
 - Python3.15.1 `test_verify_conductor.py`: 19 tests passed.
 - Python3.15.1 `scripts/verify_conductor.py`: passed, 243 documents, 21 tracks,
   25 synthetic scenarios; `git diff --check` passed.
-- Android compile/package checks: pending hosted workflow.
+- Hosted GitHub Actions runs `40076808071` and `40076812557`: all qualification,
+  slice, Compose prototype and multiplatform UI checks passed. Android development
+  slice build and unsigned release packaging passed. Instrumentation sources were
+  compiled but not executed on an emulator.
 - Emulator execution, including grant/deny/revocation: pending selected local
   emulator availability; compiling instrumentation sources is not runtime proof.
 
