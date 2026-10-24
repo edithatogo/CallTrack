@@ -108,6 +108,7 @@ class UiSafety(unittest.TestCase):
             'FATAL EXCEPTION: main\n'
             'Process: org.calltrack.community.dev.test, PID: 4321\n'
             'java.lang.SecurityException: private number 0000000000\n'
+            '\tat org.calltrack.community.dev.test.slice.ImportUiTest.run(ImportUiTest.java:120)\n'
             'ANR in org.calltrack.community.dev\n'
             'Permission Denial: private account details\n'
             'GrantPermissionsActivity visible\n'
@@ -119,8 +120,22 @@ class UiSafety(unittest.TestCase):
         self.assertIn('runtime-permission-denial=true', diagnostic)
         self.assertIn('runtime-permission-controller=true', diagnostic)
         self.assertIn('runtime-exception=java.lang.SecurityException', diagnostic)
+        self.assertIn('runtime-fatal-process=test', diagnostic)
+        self.assertIn('runtime-fatal-source=test', diagnostic)
         self.assertNotIn('0000000000', diagnostic)
         self.assertNotIn('private account details', diagnostic)
+
+    def test_runtime_diagnostic_classifies_input_method_without_retaining_stack_text(self):
+        diagnostic = device.runtime_failure_summary(
+            'FATAL EXCEPTION: main\n'
+            'Process: com.google.android.inputmethod.latin, PID: 4321\n'
+            'java.lang.IllegalStateException: private text\n'
+            '\tat com.google.android.inputmethod.latin.SomeClass.run(SomeClass.java:12)\n'
+        )
+        self.assertIn('runtime-fatal-process=input-method', diagnostic)
+        self.assertIn('runtime-fatal-source=input-method', diagnostic)
+        self.assertNotIn('SomeClass', diagnostic)
+        self.assertNotIn('private text', diagnostic)
 
     def test_nonzero_instrumentation_failure_uses_bounded_host_diagnostics(self):
         activity_dump = (

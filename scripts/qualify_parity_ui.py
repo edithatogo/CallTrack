@@ -265,6 +265,43 @@ def runtime_failure_summary(logcat):
     )
     if exception:
         categories.append('runtime-exception=' + exception.group(1))
+    fatal = re.search(
+        r'FATAL EXCEPTION:[^\n]*\n(?P<body>.*?)(?:\n\s*\n|\Z)',
+        logcat,
+        re.DOTALL,
+    )
+    if fatal:
+        body = fatal.group('body')
+        process = re.search(r'^Process:\s*([A-Za-z0-9_.]+)(?:,|\s|$)', body, re.MULTILINE)
+        if process:
+            package = process.group(1)
+            if package == TEST_PACKAGE:
+                categories.append('runtime-fatal-process=test')
+            elif package == PACKAGE:
+                categories.append('runtime-fatal-process=app')
+            elif package in ('com.android.permissioncontroller',
+                             'com.google.android.permissioncontroller'):
+                categories.append('runtime-fatal-process=permission-controller')
+            elif package.startswith(('com.android.inputmethod',
+                                     'com.google.android.inputmethod')):
+                categories.append('runtime-fatal-process=input-method')
+            elif package.startswith(('android.', 'com.android.')):
+                categories.append('runtime-fatal-process=platform')
+        frame = re.search(r'^\s*at\s+([A-Za-z0-9_.$]+)\(', body, re.MULTILINE)
+        if frame:
+            owner = frame.group(1)
+            if owner.startswith(TEST_PACKAGE + '.'):
+                categories.append('runtime-fatal-source=test')
+            elif owner.startswith(PACKAGE + '.'):
+                categories.append('runtime-fatal-source=app')
+            elif owner.startswith(('com.android.permissioncontroller.',
+                                   'com.google.android.permissioncontroller.')):
+                categories.append('runtime-fatal-source=permission-controller')
+            elif owner.startswith(('com.android.inputmethod.',
+                                   'com.google.android.inputmethod.')):
+                categories.append('runtime-fatal-source=input-method')
+            elif owner.startswith(('android.', 'com.android.')):
+                categories.append('runtime-fatal-source=platform')
     return ' '.join(categories)
 
 
