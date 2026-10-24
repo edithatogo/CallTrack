@@ -27,10 +27,10 @@ def native_failure_summary(method, output):
     frames = []
     for line in output.splitlines():
         frame = line.strip()
-        if (frame.startswith('at com.markobl.calllogsync.slice.PositiveUiTest.')
-                and 'PositiveUiTest.java:' in frame):
+        if (frame.startswith('at com.markobl.calllogsync.slice.')
+                and re.search(r'(?:PositiveUiTest|ImportUiTest|RecoveryUiTest|ParityProviderTest|RenderedUi)\.java:\d+', frame)):
             frames.append(frame)
-    detail = '; '.join(frames[:3])
+    detail = '; '.join(frames[:6])
     # The rendered accessibility gate may fail on an unlabeled control. Retain
     # only its resource ID and widget class; suppress its visible text/label.
     control = re.search(
@@ -62,13 +62,17 @@ def native_failure_summary(method, output):
         detail = (detail + '; ' if detail else '') + 'permission-dialog-choice-did-not-advance'
     elif 'Permission dialog sequence did not complete' in output:
         detail = (detail + '; ' if detail else '') + 'permission-dialog-sequence-incomplete'
+    if 'Refusing nonempty call provider' in output:
+        detail = (detail + '; ' if detail else '') + 'synthetic-calllog-provider-not-empty'
+    if 'java.lang.AssertionError: expected non-null' in output:
+        detail = (detail + '; ' if detail else '') + 'expected-provider-result-was-null'
     missing_permission = re.search(
         r'Visible enabled control missing: (permission_(?:deny|allow)_button)', output)
     if missing_permission:
         detail = (detail + '; ' if detail else '') + (
             'missing-permission-control=' + missing_permission.group(1))
     permission_root = re.search(
-        r'permission-root=(com\.android\.permissioncontroller|com\.google\.android\.permissioncontroller|com\.android\.packageinstaller|com\.google\.android\.packageinstaller|unavailable)',
+        r'permission-root=(com\.android\.permissioncontroller|com\.google\.android\.permissioncontroller|com\.android\.packageinstaller|com\.google\.android\.packageinstaller|unavailable|diagnostic-unavailable)',
         output)
     if permission_root:
         detail = (detail + '; ' if detail else '') + 'permission-root=' + permission_root.group(1)

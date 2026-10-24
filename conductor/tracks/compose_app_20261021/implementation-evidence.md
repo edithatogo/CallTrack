@@ -592,9 +592,12 @@ cleanup and package removal as verified. The public workflow summary retained
 only source lines and hid the numeric inset and permission-dialog category, so
 the runner now exposes allowlisted numeric geometry and fixed permission
 assertion categories while keeping arbitrary labels and dialog text private.
-The API26 measurement was then corrected to use the fixed scroll viewport plus
-its applied top padding, so auto-focused content scrolling cannot mimic system
-bar overlap. API33's missing deny control now records only the system
-permission-controller package and visible clickable resource IDs/classes, not
-the dialog's text. The Android source-bound build and all 19 focused Python
-safety tests pass; the hosted rerun is pending. No API26/API33 pass is claimed.
+The API26 measurement was corrected to use the fixed scroll viewport plus its
+applied top padding, so auto-focused content scrolling cannot mimic system-bar
+overlap. In run 40099074252 the API26 settings suite then passed, while import
+fixture preparation failed; API33 still failed to find its denial control. The
+attempted permission-control detail did not appear in the sanitized job output,
+so the runner now also retains bounded source frames from the synthetic import
+and recovery test classes, plus allowlisted fixture failure categories. The
+Android source-bound build and all 20 focused Python safety tests pass; another
+hosted run is pending. No API26/API33 matrix pass is claimed.

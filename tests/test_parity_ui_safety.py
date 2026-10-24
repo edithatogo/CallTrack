@@ -43,6 +43,17 @@ class UiSafety(unittest.TestCase):
         self.assertIn('system-inset screen=manual content_top=17 required_top=24', summary)
         self.assertNotIn('private rendered label', summary)
 
+    def test_failure_summary_exposes_fixture_source_frame_without_call_details(self):
+        summary = device.native_failure_summary(
+            'prepareCalendarAndTaggedHistory',
+            'java.lang.AssertionError: private fixture detail\n'
+            '    at com.markobl.calllogsync.slice.ImportUiTest.prepareCalendarAndTaggedHistory(ImportUiTest.java:124)\n'
+            '    at com.markobl.calllogsync.slice.ParityProviderTest.createCalendar(ParityProviderTest.java:109)\n',
+        )
+        self.assertIn('ImportUiTest.java:124', summary)
+        self.assertIn('ParityProviderTest.java:109', summary)
+        self.assertNotIn('private fixture detail', summary)
+
     def test_failure_summary_retains_only_allowlisted_permission_diagnostic(self):
         summary = device.native_failure_summary(
             'renderedPermissionsFiltersConfirmPauseAndReopen',
