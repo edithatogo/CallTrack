@@ -22,6 +22,25 @@ struct ParserContractHarness {
             fatalError("unsupported version was accepted")
         } catch ImportFailure.unsupportedVersion(2) { }
 
+        let negativeTimestamp = "{\"id\":\"\(callID)\",\"direction\":\"incoming\",\"started_at_ms\":-1,\"duration_seconds\":0}"
+        do {
+            _ = try CallLogImporter.preview(data: document(negativeTimestamp))
+            fatalError("negative timestamp was accepted")
+        } catch ImportFailure.invalidTimestamp { }
+
+        let timestampOverflow = "{\"id\":\"\(callID)\",\"direction\":\"incoming\",\"started_at_ms\":9223372036854775807,\"duration_seconds\":1}"
+        do {
+            _ = try CallLogImporter.preview(data: document(timestampOverflow))
+            fatalError("timestamp overflow was accepted")
+        } catch ImportFailure.invalidTimestamp { }
+
+        let tooManyCalls = Array(repeating: record, count: CallLogImporter.maximumCalls + 1)
+            .joined(separator: ",")
+        do {
+            _ = try CallLogImporter.preview(data: document(tooManyCalls))
+            fatalError("too many calls were accepted")
+        } catch ImportFailure.tooManyCalls { }
+
         do {
             _ = try CallLogImporter.preview(data: Data(repeating: 0, count: CallLogImporter.maximumFileBytes + 1))
             fatalError("oversized document was accepted")
@@ -33,6 +52,6 @@ struct ParserContractHarness {
             fatalError("overflowing duration was accepted")
         } catch ImportFailure.invalidDuration { }
 
-        print("PASS: preview, duplicate, version, size, and overflow contracts")
+        print("PASS: preview, identity, version, timestamp, duration, count, and size contracts")
     }
 }

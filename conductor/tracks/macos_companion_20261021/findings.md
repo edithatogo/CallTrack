@@ -16,7 +16,7 @@
 - `xcode-select -p` selects `/Library/Developer/CommandLineTools`; no full Xcode app is installed.
 - The EventKit method-reference probe type-checks against the installed SDK at a macOS 14 deployment target. This proves API declaration visibility only.
 - `swift test --package-path prototypes/macos-companion` fails before compilation with `Could not initialize build system` / `Unknown error parsing property list`. The Command Line Tools-only SDK also lacks the `XCTest` module, so the package test target cannot be type-checked here.
-- The production parser source type-checks with warnings-as-errors against the macOS 14 target. A checked-in direct Swift harness compiles with that source and passed preview, duplicate-ID, unsupported-version, and oversized-input checks. This is focused contract evidence, not package or native app acceptance.
+- The production parser source type-checks with warnings-as-errors against the macOS 14 target. A checked-in direct Swift harness compiles with that source and passes preview, duplicate-ID, unsupported-version, negative/overflowing timestamp, duration overflow, record-count, and oversized-input checks. This is focused contract evidence, not package or native app acceptance; see [parser boundary review](review-20261024-parser-boundaries.md).
 - No EventKit permission was requested, no calendar was enumerated, and no event was written.
 
 ## Supported boundary
