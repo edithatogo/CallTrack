@@ -138,7 +138,7 @@ public class PositiveUiTest {
             "auto_access_action",
             "slice_calendar_picker",
             "import_calendar_picker",
-            "recovery_refresh"
+            "recovery_refresh_action"
         };
         for (int i = 0; i < screens.length; i++) {
             Activity activity =

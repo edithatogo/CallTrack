@@ -240,3 +240,23 @@ acceptance before closing Track 14.
 
 **Rollback:** Restore the previous host IDs and matching host lookups. No
 persisted state, calendar identity or event behavior is affected.
+
+## D14-12: Focus the recovery action rather than its Compose host
+
+**Decision:** The rendered accessibility journey targets
+`recovery_refresh_action`, the Compose button tag, for its keyboard-focus
+assertion. Keep `recovery_refresh` as the Activity's ComposeView host ID for
+existing system-bars coverage.
+
+**Rationale:** After the picker host IDs were separated, API36 advanced to the
+recovery screen and reported `recovery_refresh` enabled but non-focusable. That
+identifier names the host container; the actual refresh button has the distinct
+`recovery_refresh_action` tag. Accessibility acceptance must inspect the
+interactive control, while system-window layout checks may inspect its host.
+
+**Promotion/removal:** No runtime code or behavior changes. The hosted
+accessibility journey must pass for the actual action and retain its rendered
+labels, touch-target and Tab-focus checks.
+
+**Rollback:** Restore the previous accessibility anchor if test-tag semantics
+regress. Keep the host ID untouched.
