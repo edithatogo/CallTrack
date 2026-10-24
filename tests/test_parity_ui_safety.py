@@ -12,6 +12,19 @@ from parity_targets import RECOVERY_AVD, TRACK14_UI_AVD
 
 
 class UiSafety(unittest.TestCase):
+    def test_failure_summary_exposes_source_location_not_rendered_content(self):
+        summary = device.native_failure_summary(
+            'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
+            'INSTRUMENTATION_STATUS: stream=private UI label\n'
+            'java.lang.AssertionError: private UI label\n'
+            '    at com.markobl.calllogsync.slice.PositiveUiTest.assertRenderedAccessibilityControls(PositiveUiTest.java:201)\n'
+            '    at com.markobl.calllogsync.slice.PositiveUiTest.renderedAccessibilityLabelsTargetsAndKeyboardFocus(PositiveUiTest.java:145)\n'
+            '    at org.junit.runner.Runner.run(Runner.java:10)\n',
+        )
+        self.assertIn('PositiveUiTest.java:201', summary)
+        self.assertIn('PositiveUiTest.java:145', summary)
+        self.assertNotIn('private UI label', summary)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)

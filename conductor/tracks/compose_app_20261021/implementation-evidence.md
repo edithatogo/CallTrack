@@ -510,4 +510,11 @@ and the API36 emulator booted successfully in about 52 seconds. The final AVD
 identity comparison failed because the emulator console response included a
 carriage-return line ending. The workflow now normalizes that response before
 comparison and avoids printing raw emulator logs into public Actions output.
-No rendered acceptance result is claimed yet.
+The following hosted attempt passed boot and identity verification. Rendered
+settings, import and recovery journeys passed with cleanup and package-removal
+readback, but accessibility failed in
+`renderedAccessibilityLabelsTargetsAndKeyboardFocus`. Its full instrumentation
+output remains in the ignored runner-local receipt and was not retained in the
+public log, so the failing assertion is not yet known. Added a safe failure
+summary that reports only app test source frames; focused host safety tests pass.
+No accessibility or full hosted UI acceptance result is claimed yet.

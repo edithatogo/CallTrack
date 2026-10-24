@@ -22,6 +22,19 @@ TEST_PACKAGE = PACKAGE + '.test'
 TEST_CLASS = 'com.markobl.calllogsync.slice.PositiveUiTest'
 
 
+def native_failure_summary(method, output):
+    """Return source locations without exposing rendered device content."""
+    frames = []
+    for line in output.splitlines():
+        frame = line.strip()
+        if (frame.startswith('at com.markobl.calllogsync.slice.PositiveUiTest.')
+                and 'PositiveUiTest.java:' in frame):
+            frames.append(frame)
+    detail = '; '.join(frames[:3])
+    suffix = ' (' + detail + ')' if detail else ''
+    return 'Native acceptance failed: ' + method + suffix
+
+
 def qualify(serial, suite="settings", receipt_dir=None):
     if suite not in ("settings", "imports", "recovery", "accessibility"):
         raise ValueError("Unknown UI suite")
@@ -78,7 +91,9 @@ def qualify(serial, suite="settings", receipt_dir=None):
                          '-e', 'class', test_class + '#' + method,
                          TEST_PACKAGE + '/androidx.test.runner.AndroidJUnitRunner')
         if 'OK (1 test)' not in output or 'FAILURES' in output or 'INSTRUMENTATION_FAILED' in output:
-            raise RuntimeError('Native acceptance failed: ' + method)
+            # The full output stays in the ignored receipt; public CI only gets
+            # source locations, never rendered labels or fixture values.
+            raise RuntimeError(native_failure_summary(method, output))
 
     def capture_ui():
         directory = evidence / ('ui-' + receipt['fixture_token'])
