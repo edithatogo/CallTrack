@@ -136,6 +136,13 @@ def native_failure_summary(method, output, declared_permissions=None):
         output)
     if permission_root:
         detail = (detail + '; ' if detail else '') + 'permission-root=' + permission_root.group(1)
+    permission_launcher = re.search(
+        r'permission-launcher=([A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z][A-Za-z0-9_]*){1,15})',
+        output,
+    )
+    if permission_launcher:
+        detail = (detail + '; ' if detail else '') + (
+            'permission-launcher=' + permission_launcher.group(1))
     system_controls = re.findall(
         r':id/([a-z0-9_]+):(android\.[A-Za-z0-9_.$]+):enabled=(true|false)', output)
     if system_controls:

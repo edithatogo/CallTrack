@@ -159,11 +159,22 @@ class UiSafety(unittest.TestCase):
         summary = device.native_failure_summary(
             'renderedRangePreviewCancelConfirmAndRepeat',
             'Visible enabled positive dialog action missing; permission-purpose=contacts '
-            'permission-app-label=visible app label and private permission message\n',
+            'permission-app-label=visible permission-launcher=com.android.shell '
+            'app label and private permission message\n',
         )
         self.assertIn('permission-app-label=visible', summary)
+        self.assertIn('permission-launcher=com.android.shell', summary)
         self.assertNotIn('app label', summary)
         self.assertNotIn('private permission message', summary)
+
+    def test_failure_summary_rejects_unbounded_permission_launcher_text(self):
+        summary = device.native_failure_summary(
+            'renderedRangePreviewCancelConfirmAndRepeat',
+            'Visible enabled positive dialog action missing; '
+            'permission-launcher=+15551234567 private content\n',
+        )
+        self.assertNotIn('permission-launcher=', summary)
+        self.assertNotIn('15551234567', summary)
 
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()

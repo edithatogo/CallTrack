@@ -10,13 +10,17 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.os.ParcelFileDescriptor;
 import android.os.SystemClock;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.function.BooleanSupplier;
 
@@ -512,7 +516,43 @@ final class RenderedUi {
         return "permission-root="
                 + (owners.isEmpty() ? "unavailable" : owners.get(0))
                 + " permission-controls="
-                + controls;
+                + controls
+                + permissionActivityLauncherSummary();
+    }
+
+    /** Read only the launcher package of the visible legacy permission activity. */
+    private String permissionActivityLauncherSummary() {
+        boolean permissionActivity = false;
+        int activityLines = 0;
+        try (ParcelFileDescriptor descriptor =
+                        automation.executeShellCommand("dumpsys activity activities");
+                BufferedReader reader =
+                        new BufferedReader(
+                                new InputStreamReader(
+                                        new FileInputStream(descriptor.getFileDescriptor()),
+                                        StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("GrantPermissionsActivity")) {
+                    permissionActivity = true;
+                    activityLines = 0;
+                } else if (line.trim().startsWith("* Hist #")) {
+                    permissionActivity = false;
+                    activityLines = 0;
+                }
+                if (!permissionActivity) continue;
+                activityLines++;
+                java.util.regex.Matcher launcher =
+                        java.util.regex.Pattern.compile(
+                                        "launchedFromPackage=([A-Za-z][A-Za-z0-9_]*(?:\\.[A-Za-z][A-Za-z0-9_]*){1,15})")
+                                .matcher(line);
+                if (launcher.find()) return " permission-launcher=" + launcher.group(1);
+                if (activityLines >= 20) permissionActivity = false;
+            }
+        } catch (Exception ignored) {
+            return " permission-launcher=diagnostic-unavailable";
+        }
+        return " permission-launcher=unavailable";
     }
 
     private void collectPermissionControls(
