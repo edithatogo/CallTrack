@@ -1,12 +1,12 @@
 {
   "track": "Track 15 KMP compiler and shared-test dependency audit",
   "date": "2026-10-24",
-  "scope": "Only new artifacts introduced by the KMP shared module and common tests; original Gradle verification entries are preserved.",
-  "artifact_count": 12,
+  "scope": "New Gradle verification artifacts introduced by the KMP shared module and common tests, plus a separately identified native tool dependency audit; original Gradle verification entries are preserved.",
+  "artifact_count": 14,
   "all_new_artifacts_match_canonical_https_bytes": true,
   "metadata_generation_alone_is_not_trust_approval": true,
   "release_ready": false,
-  "license_evidence": "Fresh Maven Central POM reads declare Apache-2.0 for kotlin-test, kotlin-test-junit, kotlin-scripting-common, kotlin-scripting-compiler-embeddable, kotlin-scripting-compiler-impl-embeddable, and kotlin-scripting-jvm.",
+  "license_evidence": "Fresh Maven Central POM reads declare Apache-2.0 for Kotlin test/compiler and Kotlin/Native prebuilt artifacts. The Kotlin/Native release SPDX file lists no packages; the bundle README contains a source-wide third-party licence inventory that is not a binary SBOM or complete applicability determination.",
   "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/",
   "artifacts": [
     {
@@ -176,6 +176,74 @@
           "sha256": "d76413ad2af842264fca36c6780a8cc66500667d990366f254f75a87842a89bc"
         }
       ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-native-prebuilt:2.3.21",
+      "name": "kotlin-native-prebuilt-2.3.21-macos-aarch64.tar.gz",
+      "sha256": [
+        "ae4c8d0d0c18a9dd3ac6a9eb1222c1b902f78ac0996de634f7a771faf5e6e583"
+      ],
+      "matches": true,
+      "size_bytes": 256454474,
+      "downloads": [
+        {
+          "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-native-prebuilt/2.3.21/kotlin-native-prebuilt-2.3.21-macos-aarch64.tar.gz",
+          "sha256": "ae4c8d0d0c18a9dd3ac6a9eb1222c1b902f78ac0996de634f7a771faf5e6e583",
+          "publisher_sha1": "c557c413016b263592b053226bb6a69f7b31d5b4"
+        },
+        {
+          "url": "https://github.com/JetBrains/kotlin/releases/download/v2.3.21/kotlin-native-prebuilt-macos-aarch64-2.3.21.tar.gz",
+          "sha256": "5418391a3b94d7bff6794668c8e813ebc471f46e04f828a35e88469c367efa4d",
+          "publisher_sha256_sidecar_matches": true,
+          "payload_equivalence": {
+            "maven_regular_files": 26128,
+            "release_regular_files": 26128,
+            "member_paths_match": true,
+            "member_sizes_and_sha256_match": true
+          }
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-native-prebuilt:2.3.21",
+      "name": "kotlin-native-prebuilt-2.3.21.pom",
+      "sha256": [
+        "b76ad8c3146787c2e38a059e03419a5e766451e787eefad08b365626daeade3c"
+      ],
+      "matches": true,
+      "downloads": [
+        {
+          "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-native-prebuilt/2.3.21/kotlin-native-prebuilt-2.3.21.pom",
+          "sha256": "b76ad8c3146787c2e38a059e03419a5e766451e787eefad08b365626daeade3c",
+          "publisher_sha1": "a1eb9b4180a5dfe7eb05ace41a0b2c19c5a270bc"
+        }
+      ],
+      "declared_license": "Apache-2.0"
     }
-  ]
+  ],
+  "native_tool_dependencies": [
+    {
+      "name": "llvm-19-aarch64-macos-essentials-81.tar.gz",
+      "url": "https://download.jetbrains.com/kotlin/native/resources/llvm/19-aarch64-macos/llvm-19-aarch64-macos-essentials-81.tar.gz",
+      "sha256": "06991994f4d42dd0229c91cf339ef5353519d8160b52a9b54812e74915d10a87",
+      "publisher_sidecar_matches": true,
+      "qualification": "publisher checksum matches; this does not resolve Xcode or prove the full Kotlin/Native test"
+    },
+    {
+      "name": "lldb-4-macos.tar.gz",
+      "url": "https://download.jetbrains.com/kotlin/native/lldb-4-macos.tar.gz",
+      "sha256": "069193359103d4e4a4653f236e7a963e266a4a366905e858d4a68e701f43866e",
+      "publisher_sidecar_sha256": "6c97f0a4755b83282b037800ac4c0591ebb8e7a3517bb53924bcb61684243d45",
+      "publisher_sidecar_matches": false,
+      "qualification": "untrusted pending publisher explanation or verified matching artifact; not used as acceptance evidence"
+    }
+  ],
+  "native_acceptance": {
+    "status": "pending",
+    "xcodebuild_version": "unavailable; active developer directory is Command Line Tools",
+    "required_xcode": "full Xcode required; Kotlin/Native 2.3.21 konan.properties sets minimalXcodeVersion=12.5 and the macosArm64 target references xcode_26.0.1_17A400",
+    "release_spdx_package_count": 0,
+    "release_spdx_relationship_count": 0,
+    "release_ready": false
+  }
 }
