@@ -46,6 +46,7 @@ public class AutomaticSettingsTest {
             assertTrue("Compose settings status host did not initialize", ready.get());
             assertTrue(activity.findViewById(R.id.auto_intro_panel) instanceof ComposeView);
             assertTrue(activity.findViewById(R.id.auto_permissions) instanceof ComposeView);
+            assertTrue(activity.findViewById(R.id.auto_call_types) instanceof ComposeView);
             RenderedUi rendered = new RenderedUi(instrumentation);
             assertNotNull(rendered.shown("auto_intro_text", true));
             assertNotNull(rendered.shown(context.getString(R.string.auto_intro), false));
@@ -57,13 +58,10 @@ public class AutomaticSettingsTest {
                                 0,
                                 ((Spinner) activity.findViewById(R.id.auto_calendar_picker))
                                         .getSelectedItemPosition());
-                        assertTrue(
-                                ((CheckBox) activity.findViewById(R.id.auto_incoming)).isChecked());
-                        assertTrue(
-                                ((CheckBox) activity.findViewById(R.id.auto_outgoing)).isChecked());
-                        assertTrue(
-                                ((CheckBox) activity.findViewById(R.id.auto_missed)).isChecked());
                     });
+            assertTrue(rendered.shown("auto_incoming", true).isChecked());
+            assertTrue(rendered.shown("auto_outgoing", true).isChecked());
+            assertTrue(rendered.shown("auto_missed", true).isChecked());
             assertFalse(
                     context.getSharedPreferences("slice", Context.MODE_PRIVATE)
                             .contains("automaticActivation"));
