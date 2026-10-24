@@ -5,7 +5,6 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.View
 import android.widget.*
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Column
@@ -52,7 +51,6 @@ internal fun AutomaticStatusPanel(state: AutomaticStatusUiState) {
 /** Explicit activation controls; reopening can resume enabled policy but never enable it. */
 class AutomaticSettingsActivity : ComponentActivity() {
     private val executor = Executors.newSingleThreadExecutor()
-    private var destination: Spinner? = null
     private var enable: Button? = null
     private var pause: Button? = null
     private var statePanel: ComposeView? = null
@@ -72,7 +70,9 @@ class AutomaticSettingsActivity : ComponentActivity() {
     private var reloadReconcile = false
     private var callTypesState by mutableStateOf(AutomaticCallTypesUiState())
     private var callTypesEnabled by mutableStateOf(true)
+    private var destinationUiState by mutableStateOf(AutomaticDestinationUiState())
     private var restoredCallTypes = false
+    private var destinationOptionTokens: List<String> = Collections.emptyList()
 
     public override fun onCreate(saved: Bundle?) {
         super.onCreate(saved)
@@ -120,35 +120,21 @@ class AutomaticSettingsActivity : ComponentActivity() {
                 }
             }
         layout.addView(access)
-        destination = Spinner(this)
-        destination!!.id = R.id.auto_calendar_picker
-        destination!!.contentDescription = getString(R.string.slice_choose)
-        layout.addView(destination)
-        destination!!.adapter =
-            ArrayAdapter(
-                this,
-                android.R.layout.simple_spinner_dropdown_item,
-                Collections.singletonList(getString(R.string.slice_choose)),
-            )
-        destination!!.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long,
-                ) {
-                    selected =
-                        if (position > 0 && position <= choices.size) choices[position - 1].id
-                        else -1
-                    buttons()
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                    selected = -1
-                    buttons()
+        val destinationPanel =
+            ComposeView(this).apply {
+                id = R.id.auto_calendar_picker
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    AutomaticDestinationPanel(
+                        state = destinationUiState,
+                        chooseLabel = getString(R.string.slice_choose),
+                        onSelect = ::selectDestination,
+                    )
                 }
             }
+        layout.addView(destinationPanel)
         val callTypes =
             ComposeView(this).apply {
                 id = R.id.auto_call_types
@@ -233,7 +219,7 @@ class AutomaticSettingsActivity : ComponentActivity() {
                     callAccess() &&
                     (callTypesState.incoming || callTypesState.outgoing || callTypesState.missed)
         pause?.isEnabled = !busy
-        destination?.isEnabled = !busy && calendarAccess()
+        destinationUiState = destinationUiState.copy(enabled = !busy && calendarAccess())
         callTypesEnabled = !busy
     }
 
@@ -341,24 +327,30 @@ class AutomaticSettingsActivity : ComponentActivity() {
                             getString(R.string.auto_failure_count, worker?.failures ?: 0L),
                         )
                     choices = loaded
+                    destinationOptionTokens = loaded.map { java.util.UUID.randomUUID().toString() }
                     renderStatus()
-                    val labels = ArrayList<String?>()
-                    labels.add(getString(R.string.slice_choose))
-                    var position = 0
                     val preferred =
                         if (initialised) selected
                         else
                             settings?.calendar
                                 ?: getSharedPreferences("slice", MODE_PRIVATE)
                                     .getLong("calendar", -1)
-                    for (i in loaded.indices) {
-                        labels.add(loaded[i].name)
-                        if (loaded[i].id == preferred) position = i + 1
-                    }
-                    selected = if (position == 0) -1 else loaded[position - 1].id
-                    destination!!.adapter =
-                        ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, labels)
-                    destination!!.setSelection(position)
+                    val preferredIndex = loaded.indexOfFirst { it.id == preferred }
+                    selected = if (preferredIndex < 0) -1 else loaded[preferredIndex].id
+                    destinationUiState =
+                        AutomaticDestinationUiState(
+                            options =
+                                loaded.mapIndexed { index, choice ->
+                                    AutomaticDestinationOption(
+                                        destinationOptionTokens[index],
+                                        choice.name,
+                                    )
+                                },
+                            selectedToken =
+                                if (preferredIndex < 0) null
+                                else destinationOptionTokens[preferredIndex],
+                            enabled = !busy && calendarAccess(),
+                        )
                     if (!initialised && settings != null && !restoredCallTypes) {
                         callTypesState =
                             AutomaticCallTypesUiState(
@@ -391,6 +383,14 @@ class AutomaticSettingsActivity : ComponentActivity() {
             reloadReconcile = false
             load(reconcile)
         }
+    }
+
+    private fun selectDestination(token: String) {
+        val index = destinationOptionTokens.indexOf(token)
+        if (index !in choices.indices || busy) return
+        selected = choices[index].id
+        destinationUiState = destinationUiState.copy(selectedToken = token)
+        buttons()
     }
 
     private fun workerMessage(code: String?): Int =
