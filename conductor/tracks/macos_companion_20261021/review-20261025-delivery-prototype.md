@@ -28,8 +28,8 @@ deletions remain terminal and are not silently overwritten or recreated.
 - `python3 scripts/verify_conductor.py` — passed (253 documents, 21 tracks, 25 synthetic scenarios).
 - `actionlint .github/workflows/macos-companion.yml` — passed.
 - `python3 -m json.tool conductor/tracks/macos_companion_20261021/metadata.json` and `git diff --check` — passed.
-- `swift test --build-system native --package-path prototypes/macos-companion` — could not run tests because this computer has only Command Line Tools and no `XCTest` module. The hosted macOS workflow must qualify both XCTest targets before this slice can be accepted.
-- Hosted macOS runs compile the XCTest target and pass the parser suite and two delivery tests, but abort while entering the larger persistence/deduplication XCTest. Symlink rejection and the full persistence/deduplication proof are covered by the standalone delivery harness; the redundant XCTest case was removed while the underlying runner failure is investigated. Hosted qualification must pass before acceptance.
+- `swift test --build-system native --package-path prototypes/macos-companion` — cannot run on this computer because it has only Command Line Tools and no `XCTest` module. The hosted macOS workflow runs the parser XCTest suite and the standalone delivery fault harness.
+- Hosted macOS runs compiled the delivery tests and passed early cases, but the XCTest process aborted while entering later cases. The delivery tests were consolidated into the standalone harness, which exercises persistence/deduplication, symlink rejection, confirmation, uncertain writes, permission loss, deletion preservation and identity conflict without XCTest. Hosted qualification must pass before acceptance.
 
 ## Remaining gates
 

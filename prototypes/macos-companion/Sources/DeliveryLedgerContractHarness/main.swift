@@ -87,6 +87,15 @@ struct DeliveryLedgerContractHarness {
       preview: flowPreview,
       destinationCalendarID: "synthetic-calendar"
     )[0]
+    do {
+      _ = try await coordinator.confirmAndDeliver(
+        operationIDs: [deliveryIntent.operationID],
+        userConfirmed: false
+      )
+      preconditionFailure("Delivery proceeded without confirmation")
+    } catch CalendarDeliveryFailure.userConfirmationRequired {
+      precondition(gateway.insertCount == 0, "Unconfirmed delivery reached the provider")
+    }
     gateway.throwAfterInsert = true
     do {
       _ = try await coordinator.confirmAndDeliver(
@@ -105,6 +114,30 @@ struct DeliveryLedgerContractHarness {
     )
     precondition(recoveredDelivery.reconciled == 1)
     precondition(gateway.insertCount == 1, "Uncertain save was blindly repeated")
+
+    gateway.authorizationState = .denied
+    do {
+      _ = try await coordinator.confirmAndDeliver(
+        operationIDs: [deliveryIntent.operationID],
+        userConfirmed: true
+      )
+      preconditionFailure("Delivery continued after permission loss")
+    } catch CalendarDeliveryFailure.accessNotGranted {
+      precondition(gateway.insertCount == 1, "Permission loss triggered another write")
+    }
+    gateway.authorizationState = .fullAccess
+    gateway.removeAllEvents()
+    let deletion = try await coordinator.confirmAndDeliver(
+      operationIDs: [deliveryIntent.operationID],
+      userConfirmed: true
+    )
+    precondition(deletion.deleted == 1, "Human deletion was not retained")
+    precondition(gateway.insertCount == 1, "Human deletion was silently recreated")
+    let deletedIntent = try reopened.intent(operationID: deliveryIntent.operationID)
+    precondition(
+      deletedIntent?.state == .deleted,
+      "Deletion state did not persist"
+    )
     print(
       "PASS: durable intent, private file, symlink rejection, dedupe, state recovery, human-edit/delete preservation, and identity conflict"
     )
@@ -169,6 +202,10 @@ private final class HarnessEventCalendarGateway: EventCalendarGateway {
 
   func event(identifier: String) -> CalendarEventSnapshot? {
     storedEvents[identifier]
+  }
+
+  func removeAllEvents() {
+    storedEvents.removeAll()
   }
 
   func events(

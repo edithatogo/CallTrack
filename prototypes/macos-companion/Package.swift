@@ -20,6 +20,5 @@ let package = Package(
             dependencies: ["CallTrackDelivery", "CallTrackImport"]
         ),
         .testTarget(name: "CallTrackImportTests", dependencies: ["CallTrackImport"]),
-        .testTarget(name: "CallTrackDeliveryTests", dependencies: ["CallTrackDelivery", "CallTrackImport"]),
     ]
 )
