@@ -28,6 +28,8 @@
 - [x] Task: Migrate the zone-formatted historical-import explanatory text to a read-only Compose panel with a stable host; keep time-zone, session and provider state in the Activity.
 - [x] Task: Migrate the launcher manual screen's calendar-access and destination controls to Compose; retain provider/permission operations in the Activity, preserve the `slice_calendar_picker` accessibility identity and stored calendar ID, and require an explicit option tap (see [review](review-20261025-manual-destination.md)).
 - [x] Task: Run hosted rendered acceptance for the manual provider selection/reopen flow on API26/API33/API36, including API-specific accessibility and permission coverage. Run 40165971174 attempt 2 passed settings/imports/recovery/accessibility on all three APIs; every suite verified fixture cleanup, package removal and screenshot hashes, and each settings suite exercised explicit manual calendar selection. Attempt 1's API26 focus failure remains recorded; retry passed on exact app/test source.
+- [x] Task: Move the manual launcher's remaining intro, panel layout and automatic-settings navigation into a lifecycle-disposed Compose screen; retain Activity-owned permissions, provider reads, destination IDs and delivery (D14-13; `97a7739`, see [review](review-20261025-manual-screen.md)).
+- [ ] Task: Run the new pure Compose manual-screen callback test and the rendered manual-provider journey on API26/API33/API36; verify Compose identifiers, scroll/insets and fixture cleanup.
 - [ ] Task: Migrate historical import and recovery screen by screen; preserve IDs, destination binding, operation ownership and saved-state semantics.
 - [ ] Task: Qualify real permission/revocation, destination disappearance, cancellation/recreation/process restore, font/RTL, TalkBack/Switch Access and no synchronization regression; remove replaced Views only after parity.
 - [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md).
@@ -81,3 +83,8 @@
 ## Phase: Review Fixes — manual destination runtime acceptance
 - [x] Task: Diagnose the API26 keyboard-focus probe when its screen anchor is disabled; select an enabled clickable app control for the keyboard journey while preserving the visible-focus assertion. Android-test compilation passed. (fb034f3)
 - [x] Task: Rerun the hosted API26/API33/API36 matrix on this exact source, preserve the first API26 failure, and verify the successful retry with fixture cleanup and artifact receipts (run 40165971174 attempt 2).
+
+## Phase: Review Fixes — manual launcher Compose screen
+
+- [x] Task: Review the complete manual launcher diff, correct the instrumentation assertion to inspect the Activity held in its array, and rerun Android test compilation, unit tests, lint, APK assembly, Conductor tests and format checks (commit `97a7739`; see [review](review-20261025-manual-screen.md)).
+- [ ] Task: Run the pure Compose callback test and manual provider journey on API26/API33/API36, then record exact-source receipts and cleanup results.
