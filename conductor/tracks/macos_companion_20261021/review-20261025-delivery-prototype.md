@@ -30,7 +30,7 @@ deletions remain terminal and are not silently overwritten or recreated.
 - `python3 -m json.tool conductor/tracks/macos_companion_20261021/metadata.json` and `git diff --check` — passed.
 - `swift test --build-system native --package-path prototypes/macos-companion` — cannot run on this computer because it has only Command Line Tools and no `XCTest` module. The hosted macOS workflow runs the parser XCTest suite and the standalone delivery fault harness.
 - Hosted macOS runs compiled the delivery tests and passed early cases, but the XCTest process aborted while entering later cases. The delivery tests were consolidated into the standalone harness, which exercises persistence/deduplication, symlink rejection, confirmation, uncertain writes, permission loss, deletion preservation and identity conflict without XCTest. Hosted qualification must pass before acceptance.
-- After consolidating delivery checks in the harness, the PR's hosted macOS workflow passed, along with the Android slice, API 26/33+ qualification matrix, Compose prototype and Compose Multiplatform checks. Runs: `40147893596`, `40147890419`, `40147893652`, and `40147890495`. PR #82 remains open pending merge; these checks do not constitute native EventKit acceptance.
+- After consolidating delivery checks in the harness, the PR's hosted macOS workflow passed, along with the Android slice, API 26/33+ qualification matrix, Compose prototype and Compose Multiplatform checks. Runs: `40147893596`, `40147890419`, `40147893652`, and `40147890495`. PR #82 was merged as `93c81ab6b6b82d1254ed3f90d4f699285e2d2582`; these checks do not constitute native EventKit acceptance.
 
 ## Remaining gates
 
