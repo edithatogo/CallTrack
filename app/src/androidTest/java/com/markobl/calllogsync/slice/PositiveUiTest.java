@@ -216,15 +216,15 @@ public class PositiveUiTest {
         RenderedUi ui = new RenderedUi(instrumentation);
         Class<?>[] screens = {
             AutomaticSettingsActivity.class,
-            CalendarSliceActivity.class,
             HistoricalImportActivity.class,
-            ReceiptRecoveryActivity.class
+            ReceiptRecoveryActivity.class,
+            CalendarSliceActivity.class
         };
         String[] anchors = {
             "auto_access_action",
-            "slice_calendar_picker",
             "import_calendar_picker",
-            "recovery_refresh_action"
+            "recovery_refresh_action",
+            "slice_calendar_picker"
         };
         for (int i = 0; i < screens.length; i++) {
             Activity activity =

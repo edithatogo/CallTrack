@@ -59,6 +59,13 @@ acceptance.
   screen without exposing visible text. That matrix is pending and this slice
   remains unaccepted until it passes or a documented, reviewed compatibility
   adjustment is qualified.
+- Hosted run [40158783286](https://github.com/edithatogo/CallTrack/actions/runs/40158783286)
+  passed API33 and API36. API26 failed twice at `import_calendar_picker` after
+  the manual screen's focus check had passed. To avoid carrying focus state from
+  the new screen into existing screens, the instrumentation now runs the
+  established settings/import/recovery checks first and the manual screen last.
+  The Android test sources compile locally; a fresh hosted matrix on this order
+  is pending.
 - The latest diagnostic change passed `tests.test_parity_ui_safety` (35 tests)
   on Python3.15.1; `git diff --check` is clean.
 
