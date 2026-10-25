@@ -291,7 +291,8 @@ public class PositiveUiTest {
                         inputFocusRequested[0]);
                 android.view.accessibility.AccessibilityNodeInfo focusTarget = node;
                 if (!node.isEnabled()) {
-                    focusTarget = firstEnabledFocusableControl(ui.automation.getRootInActiveWindow());
+                    focusTarget =
+                            firstEnabledFocusableControl(ui.automation.getRootInActiveWindow());
                 }
                 assertNotNull(
                         "Screen has no enabled focusable control for keyboard acceptance " + anchor,
