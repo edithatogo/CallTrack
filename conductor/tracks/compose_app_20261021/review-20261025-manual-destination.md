@@ -1,0 +1,105 @@
+# Review: Manual calendar destination Compose slice
+
+Date: 2026-10-25
+Scope: launcher manual-log calendar access and destination controls. This review
+does not close Track14's broader screen parity, physical-device or operational
+acceptance.
+
+## Findings and decisions
+
+- Replaced the manual screen's `Button` and `Spinner` with a
+  lifecycle-disposed `ComposeView` and explicit Compose controls. Kept
+  `requestPermissions`, calendar provider reads, selection persistence and
+  delivery in `CalendarSliceActivity`.
+- Preserved the `slice_calendar_picker` accessibility resource ID and the
+  existing `slice` preference key `calendar`.
+- Bound provider options to fresh opaque tokens for each asynchronous provider
+  read. The Activity maps only the current token set to provider IDs and ignores
+  missing tokens, permission loss and actions during refresh or delivery.
+- Preserved saved-selection restoration and missing-destination behavior. Added
+  a safe label for null/blank provider display names.
+- Added Compose coverage for explicit access and destination callbacks and stale
+  selection tokens. Extended provider instrumentation and the hosted settings
+  journey to choose a visible fixture calendar and verify the stored ID without
+  invoking logging.
+- The first hosted matrix run failed all three APIs at an assertion that
+  compared a button's `contentDescription` to its label. The acceptance harness
+  now checks the unchanged preference after provider loading and verifies the
+  selected option's visible text separately; it does not infer failure from a
+  platform-specific accessibility property.
+- Review found the rendered helper's touch selectors were private. Added narrow
+  visible-ID/text touch methods for the new acceptance path; no application
+  control bypasses accessibility discovery or actual touch injection.
+
+## Verification
+
+- JDK17.0.21.0.2 / SDK36: `:app:testDebugUnitTest`, `:app:lintDebug`,
+  `:app:compileDebugAndroidTestKotlin`,
+  `:app:compileDebugAndroidTestJavaWithJavac` and
+  `:app:assembleDebugAndroidTest` passed.
+- Pinned google-java-format1.24.0 and ktfmt0.59 passed.
+- Python3.15.1: 54 `tests.test_parity_ui_safety` and
+  `tests.test_verify_conductor` tests passed; `scripts/verify_conductor.py`
+  passed (254 documents, 21 tracks, 25 synthetic scenarios).
+- `git diff --check` passed.
+- Instrumentation sources compile. Rendered runtime for this source revision
+  remains pending because the only enumerated local emulator is offline; the PR
+  hosted API26/API33/API36 matrix is the next required acceptance evidence.
+- Hosted run [40156597838](https://github.com/edithatogo/CallTrack/actions/runs/40156597838)
+  failed on API26/API33/API36 at the initial `contentDescription` comparison;
+  fixture cleanup and package removal passed on each. The assertion fix is in
+  the follow-up commit and required a fresh matrix before acceptance.
+- Hosted run [40157221270](https://github.com/edithatogo/CallTrack/actions/runs/40157221270)
+  passed all four UI journeys on API33. API36 first stopped at the emulator
+  phone-service health gate, then passed on the failed-job retry. API26 passed
+  settings, imports and recovery, then failed the broader keyboard-focus
+  journey twice; its second run returned an app-owned focus assertion at the
+  focus-wait source line. A follow-up now retains only the safe accessibility
+  resource ID for that assertion, so the next run can identify the affected
+  screen without exposing visible text. At that checkpoint the matrix remained pending; the eventual result is
+  recorded below.
+- Hosted run [40158783286](https://github.com/edithatogo/CallTrack/actions/runs/40158783286)
+  passed API33 and API36. API26 failed twice at `import_calendar_picker` after
+  the manual screen's focus check had passed. To avoid carrying focus state from
+  the new screen into existing screens, the instrumentation now runs the
+  established settings/import/recovery checks first and the manual screen last.
+  The Android test sources compile locally; a fresh hosted matrix on this order
+  is pending.
+- Hosted run [40160333619](https://github.com/edithatogo/CallTrack/actions/runs/40160333619)
+  reproduced the API26 failure at `import_calendar_picker` despite the ordering
+  change; API33 and API36 passed. The shared Compose action now declares an
+  explicit enabled focus target in addition to click handling. Local unit tests
+  and Android test compilation pass; the new hosted matrix must verify whether
+  this addresses the older API behavior.
+- Hosted run [40161132623](https://github.com/edithatogo/CallTrack/actions/runs/40161132623)
+  failed the keyboard-focus assertion for `auto_access_action` on all three
+  APIs after the explicit focus-target change. This showed that modifier was a
+  regression; it has been removed. Keep the original `clickable` semantics and
+  retain API26's intermittent focus-probe failure as an acceptance issue to
+  resolve from a fresh run rather than weakening the app or test.
+- Hosted run [40165028540](https://github.com/edithatogo/CallTrack/actions/runs/40165028540)
+  again passed API33/API36 and failed API26 at the disabled-or-unavailable
+  `import_calendar_picker` anchor. Review traced the test path: when an anchor
+  is disabled it previously focused only the Compose host before sending Tab.
+  The test now selects an enabled, clickable app control as the focus target in
+  that case, while retaining the visible-focus-after-Tab assertion. Android
+  instrumentation compilation passed; run qualification for commit `fb034f3`
+  was pending at that checkpoint. This is a test-fixture correction, not a
+  change to app focus semantics.
+- Hosted run [40165971174 attempt 2](https://github.com/edithatogo/CallTrack/actions/runs/40165971174/attempts/2)
+  passed settings, imports, recovery and accessibility on API26, API33 and API36.
+  The API26 attempt 1 keyboard-focus failure remains visible in the run history;
+  attempt 2 passed without changing application focus semantics. All 12 suite
+  receipts verify fixture cleanup, test-package removal and screenshot hashes;
+  all three settings receipts include the explicit manual destination journey.
+  Build qualification, slice, Compose prototype and multiplatform checks also
+  pass on commit `7feb4f6`.
+- The latest diagnostic change passed `tests.test_parity_ui_safety` (35 tests)
+  on Python3.15.1; `git diff --check` is clean.
+
+## Remaining gates
+
+The manual destination Compose slice passes its local and hosted acceptance.
+Track14 remains open for broader historical-import/recovery migration, process
+and lifecycle restoration, manual assistive technology, physical-device
+permission/provider and operational acceptance.

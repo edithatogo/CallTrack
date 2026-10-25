@@ -3,6 +3,7 @@
 
     <string name="slice_intro" translatable="false">CallTrack development slice. Choose a calendar, then explicitly log the latest call. Automatic logging starts only after you explicitly enable it in Automatic logging settings. Calendar providers may sync saved events to their accounts.</string>
     <string name="slice_calendar_access" translatable="false">Allow calendar access / refresh calendars</string>
+    <string name="slice_unnamed_calendar" translatable="false">Unnamed calendar</string>
     <string name="slice_choose" translatable="false">Choose a destination calendar</string>
     <string name="slice_log_latest" translatable="false">Log latest call</string>
     <string name="slice_permission_needed" translatable="false">Calendar and call-log access are required for this action.</string>

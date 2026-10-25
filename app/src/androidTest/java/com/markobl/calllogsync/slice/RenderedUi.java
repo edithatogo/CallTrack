@@ -268,6 +268,14 @@ final class RenderedUi {
         tap(id, true, false);
     }
 
+    void tapVisibleId(String id) {
+        tap(id, true);
+    }
+
+    void tapVisibleText(String text) {
+        tap(text, false);
+    }
+
     private void tap(String value, boolean id) {
         tap(value, id, true);
     }

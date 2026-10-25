@@ -1,6 +1,8 @@
 package com.markobl.calllogsync.slice
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
@@ -38,5 +40,55 @@ class ManualLogPanelTest {
 
         compose.onNodeWithTag("slice_log_latest").assertIsEnabled().performClick()
         compose.runOnIdle { assertEquals("Only the explicit tap delivers", 1, actions) }
+    }
+
+    @Test
+    fun calendarChoiceIsExplicitAndBoundToTheCurrentLoadToken() {
+        val staleToken = "prior-load-token"
+        val currentToken = "current-load-token"
+        var state by
+            mutableStateOf(
+                ManualCalendarControlsState(
+                    options = listOf(ManualCalendarOption(currentToken, "Work calendar")),
+                    selectedToken = staleToken,
+                    enabled = true,
+                )
+            )
+        var selectedToken: String? = null
+        var accessRequests = 0
+
+        compose.setContent {
+            ManualCalendarControlsPanel(
+                state = state,
+                chooseLabel = "Choose calendar",
+                accessLabel = "Calendar access",
+                unavailableLabel = "No calendars",
+                onRequestAccess = { accessRequests++ },
+                onSelect = { token ->
+                    selectedToken = token
+                    state = state.copy(selectedToken = token)
+                },
+            )
+        }
+
+        compose.runOnIdle {
+            assertEquals(null, selectedToken)
+            assertEquals(0, accessRequests)
+            assertEquals(
+                "A token from a previous provider read is not a current selection",
+                staleToken,
+                state.selectedToken,
+            )
+        }
+        compose.onNodeWithText("Choose calendar").assertIsDisplayed()
+        compose.onNodeWithTag("slice_calendar_access").assertIsDisplayed().performClick()
+        compose.onNodeWithTag("slice_calendar_picker").assertIsDisplayed().performClick()
+        compose.onNodeWithTag("slice_calendar_option_0").assertIsDisplayed().performClick()
+        compose.onNodeWithText("Work calendar").assertIsDisplayed()
+        compose.runOnIdle {
+            assertEquals(currentToken, selectedToken)
+            assertEquals(currentToken, state.selectedToken)
+            assertEquals(1, accessRequests)
+        }
     }
 }

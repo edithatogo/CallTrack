@@ -55,6 +55,21 @@ public class PositiveUiTest {
         return null;
     }
 
+    private android.view.accessibility.AccessibilityNodeInfo firstEnabledFocusableControl(
+            android.view.accessibility.AccessibilityNodeInfo node) {
+        if (node == null || !node.refresh() || !node.isVisibleToUser()) return null;
+        if (node.isEnabled()
+                && node.isFocusable()
+                && node.isClickable()
+                && context().getPackageName().contentEquals(node.getPackageName())) return node;
+        for (int i = 0; i < node.getChildCount(); i++) {
+            android.view.accessibility.AccessibilityNodeInfo match =
+                    firstEnabledFocusableControl(node.getChild(i));
+            if (match != null) return match;
+        }
+        return null;
+    }
+
     private boolean focusComposeHost(android.view.View view) {
         view.setFocusable(true);
         view.setFocusableInTouchMode(true);
@@ -99,6 +114,53 @@ public class PositiveUiTest {
     public void prepareCalendarWithoutCallAccess() {
         assertNull(active());
         assertTrue(state().edit().putLong("calendar", fixture.createCalendar()).commit());
+    }
+
+    @Test
+    public void renderedManualCalendarChoiceRequiresAnExplicitTap() {
+        Context context = context();
+        SharedPreferences preferences = context.getSharedPreferences("slice", Context.MODE_PRIVATE);
+        long previous = preferences.getLong("calendar", -1);
+        long expected = state().getLong("calendar", -1);
+        assertTrue("Prepared synthetic calendar is required", expected > 0);
+        assertTrue(preferences.edit().putLong("calendar", -1).commit());
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        RenderedUi ui = new RenderedUi(instrumentation);
+        Activity[] activity = {null};
+        try {
+            activity[0] =
+                    instrumentation.startActivitySync(
+                            new Intent(context, CalendarSliceActivity.class)
+                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            ui.await(
+                    () -> {
+                        android.view.accessibility.AccessibilityNodeInfo picker =
+                                ui.find("slice_calendar_picker", true);
+                        return picker != null && picker.isEnabled();
+                    },
+                    "Manual destination picker did not load local calendar choices");
+            android.view.accessibility.AccessibilityNodeInfo before =
+                    ui.find("slice_calendar_picker", true);
+            assertNotNull(before);
+            assertEquals(
+                    "A provider read must not select or persist a destination",
+                    -1,
+                    preferences.getLong("calendar", -1));
+            ui.tapVisibleId("slice_calendar_picker");
+            ui.tapVisibleText(fixture.calendarDisplayName());
+            assertEquals(
+                    "Only the explicit option tap persists the provider ID",
+                    expected,
+                    preferences.getLong("calendar", -1));
+            ui.await(
+                    () -> ui.find(fixture.calendarDisplayName(), false) != null,
+                    "Selected local calendar is not shown by the manual picker");
+            // The explicit logging action is deliberately not tapped here; choosing a
+            // destination only changes local selection and cannot deliver by composition.
+        } finally {
+            if (activity[0] != null) instrumentation.runOnMainSync(activity[0]::finish);
+            assertTrue(preferences.edit().putLong("calendar", previous).commit());
+        }
     }
 
     @Test
@@ -169,15 +231,15 @@ public class PositiveUiTest {
         RenderedUi ui = new RenderedUi(instrumentation);
         Class<?>[] screens = {
             AutomaticSettingsActivity.class,
-            CalendarSliceActivity.class,
             HistoricalImportActivity.class,
-            ReceiptRecoveryActivity.class
+            ReceiptRecoveryActivity.class,
+            CalendarSliceActivity.class
         };
         String[] anchors = {
             "auto_access_action",
-            "slice_calendar_picker",
             "import_calendar_picker",
-            "recovery_refresh_action"
+            "recovery_refresh_action",
+            "slice_calendar_picker"
         };
         for (int i = 0; i < screens.length; i++) {
             Activity activity =
@@ -227,9 +289,16 @@ public class PositiveUiTest {
                                                 + ", focusable="
                                                 + initialFocus[0].isFocusable()),
                         inputFocusRequested[0]);
-                if (node.isEnabled())
-                    node.performAction(
-                            android.view.accessibility.AccessibilityNodeInfo.ACTION_FOCUS);
+                android.view.accessibility.AccessibilityNodeInfo focusTarget = node;
+                if (!node.isEnabled()) {
+                    focusTarget =
+                            firstEnabledFocusableControl(ui.automation.getRootInActiveWindow());
+                }
+                assertNotNull(
+                        "Screen has no enabled focusable control for keyboard acceptance " + anchor,
+                        focusTarget);
+                focusTarget.performAction(
+                        android.view.accessibility.AccessibilityNodeInfo.ACTION_FOCUS);
                 try (android.os.ParcelFileDescriptor ignored =
                         instrumentation
                                 .getUiAutomation()

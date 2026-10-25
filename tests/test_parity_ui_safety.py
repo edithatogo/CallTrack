@@ -196,6 +196,15 @@ class UiSafety(unittest.TestCase):
         )
         self.assertIn('non-focusable anchor id=auto_access_action enabled=true', anchor_summary)
 
+        keyboard_summary = device.native_failure_summary(
+            'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
+            'java.lang.AssertionError: Keyboard Tab did not expose visible application focus slice_calendar_picker\n'
+            '    at com.markobl.calllogsync.slice.PositiveUiTest.renderedAccessibilityLabelsTargetsAndKeyboardFocus(PositiveUiTest.java:306)\n'
+            'private visible label must remain hidden\n',
+        )
+        self.assertIn('keyboard-focus-missing anchor id=slice_calendar_picker', keyboard_summary)
+        self.assertNotIn('private visible label', keyboard_summary)
+
     def test_failure_summary_retains_safe_system_inset_measurements(self):
         summary = device.native_failure_summary(
             'renderedActivitiesRespectSystemBars',

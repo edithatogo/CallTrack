@@ -848,3 +848,59 @@ root unavailable; attempt 3 passed. These failures remain visible in Actions
 and are not counted as passing attempts. No product or test-harness code changed
 to obtain the pass. The separate physical-device, provider, manual accessibility
 and operational gates remain open.
+
+## Manual destination/access Compose slice — 2026-10-25
+
+`CalendarSliceActivity` now renders its calendar-access action and destination
+picker through a lifecycle-disposed `ComposeView`. Permission requests, calendar
+provider enumeration, opaque per-read token-to-calendar-ID mapping, preference
+persistence and call delivery remain Activity-owned. Tokens are regenerated on
+each provider read and stale or unavailable tokens cannot select a destination.
+The `slice_calendar_picker` accessibility resource ID and stored `calendar`
+preference contract remain stable. A null/blank provider label receives a
+localized-safe fallback. The settings emulator journey now explicitly opens the
+picker, selects the fixture calendar by its visible label and confirms only
+that user tap persists the expected provider ID; the test does not invoke
+logging.
+
+Local verification on JDK17.0.21.0.2 / SDK36 passed `:app:testDebugUnitTest`,
+`:app:lintDebug`, Android instrumentation Java/Kotlin compilation and
+`:app:assembleDebugAndroidTest`. The Android tests include stale-token/explicit-
+action coverage and provider-backed saved-selection, missing-destination and
+explicit-choice checks. Pinned google-java-format1.24.0 and ktfmt0.59 passed.
+Python3.15.1 host tests passed (54 targeted safety and Conductor tests);
+`scripts/verify_conductor.py` passed with 254 documents, 21 tracks and 25
+synthetic scenarios. `git diff --check` passed.
+
+Local rendered execution remains unavailable: the attached emulator enumerates
+as offline. Hosted API26/API33/API36 rendered selection and screen checks are
+required on the PR's exact source revision. Physical-device, cloud-calendar,
+remote synchronization and operational acceptance remain separate gates.
+
+The first hosted run on this slice, [40156597838](https://github.com/edithatogo/CallTrack/actions/runs/40156597838),
+failed API26/API33/API36 at the test's initial comparison of a picker button's
+`contentDescription` with its visible label. Fixture cleanup and package
+removal were verified on all three. The test now asserts that provider loading
+leaves the stored preference unchanged and separately checks visible option
+text after explicit selection. The final hosted result and later keyboard-focus finding are recorded below.
+
+Later hosted attempts exposed an API26 keyboard-focus assertion on the existing
+historical-import picker. API33/API36 passed on runs
+[40160333619](https://github.com/edithatogo/CallTrack/actions/runs/40160333619)
+and [40165028540](https://github.com/edithatogo/CallTrack/actions/runs/40165028540),
+while API26 reported `import_calendar_picker`. An attempted explicit
+`Modifier.focusable` caused the focus journey to fail on all three APIs and was
+reverted. The rendered acceptance test now focuses an enabled, clickable
+application control when its screen anchor is disabled, then still requires
+visible application focus after Tab. This test-only correction compiled; hosted acceptance was pending at this
+checkpoint. The final result is recorded below. Failed attempts are not counted
+as passes.
+
+The exact-source hosted workflow [40165971174 attempt 2](https://github.com/edithatogo/CallTrack/actions/runs/40165971174/attempts/2)
+then passed all four suites (settings, imports, recovery and accessibility) on
+API26, API33 and API36. All 12 suite receipts record successful fixture cleanup,
+test-package removal and nonempty screenshot hashes; every settings receipt
+includes the explicit manual-calendar-choice journey. Attempt 1's API26
+keyboard-focus failure remains visible as a failed run and is not counted as a
+pass. The formatter, build qualification, slice, Compose prototype,
+multiplatform and source-bound Android UI checks pass on this source revision.

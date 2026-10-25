@@ -13,6 +13,6 @@
   "track_number": 14,
   "execution_stage": 3,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
-  "implementation_status": "PR77 and PR78 merged; hosted source-bound API26/API33/API36 matrix run 40149896511 attempt 3 passed settings, imports, recovery and accessibility on all three platforms with fixture cleanup, test-package removal and screenshot hashes verified per suite. API33 attempts 1 and 2 failed intermittently in the rendered permission-dialog path before attempt 3 passed; these failures remain in the evidence history. Track14 remains active for broader screen parity, process/lifecycle restoration, manual assistive technology, native provider/destination acceptance and operational gates",
+  "implementation_status": "PR77, PR78 and PR84 merged; hosted source-bound API26/API33/API36 matrix run 40151946667 attempt 2 passed settings, imports, recovery and accessibility on all three platforms with fixture cleanup and test-package removal. Manual launcher calendar-access/destination controls are now implemented in Compose with explicit token-bound selection; hosted API26/API33/API36 acceptance passed on run 40165971174 attempt 2 with fixture cleanup, package removal and screenshot evidence. Track14 remains active for remaining historical-import/recovery migration, process/lifecycle restoration, manual assistive technology, native provider/destination acceptance and operational gates",
   "production_adopted": false
 }

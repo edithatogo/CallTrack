@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.View
 import android.widget.*
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.getValue
@@ -13,16 +12,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import com.markobl.calllogsync.R
+import java.util.HashMap
 import java.util.TimeZone
+import java.util.UUID
 import java.util.concurrent.Executors
 
 /** Explicit manual action; any enabled automatic policy is controlled independently. */
 class CalendarSliceActivity : ComponentActivity() {
     private val executor = Executors.newSingleThreadExecutor()
-    private var picker: Spinner? = null
     private var panelState by
         mutableStateOf(ManualLogUiState(logLabel = "", status = "", actionEnabled = false))
-    private var choices: List<AndroidCalendarSink.Choice> = ArrayList()
+    private var destinationState by mutableStateOf(ManualCalendarControlsState())
+    private val destinationTargets = HashMap<String, Long>()
     private var selected = -1L
     private var busy = false
     private var refreshing = false
@@ -37,44 +38,24 @@ class CalendarSliceActivity : ComponentActivity() {
         val intro = TextView(this)
         intro.setText(R.string.slice_intro)
         layout.addView(intro)
-        val permission = Button(this)
-        permission.setText(R.string.slice_calendar_access)
-        layout.addView(permission)
-        permission.setOnClickListener {
-            if (calendarAccess()) refresh()
-            else
-                requestPermissions(
-                    arrayOf(Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR),
-                    1,
+        val calendarControls =
+            ComposeView(this).apply {
+                id = R.id.slice_calendar_controls_panel
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
                 )
-        }
-        picker = Spinner(this)
-        picker!!.id = R.id.slice_calendar_picker
-        picker!!.contentDescription = getString(R.string.slice_choose)
-        layout.addView(picker)
-        picker!!.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long,
-                ) {
-                    selected =
-                        if (position > 0 && position <= choices.size) choices[position - 1].id
-                        else -1
-                    getSharedPreferences("slice", MODE_PRIVATE)
-                        .edit()
-                        .putLong("calendar", selected)
-                        .apply()
-                    updateButton()
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                    selected = -1
-                    updateButton()
+                setContent {
+                    ManualCalendarControlsPanel(
+                        state = destinationState,
+                        chooseLabel = getString(R.string.slice_choose),
+                        accessLabel = getString(R.string.slice_calendar_access),
+                        unavailableLabel = getString(R.string.slice_no_calendars),
+                        onRequestAccess = ::requestCalendarAccess,
+                        onSelect = ::selectDestination,
+                    )
                 }
             }
+        layout.addView(calendarControls)
         val manualPanel =
             ComposeView(this).apply {
                 id = R.id.slice_manual_panel
@@ -115,6 +96,7 @@ class CalendarSliceActivity : ComponentActivity() {
         if (calendarAccess()) refresh()
         else {
             selected = -1
+            destinationState = destinationState.copy(selectedToken = null, enabled = false)
             setStatus(R.string.slice_permission_needed)
             updateButton()
         }
@@ -126,12 +108,30 @@ class CalendarSliceActivity : ComponentActivity() {
             checkSelfPermission(Manifest.permission.WRITE_CALENDAR) ==
                 PackageManager.PERMISSION_GRANTED
 
+    private fun requestCalendarAccess() {
+        if (calendarAccess()) refresh()
+        else
+            requestPermissions(
+                arrayOf(Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR),
+                1,
+            )
+    }
+
+    private fun selectDestination(token: String) {
+        val target = destinationTargets[token] ?: return
+        if (!calendarAccess() || busy || refreshing) return
+        selected = target
+        getSharedPreferences("slice", MODE_PRIVATE).edit().putLong("calendar", selected).apply()
+        destinationState = destinationState.copy(selectedToken = token)
+        updateButton()
+    }
+
     private fun updateButton() {
         panelState =
             panelState.copy(
                 actionEnabled = !busy && !refreshing && selected >= 0 && calendarAccess()
             )
-        picker?.isEnabled = !busy && !refreshing && calendarAccess()
+        destinationState = destinationState.copy(enabled = !busy && !refreshing && calendarAccess())
     }
 
     private fun setStatus(message: Int) {
@@ -193,18 +193,34 @@ class CalendarSliceActivity : ComponentActivity() {
                 runOnUiThread {
                     if (isDestroyed || generation != refreshGeneration) return@runOnUiThread
                     refreshing = false
-                    choices = loaded
-                    val labels = ArrayList<String?>()
-                    labels.add(getString(R.string.slice_choose))
-                    var position = 0
-                    for (i in loaded.indices) {
-                        labels.add(loaded[i].name)
-                        if (loaded[i].id == saved) position = i + 1
+                    destinationTargets.clear()
+                    val options = ArrayList<ManualCalendarOption>()
+                    var selectedToken: String? = null
+                    for (choice in loaded) {
+                        val token = UUID.randomUUID().toString()
+                        destinationTargets[token] = choice.id
+                        options.add(
+                            ManualCalendarOption(
+                                token,
+                                choice.name?.takeIf(String::isNotBlank)
+                                    ?: getString(R.string.slice_unnamed_calendar),
+                            )
+                        )
+                        if (choice.id == saved) selectedToken = token
                     }
-                    selected = if (position == 0) -1 else loaded[position - 1].id
-                    picker!!.adapter =
-                        ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, labels)
-                    picker!!.setSelection(position)
+                    selected = selectedToken?.let(destinationTargets::get) ?: -1
+                    destinationState =
+                        ManualCalendarControlsState(
+                            options = options,
+                            selectedToken = selectedToken,
+                            enabled = false,
+                        )
+                    if (selected < 0) {
+                        getSharedPreferences("slice", MODE_PRIVATE)
+                            .edit()
+                            .putLong("calendar", -1)
+                            .apply()
+                    }
                     setStatus(
                         if (loaded.isEmpty()) R.string.slice_no_calendars else R.string.slice_ready
                     )
@@ -215,6 +231,8 @@ class CalendarSliceActivity : ComponentActivity() {
                     if (!isDestroyed && generation == refreshGeneration) {
                         refreshing = false
                         selected = -1
+                        destinationTargets.clear()
+                        destinationState = ManualCalendarControlsState()
                         setStatus(R.string.slice_calendar_unavailable)
                         updateButton()
                     }
