@@ -1,6 +1,6 @@
 # Review: Manual calendar destination Compose slice
 
-Date: 2026-10-25  
+Date: 2026-10-25
 Scope: launcher manual-log calendar access and destination controls. This review
 does not close Track14's broader screen parity, physical-device or operational
 acceptance.
@@ -49,6 +49,18 @@ acceptance.
   failed on API26/API33/API36 at the initial `contentDescription` comparison;
   fixture cleanup and package removal passed on each. The assertion fix is in
   the follow-up commit and requires a fresh matrix before acceptance.
+- Hosted run [40157221270](https://github.com/edithatogo/CallTrack/actions/runs/40157221270)
+  passed all four UI journeys on API33. API36 first stopped at the emulator
+  phone-service health gate, then passed on the failed-job retry. API26 passed
+  settings, imports and recovery, then failed the broader keyboard-focus
+  journey twice; its second run returned an app-owned focus assertion at the
+  focus-wait source line. A follow-up now retains only the safe accessibility
+  resource ID for that assertion, so the next run can identify the affected
+  screen without exposing visible text. That matrix is pending and this slice
+  remains unaccepted until it passes or a documented, reviewed compatibility
+  adjustment is qualified.
+- The latest diagnostic change passed `tests.test_parity_ui_safety` (35 tests)
+  on Python3.15.1; `git diff --check` is clean.
 
 ## Remaining gates
 
