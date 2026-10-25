@@ -139,6 +139,20 @@ public class PositiveUiTest {
                         return picker != null && picker.isEnabled();
                     },
                     "Manual destination picker did not load local calendar choices");
+            ui.await(
+                    () ->
+                            ui.find("slice_intro", false) != null
+                                    && ui.find("slice_calendar_controls_panel", false) != null
+                                    && ui.find("slice_manual_panel", false) != null
+                                    && ui.find("open_automatic", true) != null,
+                    "Manual launcher presentation did not render through Compose");
+            android.view.ViewGroup content = activity[0].findViewById(android.R.id.content);
+            assertTrue(content.getChildAt(0) instanceof android.widget.ScrollView);
+            android.widget.ScrollView viewport = (android.widget.ScrollView) content.getChildAt(0);
+            assertEquals("Manual screen has one Compose content root", 1, viewport.getChildCount());
+            assertTrue(
+                    "Manual screen presentation must use a Compose root",
+                    viewport.getChildAt(0) instanceof androidx.compose.ui.platform.ComposeView);
             android.view.accessibility.AccessibilityNodeInfo before =
                     ui.find("slice_calendar_picker", true);
             assertNotNull(before);

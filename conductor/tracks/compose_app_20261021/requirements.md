@@ -17,6 +17,7 @@
 | C14-13 | The historical-import explanation may move to Compose without changing the Activity-selected time zone or starting import work. | The stable `import_intro_panel` renders the same localized, zone-formatted text supplied by the Activity and creates no session or provider effect. |
 | C14-14 | Recovery explanations remain read-only when moved to Compose. | Stable intro and retention-copy hosts render the existing localized resources supplied by the Activity; Compose performs no permission, ledger, calendar or retention work. |
 | C14-15 | Automatic-settings introduction and permission access can migrate independently of policy controls. | Stable Compose hosts render the localized introduction and accessible access action; only an explicit tap calls the existing Activity permission request, while destination, filters and activation remain Activity-owned. |
+| C14-16 | The manual launcher's presentation can move into one lifecycle-bound Compose screen without moving effect or destination authority. | The stable accessibility identifiers render from Activity-supplied state; provider choice, permission access, manual delivery and navigation occur only after explicit actions. Existing calendar-ID persistence and inset/scroll behavior remain unchanged. |
 
 Historical-import controls and any remaining recovery parity work stay gated on
 their own lifecycle, accessibility and behavior acceptance. Completed slices do
