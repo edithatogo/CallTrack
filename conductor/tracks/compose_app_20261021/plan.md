@@ -26,6 +26,8 @@
 - [x] Task: Migrate the historical-import destination picker to a lifecycle-disposed ComposeView with Activity-owned provider choices, opaque per-load tokens and saved calendar-ID semantics; keep `import_calendar_picker` stable and do not add Material dependencies.
 - [x] Task: Migrate the historical-import permission-access button to a lifecycle-disposed ComposeView; keep the Android permission prompt and request callback in the Activity.
 - [x] Task: Migrate the zone-formatted historical-import explanatory text to a read-only Compose panel with a stable host; keep time-zone, session and provider state in the Activity.
+- [x] Task: Migrate the launcher manual screen's calendar-access and destination controls to Compose; retain provider/permission operations in the Activity, preserve the `slice_calendar_picker` accessibility identity and stored calendar ID, and require an explicit option tap (see [review](review-20261025-manual-destination.md)).
+- [ ] Task: Run hosted rendered acceptance for the manual provider selection/reopen flow on API26/API33/API36, including API-specific accessibility and permission coverage; local emulator is offline and this source revision still needs hosted runtime evidence.
 - [ ] Task: Migrate historical import and recovery screen by screen; preserve IDs, destination binding, operation ownership and saved-state semantics.
 - [ ] Task: Qualify real permission/revocation, destination disappearance, cancellation/recreation/process restore, font/RTL, TalkBack/Switch Access and no synchronization regression; remove replaced Views only after parity.
 - [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md).
@@ -72,5 +74,6 @@
 - [x] Task: Review the current-main evidence refresh, verify its source/artifact and test references, and preserve explicit emulator acceptance limits (see [review](review-20261024-current-main-refresh.md)).
 - [x] Task: Review and refine sanitized hosted diagnostics for fatal logcat and resumed activity ownership; rerun the hosted matrix and keep API26/API33 acceptance open (see [review](review-20261025-diagnostics.md); commit `0a140e7`).
 - [x] Task: Review the latest merged hosted API26/API33/API36 UI matrix result, reconcile the previously open hosted focus and permission-control findings, and retain separate device/operational gates (see [matrix result review](review-20261025-hosted-matrix-pass.md)).
+- [x] Task: Review manual destination token ownership, explicit selection persistence, permission/provider boundary and test harness; compile Android test sources, run app unit tests/lint, and record hosted-runtime acceptance as a separate pending gate (see [review](review-20261025-manual-destination.md)).
 - [ ] Task: Update requirements, decisions, remaining limitations and next-track inputs; retire superseded code/prototypes only after parity.
 - [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger.

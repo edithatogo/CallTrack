@@ -10,6 +10,7 @@ incremental reviews cover [manual logging](review-20261024-manual-logging.md),
 [historical-import status](review-20261024-import-status.md), [recovery
 feedback](review-20261024-recovery-status.md) and [recovery
 cards/actions](review-20261024-recovery-cards.md). The
+[manual destination/access controls](review-20261025-manual-destination.md),
 [historical-import history review](review-20261024-import-history.md),
 [historical-import destination review](review-20261024-import-destination.md),
 [historical-import access review](review-20261024-import-access.md),

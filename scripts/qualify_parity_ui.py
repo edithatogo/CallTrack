@@ -499,6 +499,7 @@ def qualify(serial, suite="settings", receipt_dir=None):
             check('renderedAccessibilityLabelsTargetsAndKeyboardFocus')
         elif suite == 'settings':
             check('prepareCalendarWithoutCallAccess')
+            check('renderedManualCalendarChoiceRequiresAnExplicitTap')
             for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
                 command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.' + permission)
             ui_attempted = True

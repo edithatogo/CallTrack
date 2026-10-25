@@ -37,6 +37,11 @@ public class CalendarSliceTest {
         return "org.calltrack.community.dev.fixture." + token;
     }
 
+    private String calendarDisplayName() {
+        String token = account();
+        return "CallTrack isolated test " + token.substring(token.length() - 8);
+    }
+
     private Uri syncUri(Uri uri) {
         return uri.buildUpon()
                 .appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, "true")
@@ -95,35 +100,28 @@ public class CalendarSliceTest {
                 .putLong("calendar", savedCalendar)
                 .commit();
         android.app.Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        RenderedUi ui = new RenderedUi(instrumentation);
         android.app.Activity activity =
                 instrumentation.startActivitySync(
                         new Intent(context(), CalendarSliceActivity.class)
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         try {
-            long deadline = android.os.SystemClock.elapsedRealtime() + 10000;
-            java.util.concurrent.atomic.AtomicBoolean ready =
-                    new java.util.concurrent.atomic.AtomicBoolean();
-            do {
-                instrumentation.runOnMainSync(
-                        () -> {
-                            android.widget.Spinner picker =
-                                    activity.findViewById(
-                                            com.markobl.calllogsync.R.id.slice_calendar_picker);
-                            ready.set(
-                                    picker != null
-                                            && picker.isEnabled()
-                                            && picker.getAdapter() != null
-                                            && picker.getAdapter().getCount() > 1
-                                            && (expectChoice
-                                                    ? picker.getSelectedItemPosition() > 0
-                                                    : picker.getSelectedItemPosition() == 0));
-                        });
-                if (ready.get()) break;
-                android.os.SystemClock.sleep(50);
-            } while (android.os.SystemClock.elapsedRealtime() < deadline);
-            assertTrue(
-                    "Picker did not restore explicit choice / missing-destination placeholder",
-                    ready.get());
+            final String[] label = {null};
+            ui.await(
+                    () -> {
+                        android.view.accessibility.AccessibilityNodeInfo picker =
+                                ui.find("slice_calendar_picker", true);
+                        if (picker == null || !picker.isEnabled()) return false;
+                        CharSequence description = picker.getContentDescription();
+                        label[0] = description == null ? null : description.toString();
+                        return expectChoice
+                                ? "CallTrack isolated test".equals(label[0])
+                                : context()
+                                        .getString(com.markobl.calllogsync.R.string.slice_choose)
+                                        .equals(label[0]);
+                    },
+                    "Compose picker did not restore explicit choice / missing-destination"
+                            + " placeholder");
             instrumentation.runOnMainSync(
                     () -> {
                         long actual =
@@ -132,6 +130,45 @@ public class CalendarSliceTest {
                                         .getLong("calendar", -1);
                         assertEquals(expectChoice ? savedCalendar : -1, actual);
                     });
+        } finally {
+            instrumentation.runOnMainSync(activity::finish);
+        }
+    }
+
+    private void chooseCalendar(long expectedId) {
+        android.app.Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        RenderedUi ui = new RenderedUi(instrumentation);
+        android.app.Activity activity =
+                instrumentation.startActivitySync(
+                        new Intent(context(), CalendarSliceActivity.class)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        try {
+            ui.await(
+                    () -> {
+                        android.view.accessibility.AccessibilityNodeInfo picker =
+                                ui.find("slice_calendar_picker", true);
+                        return picker != null && picker.isEnabled();
+                    },
+                    "Manual Compose destination picker did not load provider choices");
+            ui.tapVisibleId("slice_calendar_picker");
+            ui.tapVisibleText(calendarDisplayName());
+            assertEquals(
+                    "Only the explicit provider option tap persists its calendar ID",
+                    expectedId,
+                    context()
+                            .getSharedPreferences("slice", Context.MODE_PRIVATE)
+                            .getLong("calendar", -1));
+            ui.await(
+                    () -> {
+                        android.view.accessibility.AccessibilityNodeInfo picker =
+                                ui.find("slice_calendar_picker", true);
+                        CharSequence description =
+                                picker == null ? null : picker.getContentDescription();
+                        return picker != null
+                                && description != null
+                                && calendarDisplayName().contentEquals(description);
+                    },
+                    "Manual Compose picker did not show the explicitly selected calendar");
         } finally {
             instrumentation.runOnMainSync(activity::finish);
         }
@@ -146,7 +183,7 @@ public class CalendarSliceTest {
             values.put(Calendars.ACCOUNT_NAME, account());
             values.put(Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL);
             values.put(Calendars.NAME, account());
-            values.put(Calendars.CALENDAR_DISPLAY_NAME, "CallTrack isolated test");
+            values.put(Calendars.CALENDAR_DISPLAY_NAME, calendarDisplayName());
             values.put(Calendars.CALENDAR_COLOR, 0xff006699);
             values.put(Calendars.CALENDAR_ACCESS_LEVEL, Calendars.CAL_ACCESS_OWNER);
             values.put(Calendars.OWNER_ACCOUNT, account());
@@ -185,6 +222,7 @@ public class CalendarSliceTest {
             InstrumentationRegistry.getInstrumentation().sendStatus(0, categories);
             verifyPicker(calendar, true);
             verifyPicker(Long.MAX_VALUE, false);
+            chooseCalendar(calendar);
             CallRecord call =
                     new CallRecord(
                             "synthetic-" + account(),

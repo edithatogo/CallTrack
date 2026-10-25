@@ -848,3 +848,31 @@ root unavailable; attempt 3 passed. These failures remain visible in Actions
 and are not counted as passing attempts. No product or test-harness code changed
 to obtain the pass. The separate physical-device, provider, manual accessibility
 and operational gates remain open.
+
+## Manual destination/access Compose slice — 2026-10-25
+
+`CalendarSliceActivity` now renders its calendar-access action and destination
+picker through a lifecycle-disposed `ComposeView`. Permission requests, calendar
+provider enumeration, opaque per-read token-to-calendar-ID mapping, preference
+persistence and call delivery remain Activity-owned. Tokens are regenerated on
+each provider read and stale or unavailable tokens cannot select a destination.
+The `slice_calendar_picker` accessibility resource ID and stored `calendar`
+preference contract remain stable. A null/blank provider label receives a
+localized-safe fallback. The settings emulator journey now explicitly opens the
+picker, selects the fixture calendar by its visible label and confirms only
+that user tap persists the expected provider ID; the test does not invoke
+logging.
+
+Local verification on JDK17.0.21.0.2 / SDK36 passed `:app:testDebugUnitTest`,
+`:app:lintDebug`, Android instrumentation Java/Kotlin compilation and
+`:app:assembleDebugAndroidTest`. The Android tests include stale-token/explicit-
+action coverage and provider-backed saved-selection, missing-destination and
+explicit-choice checks. Pinned google-java-format1.24.0 and ktfmt0.59 passed.
+Python3.15.1 host tests passed (54 targeted safety and Conductor tests);
+`scripts/verify_conductor.py` passed with 254 documents, 21 tracks and 25
+synthetic scenarios. `git diff --check` passed.
+
+Local rendered execution remains unavailable: the attached emulator enumerates
+as offline. Hosted API26/API33/API36 rendered selection and screen checks are
+required on the PR's exact source revision. Physical-device, cloud-calendar,
+remote synchronization and operational acceptance remain separate gates.

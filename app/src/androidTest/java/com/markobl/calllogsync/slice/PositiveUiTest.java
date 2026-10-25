@@ -102,6 +102,59 @@ public class PositiveUiTest {
     }
 
     @Test
+    public void renderedManualCalendarChoiceRequiresAnExplicitTap() {
+        Context context = context();
+        SharedPreferences preferences = context.getSharedPreferences("slice", Context.MODE_PRIVATE);
+        long previous = preferences.getLong("calendar", -1);
+        long expected = state().getLong("calendar", -1);
+        assertTrue("Prepared synthetic calendar is required", expected > 0);
+        assertTrue(preferences.edit().putLong("calendar", -1).commit());
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        RenderedUi ui = new RenderedUi(instrumentation);
+        Activity[] activity = {null};
+        try {
+            activity[0] =
+                    instrumentation.startActivitySync(
+                            new Intent(context, CalendarSliceActivity.class)
+                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            ui.await(
+                    () -> {
+                        android.view.accessibility.AccessibilityNodeInfo picker =
+                                ui.find("slice_calendar_picker", true);
+                        return picker != null && picker.isEnabled();
+                    },
+                    "Manual destination picker did not load local calendar choices");
+            android.view.accessibility.AccessibilityNodeInfo before =
+                    ui.find("slice_calendar_picker", true);
+            assertNotNull(before);
+            assertEquals(
+                    "A provider read must not select or persist a destination",
+                    context.getString(R.string.slice_choose),
+                    before.getContentDescription());
+            ui.tapVisibleId("slice_calendar_picker");
+            ui.tapVisibleText(fixture.calendarDisplayName());
+            assertEquals(
+                    "Only the explicit option tap persists the provider ID",
+                    expected,
+                    preferences.getLong("calendar", -1));
+            ui.await(
+                    () -> {
+                        android.view.accessibility.AccessibilityNodeInfo picker =
+                                ui.find("slice_calendar_picker", true);
+                        return picker != null
+                                && fixture.calendarDisplayName()
+                                        .contentEquals(picker.getContentDescription());
+                    },
+                    "Selected local calendar is not shown by the manual picker");
+            // The explicit logging action is deliberately not tapped here; choosing a
+            // destination only changes local selection and cannot deliver by composition.
+        } finally {
+            if (activity[0] != null) instrumentation.runOnMainSync(activity[0]::finish);
+            assertTrue(preferences.edit().putLong("calendar", previous).commit());
+        }
+    }
+
+    @Test
     public void renderedActivitiesRespectSystemBars() {
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         RenderedUi ui = new RenderedUi(instrumentation);
