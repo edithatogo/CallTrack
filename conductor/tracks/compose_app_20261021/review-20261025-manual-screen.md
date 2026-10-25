@@ -44,6 +44,13 @@ review does not close Track14 or the physical/operational acceptance gates.
   semantics node and separates the rendered waits so a repeat failure is
   attributable to one selector. The new source revision still needs the hosted
   API26/API33/API36 rerun before that acceptance task can close.
+- Hosted run [40169911417](https://github.com/edithatogo/CallTrack/actions/runs/40169911417)
+  failed on all three APIs at the isolated `slice_intro` assertion. Inspection
+  showed that `RenderedUi.find(value, false)` searches visible text, while the
+  supplied value is a Compose resource-ID tag. The assertion now uses ID mode
+  (`true`) for the intro and panel identifiers (commit `733ffc2`). The pure
+  Compose callback test and fixture cleanup/package-removal checks passed on all
+  three jobs; a new source-bound matrix remains required.
 - The local API36 emulator process is not available through the selected ADB
   endpoint, so no local rendered result is claimed. Physical-device and
   broader permission, lifecycle, accessibility and operational acceptance
@@ -51,7 +58,7 @@ review does not close Track14 or the physical/operational acceptance gates.
 
 ## Findings
 
-The hosted identifier issue is corrected in source, pending a fresh matrix
-result. No other implementation findings remain. Broader font/RTL, assistive
-technology, permission/revocation, process restoration, physical-device and
-operational acceptance remain separate Track14 gates.
+The hosted rendered selector is corrected, pending a fresh matrix result. No
+other implementation findings remain. Broader font/RTL, assistive technology,
+permission/revocation, process restoration, physical-device and operational
+acceptance remain separate Track14 gates.

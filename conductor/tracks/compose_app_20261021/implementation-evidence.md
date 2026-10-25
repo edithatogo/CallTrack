@@ -914,7 +914,15 @@ Hosted run [40169350891](https://github.com/edithatogo/CallTrack/actions/runs/40
 then failed API26/API33/API36 at the rendered manual-screen wait for the
 stable intro/panel/navigation identifiers; the preceding picker wait passed.
 All three jobs verified fixture cleanup and test-package removal. The compound
-wait obscured which identifier was absent; commit `ffab440` now assigns
+wait obscured which identifier was absent; commit `ffab440` assigns
 `testTagsAsResourceId` to each tagged semantics node and splits the rendered
-assertions by identifier. This initial run is a failure, not a passing
-acceptance result; a fresh source-bound matrix is required.
+assertions by identifier.
+
+Hosted run [40169911417](https://github.com/edithatogo/CallTrack/actions/runs/40169911417)
+then isolated the API26/API33/API36 failure to `slice_intro`. The rendered
+helper's `find(value, false)` branch compares visible text, but the stable
+Compose identifier must be queried as a resource ID. Commit `733ffc2` changes
+the intro and panel checks to ID mode. The pure Compose callback test and
+fixture cleanup/package-removal checks passed on all three jobs in that run.
+Neither failed run counts as acceptance; a fresh source-bound matrix is
+required.
