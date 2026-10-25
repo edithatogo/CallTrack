@@ -539,3 +539,280 @@ job also caught a ktfmt formatting issue in the new import-filter modifier; it
 was formatted with the workflow's pinned ktfmt0.59 checksum, and the subsequent
 full formatting check passed. The corrected hosted UI run is pending. No full
 accessibility parity is claimed yet.
+
+## Hosted API36 acceptance and wider OS-matrix follow-up — 2026-10-24
+
+The public GitHub Actions run [40095495432](https://github.com/edithatogo/CallTrack/actions/runs/40095495432)
+tested PR head `abecf4db8141f03bfd1b75b1b2d8119d645f204b`, later merged to
+`main` as `7ef258896184f6f1a9b77bf4ce59181399fa4b4d`. A fresh Pixel 6 API36
+x86_64 guest passed the settings, historical-import, recovery and accessibility
+suites. The sanitized output identifies Android16 / SDK36, all four suite
+outcomes, tested methods and 44 screenshot hashes. Every suite receipt reports
+fixture cleanup and test-package removal; the qualifier also gates success on
+restoring the emulator's original display/font configuration.
+
+The first passing run followed two targeted accessibility repairs. The automatic
+and import picker buttons had resource IDs colliding with their ComposeView
+hosts; separate `*_calendar_picker_panel` host IDs let UI lookup target the
+interactive tags. Hosted accessibility then passed those controls. The next
+run passed the picker and showed the recovery accessibility anchor had named
+the host `recovery_refresh` instead of the button `recovery_refresh_action`;
+only the keyboard-focus anchor changed. The subsequent complete four-suite run
+passed.
+
+To extend the same source-bound journeys to minimum/intermediate Android, the
+hosted workflow now has API26, API33 and API36 x86_64 entries. API26 uses the
+Pixel2 profile; API33 and API36 preserve Pixel6. `sdkmanager --list` on the
+qualified SDK confirmed the corresponding Google APIs x86_64 system images
+exist. The matrix is pending hosted execution; no result is inferred from the
+API36 run.
+
+After refreshing to merged `origin/main`,
+`scripts/run_slice_build.py` completed with exit code0, unchanged input hashes
+and exact current-source binding across151 app/build inputs. It used the
+qualified JDK17.0.21.0.2 and SDK36, passed all119 JVM tests with zero
+failures/errors/skips, assembled the debug app and instrumentation APKs and
+completed lint. The receipt records app APK SHA-256
+`2f505e791555f95fb664feb680abba8908cb0eb7d87d0cd898c5f16a35ea583a` and
+instrumentation APK SHA-256
+`f6cf4f6872268e2808acdf648081b8f361b4beea39e375d8d82019c501e8403b`.
+`actionlint`, the Conductor verifier (248 documents,21 tracks,25 scenarios),
+formatting and `git diff --check` pass.
+
+The phone remains absent from ADB and the only local guest is still offline.
+This evidence does not qualify API26/API33 UI, local ARM64 emulator health,
+manual TalkBack/Switch Access, physical calls, real account calendars or
+operational observation.
+
+The first API26/API33 matrix run ([#78](https://github.com/edithatogo/CallTrack/pull/78),
+workflow run [40097121504](https://github.com/edithatogo/CallTrack/actions/runs/40097121504))
+passed API36. API26 failed the rendered system-bars assertion and API33 failed
+the permission/filter/pause/reopen journey. Both failures reported fixture
+cleanup and package removal as verified. The public workflow summary retained
+only source lines and hid the numeric inset and permission-dialog category, so
+the runner now exposes allowlisted numeric geometry and fixed permission
+assertion categories while keeping arbitrary labels and dialog text private.
+The API26 measurement was corrected to use the fixed scroll viewport plus its
+applied top padding, so auto-focused content scrolling cannot mimic system-bar
+overlap. In run 40099074252 the API26 settings suite then passed, while import
+fixture preparation failed; API33 still failed to find its denial control. The
+attempted permission-control detail did not appear in the sanitized job output,
+so the runner now also retains bounded source frames from the synthetic import
+and recovery test classes, plus allowlisted fixture failure categories. The
+Android source-bound build and all 20 focused Python safety tests pass;
+another hosted run is pending. Run 40099973359 passed API33 and API36 and
+passed the complete API26 settings suite. API26 import fixture preparation
+then failed because `FixtureCallLog.asShell` requires explicit temporary ADB
+root, which the new AVD setup had not enabled. The workflow now runs `adb root`
+only on the disposable API26 guest and verifies `service.adb.root=1` before
+tests. API26 import/recovery/accessibility rerun is still required.
+
+Run 40100856513 then confirmed the temporary root setup worked: API26 passed
+its settings journey and `prepareCalendarAndTaggedHistory`, with fixture and
+package cleanup verified, but the rendered import-confirmation dialog action
+was not found. API33/API36 passed their four synthetic UI suites. A fixed
+failure category is now retained for the missing `button1` action; the
+instrumentation rerun remains pending.
+
+Run [40101679905](https://github.com/edithatogo/CallTrack/actions/runs/40101679905)
+passed API36, but API26 again failed at the import confirmation action and API33
+failed because its PermissionController exposed a different denial ID. The
+follow-up review fixed the API26 test to locate the exact localized clickable
+positive label and recognize the API33 combined denial selector. AOSP defines
+that API33 control as permanent denial, so the rendered test asserts denial and
+inactive logging, then uses isolated `UiAutomation` grants only to continue the
+remaining settings journey. This does not claim user-driven API33 regrant; the
+API36 source from this run passed its rendered re-request-and-grant journey.
+
+Commit `ac42f2a` passed a fresh source-bound build with the qualified JDK17 and
+SDK36, launched by the repository-local CPython3.15.1 virtual environment. The
+build completed JVM tests, app and instrumentation APK assembly and lint with
+unchanged input hashes. The instrumentation APK SHA-256 is
+`f3a471049c8c935abe43ca59ac7ceea4393504908a1ab3203c12751ca6992dd8`. All21
+focused Python safety tests, `actionlint`, the248-document/21-track/25-scenario
+Conductor verifier, pinned Java formatting and `git diff --check` pass. The
+hosted API26/API33/API36 rerun on this commit remains required; see the
+[review](review-20261025-hosted-ui-matrix.md). The native phone is absent and
+physical, manual assistive-technology, remote-calendar and operational gates
+remain pending.
+
+The follow-up hosted matrix run `40108385701` passed API33 and API36. API26
+reached `ImportUiTest.renderedRangePreviewCancelConfirmAndRepeat` but remained
+blocked by an active PermissionController dialog classified by the safe
+harness summary as `contacts`, while the app's calendar and call-log
+permissions were already granted and phone-state was denied. The application
+manifest does not request `READ_CONTACTS`; no Contacts grant or system-dialog
+input was performed. The failure does not distinguish an app issue from a
+hosted platform/test-state issue, so API26 acceptance remains pending
+diagnosis. See [hosted matrix review](review-20261025-hosted-ui-matrix.md).
+
+The diagnostic rerun on PR #78 at commit `0abcd8787b0388f003f1a6d3b86e1a3e120d346a`
+(workflow run [40116441898](https://github.com/edithatogo/CallTrack/actions/runs/40116441898))
+completed with API36 passing, API33 failing in
+`renderedPermissionsFiltersConfirmPauseAndReopen` because the expected
+`permission_allow_button` was absent, and API26 failing again during the
+historical-import journey with the active permission UI classified as
+`contacts`. The API26 summary retained active-window, known-control,
+app-permission and permission-purpose categories, but did not retain the newly
+added declared-permission summary. The diagnostic therefore did not identify
+which manifest, if any, owns the Contacts request. API26 and API33 remain open;
+the added diagnostic did not justify changing app permission behavior.
+
+The follow-up now derives the same bounded permission list from the validated
+app and instrumentation APK manifests with `aapt`, then adds only the five
+relevant Android permission names to sanitized failures. This avoids depending
+on accessibility exception text to carry the instrumentation-side declaration
+summary. Focused safety tests and direct readback of the current APKs pass; the
+hosted matrix for this diagnostic revision is pending, so the API26 cause is
+still unverified.
+
+Diagnostic revision `5fdff4d` completed hosted run
+[40117601783](https://github.com/edithatogo/CallTrack/actions/runs/40117601783):
+API36 passed; API26 failed again during import with the dialog classified as
+`contacts`, but the validated APKs reported only calendar, call-log and
+phone-state permissions and the instrumentation APK declared none of the
+allowlisted permissions. This rules out `READ_CONTACTS` in either installed
+APK manifest, while leaving the dialog's originating request unresolved.
+API33 failed to find the deny control. The test selector now searches the
+current accessibility windows for controls owned by the known Android
+PermissionController packages, rechecks the control before touch, and keeps
+the same ID allowlist. The hosted rerun is recorded below; local Gradle validation is
+unavailable because this host currently has JDK11 while the Android Gradle
+Plugin requires JDK17. Direct `javac -source 8 -target 8` compilation of the
+changed helper against the installed API36 `android.jar` and cached JUnit passes;
+the pinned Java formatter and focused Python safety checks also pass.
+
+## Track14 hosted matrix diagnostics `ec30be3` to `51170b6`
+
+Hosted run [40129081350](https://github.com/edithatogo/CallTrack/actions/runs/40129081350)
+and paired build qualification [40129081332](https://github.com/edithatogo/CallTrack/actions/runs/40129081332)
+completed on `ec30be3`. The build qualification passed. API36 passed all four
+rendered journeys. API33 failed while searching for the rendered deny control:
+the app's four requested runtime permissions remained denied, the app window was
+active, and the permission-controller root/control were unavailable at failure
+readback. API26 failed during the rendered import journey without an
+instrumentation result marker and reported `IllegalStateException`; its
+permission-activity launcher was the input method. The initial diagnostic
+forwarding defect that discarded these categories was fixed in `ec30be3`.
+
+The next run [40130012910](https://github.com/edithatogo/CallTrack/actions/runs/40130012910)
+on `7f10dae` again passed API36. API33 failed earlier in the system-bar content
+inset assertion, while API26 repeated the incomplete import instrumentation
+result and `IllegalStateException`. A new sanitizer was added to classify the
+fatal process and top stack-frame owner without exposing exception messages or
+stack text. Its first run showed that logcat prefixes fatal lines with priority
+and tag text; the parser was corrected and its tests now use this actual format.
+Run [40130610357](https://github.com/edithatogo/CallTrack/actions/runs/40130610357)
+on `51170b6` passed API36 but repeated failures on API26/API33. The API26
+summary still could not classify the fatal process/frame; API33 again lost the
+deny control with the app window active and permission root unavailable.
+
+The next diagnostic added a category-only readback of the resumed activity
+owner. Build qualification [40131471215](https://github.com/edithatogo/CallTrack/actions/runs/40131471215)
+passed all five jobs. UI run [40131471355](https://github.com/edithatogo/CallTrack/actions/runs/40131471355)
+passed API36. API26 again exited the rendered import journey without an
+instrumentation result marker; this time the bounded summary identified the
+resumed owner as `permission-controller`, the permission activity launcher as
+`com.google.android.inputmethod.latin`, and the exception class as
+`java.net.SocketException`, but no process or stack owner. API33 again failed
+to find the deny control while only the app window was active and all four app
+permissions remained denied. This does not prove which external permission
+prompt was requested or why the runner connection closed.
+
+Focused review on the latest source passed 34 `tests.test_parity_ui_safety`
+tests, the Conductor verifier (249 documents, 21 tracks, 25 synthetic
+scenarios), and `git diff --check`. The host emulator is offline and its SDK
+resolves under PortableSSD, so local rendered reruns are unavailable. No app
+permission behavior was changed. The OS matrix is still not accepted; API26 and
+API33 are open, and API36 success does not replace their evidence.
+
+## Track14 hosted matrix diagnostic `b5c2a90`
+
+The exact-source build qualification passed in runs [40121249281](https://github.com/edithatogo/CallTrack/actions/runs/40121249281)
+and [40121253294](https://github.com/edithatogo/CallTrack/actions/runs/40121253294).
+The hosted rendered-UI matrix [40121253324](https://github.com/edithatogo/CallTrack/actions/runs/40121253324)
+completed with API33 and API36 passing and API26 failing during
+`ImportUiTest.renderedRangePreviewCancelConfirmAndRepeat`. The safe failure
+summary reports a PermissionController prompt classified as `contacts`,
+app-label visibility `not-visible`, calendar/call-log grants, phone-state
+denied, and no `READ_CONTACTS` declaration in either validated APK. The
+requesting component remains unknown; no permission behavior was changed.
+Focused host verification after the run passed: 26 `tests.test_parity_ui_safety`
+tests and `scripts/verify_conductor.py` (249 documents, 21 tracks, 25 synthetic
+scenarios); `git diff --check` passed. The rendered matrix is not accepted
+because API26 remains unresolved. The PR remains open and unmerged.
+
+## Local API26 rendered matrix and Gboard prompt fix — 2026-10-25
+
+The isolated PortableSSD API26 emulator `calltrack-release-api26-20261022`
+(Android 8.0.0 / SDK26, emulator serial `emulator-5560`) passed the
+source-bound four-suite matrix once on test APK SHA-256
+`1b0e6e45…61d5ef`. A subsequent accessibility-only rerun against the same APK
+failed the keyboard-focus assertion, so the result is not repeatable yet. The
+exact build receipt
+under ignored `.local/slice-evidence/build-receipt.json` reports JDK
+17.0.21.0.2, SDK under `/Volumes/PortableSSD/cache/calltrack-sdk-20261020`,
+`exit_code: 0`, `inputs_unchanged: true`; all first-pass receipts match the
+test APK hash and report fixture cleanup, package removal and emulator-state
+restoration. Gboard readback confirms `READ_CONTACTS` remains denied. Local
+receipt directories are under
+`.local/slice-evidence/track14-local-api26-20261025/` and are not committed.
+
+The rendered import flow exposed an Android 8/Gboard contacts prompt when a
+date field was edited. Both validated APK manifests request calendar,
+call-log and phone-state permissions only; the harness now dismisses this
+prompt only when its launcher is exactly Gboard, and only by denying the
+contacts request. It does not grant contacts access or alter app permission
+behavior. The accessibility journey applies input focus to the visible Compose
+host and enabled anchor, injects Tab through Android's input dispatcher, and
+requires a visible app-owned input-focus node. Hosted run
+[40140921320](https://github.com/edithatogo/CallTrack/actions/runs/40140921320)
+on `81779f9` still failed API26 at that focus assertion; API36 passed. API33
+failed when permission controls were absent, with the permission root
+unavailable and app permissions not fully granted. Build qualification runs
+40140916374 and 40140921324 passed. API26 accessibility and API33 permission
+dialog acceptance remain unresolved, as do physical/manual assistive
+technology and operational gates.
+
+Focused review passed 35 `tests.test_parity_ui_safety` tests,
+`scripts/verify_conductor.py` (250 documents, 21 tracks, 25 synthetic
+scenarios), pinned `google-java-format 1.24.0`, and `git diff --check`. The
+track remains active pending repeatable API26 focus, API33 permission-dialog
+acceptance, broader parity, and separate device/provider/operational gates.
+
+## Hosted matrix rerun `c4c8be9` — 2026-10-25
+
+Hosted UI run [40142395588](https://github.com/edithatogo/CallTrack/actions/runs/40142395588)
+passed API33 and API36, including all four rendered suites, cleanup and package
+removal. API26 passed settings, imports and recovery but failed the final
+keyboard-focus assertion; fixture cleanup and package removal still passed.
+Build qualification runs 40142392059 and 40142395580 passed. This supersedes
+the API33 failure from run 40140921320; API26 remains the only hosted UI matrix
+failure. The local accessibility result remains non-repeatable, so the
+track/PR stay open until the minimum-API focus behavior is resolved and the
+updated matrix passes.
+
+## Hosted matrix rerun `4d512bf` — 2026-10-25
+
+Hosted UI rerun [40143215905](https://github.com/edithatogo/CallTrack/actions/runs/40143215905)
+passed API36. API26 again passed settings/imports/recovery and failed
+`renderedAccessibilityLabelsTargetsAndKeyboardFocus` at the final
+visible app-owned keyboard-focus assertion; cleanup and package removal passed.
+API33 failed `renderedPermissionsFiltersConfirmPauseAndReopen` because the
+next `permission_allow_button` was unavailable and diagnostics reported
+`permission-root=unavailable` while calendar permissions remained denied.
+Build qualification runs 40143215932 and 40143212903 passed. This confirms
+the API33 permission-controller issue is intermittent (run 40142395588 passed
+API33), while API26 focus remains non-repeatable locally and consistently red
+in hosted runs. No product permission behavior or acceptance assertion was
+changed; both UI findings remain open.
+
+## Hosted matrix rerun `195d9ff` — 2026-10-25
+
+Hosted UI rerun [40144075982](https://github.com/edithatogo/CallTrack/actions/runs/40144075982)
+passed API33 and API36. API26 again passed settings/imports/recovery and failed
+`renderedAccessibilityLabelsTargetsAndKeyboardFocus`; cleanup and package
+removal passed. Build qualification runs [40144075971](https://github.com/edithatogo/CallTrack/actions/runs/40144075971)
+and [40144073285](https://github.com/edithatogo/CallTrack/actions/runs/40144073285)
+passed. This confirms the API33 permission-control failure is intermittent;
+API26 focus remains the blocking hosted check.

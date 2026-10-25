@@ -12,6 +12,169 @@ from parity_targets import RECOVERY_AVD, TRACK14_UI_AVD
 
 
 class UiSafety(unittest.TestCase):
+    def test_instrumentation_failures_keep_only_protocol_state_categories(self):
+        cases = (
+            ('', 'instrumentation-output-empty', 'instrumentation-protocol=none'),
+            ('INSTRUMENTATION_FAILED: Process crashed.', 'instrumentation-process-failed',
+             'instrumentation-protocol=none'),
+            ('FAILURES!!!\nINSTRUMENTATION_STATUS_CODE: -1', 'instrumentation-test-failed',
+             'instrumentation-protocol=none'),
+            ('INSTRUMENTATION_RESULT: shortMsg=Other failure',
+             'instrumentation-result-without-success-marker', 'instrumentation-protocol=result'),
+            ('INSTRUMENTATION_STATUS: stream=private text',
+             'instrumentation-result-marker-missing', 'instrumentation-protocol=status'),
+            ('arbitrary private text', 'instrumentation-result-marker-missing',
+             'instrumentation-protocol=none'),
+        )
+        for output, expected, protocol in cases:
+            with self.subTest(expected=expected):
+                summary = device.native_failure_summary('renderedRangePreviewCancelConfirmAndRepeat', output)
+                self.assertIn(expected, summary)
+                self.assertIn(protocol, summary)
+                self.assertNotIn('arbitrary private text', summary)
+
+    def test_instrumentation_status_summary_keeps_only_keys_and_numeric_codes(self):
+        output = (
+            'INSTRUMENTATION_STATUS: id=AndroidJUnitRunner\n'
+            'INSTRUMENTATION_STATUS: stream=private assertion text\n'
+            'INSTRUMENTATION_STATUS: Error=private exception detail\n'
+            'INSTRUMENTATION_STATUS_CODE: 1\n'
+            'INSTRUMENTATION_STATUS_CODE: -1\n'
+        )
+        summary = device.native_failure_summary(
+            'renderedRangePreviewCancelConfirmAndRepeat', output)
+        self.assertIn('instrumentation-status-keys=Error,id,stream', summary)
+        self.assertIn('instrumentation-status-codes=1,-1', summary)
+        self.assertNotIn('private assertion text', summary)
+        self.assertNotIn('private exception detail', summary)
+
+    def test_apk_permission_summary_reports_only_allowlisted_manifest_names(self):
+        outputs = [
+            "package: org.calltrack.community.dev\n"
+            "uses-permission: name='android.permission.READ_CALL_LOG'\n"
+            "uses-permission: name='android.permission.READ_PHONE_STATE'\n"
+            "uses-permission: name='android.permission.READ_SMS'\n",
+            "package: org.calltrack.community.dev.test\n"
+            "uses-permission: name='android.permission.READ_CONTACTS'\n",
+        ]
+        with patch.object(device.subprocess, 'check_output', side_effect=outputs):
+            summary = device.apk_runtime_permission_summary(
+                Path('app.apk'), Path('test.apk'), Path('aapt'))
+        self.assertEqual(
+            summary,
+            'READ_CALL_LOG,READ_PHONE_STATE|instrumentation:READ_CONTACTS',
+        )
+
+    def test_apk_permission_summary_suppresses_other_permission_names(self):
+        with patch.object(
+                device.subprocess, 'check_output',
+                side_effect=[
+                    "uses-permission: name='android.permission.READ_SMS'\n",
+                    "uses-permission: name='android.permission.ACCESS_NETWORK_STATE'\n",
+                ]):
+            summary = device.apk_runtime_permission_summary(
+                Path('app.apk'), Path('test.apk'), Path('aapt'))
+        self.assertEqual(summary, '|instrumentation:')
+
+    def test_permission_activity_diagnostic_retains_only_its_launcher_package(self):
+        dump = (
+            '* Hist #0: ActivityRecord{launcher com.example.unrelated/.MainActivity}\n'
+            'launchedFromPackage=com.example.unrelated userId=0\n'
+            '* Hist #1: ActivityRecord{prompt '
+            'com.android.packageinstaller/.permission.ui.GrantPermissionsActivity}\n'
+            'packageName=com.android.packageinstaller\n'
+            'launchedFromUid=10123 launchedFromPackage=com.markobl.calllogsync userId=0\n'
+            '* Hist #2: ActivityRecord{other com.example.other/.MainActivity}\n'
+            'launchedFromPackage=com.example.other userId=0\n'
+        )
+        summary = device.permission_activity_launcher_summary(dump)
+        self.assertEqual(summary, 'permission-launcher=com.markobl.calllogsync')
+        self.assertNotIn('com.example.unrelated', summary)
+        self.assertNotIn('com.example.other', summary)
+
+    def test_permission_activity_diagnostic_does_not_retain_arbitrary_text(self):
+        dump = (
+            '* Hist #0: ActivityRecord{prompt '
+            'com.android.packageinstaller/.permission.ui.GrantPermissionsActivity}\n'
+            'launchedFromPackage=+15551234567 account@example.test\n'
+        )
+        self.assertEqual(
+            device.permission_activity_launcher_summary(dump),
+            'permission-launcher=unavailable',
+        )
+
+    def test_activity_top_summary_retains_only_owner_category(self):
+        dump = (
+            'mResumedActivity: ActivityRecord{abc u0 '
+            'com.google.android.inputmethod.latin/.LatinIME t42}\n'
+            'mFocusedActivity: ActivityRecord{def u0 com.example.private/.Screen t43}\n'
+        )
+        self.assertEqual(device.activity_top_summary(dump), 'activity-top=input-method')
+        self.assertNotIn('com.example.private', device.activity_top_summary(dump))
+
+    def test_runtime_diagnostic_keeps_only_failure_categories_and_exception_class(self):
+        logcat = (
+            'E AndroidRuntime: FATAL EXCEPTION: main\n'
+            'E AndroidRuntime: Process: org.calltrack.community.dev.test, PID: 4321\n'
+            'E AndroidRuntime: java.lang.SecurityException: private number 0000000000\n'
+            'E AndroidRuntime: \tat org.calltrack.community.dev.test.slice.ImportUiTest.run(ImportUiTest.java:120)\n'
+            'ANR in org.calltrack.community.dev\n'
+            'Permission Denial: private account details\n'
+            'GrantPermissionsActivity visible\n'
+        )
+        diagnostic = device.runtime_failure_summary(logcat)
+        self.assertIn('runtime-fatal-exception=true', diagnostic)
+        self.assertIn('runtime-anr=true', diagnostic)
+        self.assertIn('runtime-test-process-died=true', diagnostic)
+        self.assertIn('runtime-permission-denial=true', diagnostic)
+        self.assertIn('runtime-permission-controller=true', diagnostic)
+        self.assertIn('runtime-exception=java.lang.SecurityException', diagnostic)
+        self.assertIn('runtime-fatal-process=test', diagnostic)
+        self.assertIn('runtime-fatal-source=test', diagnostic)
+        self.assertNotIn('0000000000', diagnostic)
+        self.assertNotIn('private account details', diagnostic)
+
+    def test_runtime_diagnostic_classifies_input_method_without_retaining_stack_text(self):
+        diagnostic = device.runtime_failure_summary(
+            'E AndroidRuntime: FATAL EXCEPTION: main\n'
+            'E AndroidRuntime: Process: com.google.android.inputmethod.latin, PID: 4321\n'
+            'E AndroidRuntime: java.lang.IllegalStateException: private text\n'
+            'E AndroidRuntime: \tat com.google.android.inputmethod.latin.SomeClass.run(SomeClass.java:12)\n'
+        )
+        self.assertIn('runtime-fatal-process=input-method', diagnostic)
+        self.assertIn('runtime-fatal-source=input-method', diagnostic)
+        self.assertNotIn('SomeClass', diagnostic)
+        self.assertNotIn('private text', diagnostic)
+
+    def test_nonzero_instrumentation_failure_uses_bounded_host_diagnostics(self):
+        activity_dump = (
+            '* Hist #0: ActivityRecord{prompt '
+            'com.android.packageinstaller/.permission.ui.GrantPermissionsActivity}\n'
+            'launchedFromUid=10123 launchedFromPackage=com.markobl.calllogsync userId=0\n'
+            'mResumedActivity: ActivityRecord{abc u0 '
+            'org.calltrack.community.dev/.MainActivity t4}\n'
+        )
+        logcat = (
+            'FATAL EXCEPTION: main\n'
+            'Process: org.calltrack.community.dev.test, PID: 4321\n'
+            'java.lang.SecurityException: private test detail\n'
+        )
+        summary = device.instrumentation_failure_summary(
+            'renderedRangePreviewCancelConfirmAndRepeat',
+            'INSTRUMENTATION_STATUS: stream=private runner output\n',
+            activity_dump,
+            logcat,
+            'READ_CALL_LOG|instrumentation:',
+        )
+        self.assertIn('permission-launcher=com.markobl.calllogsync', summary)
+        self.assertIn('activity-top=app', summary)
+        self.assertIn('runtime-fatal-exception', summary)
+        self.assertIn('runtime-test-process-died', summary)
+        self.assertIn('runtime-exception=java.lang.SecurityException', summary)
+        self.assertIn('instrumentation-protocol=status', summary)
+        self.assertNotIn('private runner output', summary)
+        self.assertNotIn('private test detail', summary)
+
     def test_failure_summary_exposes_source_location_not_rendered_content(self):
         summary = device.native_failure_summary(
             'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
@@ -32,6 +195,121 @@ class UiSafety(unittest.TestCase):
             '    at com.markobl.calllogsync.slice.PositiveUiTest.renderedAccessibilityLabelsTargetsAndKeyboardFocus(PositiveUiTest.java:160)\n',
         )
         self.assertIn('non-focusable anchor id=auto_access_action enabled=true', anchor_summary)
+
+    def test_failure_summary_retains_safe_system_inset_measurements(self):
+        summary = device.native_failure_summary(
+            'renderedActivitiesRespectSystemBars',
+            'java.lang.AssertionError: manual visible content begins at 17 beneath system area 24\n'
+            '    at com.markobl.calllogsync.slice.PositiveUiTest.renderedActivitiesRespectSystemBars(PositiveUiTest.java:114)\n'
+            'private rendered label must remain hidden\n',
+        )
+        self.assertIn('system-inset screen=manual content_top=17 required_top=24', summary)
+        self.assertNotIn('private rendered label', summary)
+
+    def test_failure_summary_exposes_fixture_source_frame_without_call_details(self):
+        summary = device.native_failure_summary(
+            'prepareCalendarAndTaggedHistory',
+            'java.lang.AssertionError: private fixture detail\n'
+            '    at com.markobl.calllogsync.slice.ImportUiTest.prepareCalendarAndTaggedHistory(ImportUiTest.java:124)\n'
+            '    at com.markobl.calllogsync.slice.ParityProviderTest.createCalendar(ParityProviderTest.java:109)\n',
+        )
+        self.assertIn('ImportUiTest.java:124', summary)
+        self.assertIn('ParityProviderTest.java:109', summary)
+        self.assertNotIn('private fixture detail', summary)
+
+    def test_failure_summary_uses_fixed_import_dialog_category(self):
+        summary = device.native_failure_summary(
+            'renderedRangePreviewCancelConfirmAndRepeat',
+            'java.lang.AssertionError: Visible enabled control missing: button1\n'
+            '    at com.markobl.calllogsync.slice.RenderedUi.tap(RenderedUi.java:154)\n'
+            '    at com.markobl.calllogsync.slice.ImportUiTest.confirm(ImportUiTest.java:104)\n',
+        )
+        self.assertIn('import-confirmation-dialog-action-missing', summary)
+        self.assertIn('ImportUiTest.java:104', summary)
+
+    def test_failure_summary_retains_only_allowlisted_dialog_action_metadata(self):
+        summary = device.native_failure_summary(
+            'renderedRangePreviewCancelConfirmAndRepeat',
+            'Visible enabled positive dialog action missing; dialog-active=input-method '
+            'dialog-windows=[app:application:[button1:android.widget.Button:'
+            'enabled=false:clickable=true], permission:application:'
+            '[permission_allow_button:android.widget.Button:enabled=true:clickable=true], '
+            'input-method:input-method:[]] app-permissions=[calendar-read=granted,'
+            'calendar-write=granted,call-log-read=denied,phone-state-read=denied] '
+            'declared-runtime-permissions={app=[READ_CALL_LOG,READ_CALENDAR],'
+            'instrumentation=[READ_CONTACTS]} '
+            'permission-purpose=calendar\n'
+            'private dialog title and message must remain hidden\n'
+            'android.permission.READ_SMS must remain hidden\n'
+            '    at com.markobl.calllogsync.slice.ImportUiTest.confirm(ImportUiTest.java:104)\n',
+        )
+        self.assertIn('dialog-active=input-method', summary)
+        self.assertIn(
+            'dialog-windows=app:application,permission:application,input-method:input-method',
+            summary,
+        )
+        self.assertIn('dialog-controls=button1:android.widget.Button:false', summary)
+        self.assertIn(
+            'permission_allow_button:android.widget.Button:true', summary)
+        self.assertIn('app-permissions=calendar-read:granted,calendar-write:granted,'
+                      'call-log-read:denied,phone-state-read:denied', summary)
+        self.assertIn('permission-purpose=calendar', summary)
+        self.assertIn(
+            'declared-runtime-permissions=app:READ_CALL_LOG,READ_CALENDAR'
+            '|instrumentation:READ_CONTACTS',
+            summary,
+        )
+        self.assertNotIn('READ_SMS', summary)
+        self.assertNotIn('private dialog title', summary)
+
+    def test_failure_summary_retains_only_allowlisted_permission_diagnostic(self):
+        summary = device.native_failure_summary(
+            'renderedPermissionsFiltersConfirmPauseAndReopen',
+            'java.lang.AssertionError: Visible enabled control missing: permission_deny_button; '
+            'permission-root=com.android.permissioncontroller controls='
+            '[com.android.permissioncontroller:id/permission_deny_and_dont_ask_again_button:'
+            'android.widget.Button:enabled=true]\n'
+            '    at com.markobl.calllogsync.slice.PositiveUiTest.renderedPermissionsFiltersConfirmPauseAndReopen(PositiveUiTest.java:233)\n',
+        )
+        self.assertIn('missing-permission-control=permission_deny_button', summary)
+        self.assertIn('permission-root=com.android.permissioncontroller', summary)
+        self.assertIn('permission_deny_and_dont_ask_again_button:android.widget.Button:enabled=true', summary)
+        self.assertNotIn('private label', summary)
+
+    def test_failure_summary_reports_safe_controls_from_all_permission_windows(self):
+        summary = device.native_failure_summary(
+            'renderedPermissionsFiltersConfirmPauseAndReopen',
+            'Visible enabled control missing: permission_allow_button; '
+            'permission-root=com.android.permissioncontroller '
+            'permission-controls=[com.android.permissioncontroller:id/'
+            'permission_allow_foreground_only_button:android.widget.Button:enabled=true]\n',
+        )
+        self.assertIn('permission-root=com.android.permissioncontroller', summary)
+        self.assertIn(
+            'permission_allow_foreground_only_button:android.widget.Button:enabled=true',
+            summary,
+        )
+
+    def test_failure_summary_reports_only_permission_requester_label_visibility(self):
+        summary = device.native_failure_summary(
+            'renderedRangePreviewCancelConfirmAndRepeat',
+            'Visible enabled positive dialog action missing; permission-purpose=contacts '
+            'permission-app-label=visible permission-launcher=com.android.shell '
+            'app label and private permission message\n',
+        )
+        self.assertIn('permission-app-label=visible', summary)
+        self.assertIn('permission-launcher=com.android.shell', summary)
+        self.assertNotIn('app label', summary)
+        self.assertNotIn('private permission message', summary)
+
+    def test_failure_summary_rejects_unbounded_permission_launcher_text(self):
+        summary = device.native_failure_summary(
+            'renderedRangePreviewCancelConfirmAndRepeat',
+            'Visible enabled positive dialog action missing; '
+            'permission-launcher=+15551234567 private content\n',
+        )
+        self.assertNotIn('permission-launcher=', summary)
+        self.assertNotIn('15551234567', summary)
 
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
