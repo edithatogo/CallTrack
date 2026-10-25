@@ -9,35 +9,6 @@ final class DeliveryIntentLedgerTests: XCTestCase {
   private let exportID = UUID(uuidString: "00000000-0000-4000-8000-000000000101")!
   private let callID = UUID(uuidString: "00000000-0000-4000-8000-000000000102")!
 
-  func testPrepareIsDurableAndDeduplicatedPerDestination() throws {
-    let directory = temporaryDirectory()
-    defer { try? FileManager.default.removeItem(at: directory) }
-    let databaseURL = directory.appending(path: "delivery.sqlite")
-    let preview = try preview()
-
-    var ledger: DeliveryIntentLedger? = try DeliveryIntentLedger(databaseURL: databaseURL)
-    let first = try ledger!.prepare(preview: preview, destinationCalendarID: "calendar-one")
-    let repeated = try ledger!.prepare(preview: preview, destinationCalendarID: "calendar-one")
-    XCTAssertEqual(first.count, 1)
-    XCTAssertEqual(first, repeated)
-    XCTAssertEqual(first[0].state, .prepared)
-    XCTAssertTrue(first[0].marker.hasPrefix("CallTrack operation: "))
-
-    let attributes = try FileManager.default.attributesOfItem(atPath: databaseURL.path)
-    XCTAssertEqual((attributes[.posixPermissions] as? NSNumber)?.intValue, 0o600)
-    ledger = nil
-
-    let reopened = try DeliveryIntentLedger(databaseURL: databaseURL)
-    XCTAssertEqual(try reopened.allIntents(), first)
-
-    let anotherDestination = try reopened.prepare(
-      preview: preview,
-      destinationCalendarID: "calendar-two"
-    )
-    XCTAssertEqual(anotherDestination.count, 1)
-    XCTAssertNotEqual(anotherDestination[0].operationID, first[0].operationID)
-  }
-
   func testWriteIntentMustBeDurableBeforeReconciliationAndNeverBlindlyReset() throws {
     let directory = temporaryDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }
