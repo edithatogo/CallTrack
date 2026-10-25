@@ -926,3 +926,13 @@ the intro and panel checks to ID mode. The pure Compose callback test and
 fixture cleanup/package-removal checks passed on all three jobs in that run.
 Neither failed run counts as acceptance; a fresh source-bound matrix is
 required.
+
+The fresh exact-source PR #86 matrix
+[40170407847](https://github.com/edithatogo/CallTrack/actions/runs/40170407847)
+passed the settings, imports, recovery and accessibility suites on API26,
+API33 and API36. Each of the twelve receipts reports passed, verified fixture
+cleanup, test-package removal and screenshot hashes. The settings receipts
+include both the pure manual-screen callback test and the rendered explicit
+calendar-selection journey. All PR checks passed at `b334a8e`; the result closes
+the manual-screen hosted acceptance task only. Broader Track14 and device/
+operational gates remain open.

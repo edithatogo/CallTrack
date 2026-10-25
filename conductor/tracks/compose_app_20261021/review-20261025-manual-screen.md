@@ -31,10 +31,20 @@ review does not close Track14 or the physical/operational acceptance gates.
   `:app:compileDebugAndroidTestKotlin`, `:app:lintDebug` and
   `:app:assembleDebugAndroidTest` pass.
 - Python3.15.1: `tests.test_parity_ui_safety` and
-  `tests.test_verify_conductor` pass (54 tests); `scripts/verify_conductor.py`
-  passes (255 documents, 21 tracks, 25 synthetic scenarios).
+  `tests.test_verify_conductor` passed (54 tests) before the final hosted
+  evidence update; `scripts/verify_conductor.py` passes (256 documents,
+  21 tracks, 25 synthetic scenarios).
 - Pinned ktfmt0.59 and google-java-format1.24.0 checks pass; `git diff --check`
   passes.
+- The exact-PR-source hosted run
+  [40170407847](https://github.com/edithatogo/CallTrack/actions/runs/40170407847)
+  passed on API26, API33 and API36. All twelve settings/import/recovery/
+  accessibility receipts report `result=passed`, fixture cleanup verified,
+  test packages removed and nonempty screenshot hashes. Each settings receipt
+  includes `ManualCalendarScreenTest#screenRendersWithoutEffectsAndDispatchesOnlyExplicitActions`
+  and `PositiveUiTest#renderedManualCalendarChoiceRequiresAnExplicitTap`.
+  All PR #86 checks, including the Compose prototype, multiplatform UI, slice,
+  qualification and build checks, also pass at head `b334a8e`.
 - The first hosted run, [40169350891](https://github.com/edithatogo/CallTrack/actions/runs/40169350891),
   failed on API26, API33 and API36 at the rendered wait for the manual screen's
   four stable identifiers. The preceding picker wait and pure Compose callback
@@ -58,7 +68,7 @@ review does not close Track14 or the physical/operational acceptance gates.
 
 ## Findings
 
-The hosted rendered selector is corrected, pending a fresh matrix result. No
-other implementation findings remain. Broader font/RTL, assistive technology,
-permission/revocation, process restoration, physical-device and operational
-acceptance remain separate Track14 gates.
+The hosted rendered selector is corrected and the exact-source matrix passes.
+No remaining findings apply to this manual launcher slice. Broader font/RTL,
+assistive technology, permission/revocation, process restoration,
+physical-device and operational acceptance remain separate Track14 gates.
