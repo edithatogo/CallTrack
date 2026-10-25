@@ -4,7 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.widget.*
+import android.widget.ScrollView
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,50 +31,37 @@ class CalendarSliceActivity : ComponentActivity() {
 
     public override fun onCreate(state: Bundle?) {
         super.onCreate(state)
-        val layout = LinearLayout(this)
-        layout.orientation = LinearLayout.VERTICAL
-        val pad = (16 * resources.displayMetrics.density).toInt()
-        layout.setPadding(pad, pad, pad, pad)
-        val intro = TextView(this)
-        intro.setText(R.string.slice_intro)
-        layout.addView(intro)
-        val calendarControls =
+        val screen =
             ComposeView(this).apply {
-                id = R.id.slice_calendar_controls_panel
                 setViewCompositionStrategy(
                     ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
                 )
                 setContent {
-                    ManualCalendarControlsPanel(
-                        state = destinationState,
+                    ManualCalendarScreen(
+                        intro = getString(R.string.slice_intro),
+                        calendarState = destinationState,
+                        logState = panelState,
                         chooseLabel = getString(R.string.slice_choose),
                         accessLabel = getString(R.string.slice_calendar_access),
                         unavailableLabel = getString(R.string.slice_no_calendars),
+                        automaticLabel = getString(R.string.auto_open),
                         onRequestAccess = ::requestCalendarAccess,
                         onSelect = ::selectDestination,
+                        onLogLatest = ::logLatest,
+                        onOpenAutomatic = {
+                            startActivity(
+                                Intent(
+                                    this@CalendarSliceActivity,
+                                    AutomaticSettingsActivity::class.java,
+                                )
+                            )
+                        },
                     )
                 }
             }
-        layout.addView(calendarControls)
-        val manualPanel =
-            ComposeView(this).apply {
-                id = R.id.slice_manual_panel
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
-                )
-                setContent { ManualLogPanel(state = panelState, onLogLatest = ::logLatest) }
-            }
-        layout.addView(manualPanel)
         panelState = panelState.copy(logLabel = getString(R.string.slice_log_latest))
-        val automatic = Button(this)
-        automatic.id = R.id.open_automatic
-        automatic.setText(R.string.auto_open)
-        automatic.setOnClickListener {
-            startActivity(Intent(this, AutomaticSettingsActivity::class.java))
-        }
-        layout.addView(automatic)
         val scroll = ScrollView(this)
-        scroll.addView(layout)
+        scroll.addView(screen)
         ActivityInsets.apply(scroll)
         setContentView(scroll)
     }

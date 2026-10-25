@@ -28,7 +28,10 @@ def native_failure_summary(method, output, declared_permissions=None):
     for line in output.splitlines():
         frame = line.strip()
         if (frame.startswith('at com.markobl.calllogsync.slice.')
-                and re.search(r'(?:PositiveUiTest|ImportUiTest|RecoveryUiTest|ParityProviderTest|RenderedUi)\.java:\d+', frame)):
+                and re.search(
+                    r'(?:(?:PositiveUiTest|ImportUiTest|RecoveryUiTest|ParityProviderTest|RenderedUi)\.java|ManualCalendarScreenTest\.kt):\d+',
+                    frame,
+                )):
             frames.append(frame)
     detail = '; '.join(frames[:6])
     if not output.strip():
@@ -410,10 +413,11 @@ def qualify(serial, suite="settings", receipt_dir=None):
             raise RuntimeError('ADB command failed: ' + ' '.join(args))
         return result.stdout.strip()
 
-    def check(method):
+    def check(method, class_name=None):
+        selected_class = class_name or test_class
         instrument_args = (
             'shell', 'am', 'instrument', '-w', '-r', '-e', 'fixtureToken',
-            receipt['fixture_token'], '-e', 'class', test_class + '#' + method,
+            receipt['fixture_token'], '-e', 'class', selected_class + '#' + method,
             TEST_PACKAGE + '/androidx.test.runner.AndroidJUnitRunner',
         )
         try:
@@ -505,6 +509,8 @@ def qualify(serial, suite="settings", receipt_dir=None):
             check('renderedAccessibilityLabelsTargetsAndKeyboardFocus')
         elif suite == 'settings':
             check('prepareCalendarWithoutCallAccess')
+            check('screenRendersWithoutEffectsAndDispatchesOnlyExplicitActions',
+                  'com.markobl.calllogsync.slice.ManualCalendarScreenTest')
             check('renderedManualCalendarChoiceRequiresAnExplicitTap')
             for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
                 command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.' + permission)

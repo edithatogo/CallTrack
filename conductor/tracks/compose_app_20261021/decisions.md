@@ -260,3 +260,31 @@ labels, touch-target and Tab-focus checks.
 
 **Rollback:** Restore the previous accessibility anchor if test-tag semantics
 regress. Keep the host ID untouched.
+
+## D14-13: Complete the manual launcher presentation in Compose
+
+**Decision:** Replace the manual launcher's remaining native intro, `LinearLayout`
+panel composition and automatic-settings `Button` with one lifecycle-disposed
+`ComposeView` screen inside the existing `ScrollView`. Preserve the established
+raw accessibility identifiers for the manual controls and expose them through
+`testTagsAsResourceId`. Keep the Activity as the sole owner of permission
+requests, provider discovery, saved calendar IDs, reconciliation and manual
+delivery; composables receive immutable presentation state and dispatch only
+explicit callbacks. Retain the existing ScrollView and inset handling so the
+screen keeps its qualified viewport behavior.
+
+**Alternatives:** Keep the intro and navigation button as Views (leaves mixed
+presentation on the manual screen); move provider or delivery work into
+composition (rejected); change the saved destination key or calendar identity
+(out of scope).
+
+**Promotion/removal:** The Compose component test verifies rendering and that
+access, selection, manual logging and navigation callbacks fire only on explicit
+actions. The hosted API26/API33/API36 settings journey verifies the Compose
+host, stable identifiers, explicit provider choice, scrolling/insets and
+existing selection semantics. Physical calls and the broader lifecycle,
+permission-revocation and operational gates remain separate.
+
+**Rollback:** Restore the existing intro TextView, individual ComposeView
+containers and Android navigation Button. No stored state, schema, permission,
+calendar identity or delivery behavior changes.

@@ -904,3 +904,35 @@ includes the explicit manual-calendar-choice journey. Attempt 1's API26
 keyboard-focus failure remains visible as a failed run and is not counted as a
 pass. The formatter, build qualification, slice, Compose prototype,
 multiplatform and source-bound Android UI checks pass on this source revision.
+
+## Manual launcher Compose root — initial hosted attempt (2026-10-25)
+
+PR #86 adds one lifecycle-disposed Compose root for the manual launcher while
+retaining Activity-owned provider, permission, saved-destination and delivery
+effects. The new pure Compose callback test passed on all three hosted APIs.
+Hosted run [40169350891](https://github.com/edithatogo/CallTrack/actions/runs/40169350891)
+then failed API26/API33/API36 at the rendered manual-screen wait for the
+stable intro/panel/navigation identifiers; the preceding picker wait passed.
+All three jobs verified fixture cleanup and test-package removal. The compound
+wait obscured which identifier was absent; commit `ffab440` assigns
+`testTagsAsResourceId` to each tagged semantics node and splits the rendered
+assertions by identifier.
+
+Hosted run [40169911417](https://github.com/edithatogo/CallTrack/actions/runs/40169911417)
+then isolated the API26/API33/API36 failure to `slice_intro`. The rendered
+helper's `find(value, false)` branch compares visible text, but the stable
+Compose identifier must be queried as a resource ID. Commit `733ffc2` changes
+the intro and panel checks to ID mode. The pure Compose callback test and
+fixture cleanup/package-removal checks passed on all three jobs in that run.
+Neither failed run counts as acceptance; a fresh source-bound matrix is
+required.
+
+The fresh exact-source PR #86 matrix
+[40170407847](https://github.com/edithatogo/CallTrack/actions/runs/40170407847)
+passed the settings, imports, recovery and accessibility suites on API26,
+API33 and API36. Each of the twelve receipts reports passed, verified fixture
+cleanup, test-package removal and screenshot hashes. The settings receipts
+include both the pure manual-screen callback test and the rendered explicit
+calendar-selection journey. All PR checks passed at `b334a8e`; the result closes
+the manual-screen hosted acceptance task only. Broader Track14 and device/
+operational gates remain open.
