@@ -55,6 +55,21 @@ public class PositiveUiTest {
         return null;
     }
 
+    private android.view.accessibility.AccessibilityNodeInfo firstEnabledFocusableControl(
+            android.view.accessibility.AccessibilityNodeInfo node) {
+        if (node == null || !node.refresh() || !node.isVisibleToUser()) return null;
+        if (node.isEnabled()
+                && node.isFocusable()
+                && node.isClickable()
+                && context().getPackageName().contentEquals(node.getPackageName())) return node;
+        for (int i = 0; i < node.getChildCount(); i++) {
+            android.view.accessibility.AccessibilityNodeInfo match =
+                    firstEnabledFocusableControl(node.getChild(i));
+            if (match != null) return match;
+        }
+        return null;
+    }
+
     private boolean focusComposeHost(android.view.View view) {
         view.setFocusable(true);
         view.setFocusableInTouchMode(true);
@@ -274,9 +289,15 @@ public class PositiveUiTest {
                                                 + ", focusable="
                                                 + initialFocus[0].isFocusable()),
                         inputFocusRequested[0]);
-                if (node.isEnabled())
-                    node.performAction(
-                            android.view.accessibility.AccessibilityNodeInfo.ACTION_FOCUS);
+                android.view.accessibility.AccessibilityNodeInfo focusTarget = node;
+                if (!node.isEnabled()) {
+                    focusTarget = firstEnabledFocusableControl(ui.automation.getRootInActiveWindow());
+                }
+                assertNotNull(
+                        "Screen has no enabled focusable control for keyboard acceptance " + anchor,
+                        focusTarget);
+                focusTarget.performAction(
+                        android.view.accessibility.AccessibilityNodeInfo.ACTION_FOCUS);
                 try (android.os.ParcelFileDescriptor ignored =
                         instrumentation
                                 .getUiAutomation()
