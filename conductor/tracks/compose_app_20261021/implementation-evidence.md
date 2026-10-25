@@ -835,3 +835,16 @@ latest complete matrix evidence. Physical-device behavior, manual TalkBack/
 Switch Access, full Activity/process restoration, provider-backed destination
 restoration, remote calendar synchronization and operational observation remain
 separate gates. Track14 remains active.
+
+## Documentation-PR hosted matrix rerun — 2026-10-25
+
+Hosted run [40149896511 attempt 3](https://github.com/edithatogo/CallTrack/actions/runs/40149896511/attempts/3)
+passed all four rendered suites on API26, API33 and API36. Each job verified
+fixture cleanup, test-package removal and rendered screenshot hashes. The
+documentation PR ran on the same app/test source revision as the already
+qualified matrix. Its API33 attempt 1 failed while locating the deny control;
+attempt 2 failed while locating the allow control with the PermissionController
+root unavailable; attempt 3 passed. These failures remain visible in Actions
+and are not counted as passing attempts. No product or test-harness code changed
+to obtain the pass. The separate physical-device, provider, manual accessibility
+and operational gates remain open.

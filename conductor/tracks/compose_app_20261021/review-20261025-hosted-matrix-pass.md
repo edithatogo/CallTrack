@@ -21,6 +21,17 @@ native and operational acceptance.
 - Earlier intermittent API26/API33 failures remain in the diagnostic records;
   this review does not relabel those attempts as passing.
 
+## Subsequent PR validation
+
+Hosted run [40149896511 attempt 3](https://github.com/edithatogo/CallTrack/actions/runs/40149896511/attempts/3)
+also passed API26, API33 and API36 across all four rendered suites, including
+fixture cleanup, package removal and screenshot evidence. API33 attempt 1
+failed to locate the deny control, and attempt 2 failed to locate the allow
+control while the permission root was unavailable; API33 attempt 3 passed.
+Attempts 1 and 2 are retained as failed runs, not counted as acceptance. The
+successful third attempt and green non-emulator checks validated the documentation
+PR without any source or test-harness change.
+
 ## Result
 
 The hosted matrix task is satisfied by the latest complete matrix run. No app
