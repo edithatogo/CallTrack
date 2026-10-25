@@ -17,8 +17,8 @@
   "native_eventkit_accepted": false,
   "macos_app_packaging_accepted": false,
   "pull_request": "https://github.com/edithatogo/CallTrack/pull/82",
-  "pull_request_state": "open",
-  "implementation_commit": "805709acef99bdd953a0d20bd0e4ef55d59d5d83",
+  "pull_request_state": "merged",
+  "implementation_commit": "93c81ab6b6b82d1254ed3f90d4f699285e2d2582",
   "review_commit": "805709acef99bdd953a0d20bd0e4ef55d59d5d83",
   "review_status": "delivery-prototype-reviewed-hosted-qualified-native-acceptance-pending",
   "hosted_qualification_run_ids": [
