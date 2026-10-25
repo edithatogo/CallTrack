@@ -66,6 +66,12 @@ acceptance.
   established settings/import/recovery checks first and the manual screen last.
   The Android test sources compile locally; a fresh hosted matrix on this order
   is pending.
+- Hosted run [40160333619](https://github.com/edithatogo/CallTrack/actions/runs/40160333619)
+  reproduced the API26 failure at `import_calendar_picker` despite the ordering
+  change; API33 and API36 passed. The shared Compose action now declares an
+  explicit enabled focus target in addition to click handling. Local unit tests
+  and Android test compilation pass; the new hosted matrix must verify whether
+  this addresses the older API behavior.
 - The latest diagnostic change passed `tests.test_parity_ui_safety` (35 tests)
   on Python3.15.1; `git diff --check` is clean.
 
