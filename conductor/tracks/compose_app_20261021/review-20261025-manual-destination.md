@@ -72,6 +72,12 @@ acceptance.
   explicit enabled focus target in addition to click handling. Local unit tests
   and Android test compilation pass; the new hosted matrix must verify whether
   this addresses the older API behavior.
+- Hosted run [40161132623](https://github.com/edithatogo/CallTrack/actions/runs/40161132623)
+  failed the keyboard-focus assertion for `auto_access_action` on all three
+  APIs after the explicit focus-target change. This showed that modifier was a
+  regression; it has been removed. Keep the original `clickable` semantics and
+  retain API26's intermittent focus-probe failure as an acceptance issue to
+  resolve from a fresh run rather than weakening the app or test.
 - The latest diagnostic change passed `tests.test_parity_ui_safety` (35 tests)
   on Python3.15.1; `git diff --check` is clean.
 
