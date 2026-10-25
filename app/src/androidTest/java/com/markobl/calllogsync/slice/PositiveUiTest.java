@@ -129,8 +129,8 @@ public class PositiveUiTest {
             assertNotNull(before);
             assertEquals(
                     "A provider read must not select or persist a destination",
-                    context.getString(R.string.slice_choose),
-                    before.getContentDescription());
+                    -1,
+                    preferences.getLong("calendar", -1));
             ui.tapVisibleId("slice_calendar_picker");
             ui.tapVisibleText(fixture.calendarDisplayName());
             assertEquals(
@@ -138,13 +138,7 @@ public class PositiveUiTest {
                     expected,
                     preferences.getLong("calendar", -1));
             ui.await(
-                    () -> {
-                        android.view.accessibility.AccessibilityNodeInfo picker =
-                                ui.find("slice_calendar_picker", true);
-                        return picker != null
-                                && fixture.calendarDisplayName()
-                                        .contentEquals(picker.getContentDescription());
-                    },
+                    () -> ui.find(fixture.calendarDisplayName(), false) != null,
                     "Selected local calendar is not shown by the manual picker");
             // The explicit logging action is deliberately not tapped here; choosing a
             // destination only changes local selection and cannot deliver by composition.

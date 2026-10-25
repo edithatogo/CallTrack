@@ -84,6 +84,7 @@ class ManualLogPanelTest {
         compose.onNodeWithTag("slice_calendar_access").assertIsDisplayed().performClick()
         compose.onNodeWithTag("slice_calendar_picker").assertIsDisplayed().performClick()
         compose.onNodeWithTag("slice_calendar_option_0").assertIsDisplayed().performClick()
+        compose.onNodeWithText("Work calendar").assertIsDisplayed()
         compose.runOnIdle {
             assertEquals(currentToken, selectedToken)
             assertEquals(currentToken, state.selectedToken)

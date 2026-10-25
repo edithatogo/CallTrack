@@ -876,3 +876,10 @@ Local rendered execution remains unavailable: the attached emulator enumerates
 as offline. Hosted API26/API33/API36 rendered selection and screen checks are
 required on the PR's exact source revision. Physical-device, cloud-calendar,
 remote synchronization and operational acceptance remain separate gates.
+
+The first hosted run on this slice, [40156597838](https://github.com/edithatogo/CallTrack/actions/runs/40156597838),
+failed API26/API33/API36 at the test's initial comparison of a picker button's
+`contentDescription` with its visible label. Fixture cleanup and package
+removal were verified on all three. The test now asserts that provider loading
+leaves the stored preference unchanged and separately checks visible option
+text after explicit selection. This harness-only fix still needs hosted rerun.

@@ -22,6 +22,11 @@ acceptance.
   selection tokens. Extended provider instrumentation and the hosted settings
   journey to choose a visible fixture calendar and verify the stored ID without
   invoking logging.
+- The first hosted matrix run failed all three APIs at an assertion that
+  compared a button's `contentDescription` to its label. The acceptance harness
+  now checks the unchanged preference after provider loading and verifies the
+  selected option's visible text separately; it does not infer failure from a
+  platform-specific accessibility property.
 - Review found the rendered helper's touch selectors were private. Added narrow
   visible-ID/text touch methods for the new acceptance path; no application
   control bypasses accessibility discovery or actual touch injection.
@@ -40,6 +45,10 @@ acceptance.
 - Instrumentation sources compile. Rendered runtime for this source revision
   remains pending because the only enumerated local emulator is offline; the PR
   hosted API26/API33/API36 matrix is the next required acceptance evidence.
+- Hosted run [40156597838](https://github.com/edithatogo/CallTrack/actions/runs/40156597838)
+  failed on API26/API33/API36 at the initial `contentDescription` comparison;
+  fixture cleanup and package removal passed on each. The assertion fix is in
+  the follow-up commit and requires a fresh matrix before acceptance.
 
 ## Remaining gates
 

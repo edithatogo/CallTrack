@@ -106,22 +106,26 @@ public class CalendarSliceTest {
                         new Intent(context(), CalendarSliceActivity.class)
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         try {
-            final String[] label = {null};
             ui.await(
                     () -> {
                         android.view.accessibility.AccessibilityNodeInfo picker =
                                 ui.find("slice_calendar_picker", true);
-                        if (picker == null || !picker.isEnabled()) return false;
-                        CharSequence description = picker.getContentDescription();
-                        label[0] = description == null ? null : description.toString();
-                        return expectChoice
-                                ? "CallTrack isolated test".equals(label[0])
-                                : context()
-                                        .getString(com.markobl.calllogsync.R.string.slice_choose)
-                                        .equals(label[0]);
+                        return picker != null && picker.isEnabled();
                     },
                     "Compose picker did not restore explicit choice / missing-destination"
                             + " placeholder");
+            assertEquals(
+                    expectChoice ? savedCalendar : -1,
+                    context()
+                            .getSharedPreferences("slice", Context.MODE_PRIVATE)
+                            .getLong("calendar", -1));
+            String expectedLabel =
+                    expectChoice
+                            ? calendarDisplayName()
+                            : context().getString(com.markobl.calllogsync.R.string.slice_choose);
+            ui.await(
+                    () -> ui.find(expectedLabel, false) != null,
+                    "Compose picker did not show the saved choice / placeholder label");
             instrumentation.runOnMainSync(
                     () -> {
                         long actual =
@@ -159,15 +163,7 @@ public class CalendarSliceTest {
                             .getSharedPreferences("slice", Context.MODE_PRIVATE)
                             .getLong("calendar", -1));
             ui.await(
-                    () -> {
-                        android.view.accessibility.AccessibilityNodeInfo picker =
-                                ui.find("slice_calendar_picker", true);
-                        CharSequence description =
-                                picker == null ? null : picker.getContentDescription();
-                        return picker != null
-                                && description != null
-                                && calendarDisplayName().contentEquals(description);
-                    },
+                    () -> ui.find(calendarDisplayName(), false) != null,
                     "Manual Compose picker did not show the explicitly selected calendar");
         } finally {
             instrumentation.runOnMainSync(activity::finish);
