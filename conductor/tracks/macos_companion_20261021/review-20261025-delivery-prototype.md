@@ -29,6 +29,7 @@ deletions remain terminal and are not silently overwritten or recreated.
 - `actionlint .github/workflows/macos-companion.yml` — passed.
 - `python3 -m json.tool conductor/tracks/macos_companion_20261021/metadata.json` and `git diff --check` — passed.
 - `swift test --build-system native --package-path prototypes/macos-companion` — could not run tests because this computer has only Command Line Tools and no `XCTest` module. The hosted macOS workflow must qualify both XCTest targets before this slice can be accepted.
+- The first hosted run compiled all tests and passed the parser suite plus the first delivery test, then aborted while entering the XCTest symlink case. To keep that filesystem regression check while removing the runner failure point, it now runs in the standalone delivery contract harness; rerun hosted qualification before acceptance.
 
 ## Remaining gates
 

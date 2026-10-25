@@ -78,18 +78,6 @@ final class DeliveryIntentLedgerTests: XCTestCase {
     }
   }
 
-  func testLedgerRejectsSymlinkDatabasePath() throws {
-    let directory = temporaryDirectory()
-    defer { try? FileManager.default.removeItem(at: directory) }
-    let target = directory.appending(path: "outside.sqlite")
-    try Data("untouched".utf8).write(to: target)
-    let link = directory.appending(path: "delivery.sqlite")
-    try FileManager.default.createSymbolicLink(at: link, withDestinationURL: target)
-
-    XCTAssertThrowsError(try DeliveryIntentLedger(databaseURL: link))
-    XCTAssertEqual(try Data(contentsOf: target), Data("untouched".utf8))
-  }
-
   func testDeliveryRequiresConfirmationAndReconcilesUncertainSaveWithoutReinserting() async throws {
     let directory = temporaryDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }

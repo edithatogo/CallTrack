@@ -23,8 +23,9 @@ Run `swift build --package-path prototypes/macos-companion --target
 CallTrackCompanionUI`, `swift run --package-path prototypes/macos-companion
 delivery-ledger-contract`, and `swift test --package-path
 prototypes/macos-companion` with a qualified full Xcode toolchain. The ledger
-harness exercises SQLite persistence, deduplication, interruption recovery,
-uncertain writes, and human-edit/deletion preservation using a fake provider.
+harness exercises SQLite persistence, private-file permissions, symlink rejection,
+deduplication, interruption recovery, uncertain writes, and human-edit/deletion
+preservation using a fake provider.
 On the current Command Line Tools-only host, the default SwiftPM build service
 fails to initialize; the deprecated native build path successfully builds the
 parser, AppKit, and delivery targets, but XCTest is unavailable. These checks do

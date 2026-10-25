@@ -17,6 +17,17 @@ struct DeliveryLedgerContractHarness {
     defer { try? FileManager.default.removeItem(at: root) }
 
     let databaseURL = root.appending(path: "delivery.sqlite")
+    let symlinkTarget = root.appending(path: "symlink-target.sqlite")
+    let symlinkLedger = root.appending(path: "symlink-ledger.sqlite")
+    try Data("untouched".utf8).write(to: symlinkTarget)
+    try FileManager.default.createSymbolicLink(at: symlinkLedger, withDestinationURL: symlinkTarget)
+    do {
+      _ = try DeliveryIntentLedger(databaseURL: symlinkLedger)
+      preconditionFailure("Ledger accepted a symlink path")
+    } catch DeliveryLedgerFailure.database {
+      let preservedTarget = try Data(contentsOf: symlinkTarget)
+      precondition(preservedTarget == Data("untouched".utf8), "Symlink rejection modified target")
+    }
     let exportID = UUID(uuidString: "00000000-0000-4000-8000-000000000201")!
     let callID = UUID(uuidString: "00000000-0000-4000-8000-000000000202")!
     let preview = try makePreview(exportID: exportID, callID: callID, duration: 0)
@@ -95,7 +106,7 @@ struct DeliveryLedgerContractHarness {
     precondition(recoveredDelivery.reconciled == 1)
     precondition(gateway.insertCount == 1, "Uncertain save was blindly repeated")
     print(
-      "PASS: durable intent, private file, dedupe, state recovery, human-edit/delete preservation, and identity conflict"
+      "PASS: durable intent, private file, symlink rejection, dedupe, state recovery, human-edit/delete preservation, and identity conflict"
     )
   }
 
