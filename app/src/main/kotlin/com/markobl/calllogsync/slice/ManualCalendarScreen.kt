@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 
@@ -28,13 +28,25 @@ internal fun ManualCalendarScreen(
 ) {
     Column(
         modifier =
-            Modifier.fillMaxWidth()
-                .padding(16.dp)
-                .semantics { testTagsAsResourceId = true }
-                .testTag("slice_screen")
+            Modifier.fillMaxWidth().padding(16.dp).semantics {
+                testTagsAsResourceId = true
+                testTag = "slice_screen"
+            }
     ) {
-        BasicText(intro, modifier = Modifier.fillMaxWidth().testTag("slice_intro"))
-        Column(Modifier.fillMaxWidth().testTag("slice_calendar_controls_panel")) {
+        BasicText(
+            intro,
+            modifier =
+                Modifier.fillMaxWidth().semantics {
+                    testTagsAsResourceId = true
+                    testTag = "slice_intro"
+                },
+        )
+        Column(
+            Modifier.fillMaxWidth().semantics {
+                testTagsAsResourceId = true
+                testTag = "slice_calendar_controls_panel"
+            }
+        ) {
             ManualCalendarControlsPanel(
                 state = calendarState,
                 chooseLabel = chooseLabel,
@@ -44,7 +56,12 @@ internal fun ManualCalendarScreen(
                 onSelect = onSelect,
             )
         }
-        Column(Modifier.fillMaxWidth().testTag("slice_manual_panel")) {
+        Column(
+            Modifier.fillMaxWidth().semantics {
+                testTagsAsResourceId = true
+                testTag = "slice_manual_panel"
+            }
+        ) {
             ManualLogPanel(state = logState, onLogLatest = onLogLatest)
         }
         ComposeActionButton(

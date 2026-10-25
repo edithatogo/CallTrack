@@ -140,12 +140,17 @@ public class PositiveUiTest {
                     },
                     "Manual destination picker did not load local calendar choices");
             ui.await(
-                    () ->
-                            ui.find("slice_intro", false) != null
-                                    && ui.find("slice_calendar_controls_panel", false) != null
-                                    && ui.find("slice_manual_panel", false) != null
-                                    && ui.find("open_automatic", true) != null,
-                    "Manual launcher presentation did not render through Compose");
+                    () -> ui.find("slice_intro", false) != null,
+                    "Manual Compose intro identifier is missing");
+            ui.await(
+                    () -> ui.find("slice_calendar_controls_panel", false) != null,
+                    "Manual Compose calendar-controls identifier is missing");
+            ui.await(
+                    () -> ui.find("slice_manual_panel", false) != null,
+                    "Manual Compose logging-panel identifier is missing");
+            ui.await(
+                    () -> ui.find("open_automatic", true) != null,
+                    "Manual Compose automatic-settings action is missing");
             android.view.ViewGroup content = activity[0].findViewById(android.R.id.content);
             assertTrue(content.getChildAt(0) instanceof android.widget.ScrollView);
             android.widget.ScrollView viewport = (android.widget.ScrollView) content.getChildAt(0);
