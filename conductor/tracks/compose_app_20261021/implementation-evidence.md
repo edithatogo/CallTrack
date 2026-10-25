@@ -816,3 +816,35 @@ removal passed. Build qualification runs [40144075971](https://github.com/editha
 and [40144073285](https://github.com/edithatogo/CallTrack/actions/runs/40144073285)
 passed. This confirms the API33 permission-control failure is intermittent;
 API26 focus remains the blocking hosted check.
+
+## Hosted API26/API33/API36 matrix pass — 2026-10-25
+
+The merged Track14 matrix source `4d4ef0e19b7363e916c5ebf8e36d31ad15a9a632`
+passed hosted run [40144778252 attempt 2](https://github.com/edithatogo/CallTrack/actions/runs/40144778252/attempts/2).
+The API26, API33 and API36 jobs each passed all four rendered journeys:
+`settings`, `imports`, `recovery` and `accessibility`. Every suite record reports
+`result=passed`, `fixture_cleanup_verified=true`, `packages_removed=true` and
+rendered screenshot hashes. The API26 accessibility suite includes the
+previously failing app-owned keyboard-focus assertion; API33 completed the
+permission/settings journey. Both build-qualification runs for the PR passed
+(`40144778270` and `40144775444`).
+
+This closes the hosted OS-matrix task for that merged source revision. Earlier
+intermittent failures remain in the diagnostic history; this result is the
+latest complete matrix evidence. Physical-device behavior, manual TalkBack/
+Switch Access, full Activity/process restoration, provider-backed destination
+restoration, remote calendar synchronization and operational observation remain
+separate gates. Track14 remains active.
+
+## Documentation-PR hosted matrix rerun — 2026-10-25
+
+Hosted run [40149896511 attempt 3](https://github.com/edithatogo/CallTrack/actions/runs/40149896511/attempts/3)
+passed all four rendered suites on API26, API33 and API36. Each job verified
+fixture cleanup, test-package removal and rendered screenshot hashes. The
+documentation PR ran on the same app/test source revision as the already
+qualified matrix. Its API33 attempt 1 failed while locating the deny control;
+attempt 2 failed while locating the allow control with the PermissionController
+root unavailable; attempt 3 passed. These failures remain visible in Actions
+and are not counted as passing attempts. No product or test-harness code changed
+to obtain the pass. The separate physical-device, provider, manual accessibility
+and operational gates remain open.
