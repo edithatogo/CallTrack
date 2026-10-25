@@ -87,4 +87,5 @@
 ## Phase: Review Fixes — manual launcher Compose screen
 
 - [x] Task: Review the complete manual launcher diff, correct the instrumentation assertion to inspect the Activity held in its array, and rerun Android test compilation, unit tests, lint, APK assembly, Conductor tests and format checks (commit `97a7739`; see [review](review-20261025-manual-screen.md)).
-- [ ] Task: Run the pure Compose callback test and manual provider journey on API26/API33/API36, then record exact-source receipts and cleanup results.
+- [x] Task: Diagnose the first hosted failure and expose each stable manual-screen tag on its own Compose semantics node; split the rendered assertions to isolate any missing identifier (commit `ffab440`).
+- [ ] Task: Rerun the pure Compose callback test and manual provider journey on API26/API33/API36, then record exact-source receipts and cleanup results.

@@ -35,13 +35,23 @@ review does not close Track14 or the physical/operational acceptance gates.
   passes (255 documents, 21 tracks, 25 synthetic scenarios).
 - Pinned ktfmt0.59 and google-java-format1.24.0 checks pass; `git diff --check`
   passes.
+- The first hosted run, [40169350891](https://github.com/edithatogo/CallTrack/actions/runs/40169350891),
+  failed on API26, API33 and API36 at the rendered wait for the manual screen's
+  four stable identifiers. The preceding picker wait and pure Compose callback
+  test passed on each API; all fixture cleanup and test-package removal checks
+  passed. The compound assertion did not identify which semantic tag was
+  missing. Commit `ffab440` now exposes each stable identifier on its own
+  semantics node and separates the rendered waits so a repeat failure is
+  attributable to one selector. The new source revision still needs the hosted
+  API26/API33/API36 rerun before that acceptance task can close.
 - The local API36 emulator process is not available through the selected ADB
-  endpoint, so no local rendered result is claimed. The isolated hosted
-  API26/API33/API36 matrix is pending on the PR and must pass before the plan
-  acceptance task is closed.
+  endpoint, so no local rendered result is claimed. Physical-device and
+  broader permission, lifecycle, accessibility and operational acceptance
+  remain separate.
 
 ## Findings
 
-No unresolved implementation findings. Broader font/RTL, assistive technology,
-permission/revocation, process restoration, physical-device and operational
-acceptance remain separate Track14 gates.
+The hosted identifier issue is corrected in source, pending a fresh matrix
+result. No other implementation findings remain. Broader font/RTL, assistive
+technology, permission/revocation, process restoration, physical-device and
+operational acceptance remain separate Track14 gates.

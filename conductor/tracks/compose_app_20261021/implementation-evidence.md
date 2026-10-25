@@ -904,3 +904,17 @@ includes the explicit manual-calendar-choice journey. Attempt 1's API26
 keyboard-focus failure remains visible as a failed run and is not counted as a
 pass. The formatter, build qualification, slice, Compose prototype,
 multiplatform and source-bound Android UI checks pass on this source revision.
+
+## Manual launcher Compose root — initial hosted attempt (2026-10-25)
+
+PR #86 adds one lifecycle-disposed Compose root for the manual launcher while
+retaining Activity-owned provider, permission, saved-destination and delivery
+effects. The new pure Compose callback test passed on all three hosted APIs.
+Hosted run [40169350891](https://github.com/edithatogo/CallTrack/actions/runs/40169350891)
+then failed API26/API33/API36 at the rendered manual-screen wait for the
+stable intro/panel/navigation identifiers; the preceding picker wait passed.
+All three jobs verified fixture cleanup and test-package removal. The compound
+wait obscured which identifier was absent; commit `ffab440` now assigns
+`testTagsAsResourceId` to each tagged semantics node and splits the rendered
+assertions by identifier. This initial run is a failure, not a passing
+acceptance result; a fresh source-bound matrix is required.
