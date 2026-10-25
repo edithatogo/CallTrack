@@ -140,13 +140,13 @@ public class PositiveUiTest {
                     },
                     "Manual destination picker did not load local calendar choices");
             ui.await(
-                    () -> ui.find("slice_intro", false) != null,
+                    () -> ui.find("slice_intro", true) != null,
                     "Manual Compose intro identifier is missing");
             ui.await(
-                    () -> ui.find("slice_calendar_controls_panel", false) != null,
+                    () -> ui.find("slice_calendar_controls_panel", true) != null,
                     "Manual Compose calendar-controls identifier is missing");
             ui.await(
-                    () -> ui.find("slice_manual_panel", false) != null,
+                    () -> ui.find("slice_manual_panel", true) != null,
                     "Manual Compose logging-panel identifier is missing");
             ui.await(
                     () -> ui.find("open_automatic", true) != null,
