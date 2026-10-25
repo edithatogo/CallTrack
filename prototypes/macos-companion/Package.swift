@@ -7,10 +7,19 @@ let package = Package(
     products: [
         .library(name: "CallTrackImport", targets: ["CallTrackImport"]),
         .library(name: "CallTrackCompanionUI", targets: ["CallTrackCompanionUI"]),
+        .library(name: "CallTrackDelivery", targets: ["CallTrackDelivery"]),
+        .executable(name: "delivery-ledger-contract", targets: ["DeliveryLedgerContractHarness"]),
     ],
     targets: [
+        .systemLibrary(name: "CSQLite"),
         .target(name: "CallTrackImport"),
         .target(name: "CallTrackCompanionUI", dependencies: ["CallTrackImport"]),
+        .target(name: "CallTrackDelivery", dependencies: ["CallTrackImport", "CSQLite"]),
+        .executableTarget(
+            name: "DeliveryLedgerContractHarness",
+            dependencies: ["CallTrackDelivery", "CallTrackImport"]
+        ),
         .testTarget(name: "CallTrackImportTests", dependencies: ["CallTrackImport"]),
+        .testTarget(name: "CallTrackDeliveryTests", dependencies: ["CallTrackDelivery", "CallTrackImport"]),
     ]
 )

@@ -31,3 +31,24 @@ scoped prerequisite record permits only bounded discovery/prototype work. It
 does not resolve either earlier stage, accept the KMP macOS target, or unlock
 Track 17. Track 16 remains open until its original implementation/acceptance
 criteria pass or a separately justified disposition is recorded.
+
+## D16-03: Prototype durable delivery behind a native adapter
+
+**Status:** local prototype only; no native calendar acceptance.
+
+The user's instruction to continue remaining repository tasks permits a
+bounded implementation prototype beyond the earlier parser-only checkpoint.
+The prototype now records privacy-minimal delivery intents in a private SQLite
+ledger, requires a separate explicit confirmation input before writes, and
+uses EventKit only through an injected gateway. A failed or interrupted write
+is reconciled by readback and never blindly replayed; exact-match receipts,
+uncertain outcomes, conflicts, human edits and deletions have separate states.
+The complete reviewed boundary is in
+[the EventKit delivery contract](eventkit-delivery-contract-20261025.md).
+
+This does not accept Track 14 or Track 15, unlock Track 17, or establish
+compatibility with the Android export format. No app UI is wired to the adapter,
+no TCC prompt or real calendar was used, and no packaged app declares the
+required usage string. Native permission, selected-calendar write/readback,
+restart recovery, accessibility and packaging remain acceptance work. Keep
+the existing preview-only UI delivery-disabled until that work is completed.
