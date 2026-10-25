@@ -28,6 +28,10 @@ jobs:
           xcodebuild -version
       - name: Build native preview target
         run: swift build --package-path prototypes/macos-companion --target CallTrackCompanionUI
+      - name: Build isolated calendar-delivery adapter
+        run: swift build --package-path prototypes/macos-companion --target CallTrackDelivery -Xswiftc -warnings-as-errors
+      - name: Run the durable delivery ledger and injected-provider contract
+        run: swift run --package-path prototypes/macos-companion delivery-ledger-contract
       - name: Run Foundation parser and file-selection contract tests
         run: |
           set -o pipefail

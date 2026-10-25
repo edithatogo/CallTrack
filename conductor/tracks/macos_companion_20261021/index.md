@@ -6,7 +6,9 @@
 - [Findings](findings.md)
 - [Decisions](decisions.md)
 - [Local-slice review](review-20261024.md)
+- [Delivery-prototype review](review-20261025-delivery-prototype.md)
 - [File-preview prototype](file-preview-prototype-20261025.md)
+- [EventKit delivery contract and durable ledger](eventkit-delivery-contract-20261025.md)
 - [Scoped prerequisite deferral](prerequisite-deferral.md)
 - [Execution sequence](../../future-architecture.md)
 
