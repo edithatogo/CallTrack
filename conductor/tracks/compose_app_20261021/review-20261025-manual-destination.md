@@ -48,7 +48,7 @@ acceptance.
 - Hosted run [40156597838](https://github.com/edithatogo/CallTrack/actions/runs/40156597838)
   failed on API26/API33/API36 at the initial `contentDescription` comparison;
   fixture cleanup and package removal passed on each. The assertion fix is in
-  the follow-up commit and requires a fresh matrix before acceptance.
+  the follow-up commit and required a fresh matrix before acceptance.
 - Hosted run [40157221270](https://github.com/edithatogo/CallTrack/actions/runs/40157221270)
   passed all four UI journeys on API33. API36 first stopped at the emulator
   phone-service health gate, then passed on the failed-job retry. API26 passed
@@ -56,9 +56,8 @@ acceptance.
   journey twice; its second run returned an app-owned focus assertion at the
   focus-wait source line. A follow-up now retains only the safe accessibility
   resource ID for that assertion, so the next run can identify the affected
-  screen without exposing visible text. That matrix is pending and this slice
-  remains unaccepted until it passes or a documented, reviewed compatibility
-  adjustment is qualified.
+  screen without exposing visible text. At that checkpoint the matrix remained pending; the eventual result is
+  recorded below.
 - Hosted run [40158783286](https://github.com/edithatogo/CallTrack/actions/runs/40158783286)
   passed API33 and API36. API26 failed twice at `import_calendar_picker` after
   the manual screen's focus check had passed. To avoid carrying focus state from
@@ -85,13 +84,22 @@ acceptance.
   The test now selects an enabled, clickable app control as the focus target in
   that case, while retaining the visible-focus-after-Tab assertion. Android
   instrumentation compilation passed; run qualification for commit `fb034f3`
-  is pending. This is a test-fixture correction, not a change to app focus
-  semantics.
+  was pending at that checkpoint. This is a test-fixture correction, not a
+  change to app focus semantics.
+- Hosted run [40165971174 attempt 2](https://github.com/edithatogo/CallTrack/actions/runs/40165971174/attempts/2)
+  passed settings, imports, recovery and accessibility on API26, API33 and API36.
+  The API26 attempt 1 keyboard-focus failure remains visible in the run history;
+  attempt 2 passed without changing application focus semantics. All 12 suite
+  receipts verify fixture cleanup, test-package removal and screenshot hashes;
+  all three settings receipts include the explicit manual destination journey.
+  Build qualification, slice, Compose prototype and multiplatform checks also
+  pass on commit `7feb4f6`.
 - The latest diagnostic change passed `tests.test_parity_ui_safety` (35 tests)
   on Python3.15.1; `git diff --check` is clean.
 
 ## Remaining gates
 
-The PR must pass build qualification and the hosted rendered API26/API33/API36
-journeys. Manual physical-device permission, provider, screen-reader and
-operational acceptance remain distinct from emulator evidence.
+The manual destination Compose slice passes its local and hosted acceptance.
+Track14 remains open for broader historical-import/recovery migration, process
+and lifecycle restoration, manual assistive technology, physical-device
+permission/provider and operational acceptance.

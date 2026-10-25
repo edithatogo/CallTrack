@@ -882,7 +882,7 @@ failed API26/API33/API36 at the test's initial comparison of a picker button's
 `contentDescription` with its visible label. Fixture cleanup and package
 removal were verified on all three. The test now asserts that provider loading
 leaves the stored preference unchanged and separately checks visible option
-text after explicit selection. This harness-only fix still needs hosted rerun.
+text after explicit selection. The final hosted result and later keyboard-focus finding are recorded below.
 
 Later hosted attempts exposed an API26 keyboard-focus assertion on the existing
 historical-import picker. API33/API36 passed on runs
@@ -892,6 +892,15 @@ while API26 reported `import_calendar_picker`. An attempted explicit
 `Modifier.focusable` caused the focus journey to fail on all three APIs and was
 reverted. The rendered acceptance test now focuses an enabled, clickable
 application control when its screen anchor is disabled, then still requires
-visible application focus after Tab. This test-only correction compiles; hosted
-acceptance for its exact source revision is pending. These failures are not
-counted as passes.
+visible application focus after Tab. This test-only correction compiled; hosted acceptance was pending at this
+checkpoint. The final result is recorded below. Failed attempts are not counted
+as passes.
+
+The exact-source hosted workflow [40165971174 attempt 2](https://github.com/edithatogo/CallTrack/actions/runs/40165971174/attempts/2)
+then passed all four suites (settings, imports, recovery and accessibility) on
+API26, API33 and API36. All 12 suite receipts record successful fixture cleanup,
+test-package removal and nonempty screenshot hashes; every settings receipt
+includes the explicit manual-calendar-choice journey. Attempt 1's API26
+keyboard-focus failure remains visible as a failed run and is not counted as a
+pass. The formatter, build qualification, slice, Compose prototype,
+multiplatform and source-bound Android UI checks pass on this source revision.
