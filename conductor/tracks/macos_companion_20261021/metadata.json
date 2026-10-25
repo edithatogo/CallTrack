@@ -13,16 +13,18 @@
   "execution_stage": 5,
   "production_adopted": false,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
-  "implementation_status": "preview-and-durable-delivery-prototypes-hosted-qualification-pending-native-eventkit-acceptance-pending",
+  "implementation_status": "preview-and-durable-delivery-prototypes-hosted-qualified-native-eventkit-acceptance-pending",
   "native_eventkit_accepted": false,
   "macos_app_packaging_accepted": false,
-  "pull_request": "https://github.com/edithatogo/CallTrack/pull/80",
-  "pull_request_state": "merged",
-  "implementation_commit": "4824ed091f35f9c73223a69450b9787b2ee1a2e4",
-  "review_commit": "0744011a17503ad1e50f8a66b7af3cb65b16d314",
-  "review_status": "delivery-prototype-local-review-pending-hosted-qualification-and-native-acceptance",
+  "pull_request": "https://github.com/edithatogo/CallTrack/pull/82",
+  "pull_request_state": "open",
+  "implementation_commit": "805709acef99bdd953a0d20bd0e4ef55d59d5d83",
+  "review_commit": "805709acef99bdd953a0d20bd0e4ef55d59d5d83",
+  "review_status": "delivery-prototype-reviewed-hosted-qualified-native-acceptance-pending",
   "hosted_qualification_run_ids": [
-    40115184152,
-    40115184153
+    40147893596,
+    40147890419,
+    40147893652,
+    40147890495
   ]
 }
