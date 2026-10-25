@@ -883,3 +883,15 @@ failed API26/API33/API36 at the test's initial comparison of a picker button's
 removal were verified on all three. The test now asserts that provider loading
 leaves the stored preference unchanged and separately checks visible option
 text after explicit selection. This harness-only fix still needs hosted rerun.
+
+Later hosted attempts exposed an API26 keyboard-focus assertion on the existing
+historical-import picker. API33/API36 passed on runs
+[40160333619](https://github.com/edithatogo/CallTrack/actions/runs/40160333619)
+and [40165028540](https://github.com/edithatogo/CallTrack/actions/runs/40165028540),
+while API26 reported `import_calendar_picker`. An attempted explicit
+`Modifier.focusable` caused the focus journey to fail on all three APIs and was
+reverted. The rendered acceptance test now focuses an enabled, clickable
+application control when its screen anchor is disabled, then still requires
+visible application focus after Tab. This test-only correction compiles; hosted
+acceptance for its exact source revision is pending. These failures are not
+counted as passes.

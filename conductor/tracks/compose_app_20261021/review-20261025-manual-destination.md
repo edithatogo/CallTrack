@@ -78,6 +78,15 @@ acceptance.
   regression; it has been removed. Keep the original `clickable` semantics and
   retain API26's intermittent focus-probe failure as an acceptance issue to
   resolve from a fresh run rather than weakening the app or test.
+- Hosted run [40165028540](https://github.com/edithatogo/CallTrack/actions/runs/40165028540)
+  again passed API33/API36 and failed API26 at the disabled-or-unavailable
+  `import_calendar_picker` anchor. Review traced the test path: when an anchor
+  is disabled it previously focused only the Compose host before sending Tab.
+  The test now selects an enabled, clickable app control as the focus target in
+  that case, while retaining the visible-focus-after-Tab assertion. Android
+  instrumentation compilation passed; run qualification for commit `fb034f3`
+  is pending. This is a test-fixture correction, not a change to app focus
+  semantics.
 - The latest diagnostic change passed `tests.test_parity_ui_safety` (35 tests)
   on Python3.15.1; `git diff --check` is clean.
 

@@ -77,3 +77,7 @@
 - [x] Task: Review manual destination token ownership, explicit selection persistence, permission/provider boundary and test harness; compile Android test sources, run app unit tests/lint, and record hosted-runtime acceptance as a separate pending gate (see [review](review-20261025-manual-destination.md)).
 - [ ] Task: Update requirements, decisions, remaining limitations and next-track inputs; retire superseded code/prototypes only after parity.
 - [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger.
+
+## Phase: Review Fixes — manual destination runtime acceptance
+- [x] Task: Diagnose the API26 keyboard-focus probe when its screen anchor is disabled; select an enabled clickable app control for the keyboard journey while preserving the visible-focus assertion. Android-test compilation passed. (fb034f3)
+- [ ] Task: Rerun the hosted API26/API33/API36 matrix on this exact source and address any remaining findings.
