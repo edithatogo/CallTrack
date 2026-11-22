@@ -110,10 +110,16 @@ def native_failure_summary(method, output, declared_permissions=None):
         detail = (detail + '; ' if detail else '') + (
             'keyboard-focus-missing anchor id=' + keyboard_anchor.group(1))
         focus_state = re.search(
-            r'focus-state=(no-root|none|initial|not-focusable|not-visible|foreign)(?![a-z-])',
+            r'focus-state=(no-root|none|stale|initial|not-focused|not-focusable|not-visible|foreign|not-in-tree)(?![a-z-])',
             output)
         if focus_state:
             detail += '; keyboard-focus-state=' + focus_state.group(1)
+        focus_node = re.search(
+            r'focus-node=(none|view|group|scroll|text|button|other):'
+            r'(none|app|foreign):(true|false):(true|false):(true|false) '
+            r'focus-tree-moved=(true|false)(?![a-z])', output)
+        if focus_node:
+            detail += '; ' + focus_node.group(0)
     # Keep only numeric geometry from the system-bars assertion; screenshot or
     # arbitrary rendered strings remain private in the ignored local receipt.
     geometry = re.search(

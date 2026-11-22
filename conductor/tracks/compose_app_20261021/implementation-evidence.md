@@ -1048,3 +1048,31 @@ restoration. A deliberate no-op key failed at the initial focused control, as
 expected, with the same cleanup verified. The restored Tab candidate was rebuilt;
 its source-input and APK hashes exactly matched the locally passing candidate.
 The hosted API26/API33/API36 matrix remains required for this updated probe.
+
+After PR #97 merged, main run `45023149403` passed all four suites on API33
+and API36. API26 passed settings, import and recovery, then failed the keyboard
+movement assertion at `auto_access_action`: Android accepted both key events,
+but `findFocus` returned a node reported as not focusable. Fixture cleanup,
+package removal and emulator shutdown passed. The job did not publish its
+private UI tree, so this observation does not establish whether another valid
+focused control existed elsewhere in the tree.
+
+The follow-up checks the refreshed accessibility tree for a different node
+that is actually focused, focusable, visible and app-owned. This retains the
+focus-movement gate without relying solely on a potentially non-focusable
+`findFocus` result. Failure diagnostics expose only fixed node categories and
+booleans, not labels or content. The updated source still requires its own
+API26/API33/API36 acceptance; a no-op key must continue to fail.
+
+The refreshed-tree candidate passed the local API26 ARM64 accessibility suite.
+A deliberate no-op key failed with `focus-tree-moved=false`, and fixture cleanup,
+package removal and emulator restoration passed for both outcomes. Rebuilding
+the restored Tab candidate produced the same source-input and APK hashes as the
+passing run. This does not retrospectively establish the cause of the main run.
+
+The final tree check also excludes the starting control's entire subtree, so a
+focused descendant of that control cannot count as a transition. On the dedicated
+API26 ARM64 emulator the no-op control again failed with `focus-tree-moved=false`
+and the restored Tab candidate passed with 12 screenshots. Both outcomes
+verified fixture cleanup, package removal and emulator restoration. Hosted
+qualification remains separate from this local evidence.

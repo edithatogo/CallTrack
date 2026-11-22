@@ -218,6 +218,16 @@ class UiSafety(unittest.TestCase):
         self.assertIn('keyboard-focus-state=initial', keyboard_summary)
         self.assertNotIn('private visible label', keyboard_summary)
 
+        tree_summary = device.native_failure_summary(
+            'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
+            'Keyboard Tab did not expose visible application focus auto_access_action '
+            'focus-state=not-focusable focus-node=view:app:true:false:true '
+            'focus-tree-moved=true private visible label must remain hidden\n',
+        )
+        self.assertIn('keyboard-focus-state=not-focusable', tree_summary)
+        self.assertIn('focus-node=view:app:true:false:true focus-tree-moved=true', tree_summary)
+        self.assertNotIn('private visible label', tree_summary)
+
         injection_summary = device.native_failure_summary(
             'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
             'java.lang.AssertionError: Android did not accept the Tab key down\n'
