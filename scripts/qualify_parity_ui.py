@@ -521,7 +521,10 @@ def qualify(serial, suite="settings", receipt_dir=None):
                   'com.markobl.calllogsync.slice.ManualCalendarScreenTest')
             command('shell', 'pm', 'grant', PACKAGE, 'android.permission.READ_CALL_LOG')
             check('renderedManualDeliverySurvivesRecreationWithoutRepeating')
-            for permission in ('READ_CALL_LOG', 'READ_CALENDAR', 'WRITE_CALENDAR'):
+            command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.READ_CALL_LOG')
+            # The automatic-settings journey starts on an empty fixture calendar.
+            check('prepareCalendarWithoutCallAccess')
+            for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
                 command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.' + permission)
             check('renderedActivitiesRespectSystemBars')
             check('renderedPermissionsFiltersConfirmPauseAndReopen')
