@@ -196,6 +196,18 @@ class UiSafety(unittest.TestCase):
         )
         self.assertIn('non-focusable anchor id=auto_access_action enabled=true', anchor_summary)
 
+        for message in (
+            'The initial keyboard target must accept focus',
+            'Initial keyboard focus was not applied',
+        ):
+            initial_summary = device.native_failure_summary(
+                'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
+                f'java.lang.AssertionError: {message} auto_access_action\n'
+                'private visible label must remain hidden\n',
+            )
+            self.assertIn('keyboard-initial-focus-missing anchor id=auto_access_action', initial_summary)
+            self.assertNotIn('private visible label', initial_summary)
+
         keyboard_summary = device.native_failure_summary(
             'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
             'java.lang.AssertionError: Keyboard Tab did not expose visible application focus slice_calendar_picker\n'

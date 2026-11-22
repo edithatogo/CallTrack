@@ -763,6 +763,8 @@ final class RenderedUi {
                 .append(node.isClickable())
                 .append(" focusable=")
                 .append(node.isFocusable())
+                .append(" focused=")
+                .append(node.isFocused())
                 .append(" checked=")
                 .append(node.isChecked())
                 .append(' ')

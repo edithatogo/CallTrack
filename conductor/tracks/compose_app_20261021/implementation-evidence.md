@@ -961,3 +961,36 @@ The [research archive](../../archive/compose_20261020/index.md) retains the
 standalone sources and results. The app's hosted API 26/33/36 settings suite now
 owns the replacement checks. That hosted matrix and the broader Track 14 device,
 accessibility and operational gates remain open on this branch.
+
+
+## API 26 keyboard focus investigation — 2026-11-22
+
+The post-merge [run 44995748589](https://github.com/edithatogo/CallTrack/actions/runs/44995748589)
+passed API 33 and 36. API 26 passed settings, import and recovery, then failed
+the visible keyboard-focus assertion at `auto_access_action`. Its fixture,
+packages and emulator were cleaned up. The local API 26 ARM64 baseline passed,
+so the hosted failure was not reproduced in that run.
+
+A local diagnostic showed that the probe first forced focus onto the
+`auto_intro_panel` Compose host while its chosen focus target was the
+`auto_access_action` in the separate `auto_permissions` host. The target's
+focus action returned success locally. The prior test also closed the shell
+command descriptor without waiting for the Tab command's output to reach EOF.
+Android 8 runs that command directly in a separate process. [Android 8
+UiAutomation source](https://android.googlesource.com/platform/frameworks/base/+/android-8.0.0_r36/core/java/android/app/UiAutomationConnection.java)
+
+The probe now requests the selected control's focus, verifies it became focused,
+waits for the device Tab command to finish, and requires focus to move to a
+different visible, focusable app-owned node. Existing screen, label, touch-target,
+permission and cleanup checks remain. Accessibility evidence records each
+node's focused state, and the host summary reports initial-focus failures using
+only the permitted anchor identifier.
+
+On a dedicated API 26 ARM64 emulator, a source-bound local acceptance run passed
+all four screens with verified fixture cleanup, package removal and emulator
+restoration. A deliberate no-op key in the same check failed the
+`auto_access_action` focus-movement assertion, with cleanup verified. A first
+candidate using shell operators failed on Android 8's direct command execution;
+the final probe invokes `input` directly. The precise cause of the historical
+hosted failure remains unconfirmed. API 26, 33 and 36 hosted acceptance must
+still run on the final source.

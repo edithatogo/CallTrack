@@ -22,43 +22,14 @@ import com.markobl.calllogsync.R;
 
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 /** Visible settings interactions on a token-owned local calendar, with no real calls. */
 public class PositiveUiTest {
     private final ParityProviderTest fixture = new ParityProviderTest();
-
-    private android.view.View firstVisibleFocusable(android.view.View view) {
-        if (view instanceof android.view.ViewGroup) {
-            android.view.ViewGroup group = (android.view.ViewGroup) view;
-            for (int i = 0; i < group.getChildCount(); i++) {
-                android.view.View candidate = firstVisibleFocusable(group.getChildAt(i));
-                if (candidate != null) return candidate;
-            }
-        }
-        android.graphics.Rect visible = new android.graphics.Rect();
-        return view.isShown()
-                        && view.isEnabled()
-                        && view.isFocusable()
-                        && view.getGlobalVisibleRect(visible)
-                        && !visible.isEmpty()
-                ? view
-                : null;
-    }
-
-    private android.view.View composeHost(android.view.View view) {
-        if (view.getClass().getName().equals("androidx.compose.ui.platform.ComposeView")) {
-            return view;
-        }
-        if (view instanceof android.view.ViewGroup) {
-            android.view.ViewGroup group = (android.view.ViewGroup) view;
-            for (int i = 0; i < group.getChildCount(); i++) {
-                android.view.View candidate = composeHost(group.getChildAt(i));
-                if (candidate != null) return candidate;
-            }
-        }
-        return null;
-    }
 
     private android.view.accessibility.AccessibilityNodeInfo firstEnabledFocusableControl(
             android.view.accessibility.AccessibilityNodeInfo node) {
@@ -73,12 +44,6 @@ public class PositiveUiTest {
             if (match != null) return match;
         }
         return null;
-    }
-
-    private boolean focusComposeHost(android.view.View view) {
-        view.setFocusable(true);
-        view.setFocusableInTouchMode(true);
-        return view.requestFocus();
     }
 
     private Context context() {
@@ -393,31 +358,6 @@ public class PositiveUiTest {
                                 + " enabled="
                                 + node.isEnabled(),
                         !node.isEnabled() || node.isFocusable());
-                android.view.View windowRoot = activity.getWindow().getDecorView();
-                final android.view.View[] initialFocus = {null};
-                final boolean[] inputFocusRequested = {false};
-                instrumentation.runOnMainSync(
-                        () -> {
-                            initialFocus[0] = composeHost(windowRoot);
-                            if (initialFocus[0] != null && initialFocus[0].isShown()) {
-                                inputFocusRequested[0] = focusComposeHost(initialFocus[0]);
-                            }
-                            if (!inputFocusRequested[0]) {
-                                initialFocus[0] = firstVisibleFocusable(windowRoot);
-                                inputFocusRequested[0] =
-                                        initialFocus[0] != null && initialFocus[0].requestFocus();
-                            }
-                        });
-                assertTrue(
-                        "Screen has no visible focusable view to accept keyboard input; host="
-                                + (initialFocus[0] == null
-                                        ? "missing"
-                                        : initialFocus[0].getClass().getName()
-                                                + ", shown="
-                                                + initialFocus[0].isShown()
-                                                + ", focusable="
-                                                + initialFocus[0].isFocusable()),
-                        inputFocusRequested[0]);
                 android.view.accessibility.AccessibilityNodeInfo focusTarget = node;
                 if (!node.isEnabled()) {
                     focusTarget =
@@ -426,14 +366,26 @@ public class PositiveUiTest {
                 assertNotNull(
                         "Screen has no enabled focusable control for keyboard acceptance " + anchor,
                         focusTarget);
-                focusTarget.performAction(
-                        android.view.accessibility.AccessibilityNodeInfo.ACTION_FOCUS);
-                try (android.os.ParcelFileDescriptor ignored =
-                        instrumentation
-                                .getUiAutomation()
-                                .executeShellCommand("input keyevent KEYCODE_TAB")) {
-                    // Inject through Android's input dispatcher; Instrumentation key events do
-                    // not traverse the Compose host consistently on API26 x86 emulators.
+                assertTrue(
+                        "The initial keyboard target must accept focus " + anchor,
+                        focusTarget.isFocused()
+                                || focusTarget.performAction(
+                                        android.view.accessibility.AccessibilityNodeInfo
+                                                .ACTION_FOCUS));
+                final android.view.accessibility.AccessibilityNodeInfo selectedTarget = focusTarget;
+                ui.await(
+                        () -> selectedTarget.refresh() && selectedTarget.isFocused(),
+                        "Initial keyboard focus was not applied " + anchor);
+                try (BufferedReader output =
+                        new BufferedReader(
+                                new InputStreamReader(
+                                        new android.os.ParcelFileDescriptor.AutoCloseInputStream(
+                                                instrumentation
+                                                        .getUiAutomation()
+                                                        .executeShellCommand(
+                                                                "input keyevent KEYCODE_TAB")),
+                                        StandardCharsets.UTF_8))) {
+                    assertNull("Tab injection emitted unexpected output", output.readLine());
                 } catch (java.io.IOException error) {
                     throw new AssertionError("Could not inject device Tab key", error);
                 }
@@ -448,6 +400,7 @@ public class PositiveUiTest {
                                             android.view.accessibility.AccessibilityNodeInfo
                                                     .FOCUS_INPUT);
                             return focused != null
+                                    && !selectedTarget.equals(focused)
                                     && focused.isFocusable()
                                     && focused.isVisibleToUser()
                                     && context()
