@@ -1,8 +1,8 @@
 # Plan: Community distribution and release readiness
 
-Original release acceptance is retained. Preparation can progress independently of
-Track4; a source-matched release candidate and recorded operational acceptance
-cannot. Track remains active and cannot yet be archived as complete.
+Track 5 owns the [active release gates](verification.md#active-release-gates).
+Preparation can progress independently of Track 4. Candidate acceptance requires
+M3 and the original M4 operational evidence.
 
 ## Phase 1: Discovery and mapping
 

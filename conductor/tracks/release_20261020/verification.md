@@ -1,6 +1,17 @@
 # Verification and readiness boundary
 
-## Current unsigned candidate — 2026-10-24
+## Active release gates
+
+Use the [D01–D09 requirements](requirements.md) and [release runbook](../../../RELEASING.md)
+for the full acceptance criteria. Select the exact release candidate and bind the
+source, artifacts, licences, trust evidence and independent reproduction to it.
+Record production identity and key custody, supported install/upgrade and recovery,
+and the corresponding-source and distribution-channel evidence. Use the existing
+physical-call, account-calendar and seven-day observation protocols. Review the
+remaining privacy, platform support and accessibility criteria before closing the
+track.
+
+## Latest recorded unsigned candidate — 2026-10-24
 
 See [candidate qualification](current-candidate-qualification-20261024.md),
 [candidate evidence](candidate-build-evidence-20261024.json),
@@ -17,7 +28,7 @@ The archive has not been published; licence/legal clearance, dependency-from-sou
 rebuild, production signing/key custody, physical calls, selected calendar routes
 and seven-day operational observation remain pending. `release_ready=false`.
 
-## Current trust and schema/provider continuation — 2026-10-21
+## Historical trust and schema/provider continuation — 2026-10-21
 
 See [current qualification](licence-tool-upgrade-qualification-20261021.md) and
 [current review](review-licence-tool-upgrade-20261021.md). Native fixture scope

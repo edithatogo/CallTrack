@@ -46,13 +46,10 @@ test "$(.venv/bin/python --version)" = "Python $python_version"
 ```
 
 The build runs JVM tests, builds app/test APKs and lints. Receipts and logs stay under
-excluded `.local/slice-evidence`. The active implementation now comprises36 Kotlin
-production files and one Java bridge preserving nullable calendar-label behaviour.
-[Track6](conductor/tracks/kotlin_20261020/index.md) records migration and acceptance
-separately. Compose/KMP/Rust are pending successor tracks in the
-[approved iOS-last sequence](conductor/future-architecture.md), not runtime dependencies.
-Retained dependencies include
-interim compatibility overrides documented in [tech stack](conductor/tech-stack.md).
+excluded `.local/slice-evidence`. The app uses Compose controls and Kotlin shared
+call-selection rules. The [live plan](conductor/index.md#current-checkpoint) links
+each track's remaining work and evidence. The [tech stack](conductor/tech-stack.md)
+documents retained dependencies and compatibility overrides.
 
 For an explicitly selected, authorised test device with neither development test
 package already installed:
@@ -99,9 +96,9 @@ future community distribution; they do not establish a release candidate or publ
 reporting channel. Physical/cloud/operational acceptance and signing/distribution
 gates remain open; Track4 selected-emulator acceptance is archived.
 
-[Compose research](prototypes/compose/README.md) is an isolated synthetic app, not
-part of this working application's build or runtime. Its research decision retains
-Views until real screen behaviour and manual accessibility are qualified.
+The app acceptance suite covers the retired standalone Compose experiment's
+launcher cases. The [Compose research archive](conductor/archive/compose_20261020/index.md)
+retains the original experiment and its evidence.
 
 ## Parity acceptance and recovery
 

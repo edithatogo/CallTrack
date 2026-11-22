@@ -30,7 +30,7 @@ class HistoricalImportActivity : ComponentActivity() {
     private var currentId: String? = null
     private var zone: String? = null
     private var session: HistoricalImport.Session? = null
-    private var destinationState by mutableStateOf(HistoricalImportDestinationUiState())
+    private var destinationState by mutableStateOf(CalendarDestinationUiState())
     private var filters by mutableStateOf(HistoricalImportFiltersUiState())
     private var actionState by mutableStateOf(HistoricalImportActionState())
     private var summary: ComposeView? = null
@@ -108,8 +108,10 @@ class HistoricalImportActivity : ComponentActivity() {
                     ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
                 )
                 setContent {
-                    HistoricalImportDestinationPanel(
+                    CalendarDestinationPicker(
                         state = destinationState,
+                        tagPrefix = "import_calendar",
+                        optionsEnabled = true,
                         chooseLabel = stringResource(R.string.slice_choose),
                         unavailableLabel = stringResource(R.string.auto_destination_unavailable),
                         onSelect = ::selectDestination,
@@ -302,7 +304,7 @@ class HistoricalImportActivity : ComponentActivity() {
                         loaded.map { choice ->
                             val token = UUID.randomUUID().toString()
                             destinationTargets[token] = choice.id
-                            HistoricalImportDestinationOption(
+                            CalendarDestinationOption(
                                 token,
                                 choice.name ?: getString(R.string.auto_destination_unavailable),
                             )
@@ -311,7 +313,7 @@ class HistoricalImportActivity : ComponentActivity() {
                         options.firstOrNull { destinationTargets[it.token] == preferred }?.token
                     selected = selectedDestinationToken?.let(destinationTargets::get) ?: -1L
                     destinationState =
-                        HistoricalImportDestinationUiState(
+                        CalendarDestinationUiState(
                             options = options,
                             selectedToken = selectedDestinationToken,
                             enabled = !busy && calendarAccess(),

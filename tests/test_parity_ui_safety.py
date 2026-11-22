@@ -338,6 +338,8 @@ class UiSafety(unittest.TestCase):
         self.systemui_anr = False
         self.files = 'screen.png\nscreen.txt'
         self.fail_cleanup = False
+        self.install_timeout = False
+        self.app_permission = ''
         self.avd = RECOVERY_AVD
 
     def command(self, command, **kwargs):
@@ -352,6 +354,8 @@ class UiSafety(unittest.TestCase):
             output = self.avd + '\nOK'
         elif args == ['shell', 'dumpsys', 'window']:
             output = 'mCurrentFocus=Window{Application Not Responding: com.android.systemui}' if self.systemui_anr else 'mCurrentFocus=Window{Launcher}'
+        elif args[0] == 'install' and self.install_timeout:
+            raise subprocess.TimeoutExpired(command, kwargs['timeout'])
         elif args[0] in ('install', 'uninstall'):
             output = 'Success'
         elif args[:4] == ['shell', 'cmd', 'package', 'compile']:
@@ -366,6 +370,8 @@ class UiSafety(unittest.TestCase):
 
     def run_fixture(self, suite="settings", receipt_dir=None):
         identities = ["package: name='" + p + "'" for p in (device.PACKAGE, device.TEST_PACKAGE)]
+        if self.app_permission:
+            identities[0] += "\nuses-permission: name='android.permission." + self.app_permission + "'"
         environment = Mock()
         environment.snapshot.return_value = {'awake': 'Awake'}
         environment.restore.return_value = {'verified': True}
@@ -412,6 +418,28 @@ class UiSafety(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'dedicated'):
             self.run_fixture()
         self.assertFalse(any(c[0] == 'install' for c in self.calls))
+
+    def test_stale_build_inputs_refuse_device_access(self):
+        with patch.object(device, 'ROOT', self.root), patch.object(
+            device, 'inputs', return_value={'app/src/changed.kt': 'different'}
+        ), patch.object(device.subprocess, 'run') as run:
+            with self.assertRaisesRegex(RuntimeError, 'build receipt does not match current source'):
+                device.qualify('emulator-5582')
+            run.assert_not_called()
+
+    def test_sensitive_permission_refuses_device_access(self):
+        self.app_permission = 'INTERNET'
+        with self.assertRaisesRegex(RuntimeError, 'outside the UI fixture scope'):
+            self.run_fixture()
+        self.assertFalse(self.calls)
+
+    def test_uncertain_install_uninstalls_and_checks_absence(self):
+        self.install_timeout = True
+        self.assertEqual(1, self.run_fixture())
+        self.assertIn(['uninstall', device.PACKAGE], self.calls)
+        self.assertIn(['shell', 'pm', 'list', 'packages', device.PACKAGE], self.calls)
+        receipt = json.loads((self.root / '.local/slice-evidence/parity-ui-receipt.json').read_text())
+        self.assertTrue(receipt['packages_removed'])
 
     def test_no_screenshot_preserves_installed_evidence_and_cleanup_code(self):
         self.files = ''
