@@ -994,3 +994,57 @@ candidate using shell operators failed on Android 8's direct command execution;
 the final probe invokes `input` directly. The precise cause of the historical
 hosted failure remains unconfirmed. API 26, 33 and 36 hosted acceptance must
 still run on the final source.
+
+
+## Import and recovery screen completion — 2026-11-22
+
+The reviewed import and recovery slices already place their visible text and
+controls in lifecycle-disposed Compose hosts. The current Activity audit found
+only native scrolling/layout containers and system confirmation dialogs around
+those hosts. They preserve existing Android host IDs and inset handling; the
+Activities retain destination, permission, import, ledger and calendar effects.
+The feedback hosts and recovery row container are local construction variables
+rather than unused Activity fields. No provider or recovery behavior changed.
+
+The accessibility journey now verifies the existing named Compose hosts and
+rejects legacy content widgets in the two screen trees while retaining the label,
+touch-target and keyboard-focus checks. The import suite additionally checks
+destination and filter restoration across Activity recreation, no implicit
+preview or calendar event, and a subsequent explicit preview bound to the
+selected calendar. The recovery suite checks that recreating a pending record
+does not approve it or create an event. Existing explicit-approval, withdrawal,
+read-only, edit/deletion, suppression and retention journeys remain in place.
+
+The source-bound local API36 ARM64 build, JVM tests and lint passed. The import,
+recovery and accessibility suites passed with respectively 12, 11 and 12
+screenshots; each verified fixture cleanup, package removal and emulator
+restoration. The 38 focused host safety tests and Conductor verification also
+passed. A prior local build failed after the filesystem filled; its log was
+retained and the successful build followed after free space returned.
+
+At this local checkpoint the hosted API26/API33/API36 matrix had not yet run on
+this source. Manual TalkBack/Switch Access, physical-device, cloud-calendar,
+full process recovery and operational acceptance remain open; this checkpoint
+does not complete Track14 or promote a release.
+
+The first hosted matrix for this checkpoint, run `45019695465`, passed all
+four suites on API33 and API36. API26 passed settings, import and recovery,
+then failed the keyboard-focus movement assertion at `recovery_refresh_action`;
+fixture cleanup and package removal passed. The failed job did not publish its
+private UI captures, so the exact cause remains unconfirmed.
+
+The focus probe now waits for the Activity window and selected node to hold input
+focus, then injects the same keyboard-source Tab down/up events synchronously
+through `UiAutomation` and checks Android's return values before requiring
+focus to move. The [Android 8 `input` command](https://android.googlesource.com/platform/frameworks/base/+/android-8.0.0_r36/cmds/input/src/com/android/commands/input/Input.java)
+does not report the injection result through its stdout. The failure summary retains only an allowlisted focus-state
+category, not rendered text. These changes remove an unobserved injection path
+and improve diagnostics; they do not establish why the earlier hosted focus
+transition failed. The existing movement, visibility and ownership gates remain.
+
+On the dedicated API26 ARM64 emulator, the updated accessibility suite passed
+with 12 screenshots and verified fixture cleanup, package removal and emulator
+restoration. A deliberate no-op key failed at the initial focused control, as
+expected, with the same cleanup verified. The restored Tab candidate was rebuilt;
+its source-input and APK hashes exactly matched the locally passing candidate.
+The hosted API26/API33/API36 matrix remains required for this updated probe.

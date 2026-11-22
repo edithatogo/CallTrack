@@ -11,7 +11,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.os.SystemClock;
 import android.provider.CallLog.Calls;
+import android.view.InputDevice;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import androidx.test.core.app.ActivityScenario;
@@ -22,9 +26,6 @@ import com.markobl.calllogsync.R;
 
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 /** Visible settings interactions on a token-owned local calendar, with no real calls. */
@@ -44,6 +45,31 @@ public class PositiveUiTest {
             if (match != null) return match;
         }
         return null;
+    }
+
+    private void assertComposeScreen(
+            Instrumentation instrumentation, Activity activity, int... ids) {
+        instrumentation.runOnMainSync(
+                () -> {
+                    for (int id : ids) {
+                        assertTrue(
+                                "Missing Compose host "
+                                        + context().getResources().getResourceEntryName(id),
+                                activity.findViewById(id)
+                                        instanceof androidx.compose.ui.platform.ComposeView);
+                    }
+                    assertNoLegacyContent(activity.findViewById(android.R.id.content));
+                });
+    }
+
+    private static void assertNoLegacyContent(android.view.View view) {
+        if (view instanceof androidx.compose.ui.platform.ComposeView) return;
+        assertFalse("Legacy adapter widget remains", view instanceof android.widget.AdapterView);
+        assertTrue(
+                "Legacy content remains: " + view.getClass().getSimpleName(),
+                view instanceof android.view.ViewGroup);
+        android.view.ViewGroup group = (android.view.ViewGroup) view;
+        for (int i = 0; i < group.getChildCount(); i++) assertNoLegacyContent(group.getChildAt(i));
     }
 
     private Context context() {
@@ -343,6 +369,41 @@ public class PositiveUiTest {
             try {
                 final String anchor = anchors[i];
                 ui.await(() -> ui.find(anchor, true) != null, "Missing screen " + anchor);
+                final boolean[] windowFocused = {false};
+                ui.await(
+                        () -> {
+                            instrumentation.runOnMainSync(
+                                    () -> windowFocused[0] = activity.hasWindowFocus());
+                            return windowFocused[0];
+                        },
+                        "Screen window did not receive keyboard input focus " + anchor);
+                if (activity instanceof HistoricalImportActivity) {
+                    assertComposeScreen(
+                            instrumentation,
+                            activity,
+                            R.id.import_intro_panel,
+                            R.id.import_access_panel,
+                            R.id.import_calendar_picker_panel,
+                            R.id.import_filters,
+                            R.id.import_actions,
+                            R.id.import_summary,
+                            R.id.import_feedback,
+                            R.id.import_history);
+                } else if (activity instanceof ReceiptRecoveryActivity) {
+                    assertComposeScreen(
+                            instrumentation,
+                            activity,
+                            R.id.recovery_intro_panel,
+                            R.id.recovery_access_panel,
+                            R.id.recovery_refresh,
+                            R.id.recovery_retention_copy,
+                            R.id.recovery_retention,
+                            R.id.recovery_feedback,
+                            R.id.recovery_empty,
+                            R.id.recovery_cards,
+                            R.id.recovery_navigation);
+                    assertNotNull(activity.findViewById(R.id.recovery_rows));
+                }
                 ui.capture("accessibility-before-" + i);
                 final int[] controls = {0};
                 assertRenderedAccessibilityControls(
@@ -374,40 +435,78 @@ public class PositiveUiTest {
                                                 .ACTION_FOCUS));
                 final android.view.accessibility.AccessibilityNodeInfo selectedTarget = focusTarget;
                 ui.await(
-                        () -> selectedTarget.refresh() && selectedTarget.isFocused(),
-                        "Initial keyboard focus was not applied " + anchor);
-                try (BufferedReader output =
-                        new BufferedReader(
-                                new InputStreamReader(
-                                        new android.os.ParcelFileDescriptor.AutoCloseInputStream(
-                                                instrumentation
-                                                        .getUiAutomation()
-                                                        .executeShellCommand(
-                                                                "input keyevent KEYCODE_TAB")),
-                                        StandardCharsets.UTF_8))) {
-                    assertNull("Tab injection emitted unexpected output", output.readLine());
-                } catch (java.io.IOException error) {
-                    throw new AssertionError("Could not inject device Tab key", error);
-                }
-                ui.capture("accessibility-after-tab-" + i);
-                ui.await(
                         () -> {
-                            android.view.accessibility.AccessibilityNodeInfo root =
-                                    ui.automation.getRootInActiveWindow();
-                            if (root == null) return false;
-                            android.view.accessibility.AccessibilityNodeInfo focused =
-                                    root.findFocus(
-                                            android.view.accessibility.AccessibilityNodeInfo
-                                                    .FOCUS_INPUT);
-                            return focused != null
-                                    && !selectedTarget.equals(focused)
-                                    && focused.isFocusable()
-                                    && focused.isVisibleToUser()
-                                    && context()
-                                            .getPackageName()
-                                            .contentEquals(focused.getPackageName());
+                            instrumentation.runOnMainSync(
+                                    () -> windowFocused[0] = activity.hasWindowFocus());
+                            return windowFocused[0]
+                                    && selectedTarget.refresh()
+                                    && selectedTarget.isFocused();
                         },
-                        "Keyboard Tab did not expose visible application focus " + anchor);
+                        "Initial keyboard focus was not applied " + anchor);
+                long now = SystemClock.uptimeMillis();
+                KeyEvent down =
+                        new KeyEvent(
+                                now,
+                                now,
+                                KeyEvent.ACTION_DOWN,
+                                KeyEvent.KEYCODE_TAB,
+                                0,
+                                0,
+                                KeyCharacterMap.VIRTUAL_KEYBOARD,
+                                0,
+                                0,
+                                InputDevice.SOURCE_KEYBOARD);
+                KeyEvent up =
+                        new KeyEvent(
+                                now,
+                                now,
+                                KeyEvent.ACTION_UP,
+                                KeyEvent.KEYCODE_TAB,
+                                0,
+                                0,
+                                KeyCharacterMap.VIRTUAL_KEYBOARD,
+                                0,
+                                0,
+                                InputDevice.SOURCE_KEYBOARD);
+                boolean downAccepted = ui.automation.injectInputEvent(down, true);
+                boolean upAccepted = ui.automation.injectInputEvent(up, true);
+                assertTrue("Android did not accept the Tab key down", downAccepted);
+                assertTrue("Android did not accept the Tab key up", upAccepted);
+                ui.capture("accessibility-after-tab-" + i);
+                final String[] focusState = {"no-root"};
+                try {
+                    ui.await(
+                            () -> {
+                                android.view.accessibility.AccessibilityNodeInfo root =
+                                        ui.automation.getRootInActiveWindow();
+                                if (root == null) {
+                                    focusState[0] = "no-root";
+                                    return false;
+                                }
+                                android.view.accessibility.AccessibilityNodeInfo focused =
+                                        root.findFocus(
+                                                android.view.accessibility.AccessibilityNodeInfo
+                                                        .FOCUS_INPUT);
+                                if (focused == null) focusState[0] = "none";
+                                else if (selectedTarget.equals(focused)) focusState[0] = "initial";
+                                else if (!focused.isFocusable()) focusState[0] = "not-focusable";
+                                else if (!focused.isVisibleToUser()) focusState[0] = "not-visible";
+                                else if (!context()
+                                        .getPackageName()
+                                        .contentEquals(focused.getPackageName()))
+                                    focusState[0] = "foreign";
+                                else focusState[0] = "moved";
+                                return focusState[0].equals("moved");
+                            },
+                            "Keyboard Tab did not expose visible application focus " + anchor);
+                } catch (AssertionError failure) {
+                    throw new AssertionError(
+                            "Keyboard Tab did not expose visible application focus "
+                                    + anchor
+                                    + " focus-state="
+                                    + focusState[0],
+                            failure);
+                }
                 ui.capture("accessibility-" + i);
             } finally {
                 finish(instrumentation, activity);

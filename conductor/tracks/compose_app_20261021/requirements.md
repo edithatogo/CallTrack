@@ -19,6 +19,6 @@
 | C14-15 | Automatic-settings introduction and permission access can migrate independently of policy controls. | Stable Compose hosts render the localized introduction and accessible access action; only an explicit tap calls the existing Activity permission request, while destination, filters and activation remain Activity-owned. |
 | C14-16 | The manual launcher's presentation can move into one lifecycle-bound Compose screen without moving effect or destination authority. | The stable accessibility identifiers render from Activity-supplied state; provider choice, permission access, manual delivery and navigation occur only after explicit actions. Existing calendar-ID persistence and inset/scroll behavior remain unchanged. |
 
-Historical-import controls and any remaining recovery parity work stay gated on
-their own lifecycle, accessibility and behavior acceptance. Completed slices do
-not close the remaining Track14 migration or its broader acceptance matrix.
+Historical-import and recovery controls are presented by the existing Compose
+hosts. Lifecycle, accessibility and behavior acceptance remains separate from
+the migration and continues to gate Track14's broader acceptance matrix.

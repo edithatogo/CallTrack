@@ -34,7 +34,6 @@ class HistoricalImportActivity : ComponentActivity() {
     private var filters by mutableStateOf(HistoricalImportFiltersUiState())
     private var actionState by mutableStateOf(HistoricalImportActionState())
     private var summary: ComposeView? = null
-    private var feedback: ComposeView? = null
     private var summaryText by mutableStateOf("")
     private var feedbackText by mutableStateOf("")
     private var historyState by mutableStateOf(HistoricalImportHistoryUiState())
@@ -193,7 +192,7 @@ class HistoricalImportActivity : ComponentActivity() {
                 }
             }
         layout.addView(runActions)
-        feedback =
+        val feedback =
             ComposeView(this).apply {
                 id = R.id.import_feedback
                 setViewCompositionStrategy(

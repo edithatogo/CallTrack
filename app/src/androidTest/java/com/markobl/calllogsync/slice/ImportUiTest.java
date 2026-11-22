@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.provider.CallLog.Calls;
 
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.markobl.calllogsync.R;
@@ -136,6 +137,57 @@ public class ImportUiTest {
                     for (int type = 1; type <= 3; type++) add(yesterday + type * 1000, type);
                     add(day(today().minusDays(8)), 1);
                 });
+    }
+
+    @Test
+    public void renderedDestinationAndFiltersSurviveRecreationBeforePreview() {
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        RenderedUi ui = new RenderedUi(instrumentation);
+        String from = today().minusDays(1).toString(), to = today().toString();
+        try (ActivityScenario<HistoricalImportActivity> scenario =
+                ActivityScenario.launch(HistoricalImportActivity.class)) {
+            ui.tapId("import_calendar_picker");
+            ui.tapText(fixture.calendarDisplayName());
+            ui.setTextId("import_from", from);
+            ui.setTextId("import_to", to);
+            ui.tapId("import_outgoing");
+            ui.await(
+                    () -> {
+                        android.view.accessibility.AccessibilityNodeInfo node =
+                                ui.shown("import_outgoing", true);
+                        return node != null && node.isCheckable() && !node.isChecked();
+                    },
+                    "Outgoing filter did not switch off");
+            ui.dismissKeyboard();
+            assertNull("Editing must not create a preview", latest());
+            assertEquals(0, fixture.events(calendar()));
+            ui.capture("import-before-recreation");
+
+            scenario.recreate();
+            ui.revealId("import_calendar_picker");
+            ui.await(
+                    () -> ui.find(fixture.calendarDisplayName(), false) != null,
+                    "Selected destination did not return after recreation");
+            assertEquals(from, ui.shown("import_from", true).getText().toString());
+            assertEquals(to, ui.shown("import_to", true).getText().toString());
+            assertFalse(ui.shown("import_outgoing", true).isChecked());
+            assertNull("Recreation must not create a preview", latest());
+            assertEquals(0, fixture.events(calendar()));
+            ui.capture("import-after-recreation");
+
+            ui.tapId("import_create");
+            ui.await(
+                    () -> phase(HistoricalImport.Phase.PREVIEW), "Restored preview did not finish");
+            assertEquals(calendar(), latest().calendar);
+            assertEquals(2, latest().count);
+            assertEquals(0, fixture.events(calendar()));
+            ui.tapId("import_cancel");
+            ui.tapDialogPositive();
+            ui.await(
+                    () -> phase(HistoricalImport.Phase.CANCELLED),
+                    "Restored preview did not cancel");
+            assertEquals(0, fixture.events(calendar()));
+        }
     }
 
     @Test

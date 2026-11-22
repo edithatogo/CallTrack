@@ -210,12 +210,29 @@ class UiSafety(unittest.TestCase):
 
         keyboard_summary = device.native_failure_summary(
             'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
-            'java.lang.AssertionError: Keyboard Tab did not expose visible application focus slice_calendar_picker\n'
+            'java.lang.AssertionError: Keyboard Tab did not expose visible application focus slice_calendar_picker focus-state=initial\n'
             '    at com.markobl.calllogsync.slice.PositiveUiTest.renderedAccessibilityLabelsTargetsAndKeyboardFocus(PositiveUiTest.java:306)\n'
             'private visible label must remain hidden\n',
         )
         self.assertIn('keyboard-focus-missing anchor id=slice_calendar_picker', keyboard_summary)
+        self.assertIn('keyboard-focus-state=initial', keyboard_summary)
         self.assertNotIn('private visible label', keyboard_summary)
+
+        injection_summary = device.native_failure_summary(
+            'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
+            'java.lang.AssertionError: Android did not accept the Tab key down\n'
+            'private visible label must remain hidden\n',
+        )
+        self.assertIn('keyboard-tab-injection-rejected phase=down', injection_summary)
+        self.assertNotIn('private visible label', injection_summary)
+
+        window_summary = device.native_failure_summary(
+            'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
+            'Screen window did not receive keyboard input focus recovery_refresh_action\n'
+            'private visible label must remain hidden\n',
+        )
+        self.assertIn('keyboard-window-focus-missing anchor id=recovery_refresh_action', window_summary)
+        self.assertNotIn('private visible label', window_summary)
 
     def test_failure_summary_retains_safe_system_inset_measurements(self):
         summary = device.native_failure_summary(
@@ -473,6 +490,7 @@ class UiSafety(unittest.TestCase):
         self.assertEqual(0, self.run_fixture('imports'))
         methods = [' '.join(c) for c in self.calls if c[:3] == ['shell', 'am', 'instrument']]
         self.assertTrue(all('ImportUiTest#' in method for method in methods))
+        self.assertTrue(any('renderedDestinationAndFiltersSurviveRecreationBeforePreview' in method for method in methods))
         receipt = json.loads((self.root / '.local/slice-evidence/parity-ui-imports-receipt.json').read_text())
         self.assertEqual('imports', receipt['suite'])
         self.assertTrue(receipt['fixture_cleanup_verified'])
@@ -481,6 +499,7 @@ class UiSafety(unittest.TestCase):
         self.assertEqual(0, self.run_fixture('recovery'))
         methods = [' '.join(c) for c in self.calls if c[:3] == ['shell', 'am', 'instrument']]
         self.assertTrue(all('RecoveryUiTest#' in method for method in methods))
+        self.assertTrue(any('renderedPendingRecoverySurvivesRecreationWithoutApproval' in method for method in methods))
         check_index = next(i for i,c in enumerate(self.calls) if 'renderedExistingCheckWithoutWriteAccess' in ' '.join(c))
         self.assertEqual(['shell', 'pm', 'revoke', device.PACKAGE, 'android.permission.WRITE_CALENDAR'], self.calls[check_index-1])
         self.assertEqual(['shell', 'pm', 'grant', device.PACKAGE, 'android.permission.WRITE_CALENDAR'], self.calls[check_index+1])
