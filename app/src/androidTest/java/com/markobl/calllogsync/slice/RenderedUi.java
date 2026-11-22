@@ -78,6 +78,32 @@ final class RenderedUi {
                                         | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
     }
 
+    private boolean stoppedWithSavedState(Class<? extends Activity> activity) {
+        boolean target = false;
+        boolean saved = false;
+        try (ParcelFileDescriptor descriptor =
+                        automation.executeShellCommand("dumpsys activity activities");
+                BufferedReader reader =
+                        new BufferedReader(
+                                new InputStreamReader(
+                                        new FileInputStream(descriptor.getFileDescriptor()),
+                                        StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().matches("\\* Hist\\s+#.*")) {
+                    if (target) return false;
+                    target = line.contains(context.getPackageName() + "/" + activity.getName());
+                } else if (target) {
+                    if (line.contains("mHaveState=true")) saved = true;
+                    if (line.contains("state=STOPPED") && saved) return true;
+                }
+            }
+        } catch (java.io.IOException failure) {
+            throw new AssertionError("Could not inspect stopped activity state", failure);
+        }
+        return false;
+    }
+
     void killStoppedProcessAndReturn(Class<? extends Activity> activity) {
         ActivityManager.RunningAppProcessInfo before = mainProcess();
         assertNotNull("App main process was not running", before);
@@ -108,6 +134,9 @@ final class RenderedUi {
                                     >= ActivityManager.RunningAppProcessInfo.IMPORTANCE_CACHED;
                 },
                 "App process did not become stopped and eligible for background death");
+        await(
+                () -> stoppedWithSavedState(activity),
+                "Android did not retain the stopped activity state");
         android.os.Process.killProcess(pid);
         await(() -> mainProcess() == null, "App process survived the background kill");
         savedTask.moveToFront();

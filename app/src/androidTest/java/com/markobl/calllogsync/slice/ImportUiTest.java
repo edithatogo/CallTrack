@@ -295,6 +295,8 @@ public class ImportUiTest {
             assertEquals(0, fixture.events(calendar()));
             ui.revealId("import_summary");
             ui.capture("import-cancelled");
+            ui.dismissKeyboard();
+            ui.revealId("import_create");
             preview(ui);
             confirm(ui);
             assertEquals(3, fixture.events(calendar()));

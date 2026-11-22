@@ -1095,3 +1095,19 @@ against the earlier query; the candidate specifies descending date and ID
 explicitly. The phone test, current-source hosted matrix and process-recovery
 qualification remain pending. The process test returns to the retained task
 after killing the stopped app process, rather than starting a new activity.
+
+The first hosted matrix on this candidate, run `45080074184`, failed the
+new import process-restoration check on API26, API33 and API36; fixture cleanup
+and package removal passed. The initial driver could kill the cached process
+before Android had saved its activity state. The revised driver waits for the
+target activity to be stopped with saved state before killing it. The import
+journey also dismisses the keyboard after verifying cancellation so its next
+explicit preview control can be reached; the cancellation assertion remains.
+The separate first build run `45080052659` encountered HTTP 429 while fetching
+the pinned formatter. These failures remain part of the qualification history.
+
+On the dedicated API36 emulator, the revised source-bound build, unit tests and
+lint passed, as did the import, recovery and accessibility suites. Each suite
+verified fixture cleanup, package removal and emulator restoration. The 38
+focused host safety tests passed. The corrected candidate still needs its own
+hosted API26/API33/API36 matrix and controlled phone/Google Calendar retest.
