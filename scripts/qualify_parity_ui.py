@@ -96,12 +96,24 @@ def native_failure_summary(method, output, declared_permissions=None):
         output)
     if initial_focus:
         detail += '; keyboard-initial-focus-missing anchor id=' + initial_focus.group(1)
+    window_focus = re.search(
+        r'Screen window did not receive keyboard input focus ([a-z0-9_]+)', output)
+    if window_focus:
+        detail += '; keyboard-window-focus-missing anchor id=' + window_focus.group(1)
+    rejected_tab = re.search(r'Android did not accept the Tab key (down|up)', output)
+    if rejected_tab:
+        detail += '; keyboard-tab-injection-rejected phase=' + rejected_tab.group(1)
     keyboard_anchor = re.search(
         r'Keyboard Tab did not expose visible application focus ([a-z0-9_]+)',
         output)
     if keyboard_anchor:
         detail = (detail + '; ' if detail else '') + (
             'keyboard-focus-missing anchor id=' + keyboard_anchor.group(1))
+        focus_state = re.search(
+            r'focus-state=(no-root|none|initial|not-focusable|not-visible|foreign)(?![a-z-])',
+            output)
+        if focus_state:
+            detail += '; keyboard-focus-state=' + focus_state.group(1)
     # Keep only numeric geometry from the system-bars assertion; screenshot or
     # arbitrary rendered strings remain private in the ignored local receipt.
     geometry = re.search(

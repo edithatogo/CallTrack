@@ -1026,3 +1026,25 @@ At this local checkpoint the hosted API26/API33/API36 matrix had not yet run on
 this source. Manual TalkBack/Switch Access, physical-device, cloud-calendar,
 full process recovery and operational acceptance remain open; this checkpoint
 does not complete Track14 or promote a release.
+
+The first hosted matrix for this checkpoint, run `45019695465`, passed all
+four suites on API33 and API36. API26 passed settings, import and recovery,
+then failed the keyboard-focus movement assertion at `recovery_refresh_action`;
+fixture cleanup and package removal passed. The failed job did not publish its
+private UI captures, so the exact cause remains unconfirmed.
+
+The focus probe now waits for the Activity window and selected node to hold input
+focus, then injects the same keyboard-source Tab down/up events synchronously
+through `UiAutomation` and checks Android's return values before requiring
+focus to move. The [Android 8 `input` command](https://android.googlesource.com/platform/frameworks/base/+/android-8.0.0_r36/cmds/input/src/com/android/commands/input/Input.java)
+does not report the injection result through its stdout. The failure summary retains only an allowlisted focus-state
+category, not rendered text. These changes remove an unobserved injection path
+and improve diagnostics; they do not establish why the earlier hosted focus
+transition failed. The existing movement, visibility and ownership gates remain.
+
+On the dedicated API26 ARM64 emulator, the updated accessibility suite passed
+with 12 screenshots and verified fixture cleanup, package removal and emulator
+restoration. A deliberate no-op key failed at the initial focused control, as
+expected, with the same cleanup verified. The restored Tab candidate was rebuilt;
+its source-input and APK hashes exactly matched the locally passing candidate.
+The hosted API26/API33/API36 matrix remains required for this updated probe.

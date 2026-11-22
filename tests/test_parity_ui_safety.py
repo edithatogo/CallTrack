@@ -210,12 +210,29 @@ class UiSafety(unittest.TestCase):
 
         keyboard_summary = device.native_failure_summary(
             'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
-            'java.lang.AssertionError: Keyboard Tab did not expose visible application focus slice_calendar_picker\n'
+            'java.lang.AssertionError: Keyboard Tab did not expose visible application focus slice_calendar_picker focus-state=initial\n'
             '    at com.markobl.calllogsync.slice.PositiveUiTest.renderedAccessibilityLabelsTargetsAndKeyboardFocus(PositiveUiTest.java:306)\n'
             'private visible label must remain hidden\n',
         )
         self.assertIn('keyboard-focus-missing anchor id=slice_calendar_picker', keyboard_summary)
+        self.assertIn('keyboard-focus-state=initial', keyboard_summary)
         self.assertNotIn('private visible label', keyboard_summary)
+
+        injection_summary = device.native_failure_summary(
+            'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
+            'java.lang.AssertionError: Android did not accept the Tab key down\n'
+            'private visible label must remain hidden\n',
+        )
+        self.assertIn('keyboard-tab-injection-rejected phase=down', injection_summary)
+        self.assertNotIn('private visible label', injection_summary)
+
+        window_summary = device.native_failure_summary(
+            'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
+            'Screen window did not receive keyboard input focus recovery_refresh_action\n'
+            'private visible label must remain hidden\n',
+        )
+        self.assertIn('keyboard-window-focus-missing anchor id=recovery_refresh_action', window_summary)
+        self.assertNotIn('private visible label', window_summary)
 
     def test_failure_summary_retains_safe_system_inset_measurements(self):
         summary = device.native_failure_summary(
