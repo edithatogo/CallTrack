@@ -6,10 +6,10 @@ Use the [D01–D09 requirements](requirements.md) and [release runbook](../../..
 for the full acceptance criteria. Select the exact release candidate and bind the
 source, artifacts, licences, trust evidence and independent reproduction to it.
 Record production identity and key custody, supported install/upgrade and recovery,
-and the corresponding-source and distribution-channel evidence. Complete physical
-calls and selected account-calendar readback, then record seven actual observation
-days under the existing protocol. Review the remaining privacy, platform support
-and accessibility criteria before closing the track.
+and the corresponding-source and distribution-channel evidence. Use the existing
+physical-call, account-calendar and seven-day observation protocols. Review the
+remaining privacy, platform support and accessibility criteria before closing the
+track.
 
 ## Latest recorded unsigned candidate — 2026-10-24
 

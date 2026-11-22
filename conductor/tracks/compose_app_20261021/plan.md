@@ -32,7 +32,7 @@
 - [x] Task: Run the new pure Compose manual-screen callback test and the rendered manual-provider journey on API26/API33/API36; verify Compose identifiers, scroll/insets and fixture cleanup (PR #86 hosted matrix run 40170407847; see [review](review-20261025-manual-screen.md)).
 - [ ] Task: Migrate historical import and recovery screen by screen; preserve IDs, destination binding, operation ownership and saved-state semantics.
 - [ ] Task: Qualify real permission/revocation, destination disappearance, cancellation/recreation/process restore, font/RTL, TalkBack/Switch Access and no synchronization regression; remove replaced Views only after parity.
-- [ ] Task: Qualify the standalone Compose experiment's unique cases on the app launcher, including explicit actions, selection loss, recreation without repeat delivery, and large text and RTL in the foreground. Retire the experiment and its CI job after the app checks pass.
+- [x] Task: Qualify the standalone Compose experiment's launcher cases in the app suite and retire the standalone job. See [API 36 retirement evidence](implementation-evidence.md#standalone-compose-retirement--2026-11-22).
 - [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md).
 
 ## Phase: Hosted API36 UI acceptance fallback (2026-10-24)

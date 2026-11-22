@@ -936,3 +936,28 @@ include both the pure manual-screen callback test and the rendered explicit
 calendar-selection journey. All PR checks passed at `b334a8e`; the result closes
 the manual-screen hosted acceptance task only. Broader Track14 and device/
 operational gates remain open.
+
+## Standalone Compose retirement — 2026-11-22
+
+At the pre-rebase checkpoint `bae2cad`, the source-bound app and
+instrumentation APKs passed 119 JVM tests,
+debug lint and the local API 36 ARM64 settings suite. The nine instrumentation
+invocations verified fixture cleanup and package removal. The same APKs passed
+the API 36 import and accessibility suites with five and two invocations
+respectively, including cleanup and package removal. An unsigned release build
+passed on the same app sources.
+
+- The manual launcher checks verify a missing saved destination, explicit
+  selection, revoked calendar access, and exactly one synthetic calendar event
+  after an explicit logging tap and Activity recreation.
+- The app component check verifies an actual foreground tap at 2× text size and
+  RTL, with the app suite's automated label, focus and touch-target assertions.
+- The active runner verifies source and APK identity, dedicated guest ownership,
+  manifest scope and cleanup after uncertain installation. The first local suite
+  run found a manual fixture event in the automatic-settings calendar. The
+  successful run recreated the empty calendar before that journey.
+
+The [research archive](../../archive/compose_20261020/index.md) retains the
+standalone sources and results. The app's hosted API 26/33/36 settings suite now
+owns the replacement checks. That hosted matrix and the broader Track 14 device,
+accessibility and operational gates remain open on this branch.
