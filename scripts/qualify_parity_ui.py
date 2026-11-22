@@ -539,12 +539,14 @@ def qualify(serial, suite="settings", receipt_dir=None):
             check('prepareCalendarAndTaggedHistory')
             command('shell', 'pm', 'grant', PACKAGE, 'android.permission.READ_CALL_LOG')
             ui_attempted = True
+            check('renderedDestinationAndFiltersSurviveRecreationBeforePreview')
             check('renderedRangePreviewCancelConfirmAndRepeat')
             check('preparePersistedPartialImport')
             check('renderedExplicitHistoryResumeCompletesPartialWork')
         else:
             check('preparePendingWithoutCallAccess')
             ui_attempted = True
+            check('renderedPendingRecoverySurvivesRecreationWithoutApproval')
             check('leavingAndReturningWithdrawsQueuedApproval')
             command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.WRITE_CALENDAR')
             ui_attempted = True

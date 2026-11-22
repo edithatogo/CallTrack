@@ -1,6 +1,7 @@
 # Jetpack Compose Android implementation
 
-Track 14; execution stage 3; milestone M6. Status: pending implementation.
+Track 14; execution stage 3; milestone M6. Status: in progress; Compose
+presentation is implemented and broader acceptance remains open.
 
 ## Objective
 

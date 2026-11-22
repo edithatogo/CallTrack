@@ -46,6 +46,31 @@ public class PositiveUiTest {
         return null;
     }
 
+    private void assertComposeScreen(
+            Instrumentation instrumentation, Activity activity, int... ids) {
+        instrumentation.runOnMainSync(
+                () -> {
+                    for (int id : ids) {
+                        assertTrue(
+                                "Missing Compose host "
+                                        + context().getResources().getResourceEntryName(id),
+                                activity.findViewById(id)
+                                        instanceof androidx.compose.ui.platform.ComposeView);
+                    }
+                    assertNoLegacyContent(activity.findViewById(android.R.id.content));
+                });
+    }
+
+    private static void assertNoLegacyContent(android.view.View view) {
+        if (view instanceof androidx.compose.ui.platform.ComposeView) return;
+        assertFalse("Legacy adapter widget remains", view instanceof android.widget.AdapterView);
+        assertTrue(
+                "Legacy content remains: " + view.getClass().getSimpleName(),
+                view instanceof android.view.ViewGroup);
+        android.view.ViewGroup group = (android.view.ViewGroup) view;
+        for (int i = 0; i < group.getChildCount(); i++) assertNoLegacyContent(group.getChildAt(i));
+    }
+
     private Context context() {
         return fixture.context();
     }
@@ -343,6 +368,33 @@ public class PositiveUiTest {
             try {
                 final String anchor = anchors[i];
                 ui.await(() -> ui.find(anchor, true) != null, "Missing screen " + anchor);
+                if (activity instanceof HistoricalImportActivity) {
+                    assertComposeScreen(
+                            instrumentation,
+                            activity,
+                            R.id.import_intro_panel,
+                            R.id.import_access_panel,
+                            R.id.import_calendar_picker_panel,
+                            R.id.import_filters,
+                            R.id.import_actions,
+                            R.id.import_summary,
+                            R.id.import_feedback,
+                            R.id.import_history);
+                } else if (activity instanceof ReceiptRecoveryActivity) {
+                    assertComposeScreen(
+                            instrumentation,
+                            activity,
+                            R.id.recovery_intro_panel,
+                            R.id.recovery_access_panel,
+                            R.id.recovery_refresh,
+                            R.id.recovery_retention_copy,
+                            R.id.recovery_retention,
+                            R.id.recovery_feedback,
+                            R.id.recovery_empty,
+                            R.id.recovery_cards,
+                            R.id.recovery_navigation);
+                    assertNotNull(activity.findViewById(R.id.recovery_rows));
+                }
                 ui.capture("accessibility-before-" + i);
                 final int[] controls = {0};
                 assertRenderedAccessibilityControls(

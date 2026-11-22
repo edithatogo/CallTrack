@@ -40,7 +40,7 @@ to select work. Each track owns its current checklist and links its dated eviden
 |---|---|
 | 6 · Kotlin | Active conversion is complete. Verify the remaining supported upgrade and operational requirements with the Track 5 release evidence. [Plan](tracks/kotlin_20261020/plan.md) |
 | 5 · Release | Select the exact candidate and work through the remaining release gates. [Verification](tracks/release_20261020/verification.md#active-release-gates) |
-| 14 · Android Compose | Complete import and recovery parity and the remaining device and accessibility acceptance. [Plan](tracks/compose_app_20261021/plan.md) |
+| 14 · Android Compose | Qualify import and recovery parity and the remaining device and accessibility acceptance. [Plan](tracks/compose_app_20261021/plan.md) |
 | 15 · Shared core | Use the common fixture receipts for the extracted rules. Complete the remaining track acceptance in the approved sequence. [Plan](tracks/shared_core_20261021/plan.md) |
 | 16 · macOS companion | Connect one packaged native file-to-calendar journey and qualify the delivery and recovery cases. [Plan](tracks/macos_companion_20261021/plan.md) |
 | 17 · Shared UI | Use a qualified native companion journey to choose the first real presentation to share. [Plan](tracks/shared_ui_20261021/plan.md) |

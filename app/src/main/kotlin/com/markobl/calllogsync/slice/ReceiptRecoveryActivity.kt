@@ -26,9 +26,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
     private val back = ArrayList<SqliteLedger.RecoveryCursor?>()
     private var current: SqliteLedger.RecoveryCursor? = null
     private var next: SqliteLedger.RecoveryCursor? = null
-    private var rows: LinearLayout? = null
     private var emptyState by mutableStateOf(false)
-    private var feedback: ComposeView? = null
     private var feedbackText by mutableStateOf("")
     private var cards by mutableStateOf<List<RecoveryCardUiState>>(emptyList())
     private var visibleRecords: Map<Long, Pair<DurableDelivery.Intent, String?>> = emptyMap()
@@ -124,7 +122,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                 }
             }
         layout.addView(expire)
-        feedback =
+        val feedback =
             ComposeView(this).apply {
                 id = R.id.recovery_feedback
                 setViewCompositionStrategy(
@@ -133,9 +131,9 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                 setContent { RecoveryStatusPanel(feedbackText) }
             }
         layout.addView(feedback)
-        rows = LinearLayout(this)
-        rows!!.id = R.id.recovery_rows
-        rows!!.orientation = LinearLayout.VERTICAL
+        val rows = LinearLayout(this)
+        rows.id = R.id.recovery_rows
+        rows.orientation = LinearLayout.VERTICAL
         val emptyPanel =
             ComposeView(this).apply {
                 id = R.id.recovery_empty
@@ -149,7 +147,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                     )
                 }
             }
-        rows!!.addView(emptyPanel)
+        rows.addView(emptyPanel)
         val cardsPanel =
             ComposeView(this).apply {
                 id = R.id.recovery_cards
@@ -179,7 +177,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                     )
                 }
             }
-        rows!!.addView(cardsPanel)
+        rows.addView(cardsPanel)
         layout.addView(rows)
         val navigation =
             ComposeView(this).apply {

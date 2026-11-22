@@ -994,3 +994,35 @@ candidate using shell operators failed on Android 8's direct command execution;
 the final probe invokes `input` directly. The precise cause of the historical
 hosted failure remains unconfirmed. API 26, 33 and 36 hosted acceptance must
 still run on the final source.
+
+
+## Import and recovery screen completion — 2026-11-22
+
+The reviewed import and recovery slices already place their visible text and
+controls in lifecycle-disposed Compose hosts. The current Activity audit found
+only native scrolling/layout containers and system confirmation dialogs around
+those hosts. They preserve existing Android host IDs and inset handling; the
+Activities retain destination, permission, import, ledger and calendar effects.
+The feedback hosts and recovery row container are local construction variables
+rather than unused Activity fields. No provider or recovery behavior changed.
+
+The accessibility journey now verifies the existing named Compose hosts and
+rejects legacy content widgets in the two screen trees while retaining the label,
+touch-target and keyboard-focus checks. The import suite additionally checks
+destination and filter restoration across Activity recreation, no implicit
+preview or calendar event, and a subsequent explicit preview bound to the
+selected calendar. The recovery suite checks that recreating a pending record
+does not approve it or create an event. Existing explicit-approval, withdrawal,
+read-only, edit/deletion, suppression and retention journeys remain in place.
+
+The source-bound local API36 ARM64 build, JVM tests and lint passed. The import,
+recovery and accessibility suites passed with respectively 12, 11 and 12
+screenshots; each verified fixture cleanup, package removal and emulator
+restoration. The 38 focused host safety tests and Conductor verification also
+passed. A prior local build failed after the filesystem filled; its log was
+retained and the successful build followed after free space returned.
+
+At this local checkpoint the hosted API26/API33/API36 matrix had not yet run on
+this source. Manual TalkBack/Switch Access, physical-device, cloud-calendar,
+full process recovery and operational acceptance remain open; this checkpoint
+does not complete Track14 or promote a release.

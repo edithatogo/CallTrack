@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.provider.CalendarContract;
 
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.markobl.calllogsync.R;
@@ -130,6 +131,32 @@ public class RecoveryUiTest {
                     assertNotNull(ui.shown("recovery_retention_copy", true));
                     assertNotNull(ui.shown(context().getString(R.string.retention_policy), false));
                 });
+    }
+
+    @Test
+    public void renderedPendingRecoverySurvivesRecreationWithoutApproval() {
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        RenderedUi ui = new RenderedUi(instrumentation);
+        try (ActivityScenario<ReceiptRecoveryActivity> scenario =
+                ActivityScenario.launch(ReceiptRecoveryActivity.class)) {
+            ui.await(
+                    () -> ui.shown(context().getString(R.string.reapproval_open), false) != null,
+                    "Pending recovery action did not render");
+            assertEquals(DurableDelivery.State.READY, saved("pending").state);
+            assertEquals(0, fixture.events(calendar()));
+            ui.capture("recovery-before-recreation");
+
+            scenario.recreate();
+            ui.await(
+                    () -> ui.shown(context().getString(R.string.reapproval_open), false) != null,
+                    "Pending recovery action did not return after recreation");
+            assertEquals(
+                    "Recreation must not approve a pending record",
+                    DurableDelivery.State.READY,
+                    saved("pending").state);
+            assertEquals(0, fixture.events(calendar()));
+            ui.capture("recovery-after-recreation");
+        }
     }
 
     private Object field(Activity activity, String name) {
