@@ -1076,3 +1076,22 @@ API26 ARM64 emulator the no-op control again failed with `focus-tree-moved=false
 and the restored Tab candidate passed with 12 screenshots. Both outcomes
 verified fixture cleanup, package removal and emulator restoration. Hosted
 qualification remains separate from this local evidence.
+
+## Latest-call and process-recovery continuation — 2026-11-23
+
+On a user-selected Android 17 phone and dedicated Google test calendar, the
+manual latest-call action saved an older call rather than the controlled call.
+The exact unintended event was removed from the phone; bounded Google Calendar
+readbacks found no matching remote event. This does not prove the event was never
+transiently uploaded. Call-log permission was revoked while the defect is fixed,
+and automatic logging was not enabled. The original ignored local journal was
+lost during worktree cleanup; a private replacement identifies itself as
+reconstructed from retained conversation tool results.
+
+The Android framework's synthesized multi-column sort can append the descending
+direction only after the final column. The observed old event matched the first
+row under that ordering on the phone. A synthetic real-provider regression failed
+against the earlier query; the candidate specifies descending date and ID
+explicitly. The phone test, current-source hosted matrix and process-recovery
+qualification remain pending. The process test returns to the retained task
+after killing the stopped app process, rather than starting a new activity.

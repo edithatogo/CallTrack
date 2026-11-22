@@ -500,6 +500,9 @@ class UiSafety(unittest.TestCase):
         self.assertEqual(0, self.run_fixture('imports'))
         methods = [' '.join(c) for c in self.calls if c[:3] == ['shell', 'am', 'instrument']]
         self.assertTrue(all('ImportUiTest#' in method for method in methods))
+        self.assertTrue(any('latestCallUsesNewestDateAndHighestIdOnTies' in method for method in methods))
+        self.assertTrue(any('renderedDestinationAndFiltersSurviveProcessDeathWithoutPreview' in method
+                            and 'ProcessRecoveryRunner' in method for method in methods))
         self.assertTrue(any('renderedDestinationAndFiltersSurviveRecreationBeforePreview' in method for method in methods))
         receipt = json.loads((self.root / '.local/slice-evidence/parity-ui-imports-receipt.json').read_text())
         self.assertEqual('imports', receipt['suite'])
@@ -509,6 +512,8 @@ class UiSafety(unittest.TestCase):
         self.assertEqual(0, self.run_fixture('recovery'))
         methods = [' '.join(c) for c in self.calls if c[:3] == ['shell', 'am', 'instrument']]
         self.assertTrue(all('RecoveryUiTest#' in method for method in methods))
+        self.assertTrue(any('renderedPendingRecoverySurvivesProcessDeathWithoutApproval' in method
+                            and 'ProcessRecoveryRunner' in method for method in methods))
         self.assertTrue(any('renderedPendingRecoverySurvivesRecreationWithoutApproval' in method for method in methods))
         check_index = next(i for i,c in enumerate(self.calls) if 'renderedExistingCheckWithoutWriteAccess' in ' '.join(c))
         self.assertEqual(['shell', 'pm', 'revoke', device.PACKAGE, 'android.permission.WRITE_CALENDAR'], self.calls[check_index-1])

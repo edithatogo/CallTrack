@@ -134,6 +134,33 @@ public class RecoveryUiTest {
     }
 
     @Test
+    public void renderedPendingRecoverySurvivesProcessDeathWithoutApproval() {
+        RenderedUi ui = new RenderedUi(InstrumentationRegistry.getInstrumentation());
+        ui.startActivity(ReceiptRecoveryActivity.class);
+        ui.await(
+                () -> ui.shown(context().getString(R.string.reapproval_open), false) != null,
+                "Pending recovery action did not render",
+                90000);
+        tap(ui, R.string.reapproval_open);
+        ui.await(() -> ui.find("button1", true) != null, "Reapproval dialog did not open");
+        assertEquals(DurableDelivery.State.READY, saved("pending").state);
+        assertEquals(0, fixture.events(calendar()));
+        ui.capture("recovery-before-process-death");
+
+        ui.killStoppedProcessAndReturn(ReceiptRecoveryActivity.class);
+        ui.await(
+                () -> ui.shown(context().getString(R.string.reapproval_open), false) != null,
+                "Pending recovery action did not return after process death",
+                90000);
+        assertNull(
+                "Process restoration must not revive the approval dialog",
+                ui.find("button1", true));
+        assertEquals(DurableDelivery.State.READY, saved("pending").state);
+        assertEquals(0, fixture.events(calendar()));
+        ui.capture("recovery-after-process-death");
+    }
+
+    @Test
     public void renderedPendingRecoverySurvivesRecreationWithoutApproval() {
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         RenderedUi ui = new RenderedUi(instrumentation);

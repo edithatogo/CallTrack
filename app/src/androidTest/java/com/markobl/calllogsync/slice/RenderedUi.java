@@ -3,9 +3,12 @@ package com.markobl.calllogsync.slice;
 import static org.junit.Assert.*;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Instrumentation;
 import android.app.UiAutomation;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -54,6 +57,63 @@ final class RenderedUi {
             SystemClock.sleep(100);
         } while (SystemClock.elapsedRealtime() < end);
         fail(message);
+    }
+
+    private ActivityManager.RunningAppProcessInfo mainProcess() {
+        ActivityManager manager =
+                (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        java.util.List<ActivityManager.RunningAppProcessInfo> processes =
+                manager.getRunningAppProcesses();
+        if (processes == null) return null;
+        for (ActivityManager.RunningAppProcessInfo process : processes)
+            if (context.getPackageName().equals(process.processName)) return process;
+        return null;
+    }
+
+    void startActivity(Class<? extends Activity> activity) {
+        context.startActivity(
+                new Intent(context, activity)
+                        .addFlags(
+                                Intent.FLAG_ACTIVITY_NEW_TASK
+                                        | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+    }
+
+    void killStoppedProcessAndReturn(Class<? extends Activity> activity) {
+        ActivityManager.RunningAppProcessInfo before = mainProcess();
+        assertNotNull("App main process was not running", before);
+        int pid = before.pid;
+        assertNotEquals(
+                "The driver must run in a separate process", android.os.Process.myPid(), pid);
+        ActivityManager manager =
+                (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager.AppTask savedTask = null;
+        for (ActivityManager.AppTask task : manager.getAppTasks()) {
+            ActivityManager.RecentTaskInfo info = task.getTaskInfo();
+            if (info.baseIntent.getComponent() != null
+                    && activity.getName().equals(info.baseIntent.getComponent().getClassName())) {
+                savedTask = task;
+                break;
+            }
+        }
+        assertNotNull("The original activity task was not retained", savedTask);
+        assertTrue(
+                automation.performGlobalAction(
+                        android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME));
+        await(
+                () -> {
+                    ActivityManager.RunningAppProcessInfo process = mainProcess();
+                    return process != null
+                            && process.pid == pid
+                            && process.importance
+                                    >= ActivityManager.RunningAppProcessInfo.IMPORTANCE_CACHED;
+                },
+                "App process did not become stopped and eligible for background death");
+        android.os.Process.killProcess(pid);
+        await(() -> mainProcess() == null, "App process survived the background kill");
+        savedTask.moveToFront();
+        await(
+                () -> mainProcess() != null && mainProcess().pid != pid,
+                "App did not restart in a new process");
     }
 
     AccessibilityNodeInfo find(String value, boolean id) {

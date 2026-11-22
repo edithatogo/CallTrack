@@ -440,12 +440,12 @@ def qualify(serial, suite="settings", receipt_dir=None):
             raise RuntimeError('ADB command failed: ' + ' '.join(args))
         return result.stdout.strip()
 
-    def check(method, class_name=None):
+    def check(method, class_name=None, runner='androidx.test.runner.AndroidJUnitRunner'):
         selected_class = class_name or test_class
         instrument_args = (
             'shell', 'am', 'instrument', '-w', '-r', '-e', 'fixtureToken',
             receipt['fixture_token'], '-e', 'class', selected_class + '#' + method,
-            TEST_PACKAGE + '/androidx.test.runner.AndroidJUnitRunner',
+            TEST_PACKAGE + '/' + runner,
         )
         try:
             output = command(*instrument_args)
@@ -556,7 +556,10 @@ def qualify(serial, suite="settings", receipt_dir=None):
         elif suite == 'imports':
             check('prepareCalendarAndTaggedHistory')
             command('shell', 'pm', 'grant', PACKAGE, 'android.permission.READ_CALL_LOG')
+            check('latestCallUsesNewestDateAndHighestIdOnTies')
             ui_attempted = True
+            check('renderedDestinationAndFiltersSurviveProcessDeathWithoutPreview',
+                  runner='com.markobl.calllogsync.slice.ProcessRecoveryRunner')
             check('renderedDestinationAndFiltersSurviveRecreationBeforePreview')
             check('renderedRangePreviewCancelConfirmAndRepeat')
             check('preparePersistedPartialImport')
@@ -564,6 +567,8 @@ def qualify(serial, suite="settings", receipt_dir=None):
         else:
             check('preparePendingWithoutCallAccess')
             ui_attempted = True
+            check('renderedPendingRecoverySurvivesProcessDeathWithoutApproval',
+                  runner='com.markobl.calllogsync.slice.ProcessRecoveryRunner')
             check('renderedPendingRecoverySurvivesRecreationWithoutApproval')
             check('leavingAndReturningWithdrawsQueuedApproval')
             command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.WRITE_CALENDAR')
