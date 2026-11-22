@@ -91,6 +91,11 @@ def native_failure_summary(method, output, declared_permissions=None):
         detail = (detail + '; ' if detail else '') + (
             'non-focusable anchor id=' + anchor.group(1) +
             ' enabled=' + anchor.group(2))
+    initial_focus = re.search(
+        r'(?:The initial keyboard target must accept focus|Initial keyboard focus was not applied) ([a-z0-9_]+)',
+        output)
+    if initial_focus:
+        detail += '; keyboard-initial-focus-missing anchor id=' + initial_focus.group(1)
     keyboard_anchor = re.search(
         r'Keyboard Tab did not expose visible application focus ([a-z0-9_]+)',
         output)
