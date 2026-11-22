@@ -72,6 +72,60 @@ public class PositiveUiTest {
         for (int i = 0; i < group.getChildCount(); i++) assertNoLegacyContent(group.getChildAt(i));
     }
 
+    private boolean treeHasMovedFocus(AccessibilityNodeInfo node, AccessibilityNodeInfo initial) {
+        // A focused descendant of the original control is not a focus transition.
+        if (node == null || !node.refresh() || initial.equals(node)) return false;
+        if (node.isFocused()
+                && node.isFocusable()
+                && node.isVisibleToUser()
+                && node.getPackageName() != null
+                && context().getPackageName().contentEquals(node.getPackageName())) return true;
+        for (int i = 0; i < node.getChildCount(); i++) {
+            if (treeHasMovedFocus(node.getChild(i), initial)) return true;
+        }
+        return false;
+    }
+
+    private String focusDiagnostic(RenderedUi ui, AccessibilityNodeInfo initial) {
+        AccessibilityNodeInfo root = ui.automation.getRootInActiveWindow();
+        AccessibilityNodeInfo node =
+                root == null ? null : root.findFocus(AccessibilityNodeInfo.FOCUS_INPUT);
+        String kind = "none", owner = "none";
+        boolean focused = false, focusable = false, visible = false;
+        if (node != null) {
+            node.refresh();
+            String name = String.valueOf(node.getClassName());
+            if (name.equals("android.view.View")) kind = "view";
+            else if (name.equals("android.view.ViewGroup")) kind = "group";
+            else if (name.equals("android.widget.ScrollView")) kind = "scroll";
+            else if (name.equals("android.widget.TextView")) kind = "text";
+            else if (name.equals("android.widget.Button")) kind = "button";
+            else kind = "other";
+            owner =
+                    node.getPackageName() != null
+                                    && context()
+                                            .getPackageName()
+                                            .contentEquals(node.getPackageName())
+                            ? "app"
+                            : "foreign";
+            focused = node.isFocused();
+            focusable = node.isFocusable();
+            visible = node.isVisibleToUser();
+        }
+        return " focus-node="
+                + kind
+                + ":"
+                + owner
+                + ":"
+                + focused
+                + ":"
+                + focusable
+                + ":"
+                + visible
+                + " focus-tree-moved="
+                + treeHasMovedFocus(root, initial);
+    }
+
     private Context context() {
         return fixture.context();
     }
@@ -483,20 +537,27 @@ public class PositiveUiTest {
                                     focusState[0] = "no-root";
                                     return false;
                                 }
+                                if (treeHasMovedFocus(root, selectedTarget)) {
+                                    focusState[0] = "moved";
+                                    return true;
+                                }
                                 android.view.accessibility.AccessibilityNodeInfo focused =
                                         root.findFocus(
                                                 android.view.accessibility.AccessibilityNodeInfo
                                                         .FOCUS_INPUT);
                                 if (focused == null) focusState[0] = "none";
+                                else if (!focused.refresh()) focusState[0] = "stale";
                                 else if (selectedTarget.equals(focused)) focusState[0] = "initial";
+                                else if (!focused.isFocused()) focusState[0] = "not-focused";
                                 else if (!focused.isFocusable()) focusState[0] = "not-focusable";
                                 else if (!focused.isVisibleToUser()) focusState[0] = "not-visible";
-                                else if (!context()
-                                        .getPackageName()
-                                        .contentEquals(focused.getPackageName()))
+                                else if (focused.getPackageName() == null
+                                        || !context()
+                                                .getPackageName()
+                                                .contentEquals(focused.getPackageName()))
                                     focusState[0] = "foreign";
-                                else focusState[0] = "moved";
-                                return focusState[0].equals("moved");
+                                else focusState[0] = "not-in-tree";
+                                return false;
                             },
                             "Keyboard Tab did not expose visible application focus " + anchor);
                 } catch (AssertionError failure) {
@@ -504,7 +565,8 @@ public class PositiveUiTest {
                             "Keyboard Tab did not expose visible application focus "
                                     + anchor
                                     + " focus-state="
-                                    + focusState[0],
+                                    + focusState[0]
+                                    + focusDiagnostic(ui, selectedTarget),
                             failure);
                 }
                 ui.capture("accessibility-" + i);
