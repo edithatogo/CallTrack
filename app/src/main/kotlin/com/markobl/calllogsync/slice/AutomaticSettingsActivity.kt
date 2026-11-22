@@ -68,7 +68,7 @@ class AutomaticSettingsActivity : ComponentActivity() {
     private var reloadReconcile = false
     private var callTypesState by mutableStateOf(AutomaticCallTypesUiState())
     private var callTypesEnabled by mutableStateOf(true)
-    private var destinationUiState by mutableStateOf(AutomaticDestinationUiState())
+    private var destinationUiState by mutableStateOf(CalendarDestinationUiState())
     private var actionsUiState by mutableStateOf(AutomaticSettingsActionsUiState())
     private var restoredCallTypes = false
     private var destinationOptionTokens: List<String> = Collections.emptyList()
@@ -126,8 +126,9 @@ class AutomaticSettingsActivity : ComponentActivity() {
                     ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
                 )
                 setContent {
-                    AutomaticDestinationPanel(
+                    CalendarDestinationPicker(
                         state = destinationUiState,
+                        tagPrefix = "auto_calendar",
                         chooseLabel = getString(R.string.slice_choose),
                         onSelect = ::selectDestination,
                     )
@@ -363,10 +364,10 @@ class AutomaticSettingsActivity : ComponentActivity() {
                     val preferredIndex = loaded.indexOfFirst { it.id == preferred }
                     selected = if (preferredIndex < 0) -1 else loaded[preferredIndex].id
                     destinationUiState =
-                        AutomaticDestinationUiState(
+                        CalendarDestinationUiState(
                             options =
                                 loaded.mapIndexed { index, choice ->
-                                    AutomaticDestinationOption(
+                                    CalendarDestinationOption(
                                         destinationOptionTokens[index],
                                         choice.name
                                             ?: getString(R.string.auto_destination_unavailable),

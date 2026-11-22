@@ -22,7 +22,7 @@ class CalendarSliceActivity : ComponentActivity() {
     private val executor = Executors.newSingleThreadExecutor()
     private var panelState by
         mutableStateOf(ManualLogUiState(logLabel = "", status = "", actionEnabled = false))
-    private var destinationState by mutableStateOf(ManualCalendarControlsState())
+    private var destinationState by mutableStateOf(CalendarDestinationUiState())
     private val destinationTargets = HashMap<String, Long>()
     private var selected = -1L
     private var busy = false
@@ -114,11 +114,9 @@ class CalendarSliceActivity : ComponentActivity() {
     }
 
     private fun updateButton() {
-        panelState =
-            panelState.copy(
-                actionEnabled = !busy && !refreshing && selected >= 0 && calendarAccess()
-            )
-        destinationState = destinationState.copy(enabled = !busy && !refreshing && calendarAccess())
+        val enabled = !busy && !refreshing && calendarAccess()
+        panelState = panelState.copy(actionEnabled = enabled && selected >= 0)
+        destinationState = destinationState.copy(enabled = enabled)
     }
 
     private fun setStatus(message: Int) {
@@ -181,13 +179,13 @@ class CalendarSliceActivity : ComponentActivity() {
                     if (isDestroyed || generation != refreshGeneration) return@runOnUiThread
                     refreshing = false
                     destinationTargets.clear()
-                    val options = ArrayList<ManualCalendarOption>()
+                    val options = ArrayList<CalendarDestinationOption>()
                     var selectedToken: String? = null
                     for (choice in loaded) {
                         val token = UUID.randomUUID().toString()
                         destinationTargets[token] = choice.id
                         options.add(
-                            ManualCalendarOption(
+                            CalendarDestinationOption(
                                 token,
                                 choice.name?.takeIf(String::isNotBlank)
                                     ?: getString(R.string.slice_unnamed_calendar),
@@ -197,7 +195,7 @@ class CalendarSliceActivity : ComponentActivity() {
                     }
                     selected = selectedToken?.let(destinationTargets::get) ?: -1
                     destinationState =
-                        ManualCalendarControlsState(
+                        CalendarDestinationUiState(
                             options = options,
                             selectedToken = selectedToken,
                             enabled = false,
@@ -219,7 +217,7 @@ class CalendarSliceActivity : ComponentActivity() {
                         refreshing = false
                         selected = -1
                         destinationTargets.clear()
-                        destinationState = ManualCalendarControlsState()
+                        destinationState = CalendarDestinationUiState()
                         setStatus(R.string.slice_calendar_unavailable)
                         updateButton()
                     }

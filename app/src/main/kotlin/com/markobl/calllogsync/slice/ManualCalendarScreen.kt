@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 internal fun ManualCalendarScreen(
     intro: String,
-    calendarState: ManualCalendarControlsState,
+    calendarState: CalendarDestinationUiState,
     logState: ManualLogUiState,
     chooseLabel: String,
     accessLabel: String,

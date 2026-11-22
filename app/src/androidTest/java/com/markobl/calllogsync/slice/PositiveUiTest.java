@@ -5,11 +5,16 @@ import static org.junit.Assert.*;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Instrumentation;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.provider.CallLog.Calls;
+import android.view.accessibility.AccessibilityNodeInfo;
 
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.work.WorkManager;
 
@@ -123,7 +128,7 @@ public class PositiveUiTest {
         long previous = preferences.getLong("calendar", -1);
         long expected = state().getLong("calendar", -1);
         assertTrue("Prepared synthetic calendar is required", expected > 0);
-        assertTrue(preferences.edit().putLong("calendar", -1).commit());
+        assertTrue(preferences.edit().putLong("calendar", Long.MAX_VALUE).commit());
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         RenderedUi ui = new RenderedUi(instrumentation);
         Activity[] activity = {null};
@@ -165,6 +170,18 @@ public class PositiveUiTest {
                     "A provider read must not select or persist a destination",
                     -1,
                     preferences.getLong("calendar", -1));
+            AccessibilityNodeInfo log = ui.shown("slice_log_latest", true);
+            assertNotNull("Manual logging action is missing", log);
+            assertFalse("A missing saved destination must leave logging disabled", log.isEnabled());
+            ui.tapId("slice_calendar_access");
+            ui.await(
+                    () -> {
+                        AccessibilityNodeInfo picker = ui.find("slice_calendar_picker", true);
+                        return picker != null && picker.isEnabled();
+                    },
+                    "Manual destination picker did not finish refreshing");
+            assertEquals(
+                    "Permission and refresh alone must not deliver", 0, fixture.events(expected));
             ui.tapVisibleId("slice_calendar_picker");
             ui.tapVisibleText(fixture.calendarDisplayName());
             assertEquals(
@@ -174,12 +191,105 @@ public class PositiveUiTest {
             ui.await(
                     () -> ui.find(fixture.calendarDisplayName(), false) != null,
                     "Selected local calendar is not shown by the manual picker");
-            // The explicit logging action is deliberately not tapped here; choosing a
-            // destination only changes local selection and cannot deliver by composition.
+            assertEquals(
+                    "Destination selection alone must not deliver", 0, fixture.events(expected));
         } finally {
             if (activity[0] != null) instrumentation.runOnMainSync(activity[0]::finish);
             assertTrue(preferences.edit().putLong("calendar", previous).commit());
         }
+    }
+
+    @Test
+    public void renderedManualDeliverySurvivesRecreationWithoutRepeating() {
+        Context context = context();
+        long calendar = state().getLong("calendar", -1);
+        assertTrue("Prepared synthetic calendar is required", calendar > 0);
+        assertNull("Automatic delivery must be inactive for the manual fixture", active());
+        SharedPreferences preferences = context.getSharedPreferences("slice", Context.MODE_PRIVATE);
+        long previous = preferences.getLong("calendar", -1);
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        RenderedUi ui = new RenderedUi(instrumentation);
+        try {
+            FixtureCallLog.asShell(
+                    () -> {
+                        try (Cursor rows =
+                                FixtureCallLog.query(
+                                        context, new String[] {Calls._ID}, null, null, null)) {
+                            assertNotNull(rows);
+                            assertEquals(
+                                    "Manual fixture requires an empty emulator call log",
+                                    0,
+                                    rows.getCount());
+                        }
+                        assertTrue(state().edit().putBoolean("manualCallPending", true).commit());
+                        ContentValues row = new ContentValues();
+                        row.put(Calls.NUMBER, "0000000000");
+                        row.put(Calls.DATE, System.currentTimeMillis());
+                        row.put(Calls.DURATION, 7);
+                        row.put(Calls.TYPE, Calls.OUTGOING_TYPE);
+                        row.put(Calls.NUMBER_PRESENTATION, Calls.PRESENTATION_ALLOWED);
+                        row.put(Calls.PHONE_ACCOUNT_ID, manualCallTag());
+                        assertNotNull(FixtureCallLog.insert(context, row));
+                    });
+            assertTrue(preferences.edit().putLong("calendar", calendar).commit());
+            try (ActivityScenario<CalendarSliceActivity> scenario =
+                    ActivityScenario.launch(CalendarSliceActivity.class)) {
+                awaitManualSelection(ui);
+                assertEquals(
+                        "Opening with a saved destination must not deliver",
+                        0,
+                        fixture.events(calendar));
+                ui.tapId("slice_log_latest");
+                ui.await(
+                        () -> ui.find(context.getString(R.string.slice_saved), false) != null,
+                        "Explicit manual delivery did not report success");
+                assertEquals("One tap must produce one event", 1, fixture.events(calendar));
+
+                scenario.recreate();
+                awaitManualSelection(ui);
+                assertEquals(calendar, preferences.getLong("calendar", -1));
+                assertEquals("Recreation must not repeat delivery", 1, fixture.events(calendar));
+                ui.capture("manual-recreated-single-event");
+            }
+        } finally {
+            try {
+                cleanManualCall();
+            } finally {
+                assertTrue(preferences.edit().putLong("calendar", previous).commit());
+            }
+        }
+    }
+
+    private void awaitManualSelection(RenderedUi ui) {
+        ui.await(
+                () -> {
+                    AccessibilityNodeInfo action = ui.find("slice_log_latest", true);
+                    return action != null
+                            && action.isEnabled()
+                            && ui.find(fixture.calendarDisplayName(), false) != null;
+                },
+                "Manual launcher did not restore its exact saved destination");
+    }
+
+    private String manualCallTag() {
+        return fixture.account() + "-manual";
+    }
+
+    private void cleanManualCall() {
+        if (!state().getBoolean("manualCallPending", false)) return;
+        FixtureCallLog.asShell(
+                () -> {
+                    String where = Calls.PHONE_ACCOUNT_ID + "=?";
+                    String[] args = {manualCallTag()};
+                    FixtureCallLog.delete(context(), where, args);
+                    try (Cursor remaining =
+                            FixtureCallLog.query(
+                                    context(), new String[] {Calls._ID}, where, args, null)) {
+                        assertNotNull(remaining);
+                        assertEquals("Owned manual call survived cleanup", 0, remaining.getCount());
+                    }
+                });
+        assertTrue(state().edit().remove("manualCallPending").commit());
     }
 
     @Test
@@ -353,7 +463,7 @@ public class PositiveUiTest {
         assertNull("Reading screens must not enable logging", active());
     }
 
-    private void assertRenderedAccessibilityControls(
+    static void assertRenderedAccessibilityControls(
             android.view.accessibility.AccessibilityNodeInfo node, int[] controls, float density) {
         if (node == null || !node.refresh()) return;
         if (node.isVisibleToUser() && node.isEnabled() && node.isClickable()) {
@@ -484,6 +594,22 @@ public class PositiveUiTest {
     public void revokedCalendarAndVisibleRestoreDoNotEnableLogging() {
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         RenderedUi ui = new RenderedUi(instrumentation);
+        SharedPreferences manual = context().getSharedPreferences("slice", Context.MODE_PRIVATE);
+        long prior = manual.getLong("calendar", -1);
+        assertTrue(manual.edit().putLong("calendar", state().getLong("calendar", -1)).commit());
+        try (ActivityScenario<CalendarSliceActivity> scenario =
+                ActivityScenario.launch(CalendarSliceActivity.class)) {
+            ui.await(
+                    () ->
+                            ui.find(context().getString(R.string.slice_permission_needed), false)
+                                    != null,
+                    "Manual launcher did not report revoked calendar access");
+            AccessibilityNodeInfo action = ui.shown("slice_log_latest", true);
+            assertNotNull("Manual logging action is missing", action);
+            assertFalse("Revoked calendar access must disable manual delivery", action.isEnabled());
+        } finally {
+            assertTrue(manual.edit().putLong("calendar", prior).commit());
+        }
         Activity activity = null;
         try {
             activity = open(instrumentation);
@@ -511,6 +637,7 @@ public class PositiveUiTest {
 
     @Test
     public void cleanupFixture() throws Exception {
+        cleanManualCall();
         new ActivationControl(new AndroidActivationStore(context())).pause();
         WorkManager.getInstance(context())
                 .cancelAllWorkByTag(AutomaticScheduling.TAG)

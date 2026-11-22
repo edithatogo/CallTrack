@@ -19,14 +19,16 @@ class HistoricalImportDestinationPanelTest {
         val selected = mutableListOf<String>()
         val options =
             listOf(
-                HistoricalImportDestinationOption("opaque-1", "Personal calendar"),
-                HistoricalImportDestinationOption("opaque-2", "Work calendar"),
+                CalendarDestinationOption("opaque-1", "Personal calendar"),
+                CalendarDestinationOption("opaque-2", "Work calendar"),
             )
 
         compose.setContent {
-            HistoricalImportDestinationPanel(
-                state = HistoricalImportDestinationUiState(options, "opaque-1", enabled = true),
+            CalendarDestinationPicker(
+                state = CalendarDestinationUiState(options, "opaque-1", enabled = true),
                 chooseLabel = "Choose a destination calendar",
+                tagPrefix = "import_calendar",
+                optionsEnabled = true,
                 unavailableLabel = "Destination unavailable",
                 onSelect = selected::add,
             )
@@ -49,9 +51,11 @@ class HistoricalImportDestinationPanelTest {
         val selected = mutableListOf<String>()
 
         compose.setContent {
-            HistoricalImportDestinationPanel(
-                state = HistoricalImportDestinationUiState(),
+            CalendarDestinationPicker(
+                state = CalendarDestinationUiState(),
                 chooseLabel = "Choose a destination calendar",
+                tagPrefix = "import_calendar",
+                optionsEnabled = true,
                 unavailableLabel = "Destination unavailable",
                 onSelect = selected::add,
             )

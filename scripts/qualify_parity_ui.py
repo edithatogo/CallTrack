@@ -382,6 +382,10 @@ def qualify(serial, suite="settings", receipt_dir=None):
         identity = subprocess.check_output([str(aapt), 'dump', 'badging', str(apk)], text=True)
         if "package: name='" + package + "'" not in identity:
             raise RuntimeError('Unexpected APK identity')
+        declared = set(re.findall(
+            r"uses-permission(?:-sdk-23)?: name='android\.permission\.([A-Z_]+)'", identity))
+        if declared & {'WRITE_CALL_LOG', 'READ_CONTACTS', 'RECORD_AUDIO', 'INTERNET'}:
+            raise RuntimeError('APK requests a permission outside the UI fixture scope')
     if receipt_dir is not None:
         receipt_dir = Path(receipt_dir)
         receipt_dir.mkdir(parents=True, exist_ok=False)
@@ -509,12 +513,16 @@ def qualify(serial, suite="settings", receipt_dir=None):
             check('renderedAccessibilityLabelsTargetsAndKeyboardFocus')
         elif suite == 'settings':
             check('prepareCalendarWithoutCallAccess')
+            ui_attempted = True
             check('screenRendersWithoutEffectsAndDispatchesOnlyExplicitActions',
                   'com.markobl.calllogsync.slice.ManualCalendarScreenTest')
             check('renderedManualCalendarChoiceRequiresAnExplicitTap')
-            for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
+            check('largeTextAndRtlKeepManualActionReachable',
+                  'com.markobl.calllogsync.slice.ManualCalendarScreenTest')
+            command('shell', 'pm', 'grant', PACKAGE, 'android.permission.READ_CALL_LOG')
+            check('renderedManualDeliverySurvivesRecreationWithoutRepeating')
+            for permission in ('READ_CALL_LOG', 'READ_CALENDAR', 'WRITE_CALENDAR'):
                 command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.' + permission)
-            ui_attempted = True
             check('renderedActivitiesRespectSystemBars')
             check('renderedPermissionsFiltersConfirmPauseAndReopen')
             command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.READ_CALENDAR')
