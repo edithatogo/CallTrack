@@ -115,6 +115,26 @@ class AuditTest(unittest.TestCase):
                         self.assertFalse(destination.exists())
                 self.assertEqual([start, final] if accepted else [start], visited)
 
+    def test_sdk_download_keeps_size_and_checksum_gates(self):
+        url = 'https://dl.google.com/android/repository/archive'
+        payload = b'sdk'
+        valid_sha1 = hashlib.sha1(payload).hexdigest()
+        cases = [
+            ({'size': 2, 'checksum_algorithm': 'sha1', 'checksum': valid_sha1}, 'exceeds declared size'),
+            ({'size': 4, 'checksum_algorithm': 'sha1', 'checksum': valid_sha1}, 'checksum/size mismatch'),
+            ({'size': 3, 'checksum_algorithm': 'sha1', 'checksum': '0' * 40}, 'checksum/size mismatch'),
+            ({'size': 3, 'checksum_algorithm': 'sha1', 'checksum': valid_sha1,
+              'sha256': '0' * 64}, 'checksum/size mismatch'),
+        ]
+        for row, message in cases:
+            with self.subTest(row=row), tempfile.TemporaryDirectory() as directory:
+                visited = []
+                transport = self.publication_transport({url: (200, payload)}, visited)
+                with patch.object(audit.urllib.request.HTTPSHandler, 'https_open', new=transport):
+                    with self.assertRaisesRegex(ValueError, message):
+                        linux.download_sdk_archive(url, Path(directory) / 'archive', row)
+                self.assertEqual([url], visited)
+
     def test_uses_original_artifact_name_and_canonical_repository(self):
         row = dict(coordinate='androidx.room:room-runtime-android:2.7.0', name='room-runtime-android-2.7.0.aar')
         self.assertEqual('https://dl.google.com/dl/android/maven2/androidx/room/room-runtime-android/2.7.0/room-runtime-android-2.7.0.aar', audit.repository_url(row))
