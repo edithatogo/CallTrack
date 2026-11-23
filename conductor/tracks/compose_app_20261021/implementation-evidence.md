@@ -1217,3 +1217,27 @@ added. The existing exact call-time tests remain in place. Physical recovery
 readback, identified-event cleanup and the affected hosted gates remain open until
 verified on the revised candidate. Private identifiers and call content remain in
 the local test journal, not this repository.
+
+The subsequent API 37 phone retest logged one user-confirmed outgoing call to
+that dedicated calendar. The latest-call candidate was source-equivalent to
+`b402aa8a92e3781ef312ad7a7a58c012c7043aa7` and had SHA-256
+`acfb084a0536dc2dfd7732b44a4560c4ef065336f2bd26d75e22e103ee54597e`.
+After sync, local and Google title, description, start/end and duration matched
+at the provider's whole-second resolution. Private visibility and free
+availability matched; the local app marker and device timezone remained present.
+
+A non-debuggable release test candidate built from
+`3129fd6fce0cfefbcfd0f5db02b3f8b461b13829` had SHA-256
+`4203d868e701c738107fa86364806100881e594e991eae391bc642517bcbddcf`.
+It used the same development signer and was installed as a preserving update.
+Its recovery screen identified the existing receipt and verified the existing
+effect without creating another event; both providers still showed exactly one
+matching event. The identified unedited test event was deleted once, and its
+absence was verified locally and on Google. The previous call-log permission
+state was restored. Private identifiers and call content remain in the local
+journal, not this repository.
+
+The local release build, lint and 119 release JVM tests passed without errors
+or skips, and the shared-core JVM suite passed. Hosted API 26/33/36 acceptance
+is recorded separately. This one controlled outgoing case does not close the
+broader physical-release, operational, accessibility or observation gates.
