@@ -426,7 +426,7 @@ class UiSafety(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.root = Path(self.temp.name)
+        self.root = Path(self.temp.name).resolve()
         evidence = self.root / '.local/slice-evidence'
         evidence.mkdir(parents=True)
         artifacts = {}
@@ -500,7 +500,7 @@ class UiSafety(unittest.TestCase):
         self.assertTrue(receipt['packages_removed'])
 
     def test_matrix_receipt_isolated_and_cannot_overwrite_a_prior_run(self):
-        output = self.root / 'matrix' / 'first'
+        output = self.root / '.local/matrix/first'
         self.assertEqual(0, self.run_fixture('accessibility', output))
         receipt = output / 'parity-ui-accessibility-receipt.json'
         original = receipt.read_bytes()
@@ -555,9 +555,22 @@ class UiSafety(unittest.TestCase):
         output.write_text('previous receipt')
         self.assertEqual(0, self.run_fixture())
         self.assertEqual('passed', json.loads(output.read_text())['result'])
+        self.assertEqual(0o600, output.stat().st_mode & 0o777)
+
+    def test_matrix_receipt_refuses_outside_and_linked_directories(self):
+        sibling = self.root / '.local-other'
+        sibling.mkdir()
+        link = self.root / '.local/link'
+        link.symlink_to(sibling, target_is_directory=True)
+        for output in (sibling / 'receipt', link / 'receipt',
+                       self.root / '.local/../.local-other/receipt'):
+            with self.subTest(output=output), self.assertRaisesRegex(ValueError, 'under the repository'):
+                self.run_fixture('accessibility', output)
+        self.assertEqual([], self.calls)
+        self.assertEqual([], list(sibling.iterdir()))
 
     def test_new_matrix_receipt_rejects_a_link_created_during_the_run(self):
-        output = self.root / 'selected output'
+        output = self.root / '.local/selected output'
         sentinel = self.root / 'retain.txt'
         sentinel.write_text('keep')
         original = self.command
@@ -574,7 +587,7 @@ class UiSafety(unittest.TestCase):
         self.assertTrue(any(c[0] == 'uninstall' for c in self.calls))
 
     def test_changed_matrix_receipt_directory_is_refused(self):
-        output = self.root / 'selected output'
+        output = self.root / '.local/selected output'
         moved = self.root / 'moved'
         replacement = self.root / 'replacement'
         replacement.mkdir()
@@ -593,7 +606,7 @@ class UiSafety(unittest.TestCase):
         self.assertTrue(any(c[0] == 'uninstall' for c in self.calls))
 
     def test_new_matrix_directory_replaced_before_use_is_refused(self):
-        output = self.root / 'selected output'
+        output = self.root / '.local/selected output'
         replacement = self.root / 'replacement'
         replacement.mkdir()
         original_mkdir = Path.mkdir
