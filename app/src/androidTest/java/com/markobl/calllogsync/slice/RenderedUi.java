@@ -71,13 +71,12 @@ final class RenderedUi {
     }
 
     void startActivity(Class<? extends Activity> activity) {
-        withSystemTaskStart(
-                () ->
-                        context.startActivity(
-                                new Intent(context, activity)
-                                        .addFlags(
-                                                Intent.FLAG_ACTIVITY_NEW_TASK
-                                                        | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)));
+        withSystemTaskStart(() ->
+                context.startActivity(
+                        new Intent(context, activity)
+                                .addFlags(
+                                        Intent.FLAG_ACTIVITY_NEW_TASK
+                                                | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)));
         if (android.os.Build.VERSION.SDK_INT == 33) {
             await(() -> activityTask(activity) != null, "Initial activity task was not retained");
             if (!waitForAppWindow(10000)) returnFromRecents();

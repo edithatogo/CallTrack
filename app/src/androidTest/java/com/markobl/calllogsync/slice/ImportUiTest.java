@@ -154,15 +154,14 @@ public class ImportUiTest {
                     Long.toString(tiedId[0]),
                     latest.id);
         } finally {
-            shellCalls(
-                    () -> {
-                        assertEquals(
-                                1,
-                                FixtureCallLog.delete(
-                                        context(),
-                                        Calls._ID + "=? AND " + Calls.PHONE_ACCOUNT_ID + "=?",
-                                        new String[] {Long.toString(tiedId[0]), tag()}));
-                    });
+            shellCalls(() -> {
+                assertEquals(
+                        1,
+                        FixtureCallLog.delete(
+                                context(),
+                                Calls._ID + "=? AND " + Calls.PHONE_ACCOUNT_ID + "=?",
+                                new String[] {Long.toString(tiedId[0]), tag()}));
+            });
         }
     }
 

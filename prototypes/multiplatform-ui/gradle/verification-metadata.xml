@@ -2360,6 +2360,9 @@
       <artifact name="junit-bom-5.14.4.pom">
         <sha256 value="5706e8f29a0a07f56efbbea4a0670793414194bb8d24d8143ba1e787a2f32856" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
       </artifact>
+      <artifact name="junit-bom-5.14.4.module">
+        <sha256 value="8a5e98d131de7d7aadb1ee88bfd86d66e62a7c2e2a4074a3b2498b03d236eb64" origin="Canonical Gradle Plugin Portal bytes matched to audited root policy" />
+      </artifact>
     </component>
     <component group="org.mockito" name="mockito-bom" version="4.11.0">
       <artifact name="mockito-bom-4.11.0.pom">
@@ -3901,6 +3904,16 @@
       </artifact>
       <artifact name="skiko-awt-runtime-linux-x64-0.150.2.pom">
         <sha256 value="0f7e070a5e1f50a40ea0b008874dd548dc03d64214ef65ba079b141a766c9732" origin="Canonical Maven Central Linux desktop variant" />
+      </artifact>
+    </component>
+    <component group="com.google.guava" name="guava-parent" version="33.8.0-jre">
+      <artifact name="guava-parent-33.8.0-jre.pom">
+        <sha256 value="31b614120ff2858dd84fded11a96b8c00cb75abc8bfcdd14b6551050e27bcdc1" origin="Canonical Gradle Plugin Portal bytes matched to audited root policy" />
+      </artifact>
+    </component>
+    <component group="org.jetbrains.kotlinx" name="kotlinx-coroutines-bom" version="1.8.0">
+      <artifact name="kotlinx-coroutines-bom-1.8.0.pom">
+        <sha256 value="1239e9dbe1397cd5971342956b2511bc3ace7b641842e4372a088dcfa8b9ad55" origin="Canonical Gradle Plugin Portal bytes matched to audited root policy" />
       </artifact>
     </component>
   </components>
