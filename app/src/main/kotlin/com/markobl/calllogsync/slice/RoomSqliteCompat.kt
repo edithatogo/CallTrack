@@ -18,12 +18,12 @@ class RoomSqliteCompat(private val database: SupportSQLiteDatabase) {
     fun setTransactionSuccessful() = database.setTransactionSuccessful()
     fun endTransaction() = database.endTransaction()
     fun getVersion(): Int = database.version
-    fun setVersion(version: Int) = database.setVersion(version)
+    fun setVersion(version: Int) { database.version = version }
     fun execSQL(sql: String) = database.execSQL(sql)
     fun execSQL(sql: String, bindArgs: Array<out Any>) = database.execSQL(sql, bindArgs)
     fun compileStatement(sql: String): SupportSQLiteStatement = database.compileStatement(sql)
 
-    fun rawQuery(sql: String, selectionArgs: Array<String?>?): Cursor =
+    fun rawQuery(sql: String, selectionArgs: Array<out String?>?): Cursor =
         if (selectionArgs == null) database.query(sql)
         else database.query(sql, selectionArgs.map { it as Any? }.toTypedArray())
 
@@ -31,7 +31,7 @@ class RoomSqliteCompat(private val database: SupportSQLiteDatabase) {
         table: String,
         columns: Array<String>,
         selection: String?,
-        selectionArgs: Array<String?>?,
+        selectionArgs: Array<out String?>?,
         groupBy: String?,
         having: String?,
         orderBy: String?,
@@ -71,7 +71,7 @@ class RoomSqliteCompat(private val database: SupportSQLiteDatabase) {
         table: String,
         values: ContentValues,
         whereClause: String?,
-        whereArgs: Array<String?>?,
+        whereArgs: Array<out String?>?,
     ): Int =
         database.update(
             table,
@@ -81,6 +81,6 @@ class RoomSqliteCompat(private val database: SupportSQLiteDatabase) {
             whereArgs?.map { it as Any? }?.toTypedArray(),
         )
 
-    fun delete(table: String, whereClause: String?, whereArgs: Array<String?>?): Int =
+    fun delete(table: String, whereClause: String?, whereArgs: Array<out String?>?): Int =
         database.delete(table, whereClause, whereArgs?.map { it as Any? }?.toTypedArray())
 }

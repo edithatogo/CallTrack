@@ -15,7 +15,7 @@ import androidx.room3.migration.Migration
 import androidx.room3.support.getSupportWrapper
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.driver.AndroidSQLiteDriver
-import androidx.sqlite.executeSQL
+import androidx.sqlite.execSQL
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 // These entities describe the existing on-disk schema, not a new interchange format.
@@ -147,36 +147,36 @@ internal object RoomPersistence {
         object : Migration(from, 7) {
             override suspend fun migrate(connection: SQLiteConnection) {
                 if (from == 1) {
-                    connection.executeSQL(OUTBOX_TABLE)
-                    connection.executeSQL("CREATE INDEX outbox_state ON outbox(calendar,state)")
-                    connection.executeSQL(
+                    connection.execSQL(OUTBOX_TABLE)
+                    connection.execSQL("CREATE INDEX outbox_state ON outbox(calendar,state)")
+                    connection.execSQL(
                         "INSERT INTO outbox (source,calendar,state,event,fingerprint) " +
                             "SELECT source,calendar,'LEGACY',event,fingerprint FROM receipts",
                     )
                 } else {
                     if (from == 2) {
-                        connection.executeSQL("ALTER TABLE outbox ADD COLUMN operation_owner TEXT")
-                        connection.executeSQL(
+                        connection.execSQL("ALTER TABLE outbox ADD COLUMN operation_owner TEXT")
+                        connection.execSQL(
                             "ALTER TABLE outbox ADD COLUMN operation_generation INTEGER NOT NULL DEFAULT 0",
                         )
                     }
                     if (from < 4) {
-                        connection.executeSQL("ALTER TABLE outbox ADD COLUMN source_start INTEGER")
-                        connection.executeSQL("ALTER TABLE outbox ADD COLUMN source_seconds INTEGER")
-                        connection.executeSQL("ALTER TABLE outbox ADD COLUMN source_type INTEGER")
-                        connection.executeSQL("ALTER TABLE outbox ADD COLUMN source_presentation INTEGER")
-                        connection.executeSQL(
+                        connection.execSQL("ALTER TABLE outbox ADD COLUMN source_start INTEGER")
+                        connection.execSQL("ALTER TABLE outbox ADD COLUMN source_seconds INTEGER")
+                        connection.execSQL("ALTER TABLE outbox ADD COLUMN source_type INTEGER")
+                        connection.execSQL("ALTER TABLE outbox ADD COLUMN source_presentation INTEGER")
+                        connection.execSQL(
                             "ALTER TABLE outbox ADD COLUMN source_presentation_supplied INTEGER",
                         )
                     }
                 }
-                if (from < 5) connection.executeSQL(SCANS_TABLE)
+                if (from < 5) connection.execSQL(SCANS_TABLE)
                 if (from != 1) {
-                    connection.executeSQL("ALTER TABLE outbox ADD COLUMN payload_saved_at INTEGER")
+                    connection.execSQL("ALTER TABLE outbox ADD COLUMN payload_saved_at INTEGER")
                 }
                 val now = System.currentTimeMillis()
                 check(now >= 0) { "Invalid migration clock" }
-                connection.executeSQL(
+                connection.execSQL(
                     "UPDATE outbox SET payload_saved_at=" + now +
                         " WHERE payload_title IS NOT NULL",
                 )
@@ -193,7 +193,7 @@ internal object RoomPersistence {
     private val migration1To3 =
         object : Migration(1, 3) {
             override suspend fun migrate(connection: SQLiteConnection) {
-                connection.executeSQL("ALTER TABLE candidates ADD COLUMN outcome TEXT")
+                connection.execSQL("ALTER TABLE candidates ADD COLUMN outcome TEXT")
             }
         }
 
