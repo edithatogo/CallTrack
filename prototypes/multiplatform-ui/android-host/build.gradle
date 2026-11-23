@@ -1,12 +1,11 @@
 plugins {
     id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.compose'
 }
 
 android {
     namespace 'org.calltrack.companion.androidhost'
-    compileSdk 36
+    compileSdk 37
 
     defaultConfig {
         applicationId 'org.calltrack.companion.androidhost'
@@ -26,5 +25,5 @@ android {
 
 dependencies {
     implementation project(':')
-    implementation 'androidx.activity:activity-compose:1.12.4'
+    implementation 'androidx.activity:activity-compose:1.13.0'
 }
