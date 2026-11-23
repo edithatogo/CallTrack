@@ -69,6 +69,17 @@ public class ReceiptRecoveryTest {
         assertEquals(1, sink.inserts);
         assertEquals(DurableDelivery.State.CONFIRMED, store.get(call().key(), 7).state);
         assertNull(store.get(call().key(), 7).payload);
+
+        DurableDeliveryTest.Store syncedStore = new DurableDeliveryTest.Store();
+        SliceTest.Sink syncedSink = new SliceTest.Sink();
+        assertEquals(
+                DurableDelivery.Result.SAVED,
+                new DurableDelivery(syncedStore, syncedSink).deliver(call(), 7, "UTC", () -> true));
+        syncedSink.rows.put(1L, DurableDeliveryTest.wholeSecondCopy(syncedSink.rows.get(1L)));
+        assertEquals(
+                ReceiptRecovery.Result.VERIFIED,
+                recovery(syncedStore, syncedSink).reconcile(call().key(), 7));
+        assertEquals(1, syncedSink.inserts);
     }
 
     @Test
@@ -85,6 +96,51 @@ public class ReceiptRecoveryTest {
         assertNull(store.get(call().key(), 7).payload);
         assertEquals(ReceiptRecovery.Result.SUPPRESSED, recovery.reconcile(call().key(), 7));
         assertEquals(1, sink.inserts);
+
+        // Normalization must not hide changes to the title or either boundary.
+        for (int change = 0; change < 3; change++) {
+            DurableDeliveryTest.Store changedStore = new DurableDeliveryTest.Store();
+            SliceTest.Sink changedSink = new SliceTest.Sink();
+            assertEquals(
+                    DurableDelivery.Result.SAVED,
+                    new DurableDelivery(changedStore, changedSink)
+                            .deliver(call(), 7, "UTC", () -> true));
+            CallEvent original = changedSink.rows.get(1L);
+            CallEvent normalized = DurableDeliveryTest.wholeSecondCopy(original);
+            changedSink.rows.put(
+                    1L,
+                    new CallEvent(
+                            change == 0 ? normalized.title + " edited" : normalized.title,
+                            normalized.description,
+                            change == 1 ? normalized.start + 1000 : normalized.start,
+                            change == 2 ? original.end : normalized.end,
+                            normalized.timezone,
+                            normalized.marker));
+            assertEquals(
+                    ReceiptRecovery.Result.REVIEW_REQUIRED,
+                    recovery(changedStore, changedSink).reconcile(call().key(), 7));
+            assertEquals(1, changedSink.inserts);
+        }
+
+        // Old receipts without source facts cannot safely infer fractional seconds.
+        DurableDeliveryTest.Store legacyStore = new DurableDeliveryTest.Store();
+        SliceTest.Sink legacySink = new SliceTest.Sink();
+        CallEvent original = CallEvent.from(call(), "UTC");
+        legacySink.insert(7, DurableDeliveryTest.wholeSecondCopy(original));
+        legacyStore.put(
+                new DurableDelivery.Intent(
+                        DurableDelivery.State.CONFIRMED,
+                        call().key(),
+                        7,
+                        CallIdentity.signature(call()),
+                        original.marker,
+                        original.fingerprint(),
+                        1,
+                        null));
+        assertEquals(
+                ReceiptRecovery.Result.REVIEW_REQUIRED,
+                recovery(legacyStore, legacySink).reconcile(call().key(), 7));
+        assertEquals(1, legacySink.inserts);
     }
 
     @Test

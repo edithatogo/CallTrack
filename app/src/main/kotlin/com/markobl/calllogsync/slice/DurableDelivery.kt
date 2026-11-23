@@ -92,6 +92,36 @@ class DurableDelivery(private val store: Store?, private val sink: SliceEngine.C
         @JvmField val key: String = key ?: throw NullPointerException()
         @JvmField val fingerprint: String = fingerprint ?: throw NullPointerException()
 
+        /** Match the exact event, including a provider's whole-second sync representation. */
+        fun matchesEvent(event: CallEvent?): Boolean {
+            if (event == null) return false
+            if (fingerprint == event.fingerprint()) return true
+            val source = facts ?: return false
+            val fraction = source.start % 1000
+            if (fraction == 0L || event.start != source.start - fraction) return false
+            val originalEnd =
+                try {
+                    Math.addExact(
+                        source.start,
+                        if (source.seconds == 0L) 60000L
+                        else Math.multiplyExact(source.seconds, 1000L),
+                    )
+                } catch (overflow: ArithmeticException) {
+                    return false
+                }
+            if (event.end != originalEnd - fraction) return false
+            return fingerprint ==
+                CallEvent(
+                        event.title,
+                        event.description,
+                        source.start,
+                        originalEnd,
+                        event.timezone,
+                        event.marker,
+                    )
+                    .fingerprint()
+        }
+
         constructor(
             state: State?,
             key: String?,
@@ -358,7 +388,7 @@ class DurableDelivery(private val store: Store?, private val sink: SliceEngine.C
             event.id >= 0 &&
             event.calendar == intent.calendar &&
             event.event != null &&
-            intent.fingerprint == event.event.fingerprint()
+            intent.matchesEvent(event.event)
 
     private fun review(intent: Intent, result: Result): Result {
         store!!.put(intent.state(State.REVIEW, intent.eventId))

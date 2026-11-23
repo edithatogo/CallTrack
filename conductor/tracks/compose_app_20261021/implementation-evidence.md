@@ -1199,3 +1199,21 @@ hashes. The two build qualifications and privacy check passed on that head.
 The local API33 ARM settings and accessibility suites also passed after the
 import and recovery runs. The Google Calendar phone retest, manual assistive
 technology checks and broader operational acceptance remain open.
+
+## Google sync precision and recovery follow-up — 2026-11-23
+
+A user-confirmed outgoing test call produced one event in the dedicated Google
+calendar. The phone provider and Google readback agreed on the event title,
+description, duration, private visibility and free availability. The synchronized
+provider record retained the app marker and the device timezone, but both event
+times were rounded down by 644 ms. The original fingerprint retained the precise
+call time, so the unchanged synced event would otherwise require review on retry.
+
+A focused regression reproduced that outcome. The candidate recovery change
+accepts only the exact whole-second representation derived from the stored source
+facts, then verifies the complete original fingerprint. Changed titles or times
+and older receipts without source facts still require review; no insertion path is
+added. The existing exact call-time tests remain in place. Physical recovery
+readback, identified-event cleanup and the affected hosted gates remain open until
+verified on the revised candidate. Private identifiers and call content remain in
+the local test journal, not this repository.

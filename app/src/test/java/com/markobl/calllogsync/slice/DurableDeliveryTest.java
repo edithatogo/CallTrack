@@ -39,6 +39,16 @@ public class DurableDeliveryTest {
         return new DurableDelivery(store, sink);
     }
 
+    static CallEvent wholeSecondCopy(CallEvent event) {
+        return new CallEvent(
+                event.title,
+                event.description,
+                event.start - event.start % 1000,
+                event.end - event.end % 1000,
+                event.timezone,
+                event.marker);
+    }
+
     @Test
     public void intentIsCommittedBeforeInsertAndPayloadPurgedAfterSuccess() {
         Store store = new Store();
@@ -58,6 +68,13 @@ public class DurableDeliveryTest {
         DurableDelivery.Intent receipt = store.get(call().key(), 7);
         assertEquals(DurableDelivery.State.CONFIRMED, receipt.state);
         assertNull(receipt.payload);
+        assertEquals(
+                DurableDelivery.Result.ALREADY_LOGGED,
+                delivery(store, sink).deliver(call(), 7, "UTC", () -> true));
+        assertEquals(1, sink.inserts);
+
+        // Google sync can remove the same fractional second from both boundaries.
+        sink.rows.put(1L, wholeSecondCopy(sink.rows.get(1L)));
         assertEquals(
                 DurableDelivery.Result.ALREADY_LOGGED,
                 delivery(store, sink).deliver(call(), 7, "UTC", () -> true));
@@ -100,6 +117,24 @@ public class DurableDeliveryTest {
                 DurableDelivery.Result.RECOVERED,
                 delivery(store, sink).resume(call().key(), 7, () -> true));
         assertEquals(1, sink.inserts);
+
+        Store syncedStore = new Store();
+        SliceTest.Sink syncedSink =
+                new SliceTest.Sink() {
+                    @Override
+                    public long insert(long calendar, CallEvent event) {
+                        super.insert(calendar, event);
+                        throw new Crash();
+                    }
+                };
+        assertThrows(
+                Crash.class,
+                () -> delivery(syncedStore, syncedSink).deliver(call(), 7, "UTC", () -> true));
+        syncedSink.rows.put(1L, wholeSecondCopy(syncedSink.rows.get(1L)));
+        assertEquals(
+                DurableDelivery.Result.RECOVERED,
+                delivery(syncedStore, syncedSink).resume(call().key(), 7, () -> true));
+        assertEquals(1, syncedSink.inserts);
     }
 
     @Test
