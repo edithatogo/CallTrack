@@ -34,8 +34,13 @@ jobs:
           curl --fail --location --silent --show-error https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/ktfmt/0.65/ktfmt-0.65-with-dependencies.jar -o .local/room3-candidate/ktfmt.jar
           echo 'aba9753b6ab387926179ab7318ba8e0c33dad483ebc72f633e79522265b15214  .local/room3-candidate/ktfmt.jar' | sha256sum --check
           for file in RoomPersistence.kt RoomSqliteCompat.kt SqliteLedger.kt SqliteImportStore.kt; do
-            java -jar .local/room3-candidate/ktfmt.jar --kotlinlang-style --format "app/src/main/kotlin/com/markobl/calllogsync/slice/$file"
+            java -jar .local/room3-candidate/ktfmt.jar --kotlinlang-style "app/src/main/kotlin/com/markobl/calllogsync/slice/$file"
           done
+      - name: Format only changed Android Java test helper
+        run: |
+          curl --fail --location --silent --show-error https://repo.maven.apache.org/maven2/com/google/googlejavaformat/google-java-format/2.0.0/google-java-format-2.0.0-all-deps.jar -o .local/room3-candidate/google-java-format.jar
+          echo 'c78feb48c549fa7114b7ea11db3b456808f7b371ffe84e6643a44dd2f9588639  .local/room3-candidate/google-java-format.jar' | sha256sum --check
+          java -jar .local/room3-candidate/google-java-format.jar --aosp --cleanup=false --replace app/src/androidTest/java/com/markobl/calllogsync/slice/KotlinPackageUpdateTest.java
       - name: Resolve candidate hashes and compile with KSP
         run: |
           set -o pipefail
@@ -79,4 +84,5 @@ jobs:
             app/src/main/kotlin/com/markobl/calllogsync/slice/RoomSqliteCompat.kt
             app/src/main/kotlin/com/markobl/calllogsync/slice/SqliteLedger.kt
             app/src/main/kotlin/com/markobl/calllogsync/slice/SqliteImportStore.kt
+            app/src/androidTest/java/com/markobl/calllogsync/slice/KotlinPackageUpdateTest.java
             .local/room3-candidate/gradle.log
