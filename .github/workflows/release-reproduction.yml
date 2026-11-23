@@ -12,6 +12,7 @@ on:
         default: 0f672916f06afbc2ec4b0730c1df167d44dcb094b41385cb8a0bfc6b234f48df
 permissions:
   contents: read
+cache-mode: none
 jobs:
   cold-linux:
     runs-on: ubuntu-24.04
