@@ -27,8 +27,8 @@ public class Room3MigrationTest {
             try (SQLiteDatabase sqlite = context.openOrCreateDatabase(ledgerFile, 0, null)) {
                 sqlite.execSQL(
                         "CREATE TABLE receipts (source TEXT NOT NULL, calendar INTEGER NOT NULL,"
-                            + " event INTEGER NOT NULL, fingerprint TEXT NOT NULL, PRIMARY"
-                            + " KEY(source,calendar))");
+                                + " event INTEGER NOT NULL, fingerprint TEXT NOT NULL, PRIMARY"
+                                + " KEY(source,calendar))");
                 sqlite.execSQL(
                         "CREATE TABLE outbox (source TEXT NOT NULL, calendar INTEGER NOT NULL,"
                             + " state TEXT NOT NULL, event INTEGER NOT NULL, signature TEXT, marker"
@@ -47,7 +47,7 @@ public class Room3MigrationTest {
                             + " PRIMARY KEY(owner,generation))");
                 sqlite.execSQL(
                         "INSERT INTO receipts (source,calendar,event,fingerprint) VALUES"
-                            + " ('legacy',7,42,'old-fingerprint')");
+                                + " ('legacy',7,42,'old-fingerprint')");
                 sqlite.execSQL(
                         "INSERT INTO outbox"
                             + " (source,calendar,state,event,signature,marker,fingerprint,operation_owner,operation_generation,source_start,source_seconds,source_type,source_presentation_supplied,payload_saved_at)"
@@ -59,17 +59,17 @@ public class Room3MigrationTest {
                 sqlite.execSQL("PRAGMA foreign_keys=ON");
                 sqlite.execSQL(
                         "CREATE TABLE sessions (id TEXT PRIMARY KEY NOT NULL, revision INTEGER NOT"
-                            + " NULL, body TEXT NOT NULL)");
+                                + " NULL, body TEXT NOT NULL)");
                 sqlite.execSQL(
                         "CREATE TABLE candidates (session TEXT NOT NULL REFERENCES sessions(id),"
                             + " source_id INTEGER NOT NULL, source_key TEXT NOT NULL, binding TEXT"
                             + " NOT NULL, outcome TEXT, PRIMARY KEY(session,source_id))");
                 sqlite.execSQL(
                         "INSERT INTO sessions (id,revision,body) VALUES"
-                            + " ('session',3,'synthetic-record')");
+                                + " ('session',3,'synthetic-record')");
                 sqlite.execSQL(
                         "INSERT INTO candidates (session,source_id,source_key,binding,outcome)"
-                            + " VALUES ('session',1,'key','binding','SAVED')");
+                                + " VALUES ('session',1,'key','binding','SAVED')");
                 sqlite.setVersion(2);
             }
             for (int iteration = 0; iteration < 2; iteration++) {
@@ -96,7 +96,7 @@ public class Room3MigrationTest {
                             imports.getReadableDatabase()
                                     .rawQuery(
                                             "SELECT outcome FROM candidates WHERE"
-                                                + " session='session'",
+                                                    + " session='session'",
                                             null)) {
                         assertTrue(cursor.moveToFirst());
                         assertEquals("SAVED", cursor.getString(0));
