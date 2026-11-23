@@ -37,6 +37,13 @@ class Android17Scope(unittest.TestCase):
                 self.assertTrue((path / "deferral.md").is_file())
                 self.assertFalse(meta.get("production_adopted", True))
 
+    def test_only_supported_android_insets_path_remains(self):
+        """With minimum SDK 37, old WindowInsets and systemUiVisibility code is unreachable."""
+        source = (ROOT / "app/src/main/kotlin/com/markobl/calllogsync/slice/ActivityInsets.kt").read_text()
+        self.assertNotIn("Build.VERSION.SDK_INT", source)
+        self.assertNotIn("systemWindowInset", source)
+        self.assertNotIn("SYSTEM_UI_FLAG_LIGHT_STATUS_BAR", source)
+
     def test_active_ui_matrix_only_checks_android17(self):
         workflow = (ROOT / ".github/workflows/track14-hosted-ui.yml").read_text()
         self.assertIn("api-level: 37", workflow)
