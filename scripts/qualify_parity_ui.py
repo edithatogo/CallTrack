@@ -66,7 +66,7 @@ def native_failure_summary(method, output, declared_permissions=None):
     for diagnostic in (
         'runtime-fatal-exception', 'runtime-anr', 'runtime-test-process-died',
         'runtime-app-process-died', 'runtime-permission-denial',
-        'runtime-permission-controller',
+        'runtime-permission-controller', 'runtime-shell-pipe-failure',
     ):
         if diagnostic + '=true' in output:
             detail += '; ' + diagnostic
@@ -340,23 +340,27 @@ def runtime_failure_summary(logcat):
         categories.append('runtime-test-process-died=true')
     if re.search(r'Process:\s*' + re.escape(PACKAGE) + r'(?:\s|,)', logcat):
         categories.append('runtime-app-process-died=true')
-    exception = re.search(
-        r'\b((?:java|android|androidx)\.[A-Za-z0-9_.$]+(?:Exception|Error))\b',
-        logcat,
-    )
-    if exception:
-        categories.append('runtime-exception=' + exception.group(1))
     fatal = re.search(
-        r'FATAL EXCEPTION:[^\n]*\n(?P<body>.*?)(?:\n\s*\n|\Z)',
+        r'FATAL EXCEPTION(?P<system> IN SYSTEM PROCESS)?:[^\n]*\n(?P<body>.*?)(?:\n\s*\n|\Z)',
         logcat,
         re.DOTALL,
     )
+    exception = re.search(
+        r'\b((?:java|android|androidx)\.[A-Za-z0-9_.$]+(?:Exception|Error))\b',
+        fatal.group('body') if fatal else logcat,
+    )
+    if exception:
+        categories.append('runtime-exception=' + exception.group(1))
     if fatal:
         body = fatal.group('body')
+        if fatal.group('system'):
+            categories.append('runtime-fatal-process=platform')
+        if 'UiAutomationConnection' in body and re.search(r'\bEPIPE\b|broken pipe', body, re.I):
+            categories.append('runtime-shell-pipe-failure=true')
         process = re.search(
             r'^[^\n]*\bProcess:\s*([A-Za-z0-9_.:]+)(?:,|\s|$)', body, re.MULTILINE
         )
-        if process:
+        if process and not fatal.group('system'):
             package = process.group(1)
             if package == TEST_PACKAGE:
                 categories.append('runtime-fatal-process=test')

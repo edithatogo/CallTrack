@@ -160,6 +160,21 @@ class UiSafety(unittest.TestCase):
         self.assertNotIn('private call details', summary)
         self.assertNotIn('4321', summary)
 
+    def test_runtime_diagnostic_identifies_system_shell_pipe_failure(self):
+        logcat = (
+            'android.apps.gsa.shared.exception.GsaIOException: unrelated private detail\n'
+            'FATAL EXCEPTION IN SYSTEM PROCESS: Thread-1\n'
+            'java.lang.RuntimeException: private shell output\n'
+            '\tat android.app.UiAutomationConnection$1.run(UiAutomationConnection.java:300)\n'
+            'Caused by: java.io.IOException: write failed: EPIPE (Broken pipe)\n'
+        )
+        summary = device.instrumentation_failure_summary('restore', '', logcat=logcat)
+        self.assertIn('runtime-exception=java.lang.RuntimeException', summary)
+        self.assertIn('runtime-fatal-process=platform', summary)
+        self.assertIn('runtime-shell-pipe-failure', summary)
+        self.assertNotIn('GsaIOException', summary)
+        self.assertNotIn('private', summary)
+
     def test_nonzero_instrumentation_failure_uses_bounded_host_diagnostics(self):
         activity_dump = (
             '* Hist #0: ActivityRecord{prompt '

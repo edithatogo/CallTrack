@@ -81,6 +81,8 @@ final class RenderedUi {
     private boolean stoppedWithSavedState(Class<? extends Activity> activity) {
         boolean target = false;
         boolean saved = false;
+        boolean stopped = false;
+        boolean found = false;
         try (ParcelFileDescriptor descriptor =
                         automation.executeShellCommand("dumpsys activity activities");
                 BufferedReader reader =
@@ -89,20 +91,23 @@ final class RenderedUi {
                                         new FileInputStream(descriptor.getFileDescriptor()),
                                         StandardCharsets.UTF_8))) {
             String line;
+            // Drain the pipe even after finding the record: Android 8's writer can crash on EPIPE.
             while ((line = reader.readLine()) != null) {
                 if (line.trim().matches("\\* Hist\\s+#.*")) {
-                    if (target) return false;
                     target = line.contains(context.getPackageName() + "/" + activity.getName());
+                    saved = false;
+                    stopped = false;
                 } else if (target) {
                     if (line.contains("mHaveState=true") || line.contains("haveState=true"))
                         saved = true;
-                    if (line.contains("state=STOPPED") && saved) return true;
+                    if (line.contains("state=STOPPED")) stopped = true;
+                    if (saved && stopped) found = true;
                 }
             }
         } catch (java.io.IOException failure) {
             throw new AssertionError("Could not inspect stopped activity state", failure);
         }
-        return false;
+        return found;
     }
 
     void killStoppedProcessAndReturn(Class<? extends Activity> activity) {

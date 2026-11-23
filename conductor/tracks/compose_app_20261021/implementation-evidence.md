@@ -1148,3 +1148,12 @@ the recovery assertions. The hosted API26 crash's cause and the effect of this
 task-return change still require verification; the physical user journey
 remains a separate gate. Sanitized failure diagnostics now also classify the
 driver and known project frames without emitting rendered or call data.
+
+On a later local API26 run the instrumentation again terminated without a
+result. Its retained emulator log showed Android 8's `UiAutomation` shell
+writer failing with `EPIPE`: the saved-state probe had closed the pipe as soon
+as it found the record. The probe now reads the complete dump before returning,
+while still requiring both stopped and saved state for the target activity.
+This establishes the local failure mechanism; the hosted run did not retain
+enough detail to prove its termination had the same cause. The candidate needs
+fresh local and hosted qualification.
