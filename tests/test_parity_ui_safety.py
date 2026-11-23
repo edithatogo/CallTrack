@@ -175,6 +175,16 @@ class UiSafety(unittest.TestCase):
         self.assertNotIn('GsaIOException', summary)
         self.assertNotIn('private', summary)
 
+    def test_runtime_diagnostic_classifies_only_our_blocked_background_start(self):
+        logcat = ('Background activity start [callingPackage: org.calltrack.community.dev; '
+                  'private account and call details]\n')
+        summary = device.instrumentation_failure_summary('restore', '', logcat=logcat)
+        self.assertIn('runtime-background-start-blocked', summary)
+        self.assertNotIn('private', summary)
+        other = device.runtime_failure_summary(
+            'Background activity start [callingPackage: com.example.other; private]\n')
+        self.assertNotIn('runtime-background-start-blocked', other)
+
     def test_nonzero_instrumentation_failure_uses_bounded_host_diagnostics(self):
         activity_dump = (
             '* Hist #0: ActivityRecord{prompt '

@@ -1157,3 +1157,13 @@ while still requiring both stopped and saved state for the target activity.
 This establishes the local failure mechanism; the hosted run did not retain
 enough detail to prove its termination had the same cause. The candidate needs
 fresh local and hosted qualification.
+
+In hosted run `45094878459`, API33 subsequently failed before the first
+recovery screen appeared, with another application active; fixture cleanup
+passed but no screenshot was available, so the harness did not verify package
+removal before the disposable emulator was stopped. The process-death driver's
+initial screen launch is also a background task start. The same narrowly
+scoped system permission now surrounds that launch as well as returning the
+retained task. This is a test-driver change; it does not establish that the
+background-start restriction caused the hosted failure. Diagnostics classify
+that specific platform denial without retaining its account or call details.

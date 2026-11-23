@@ -67,6 +67,7 @@ def native_failure_summary(method, output, declared_permissions=None):
         'runtime-fatal-exception', 'runtime-anr', 'runtime-test-process-died',
         'runtime-app-process-died', 'runtime-permission-denial',
         'runtime-permission-controller', 'runtime-shell-pipe-failure',
+        'runtime-background-start-blocked',
     ):
         if diagnostic + '=true' in output:
             detail += '; ' + diagnostic
@@ -336,6 +337,9 @@ def runtime_failure_summary(logcat):
         categories.append('runtime-permission-denial=true')
     if 'grantpermissionsactivity' in lowered:
         categories.append('runtime-permission-controller=true')
+    if re.search(r'Background activity start \[callingPackage: '
+                 + re.escape(PACKAGE) + r'(?:;|\])', logcat):
+        categories.append('runtime-background-start-blocked=true')
     if re.search(r'Process:\s*' + re.escape(TEST_PACKAGE) + r'(?:\s|,)', logcat):
         categories.append('runtime-test-process-died=true')
     if re.search(r'Process:\s*' + re.escape(PACKAGE) + r'(?:\s|,)', logcat):

@@ -71,11 +71,25 @@ final class RenderedUi {
     }
 
     void startActivity(Class<? extends Activity> activity) {
-        context.startActivity(
-                new Intent(context, activity)
-                        .addFlags(
-                                Intent.FLAG_ACTIVITY_NEW_TASK
-                                        | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+        withSystemTaskStart(
+                () ->
+                        context.startActivity(
+                                new Intent(context, activity)
+                                        .addFlags(
+                                                Intent.FLAG_ACTIVITY_NEW_TASK
+                                                        | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)));
+    }
+
+    private void withSystemTaskStart(Runnable action) {
+        // Emulate an explicit system task selection while the test driver is backgrounded.
+        if (android.os.Build.VERSION.SDK_INT >= 29)
+            automation.adoptShellPermissionIdentity(
+                    "android.permission.START_ACTIVITIES_FROM_BACKGROUND");
+        try {
+            action.run();
+        } finally {
+            if (android.os.Build.VERSION.SDK_INT >= 29) automation.dropShellPermissionIdentity();
+        }
     }
 
     private boolean stoppedWithSavedState(Class<? extends Activity> activity) {
@@ -146,16 +160,8 @@ final class RenderedUi {
                 "Android did not retain the stopped activity state");
         android.os.Process.killProcess(pid);
         await(() -> mainProcess() == null, "App process survived the background kill");
-        // The driver is backgrounded; use the system's task-return permission to
-        // simulate selecting this existing task from Recents on Android 10+.
-        if (android.os.Build.VERSION.SDK_INT >= 29)
-            automation.adoptShellPermissionIdentity(
-                    "android.permission.START_ACTIVITIES_FROM_BACKGROUND");
-        try {
-            savedTask.moveToFront();
-        } finally {
-            if (android.os.Build.VERSION.SDK_INT >= 29) automation.dropShellPermissionIdentity();
-        }
+        ActivityManager.AppTask task = savedTask;
+        withSystemTaskStart(task::moveToFront);
         await(
                 () -> mainProcess() != null && mainProcess().pid != pid,
                 "App did not restart in a new process");
