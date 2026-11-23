@@ -15,7 +15,7 @@ android {
     defaultConfig {
         applicationId "org.calltrack.community.dev"
         minSdk 26
-        targetSdk 36
+        targetSdk 37
         versionCode 10
         versionName "0.1.0-dev"
 

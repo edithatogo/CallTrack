@@ -675,6 +675,7 @@ def qualify(serial, suite="settings", receipt_dir=None):
             check('renderedRangePreviewCancelConfirmAndRepeat')
             check('preparePersistedPartialImport')
             check('renderedExplicitHistoryResumeCompletesPartialWork')
+            check('removedDestinationBlocksDeliveryWithoutSwitchingCalendars')
         else:
             check('preparePendingWithoutCallAccess')
             ui_attempted = True

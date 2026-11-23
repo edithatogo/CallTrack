@@ -96,11 +96,15 @@ public class ParityProviderTest {
         assertEquals(
                 PackageManager.PERMISSION_DENIED,
                 context().checkSelfPermission(Manifest.permission.READ_CALL_LOG));
+        return insertCalendar(calendarDisplayName());
+    }
+
+    long insertCalendar(String displayName) {
         ContentValues values = new ContentValues();
         values.put(Calendars.ACCOUNT_NAME, account());
         values.put(Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL);
-        values.put(Calendars.NAME, account());
-        values.put(Calendars.CALENDAR_DISPLAY_NAME, calendarDisplayName());
+        values.put(Calendars.NAME, displayName);
+        values.put(Calendars.CALENDAR_DISPLAY_NAME, displayName);
         values.put(Calendars.CALENDAR_COLOR, 0xff006699);
         values.put(Calendars.CALENDAR_ACCESS_LEVEL, Calendars.CAL_ACCESS_OWNER);
         values.put(Calendars.OWNER_ACCOUNT, account());
@@ -110,6 +114,27 @@ public class ParityProviderTest {
         Uri created = context().getContentResolver().insert(sync(Calendars.CONTENT_URI), values);
         assertNotNull(created);
         return ContentUris.parseId(created);
+    }
+
+    void removeCalendar(long id) {
+        assertEquals(
+                "Must remove exactly the selected synthetic calendar",
+                1,
+                context()
+                        .getContentResolver()
+                        .delete(
+                                sync(Calendars.CONTENT_URI),
+                                Calendars._ID
+                                        + "=? AND "
+                                        + Calendars.ACCOUNT_NAME
+                                        + "=? AND "
+                                        + Calendars.ACCOUNT_TYPE
+                                        + "=?",
+                                new String[] {
+                                    Long.toString(id),
+                                    account(),
+                                    CalendarContract.ACCOUNT_TYPE_LOCAL
+                                }));
     }
 
     private CallRecord call(long id) {
