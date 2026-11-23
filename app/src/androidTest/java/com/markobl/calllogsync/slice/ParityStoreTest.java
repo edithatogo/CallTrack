@@ -13,7 +13,7 @@ import org.junit.Test;
 /** Own private fixture database only; no calls, calendars or device settings are changed. */
 public class ParityStoreTest {
     /** Historical v4/v5 shape; DROP COLUMN is unavailable on older SQLite releases. */
-    private static void restorePreRetentionOutbox(SQLiteDatabase db) {
+    private static void restorePreRetentionOutbox(RoomSqliteCompat db) {
         String columns =
                 "source,calendar,state,event,signature,marker,fingerprint,payload_title,payload_description,payload_start,payload_end,payload_timezone,operation_owner,operation_generation,source_start,source_seconds,source_type,source_presentation,source_presentation_supplied";
         db.beginTransaction();
@@ -81,7 +81,7 @@ public class ParityStoreTest {
                 assertEquals(42, migrated.eventId);
                 assertEquals("old-fingerprint", migrated.fingerprint);
                 assertNull(migrated.sourceSignature);
-                assertEquals(6, ledger.getReadableDatabase().getVersion());
+                assertEquals(7, ledger.getReadableDatabase().getVersion());
             }
         } finally {
             context().deleteDatabase(name);
@@ -237,7 +237,7 @@ public class ParityStoreTest {
                         SliceEngine.Result.REVIEW_REQUIRED,
                         new SliceEngine(() -> call, sink, ledger, "UTC").run(7));
                 assertEquals(javaFingerprint, ledger.get(call.key(), 7).fingerprint);
-                assertEquals(6, ledger.getReadableDatabase().getVersion());
+                assertEquals(7, ledger.getReadableDatabase().getVersion());
             }
         } finally {
             context().deleteDatabase(name);
@@ -270,7 +270,7 @@ public class ParityStoreTest {
             }
             try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
                 DurableDelivery.Intent intent = ledger.outbox().get("source", 7);
-                assertEquals(6, ledger.getReadableDatabase().getVersion());
+                assertEquals(7, ledger.getReadableDatabase().getVersion());
                 assertNull(intent.operation);
                 assertEquals(DurableDelivery.State.READY, intent.state);
                 assertEquals("Synthetic title", intent.payload.title);
@@ -348,7 +348,7 @@ public class ParityStoreTest {
             }
             try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
                 DurableDelivery.Intent intent = ledger.outbox().get("source", 7);
-                assertEquals(6, ledger.getReadableDatabase().getVersion());
+                assertEquals(7, ledger.getReadableDatabase().getVersion());
                 assertNull(intent.facts);
                 assertEquals("import-1", intent.operation.owner);
                 assertEquals(42, intent.operation.generation);
@@ -468,13 +468,13 @@ public class ParityStoreTest {
                                         null,
                                         new DurableDelivery.Operation("automatic", 42),
                                         new DurableDelivery.SourceFacts(123, 0, 3, null, true)));
-                SQLiteDatabase db = ledger.getWritableDatabase();
+                RoomSqliteCompat db = ledger.getWritableDatabase();
                 db.execSQL("DROP TABLE scan_cursors");
                 restorePreRetentionOutbox(db);
                 db.setVersion(4);
             }
             try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
-                assertEquals(6, ledger.getReadableDatabase().getVersion());
+                assertEquals(7, ledger.getReadableDatabase().getVersion());
                 DurableDelivery.Intent saved = ledger.outbox().get("source", 7);
                 assertEquals(123, saved.eventId);
                 assertEquals(123, saved.facts.start);
@@ -927,7 +927,7 @@ public class ParityStoreTest {
             long migrated = base + 100 * PayloadRetention.WINDOW_MILLIS;
             time.set(migrated);
             try (SqliteLedger ledger = new SqliteLedger(context(), name, time::get)) {
-                assertEquals(6, ledger.getReadableDatabase().getVersion());
+                assertEquals(7, ledger.getReadableDatabase().getVersion());
                 assertNotNull(ledger.outbox().get(call.key(), 7).payload);
                 assertEquals(1, ledger.checkpoint(operation).lastId);
                 assertEquals(99, ledger.get("legacy", 7).id);

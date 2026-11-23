@@ -180,7 +180,7 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
     public void importMigrationPreservesProgressAndCancelledSession() {
         try (SqliteImportStore imports =
                 new SqliteImportStore(context(), account() + "-imports.db")) {
-            assertEquals(2, imports.getReadableDatabase().getVersion());
+            assertEquals(3, imports.getReadableDatabase().getVersion());
             for (String phase : new String[] {"CONFIRMED", "CANCELLED"}) {
                 String id = importId(phase);
                 HistoricalImport.Session saved = imports.get(id);
@@ -297,7 +297,7 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
         assertEquals(14, events(destination));
         for (int version = 1; version <= 5; version++) {
             try (SqliteLedger ledger = new SqliteLedger(context(), database(version))) {
-                assertEquals(6, ledger.getWritableDatabase().getVersion());
+                assertEquals(7, ledger.getWritableDatabase().getVersion());
                 ReceiptRecovery recovery = recovery(ledger, sink);
                 for (int id = 0; id < 3; id++) {
                     long eventId = preferences().getLong(version + "/" + id, -1);
@@ -370,7 +370,7 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
             db.execSQL("DROP TRIGGER release_migration_fault");
         }
         try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
-            assertEquals(6, ledger.getWritableDatabase().getVersion());
+            assertEquals(7, ledger.getWritableDatabase().getVersion());
             assertNotNull(ledger.outbox().get(record(2, 4).key(), calendar()).payload);
         }
     }

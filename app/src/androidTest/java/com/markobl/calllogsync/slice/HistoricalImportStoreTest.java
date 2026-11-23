@@ -210,7 +210,7 @@ public class HistoricalImportStoreTest {
                 assertEquals(
                         DurableDelivery.Result.SAVED, imports.candidates(id, -1, 4).get(0).outcome);
                 // Reconstruct the historical table using SQL supported by the minimum SDK.
-                android.database.sqlite.SQLiteDatabase db = imports.getWritableDatabase();
+                RoomSqliteCompat db = imports.getWritableDatabase();
                 db.beginTransaction();
                 try {
                     db.execSQL("ALTER TABLE candidates RENAME TO candidates_v2");
@@ -230,7 +230,7 @@ public class HistoricalImportStoreTest {
             }
             try (SqliteImportStore imports = new SqliteImportStore(context(), name);
                     SqliteLedger ledger = new SqliteLedger(context(), ledgerName)) {
-                assertEquals(2, imports.getReadableDatabase().getVersion());
+                assertEquals(3, imports.getReadableDatabase().getVersion());
                 assertEquals(1, imports.get(id).saved);
                 assertNull(imports.candidates(id, -1, 4).get(0).outcome);
                 assertNull(imports.candidates(id, -1, 4).get(1).outcome);
