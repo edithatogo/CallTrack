@@ -49,17 +49,15 @@ public class PositiveUiTest {
 
     private void assertComposeScreen(
             Instrumentation instrumentation, Activity activity, int... ids) {
-        instrumentation.runOnMainSync(
-                () -> {
-                    for (int id : ids) {
-                        assertTrue(
-                                "Missing Compose host "
-                                        + context().getResources().getResourceEntryName(id),
-                                activity.findViewById(id)
-                                        instanceof androidx.compose.ui.platform.ComposeView);
-                    }
-                    assertNoLegacyContent(activity.findViewById(android.R.id.content));
-                });
+        instrumentation.runOnMainSync(() -> {
+            for (int id : ids) {
+                assertTrue(
+                        "Missing Compose host " + context().getResources().getResourceEntryName(id),
+                        activity.findViewById(id)
+                                instanceof androidx.compose.ui.platform.ComposeView);
+            }
+            assertNoLegacyContent(activity.findViewById(android.R.id.content));
+        });
     }
 
     private static void assertNoLegacyContent(android.view.View view) {
@@ -255,27 +253,25 @@ public class PositiveUiTest {
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         RenderedUi ui = new RenderedUi(instrumentation);
         try {
-            FixtureCallLog.asShell(
-                    () -> {
-                        try (Cursor rows =
-                                FixtureCallLog.query(
-                                        context, new String[] {Calls._ID}, null, null, null)) {
-                            assertNotNull(rows);
-                            assertEquals(
-                                    "Manual fixture requires an empty emulator call log",
-                                    0,
-                                    rows.getCount());
-                        }
-                        assertTrue(state().edit().putBoolean("manualCallPending", true).commit());
-                        ContentValues row = new ContentValues();
-                        row.put(Calls.NUMBER, "0000000000");
-                        row.put(Calls.DATE, System.currentTimeMillis());
-                        row.put(Calls.DURATION, 7);
-                        row.put(Calls.TYPE, Calls.OUTGOING_TYPE);
-                        row.put(Calls.NUMBER_PRESENTATION, Calls.PRESENTATION_ALLOWED);
-                        row.put(Calls.PHONE_ACCOUNT_ID, manualCallTag());
-                        assertNotNull(FixtureCallLog.insert(context, row));
-                    });
+            FixtureCallLog.asShell(() -> {
+                try (Cursor rows =
+                        FixtureCallLog.query(context, new String[] {Calls._ID}, null, null, null)) {
+                    assertNotNull(rows);
+                    assertEquals(
+                            "Manual fixture requires an empty emulator call log",
+                            0,
+                            rows.getCount());
+                }
+                assertTrue(state().edit().putBoolean("manualCallPending", true).commit());
+                ContentValues row = new ContentValues();
+                row.put(Calls.NUMBER, "0000000000");
+                row.put(Calls.DATE, System.currentTimeMillis());
+                row.put(Calls.DURATION, 7);
+                row.put(Calls.TYPE, Calls.OUTGOING_TYPE);
+                row.put(Calls.NUMBER_PRESENTATION, Calls.PRESENTATION_ALLOWED);
+                row.put(Calls.PHONE_ACCOUNT_ID, manualCallTag());
+                assertNotNull(FixtureCallLog.insert(context, row));
+            });
             assertTrue(preferences.edit().putLong("calendar", calendar).commit());
             try (ActivityScenario<CalendarSliceActivity> scenario =
                     ActivityScenario.launch(CalendarSliceActivity.class)) {
@@ -322,18 +318,16 @@ public class PositiveUiTest {
 
     private void cleanManualCall() {
         if (!state().getBoolean("manualCallPending", false)) return;
-        FixtureCallLog.asShell(
-                () -> {
-                    String where = Calls.PHONE_ACCOUNT_ID + "=?";
-                    String[] args = {manualCallTag()};
-                    FixtureCallLog.delete(context(), where, args);
-                    try (Cursor remaining =
-                            FixtureCallLog.query(
-                                    context(), new String[] {Calls._ID}, where, args, null)) {
-                        assertNotNull(remaining);
-                        assertEquals("Owned manual call survived cleanup", 0, remaining.getCount());
-                    }
-                });
+        FixtureCallLog.asShell(() -> {
+            String where = Calls.PHONE_ACCOUNT_ID + "=?";
+            String[] args = {manualCallTag()};
+            FixtureCallLog.delete(context(), where, args);
+            try (Cursor remaining =
+                    FixtureCallLog.query(context(), new String[] {Calls._ID}, where, args, null)) {
+                assertNotNull(remaining);
+                assertEquals("Owned manual call survived cleanup", 0, remaining.getCount());
+            }
+        });
         assertTrue(state().edit().remove("manualCallPending").commit());
     }
 
@@ -364,28 +358,25 @@ public class PositiveUiTest {
                 ui.await(() -> ui.find(id, true) != null, "Screen missing: " + names[i]);
                 ui.capture("system-bars-" + names[i]);
                 int[] rootPosition = new int[2], contentTop = new int[1], requiredTop = new int[1];
-                instrumentation.runOnMainSync(
-                        () -> {
-                            android.view.ViewGroup content =
-                                    activity.findViewById(android.R.id.content);
-                            android.widget.ScrollView scroll =
-                                    (android.widget.ScrollView) content.getChildAt(0);
-                            // Measure the viewport's visible content edge. Its child can be
-                            // scrolled above the viewport when Android auto-focuses a field.
-                            scroll.getLocationOnScreen(rootPosition);
-                            contentTop[0] = rootPosition[1] + scroll.getPaddingTop();
-                            android.view.WindowInsets insets =
-                                    activity.getWindow().getDecorView().getRootWindowInsets();
-                            requiredTop[0] =
-                                    android.os.Build.VERSION.SDK_INT >= 30
-                                            ? insets.getInsets(
-                                                            android.view.WindowInsets.Type
-                                                                            .systemBars()
-                                                                    | android.view.WindowInsets.Type
-                                                                            .displayCutout())
-                                                    .top
-                                            : insets.getSystemWindowInsetTop();
-                        });
+                instrumentation.runOnMainSync(() -> {
+                    android.view.ViewGroup content = activity.findViewById(android.R.id.content);
+                    android.widget.ScrollView scroll =
+                            (android.widget.ScrollView) content.getChildAt(0);
+                    // Measure the viewport's visible content edge. Its child can be
+                    // scrolled above the viewport when Android auto-focuses a field.
+                    scroll.getLocationOnScreen(rootPosition);
+                    contentTop[0] = rootPosition[1] + scroll.getPaddingTop();
+                    android.view.WindowInsets insets =
+                            activity.getWindow().getDecorView().getRootWindowInsets();
+                    requiredTop[0] =
+                            android.os.Build.VERSION.SDK_INT >= 30
+                                    ? insets.getInsets(
+                                                    android.view.WindowInsets.Type.systemBars()
+                                                            | android.view.WindowInsets.Type
+                                                                    .displayCutout())
+                                            .top
+                                    : insets.getSystemWindowInsetTop();
+                });
                 assertTrue(
                         names[i]
                                 + " visible content begins at "

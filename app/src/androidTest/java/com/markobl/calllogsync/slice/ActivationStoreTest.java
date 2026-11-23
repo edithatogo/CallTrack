@@ -121,19 +121,17 @@ public class ActivationStoreTest {
                                             });
                                 });
         try {
-            expectUnavailable(
-                    () ->
-                            new ActivationControl(new AndroidActivationStore(fault))
-                                    .activate(7, "UTC", 1000, true, true, true));
+            expectUnavailable(() ->
+                    new ActivationControl(new AndroidActivationStore(fault))
+                            .activate(7, "UTC", 1000, true, true, true));
             assertNotNull(disk.getString("automaticActivation", null));
             expectUnavailable(() -> new AndroidActivationStore(fault).get());
             expectUnavailable(() -> new AndroidActivationStore(disk).get());
-            expectUnavailable(
-                    () ->
-                            new AndroidActivationStore(disk)
-                                    .put(
-                                            new ActivationControl.Settings(
-                                                    2, true, 8, "UTC", 2000, true, true, true)));
+            expectUnavailable(() ->
+                    new AndroidActivationStore(disk)
+                            .put(
+                                    new ActivationControl.Settings(
+                                            2, true, 8, "UTC", 2000, true, true, true)));
         } finally {
             assertTrue(context().deleteSharedPreferences(name));
         }

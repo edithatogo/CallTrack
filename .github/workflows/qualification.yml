@@ -91,9 +91,9 @@ jobs:
       - name: Check slice Java formatting
         run: |
           mkdir -p .local/toolchain
-          curl --fail --location --silent --show-error https://repo.maven.apache.org/maven2/com/google/googlejavaformat/google-java-format/1.37.0/google-java-format-1.37.0-all-deps.jar -o .local/toolchain/google-java-format-1.37.0.jar
-          echo "834b2a0c38cb774953322a84b5ca3f2f40dd3156650b3cd44d3b744345962f7a  .local/toolchain/google-java-format-1.37.0.jar" | sha256sum --check
-          java -jar .local/toolchain/google-java-format-1.37.0.jar --aosp --dry-run --set-exit-if-changed app/src/*/java/com/markobl/calllogsync/slice/*.java
+          curl --fail --location --silent --show-error https://repo.maven.apache.org/maven2/com/google/googlejavaformat/google-java-format/2.0.0/google-java-format-2.0.0-all-deps.jar -o .local/toolchain/google-java-format-2.0.0.jar
+          echo "c78feb48c549fa7114b7ea11db3b456808f7b371ffe84e6643a44dd2f9588639  .local/toolchain/google-java-format-2.0.0.jar" | sha256sum --check
+          java -jar .local/toolchain/google-java-format-2.0.0.jar --aosp --cleanup=false --dry-run --set-exit-if-changed app/src/*/java/com/markobl/calllogsync/slice/*.java
       - name: Check Kotlin formatting
         run: |
           mkdir -p .local/toolchain

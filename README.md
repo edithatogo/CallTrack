@@ -75,7 +75,7 @@ calendar availability or remote sync.
 
 ## Development and recovery
 
-Run new Java files through google-java-format 1.37.0 with `--aosp`; the checksum and
+Run new Java files through google-java-format 2.0.0 with `--aosp --cleanup=false`; the checksum and
 download recipe are in CI. Kotlin uses ktfmt0.59 with `--kotlinlang-style`;
 CI checks both languages. The upstream build reproducer remains available through
 [qualification instructions](qualification/README.md). CI definitions are local

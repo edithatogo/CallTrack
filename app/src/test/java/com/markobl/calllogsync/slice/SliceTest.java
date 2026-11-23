@@ -75,11 +75,10 @@ public class SliceTest {
 
         public List<SliceEngine.StoredEvent> find(long calendar, String marker) {
             List<SliceEngine.StoredEvent> found = new ArrayList<>();
-            rows.forEach(
-                    (id, e) -> {
-                        if (e.marker.equals(marker))
-                            found.add(new SliceEngine.StoredEvent(id, calendar, e));
-                    });
+            rows.forEach((id, e) -> {
+                if (e.marker.equals(marker))
+                    found.add(new SliceEngine.StoredEvent(id, calendar, e));
+            });
             return found;
         }
 

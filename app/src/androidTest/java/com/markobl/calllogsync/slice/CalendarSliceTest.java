@@ -126,14 +126,13 @@ public class CalendarSliceTest {
             ui.await(
                     () -> ui.find(expectedLabel, false) != null,
                     "Compose picker did not show the saved choice / placeholder label");
-            instrumentation.runOnMainSync(
-                    () -> {
-                        long actual =
-                                context()
-                                        .getSharedPreferences("slice", Context.MODE_PRIVATE)
-                                        .getLong("calendar", -1);
-                        assertEquals(expectChoice ? savedCalendar : -1, actual);
-                    });
+            instrumentation.runOnMainSync(() -> {
+                long actual =
+                        context()
+                                .getSharedPreferences("slice", Context.MODE_PRIVATE)
+                                .getLong("calendar", -1);
+                assertEquals(expectChoice ? savedCalendar : -1, actual);
+            });
         } finally {
             instrumentation.runOnMainSync(activity::finish);
         }
