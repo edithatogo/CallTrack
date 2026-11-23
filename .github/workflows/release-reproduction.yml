@@ -57,7 +57,10 @@ jobs:
             echo '::error::Dispatch from a repository branch containing the reviewed candidate.'
             exit 1
           fi
-          git -C qualification-tools worktree add --detach "$GITHUB_WORKSPACE/candidate" "$CANDIDATE_SHA"
+          # AGP reads the candidate's Git directory to embed the built revision.
+          git init --quiet "$GITHUB_WORKSPACE/candidate"
+          git -C candidate fetch --no-tags "$GITHUB_WORKSPACE/qualification-tools" "$CANDIDATE_SHA"
+          git -C candidate checkout --quiet --detach "$CANDIDATE_SHA"
       - name: Select repository Python runtime
         working-directory: qualification-tools
         run: |

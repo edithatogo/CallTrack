@@ -22,12 +22,17 @@ ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = 'org.calltrack.community.dev'
 TEST_PACKAGE = PACKAGE + '.test'
 TEST_CLASS = 'com.markobl.calllogsync.slice.PositiveUiTest'
+RECEIPT_NAMES = {
+    'settings': 'parity-ui-receipt.json',
+    'imports': 'parity-ui-imports-receipt.json',
+    'recovery': 'parity-ui-recovery-receipt.json',
+    'accessibility': 'parity-ui-accessibility-receipt.json',
+}
 
 
-def write_receipt(directory, expected, filename, receipt, replace):
+def write_receipt(directory, expected, suite, receipt, replace):
     """Write only a regular receipt in the directory selected for this run."""
-    if not re.fullmatch(r'parity-ui(?:-(?:imports|recovery|accessibility))?-receipt\.json', filename):
-        raise ValueError('Unexpected receipt name')
+    filename = RECEIPT_NAMES[suite]
     directory_fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
     try:
         def require_same_directory():
@@ -45,11 +50,12 @@ def write_receipt(directory, expected, filename, receipt, replace):
         flags = os.O_WRONLY | os.O_CREAT | os.O_NOFOLLOW | os.O_NONBLOCK
         if not replace:
             flags |= os.O_EXCL
-        descriptor = os.open(filename, flags, 0o666, dir_fd=directory_fd)
+        descriptor = os.open(filename, flags, 0o600, dir_fd=directory_fd)
         with os.fdopen(descriptor, 'w') as stream:
             info = os.fstat(stream.fileno())
             if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
                 raise RuntimeError('Unsafe receipt file')
+            os.fchmod(stream.fileno(), 0o600)
             stream.truncate(0)
             stream.write(json.dumps(receipt, indent=2) + '\n')
         require_same_directory()
@@ -480,7 +486,9 @@ def qualify(serial, suite="settings", receipt_dir=None):
     if not re.fullmatch(r'emulator-\d+', serial):
         raise RuntimeError('Provider harness refuses a physical-device serial')
     evidence = ROOT / '.local/slice-evidence'
-    evidence_stat = evidence.stat()
+    evidence_stat = evidence.stat(follow_symlinks=False)
+    if not stat.S_ISDIR(evidence_stat.st_mode):
+        raise RuntimeError('Receipt directory changed during the run')
     build = json.loads((evidence / 'build-receipt.json').read_text())
     if build['exit_code'] != 0 or not build['inputs_unchanged'] or build['inputs'] != inputs():
         raise RuntimeError('Successful build receipt does not match current source')
@@ -498,18 +506,20 @@ def qualify(serial, suite="settings", receipt_dir=None):
         if declared & {'WRITE_CALL_LOG', 'READ_CONTACTS', 'RECORD_AUDIO', 'INTERNET'}:
             raise RuntimeError('APK requests a permission outside the UI fixture scope')
     if receipt_dir is not None:
-        receipt_dir = Path(receipt_dir)
-        receipt_dir.mkdir(parents=True, exist_ok=False)
-        initial_receipt_directory_stat = receipt_dir.stat(follow_symlinks=False)
-        if not stat.S_ISDIR(initial_receipt_directory_stat.st_mode):
+        location = os.path.realpath(receipt_dir)
+        if not location.startswith(str(ROOT / '.local') + os.sep):
+            raise ValueError('Receipt directory must be under the repository .local directory')
+        receipt_directory = Path(location)
+        receipt_directory.mkdir(mode=0o700, parents=True, exist_ok=False)
+        receipt_directory_stat = receipt_directory.stat(follow_symlinks=False)
+        if not stat.S_ISDIR(receipt_directory_stat.st_mode):
             raise RuntimeError('Receipt directory changed during the run')
     else:
-        initial_receipt_directory_stat = evidence_stat
-    receipt_directory = (receipt_dir or evidence).resolve(strict=True)
-    receipt_directory_stat = receipt_directory.stat()
-    initial_identity = (initial_receipt_directory_stat.st_dev, initial_receipt_directory_stat.st_ino)
-    if initial_identity != (receipt_directory_stat.st_dev, receipt_directory_stat.st_ino):
-        raise RuntimeError('Receipt directory changed during the run')
+        receipt_directory = evidence
+        receipt_directory_stat = evidence.stat(follow_symlinks=False)
+        if ((receipt_directory_stat.st_dev, receipt_directory_stat.st_ino)
+                != (evidence_stat.st_dev, evidence_stat.st_ino)):
+            raise RuntimeError('Receipt directory changed during the run')
     receipt = {'suite': suite, 'fixture_token': uuid.uuid4().hex, 'steps': [], 'artifacts': build['artifacts'], 'inputs': build['inputs']}
     installed = []
     fixture_possible = False
@@ -727,8 +737,7 @@ def qualify(serial, suite="settings", receipt_dir=None):
         if (not receipt['fixture_cleanup_verified'] or not receipt['packages_removed']
                 or not receipt.get('emulator_restored', {'verified': True})['verified']):
             receipt['result'] = 'failed'
-        receipt_name = 'parity-ui-receipt.json' if suite == 'settings' else 'parity-ui-' + suite + '-receipt.json'
-        write_receipt(receipt_directory, receipt_directory_stat, receipt_name, receipt, receipt_dir is None)
+        write_receipt(receipt_directory, receipt_directory_stat, suite, receipt, receipt_dir is None)
     print(json.dumps({k: receipt.get(k) for k in ('result', 'fixture_cleanup_verified', 'packages_removed', 'error')}))
     return 0 if receipt.get('result') == 'passed' else 1
 
@@ -737,6 +746,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--serial', required=True)
     parser.add_argument('--suite', choices=('settings', 'imports', 'recovery', 'accessibility'), default='settings')
-    parser.add_argument('--receipt-dir', type=Path, help='New per-run directory; refuse reuse to retain matrix evidence')
+    parser.add_argument('--receipt-dir', type=Path,
+                        help='New per-run directory under repository .local; refuse reuse')
     args = parser.parse_args()
     raise SystemExit(qualify(args.serial, args.suite, args.receipt_dir))
