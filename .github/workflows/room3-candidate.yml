@@ -45,10 +45,10 @@ jobs:
           curl --fail --location --silent --show-error https://repo.maven.apache.org/maven2/com/google/googlejavaformat/google-java-format/2.0.0/google-java-format-2.0.0-all-deps.jar -o .local/room3-candidate/google-java-format.jar
           echo 'c78feb48c549fa7114b7ea11db3b456808f7b371ffe84e6643a44dd2f9588639  .local/room3-candidate/google-java-format.jar' | sha256sum --check
           java -jar .local/room3-candidate/google-java-format.jar --aosp --cleanup=false --replace app/src/androidTest/java/com/markobl/calllogsync/slice/KotlinPackageUpdateTest.java
-      - name: Resolve candidate hashes and compile with KSP
+      - name: Resolve candidate hashes and compile serial KSP variants
         run: |
           set -o pipefail
-          sh gradlew --no-daemon --console=plain --write-verification-metadata sha256 \
+          sh gradlew --no-daemon --max-workers=1 --console=plain --write-verification-metadata sha256 \
             :app:compileDebugKotlin :app:compileDebugAndroidTestKotlin \
             :app:testDebugUnitTest :app:lintDebug :app:assembleRelease \
             2>&1 | tee .local/room3-candidate/gradle.log
