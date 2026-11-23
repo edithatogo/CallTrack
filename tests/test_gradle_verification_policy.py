@@ -3,6 +3,7 @@ import sys
 import unittest
 import hashlib
 import json
+import xml.etree.ElementTree as ET
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import audit_gradle_verification as policy
 
@@ -20,6 +21,14 @@ class VerificationPolicyTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             policy.rows(self.document(checksum='generated is not trusted'))
         self.assertEqual(['a' * 64], policy.rows(self.document())[0]['sha256'])
+
+    def test_gradle_metadata_rejects_dtd_in_utf8_and_utf16(self):
+        xml = '<!DOCTYPE verification-metadata [<!ENTITY x "value">]>' + self.document().decode()
+        for encoding in ('utf-8', 'utf-16'):
+            with self.subTest(encoding=encoding), self.assertRaisesRegex(ET.ParseError, 'DTD declarations are not allowed'):
+                policy.rows(xml.encode(encoding))
+        with self.assertRaises(ET.ParseError):
+            policy.rows(b'<verification-metadata>')
 
     def test_renamed_variant_artifact_requires_allowlisted_module_bytes(self):
         artifact = b'aar payload'

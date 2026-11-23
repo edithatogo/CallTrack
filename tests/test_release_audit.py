@@ -6,6 +6,7 @@ import sys
 import unittest
 import tempfile
 import json
+import xml.etree.ElementTree as ET
 from unittest.mock import patch
 from urllib.response import addinfourl
 import zipfile
@@ -123,6 +124,50 @@ class AuditTest(unittest.TestCase):
 
     def test_missing_pom_declaration_is_not_invented(self):
         self.assertEqual([], audit.declarations(b'<project xmlns="http://maven.apache.org/POM/4.0.0"/>'))
+
+    def test_pom_dtd_is_rejected_before_entity_expansion(self):
+        project = '<project xmlns="http://maven.apache.org/POM/4.0.0"><licenses><license><name>&x;</name></license></licenses></project>'
+        for dtd in ('<!DOCTYPE project [<!ENTITY x "expanded">]>',
+                    '<!DOCTYPE project [<!ENTITY x invalid>]>',
+                    '<!DOCTYPE project SYSTEM "file:///nonexistent/external.dtd">'):
+            for encoding in ('utf-8', 'utf-16'):
+                data = (dtd + project).encode(encoding)
+                with self.subTest(dtd=dtd, encoding=encoding):
+                    for parser in (audit.declarations, lambda value: audit.inherited_licences(value, [])):
+                        with self.assertRaisesRegex(ET.ParseError, 'DTD declarations are not allowed'):
+                            parser(data)
+
+    def test_normal_pom_entities_comments_and_parse_errors_are_preserved(self):
+        pom = ('<project xmlns="http://maven.apache.org/POM/4.0.0">'
+               '<!-- literal <!DOCTYPE project> is only a comment -->'
+               '<licenses><license><name>Research &amp; Development</name></license></licenses></project>')
+        for encoding in ('utf-8', 'utf-16'):
+            with self.subTest(encoding=encoding):
+                self.assertEqual('Research & Development', audit.declarations(pom.encode(encoding))[0]['name'])
+        with self.assertRaises(ET.ParseError):
+            audit.declarations(b'<project>')
+
+    def test_rejected_pom_prevents_successful_artifact_audit(self):
+        archive = io.BytesIO()
+        with zipfile.ZipFile(archive, 'w') as bundle:
+            bundle.writestr('META-INF/LICENSE', 'license')
+        artifact = archive.getvalue()
+        pom = b'<!DOCTYPE project [<!ENTITY x "expanded">]><project><name>&x;</name></project>'
+        def response(url, **_kwargs):
+            stream = io.BytesIO(pom if url.endswith('.pom') else artifact)
+            stream.url = url
+            return stream
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': [dict(
+                coordinate='org.test:test:1', name='test-1.jar', sha256=hashlib.sha256(artifact).hexdigest())]}))
+            with patch.object(audit.PUBLICATION_OPENER, 'open', side_effect=response):
+                result = audit.audit(inventory, root / 'output')
+            self.assertTrue(result['artifacts'][0]['repository_bytes_match'])
+            self.assertIn('DTD declarations are not allowed', result['artifacts'][0]['error'])
+            self.assertFalse(result['all_repository_bytes_match'])
+            self.assertFalse(json.loads((root / 'output/receipt.json').read_text())['release_ready'])
 
     def test_nested_aar_notices_are_hashed_without_extraction(self):
         jar = io.BytesIO()

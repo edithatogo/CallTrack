@@ -16,9 +16,9 @@ import subprocess
 import time
 import urllib.request
 from urllib.parse import urlsplit
-import xml.etree.ElementTree as ET
 import zipfile
 from redirect_validation import ValidatingRedirectHandler
+from xml_safety import parse_xml_file
 
 TOOLS = Path(__file__).resolve().parents[1]
 
@@ -97,7 +97,7 @@ def extract_sdk(path, destination):
 def junit_counts(source):
     counts = dict(tests=0, failures=0, errors=0, skipped=0)
     for path in (source / 'app/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'):
-        data = ET.parse(path).getroot().attrib
+        data = parse_xml_file(path).attrib
         for key in counts:
             counts[key] += int(data.get(key, 0))
     return counts
@@ -122,6 +122,7 @@ def run(source, output, revision, expected_apk):
                    sdk_packages=[], source_files_unchanged=False,
                    script_sha256=sha(Path(__file__)),
                    redirect_policy_sha256=sha(Path(__file__).with_name('redirect_validation.py')),
+                   xml_policy_sha256=sha(Path(__file__).with_name('xml_safety.py')),
                    sdk_manifest_sha256=sha(TOOLS / 'qualification/release/linux-sdk-inputs.json'))
     start = time.monotonic()
     names = subprocess.check_output(['git', 'ls-files', '-z'], cwd=source).decode().split('\0')[:-1]
@@ -163,7 +164,7 @@ def run(source, output, revision, expected_apk):
         # frozen candidates retain their separately recorded 115-test baseline.
         if receipt['jvm'] != dict(tests=119, failures=0, errors=0, skipped=0):
             raise RuntimeError('Candidate JVM acceptance count/outcome changed')
-        lint = ET.parse(source / 'app/build/reports/lint-results-release.xml').getroot()
+        lint = parse_xml_file(source / 'app/build/reports/lint-results-release.xml')
         counts = {}
         for issue in lint.findall('issue'):
             counts[issue.get('severity')] = counts.get(issue.get('severity'), 0) + 1

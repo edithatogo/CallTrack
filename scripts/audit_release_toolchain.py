@@ -14,9 +14,9 @@ import struct
 import tarfile
 import urllib.request
 from urllib.parse import urlsplit
-import xml.etree.ElementTree as ET
 import zipfile
 from redirect_validation import ValidatingRedirectHandler
+from xml_safety import parse_xml
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -184,7 +184,7 @@ def run(output, archives_from=None):
         receipt['gradle_distribution'] = zip_comparison(distribution, caches[0])
         repository = output / 'sdk-repository.xml'
         fetch('https://dl.google.com/android/repository/repository2-3.xml', repository)
-        root = ET.fromstring(repository.read_bytes())
+        root = parse_xml(repository.read_bytes())
         receipt['sdk_repository_sha256'] = sha(repository)
         receipt['sdk'] = []
         sdk = (ROOT / '.local/android-sdk').resolve()
