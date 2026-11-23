@@ -1,15 +1,16 @@
 # Security and support status
 
-No public supported release or hosted repository/reporting channel is configured.
+No public supported release is available.
 Development snapshots have no security-update service-level commitment. Do not use
 them for unattended routine logging until the release gates pass.
 
-If you discover a suspected vulnerability, retain a synthetic minimal reproduction
-locally. Do not open a public issue containing call data, calendar content,
-credentials, databases or exploit details that expose others. When a repository is
-published, its owner must configure and test a private reporting route before
-inviting reports; no inbox or GitHub private-reporting capability is implied here.
-For ordinary bugs, submit only redacted metadata using the prepared template.
+If you discover a suspected vulnerability, report it privately through
+[GitHub's private vulnerability reporting](https://github.com/edithatogo/CallTrack/security/advisories/new).
+Use a synthetic minimal reproduction and do not include real call data, calendar
+content, credentials or databases. Do not open a public issue containing exploit
+details that expose others. For ordinary bugs, submit only redacted metadata using
+the prepared template. Private reporting is enabled; an end-to-end report delivery
+test has not yet been performed.
 
 Maintainer triage should record affected commit/version, acquisition or calendar
 boundary, minimum permissions, impact, containment, fix and regression test. Audit
