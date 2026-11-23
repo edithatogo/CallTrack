@@ -19,24 +19,8 @@ on:
       - 'settings.gradle'
       - 'conductor/tracks/compose_app_20261021/**'
       - 'scripts/qualify_android17_local.sh'
+  # Required on main, including documentation-only pull requests.
   pull_request:
-    paths:
-      - '.github/workflows/track14-hosted-ui.yml'
-      - '.github/workflows/qualification.yml'
-      - '.python-version'
-      - 'app/**'
-      - 'build.gradle'
-      - 'gradle/**'
-      - 'gradle.properties'
-      - 'gradlew'
-      - 'scripts/parity_environment.py'
-      - 'scripts/parity_health.py'
-      - 'scripts/parity_targets.py'
-      - 'scripts/qualify_parity_ui.py'
-      - 'scripts/run_slice_build.py'
-      - 'settings.gradle'
-      - 'conductor/tracks/compose_app_20261021/**'
-      - 'scripts/qualify_android17_local.sh'
   workflow_dispatch:
 permissions:
   contents: read

@@ -64,6 +64,8 @@ Android API 26/33/36 and all other OS/runtime targets, macOS, iOS, desktop and c
 
 [Native architecture and scope PR #114](https://github.com/edithatogo/CallTrack/pull/114) · [Room migration issue #115](https://github.com/edithatogo/CallTrack/issues/115) · [native UI cleanup issue #116](https://github.com/edithatogo/CallTrack/issues/116) · [local Apple Silicon runner issue #117](https://github.com/edithatogo/CallTrack/issues/117). These are task pointers only; an open issue or draft PR does not establish acceptance.
 
-## Temporary GitHub required-check name migration
+## Required checks on GitHub main
 
-The protected `main` branch still requires three *legacy-named* GitHub checks (`multiplatform-ui`, `qualification (upstream, 11, 32, 30.0.3)`, `qualification (modern, 17, 36, 35.0.0)`). They are **only name aliases** of the actual Android 17 host/build/lint qualification, gated through `needs: [qualification, slice]` in the single [Build qualification](../.github/workflows/qualification.yml) workflow. They do **not** run older Android, KMP or upstream tools. [Issue #119](https://github.com/edithatogo/CallTrack/issues/119) owns updating branch protection and deleting this temporary shim. Until the rule is corrected, do not remove the aliases or bypass protection.
+Strict branch protection requires native build qualification, hosted Android 17 UI acceptance, workflow lint, secret history scanning, privacy and secrets, call-data fuzzing, and both the CodeQL summary and each configured analysis. The hosted API 37 workflow runs on every pull request and verifies settings, imports, full process recovery, accessibility, and fixture cleanup.
+
+The [CodeQL ruleset](https://github.com/edithatogo/CallTrack/rules/27936995) requires scan results and blocks new alerts at every severity.

@@ -66,26 +66,3 @@ jobs:
           python -m venv .venv
           .venv/bin/python scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"
           sh gradlew --no-daemon --console=plain :app:assembleRelease
-
-  legacy-required-status-alias:
-    # GitHub main still requires three obsolete check CONTEXT NAMES. These are
-    # aliases for current Android 17 qualification, NOT legacy OS/KMP test runs.
-    # Remove after https://github.com/edithatogo/CallTrack/issues/119 updates protection.
-    name: ${{ matrix.required_context }}
-    needs: [qualification, slice]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        required_context:
-          - 'multiplatform-ui'
-          - 'qualification (upstream, 11, 32, 30.0.3)'
-          - 'qualification (modern, 17, 36, 35.0.0)'
-    steps:
-      - name: Disclose legacy context alias and assert native prerequisites
-        run: |
-          set -euo pipefail
-          echo 'This is a TEMPORARY GitHub branch protection CONTEXT ALIAS.'
-          echo 'It executes no pre-Android17, Java11 upstream or multiplatform code.'
-          echo 'Its prerequisite jobs have both passed native Android17 build, JVM tests, lint and Conductor.'
-          echo 'Required status contexts must be updated before alias retirement: issue #119.'
