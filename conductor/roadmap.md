@@ -1,3 +1,5 @@
+> **Current scope supersession (2026-11-24):** Only native Android 17 is actively developed. Older Android versions, KMP/shared UI, macOS, iOS, desktop and Rust are roadmap-only; see [current architecture](architecture-android17.md), [active scope](active-scope.json) and [track registry](tracks.md). The rest of this file records the previously approved sequence and evidence, not a current implementation queue.
+
 # CallTrack successor roadmap
 
 Current implementation order: [approved future architecture sequence](future-architecture.md),

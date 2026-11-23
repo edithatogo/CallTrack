@@ -18,6 +18,7 @@ on:
       - 'scripts/run_slice_build.py'
       - 'settings.gradle'
       - 'conductor/tracks/compose_app_20261021/**'
+      - 'scripts/qualify_android17_local.sh'
   pull_request:
     paths:
       - '.github/workflows/track14-hosted-ui.yml'
@@ -35,6 +36,7 @@ on:
       - 'scripts/run_slice_build.py'
       - 'settings.gradle'
       - 'conductor/tracks/compose_app_20261021/**'
+      - 'scripts/qualify_android17_local.sh'
   workflow_dispatch:
 permissions:
   contents: read
@@ -46,14 +48,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - api-level: 26
-            avd-name: calltrack-release-api26-20261022
-            device-profile: pixel_2
-          - api-level: 33
-            avd-name: calltrack-release-api33-20261022
-            device-profile: pixel_6
-          - api-level: 36
-            avd-name: calltrack-track14-api36
+          - api-level: 37
+            avd-name: calltrack-track14-api37
             device-profile: pixel_6
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -86,10 +82,10 @@ jobs:
             echo "$ANDROID_HOME/platform-tools"
             echo "$ANDROID_HOME/emulator"
           } >> "$GITHUB_PATH"
-          "$sdkmanager_path" "platforms;android-36" "platforms;android-37.1" \
+          "$sdkmanager_path" "platforms;android-37.1" \
             "build-tools;35.0.0" \
             "build-tools;36.0.0" \
-            "system-images;android-${{ matrix.api-level }};google_apis;x86_64"
+            "system-images;android-37.2;google_apis_ps16k;x86_64"
           "$ANDROID_HOME/emulator/emulator" -accel-check
       - name: Build source-bound app and test APKs
         run: |
@@ -107,7 +103,7 @@ jobs:
           set -euo pipefail
           mkdir -p "$ANDROID_AVD_HOME"
           avdmanager create avd --name "$AVD_NAME" \
-            --package "system-images;android-${API_LEVEL};google_apis;x86_64" \
+            --package "system-images;android-37.2;google_apis_ps16k;x86_64" \
             --device "$DEVICE_PROFILE" --path "$ANDROID_AVD_HOME/$AVD_NAME.avd"
           emulator -avd "$AVD_NAME" -port 5554 \
             -no-window -no-audio -no-snapshot -no-boot-anim -gpu swiftshader_indirect \
@@ -139,15 +135,6 @@ jobs:
             adb devices -l || true
             exit 1
           fi
-      - name: Enable temporary root for API 26 synthetic call fixtures
-        if: matrix.api-level == 26
-        run: |
-          set -euo pipefail
-          adb -s emulator-5554 root
-          timeout 30 adb -s emulator-5554 wait-for-device
-          root_mode="$(adb -s emulator-5554 shell getprop service.adb.root | tr -d '\r')"
-          test "$root_mode" = 1
-          echo 'API 26 emulator root mode verified for synthetic fixtures.'
       - name: Run API ${{ matrix.api-level }} settings, import, recovery and accessibility journeys
         env:
           RUN_ATTEMPT: ${{ github.run_attempt }}

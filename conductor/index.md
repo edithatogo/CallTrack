@@ -1,5 +1,8 @@
 # Project Context
 
+> **Current decision (2026-11-24):** [Android 17-only native architecture](architecture-android17.md) · [machine-readable active scope](active-scope.json) · [active/deferred tracks](tracks.md). Older milestone and platform roadmaps below are historical; do not use them as permission to resume deferred projects.
+
+
 ## Definition
 
 - [Product Definition](product.md)

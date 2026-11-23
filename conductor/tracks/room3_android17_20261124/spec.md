@@ -1,0 +1,7 @@
+# Specification — Room 3.0.3 on Android 17
+
+Use `androidx.room3:room3-runtime:3.0.3` and matching `room3-compiler` with KSP, AndroidSQLiteDriver, suspend DAO operations, compile-time query checks and exported schemas. Concentrate annotation processing in one Android module (prefer existing app; a new module requires a measured benefit). Do not introduce KMP, a second database owner, Java KAPT or speculative repository wrappers.
+
+Preserve existing `calltrack-imports.db` schema version 2 (sessions/candidates), and `calltrack-ledger.db` schema version 6 (receipts/outbox/scans), including every historical migration fixture. Preserve row/field types, PK/FK/indexes, transaction and fsync/uncertain-write order, namespace, source signatures, edits/deletions, ledger ownership and explicit user consent. Support migration of old files before native wrappers are removed. Never destructive reset, dual writer or silent receipt reissue.
+
+Acceptance: intentional failing before/after tests covering schema history v1–v6/import v1–v2, concurrent manual/automatic/import delivery, crash at each write boundary, stale/calendar-moved/edited records, cancellation/restart and close/reopen. Run native Android 17 emulator readback, not just host tests. Diffs should remove more custom persistence code than new helper code; if not, re-evaluate the migration and document the incompatibility rather than forcing production risk.

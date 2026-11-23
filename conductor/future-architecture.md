@@ -1,3 +1,5 @@
+> **Superseded active execution order (2026-11-24):** The nine-stage sequence below is retained for historic traceability and integrity checks, not active authorisation. [Android 17-only native architecture](architecture-android17.md) now controls development. Other platforms are deferred in [active scope](active-scope.json) and their Conductor metadata.
+
 # Approved future architecture implementation sequence
 
 User-approved2026-10-21. This is the current execution order; earlier roadmap

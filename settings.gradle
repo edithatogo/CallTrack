@@ -19,4 +19,3 @@ dependencyResolutionManagement {
 }
 rootProject.name = "CallLogSync"
 include ':app'
-include ':shared-core'

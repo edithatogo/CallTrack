@@ -6,7 +6,8 @@ MATRIX_AVDS = (
     'calltrack-release-api33-20261022',
     'calltrack-qualification-api37',
 )
-TRACK14_UI_AVD = 'calltrack-track14-api36'
+TRACK14_UI_AVD = 'calltrack-track14-api37'
+ANDROID17_LOCAL_AVD = 'calltrack-android17-local'
 
 
 def is_dedicated_avd(output):
@@ -17,4 +18,4 @@ def is_dedicated_avd(output):
 def is_dedicated_ui_avd(output):
     """Allow the Track 14 guest only for rendered UI acceptance."""
     lines = output.splitlines()
-    return bool(lines) and lines[0].strip() in (AVD, RECOVERY_AVD, *MATRIX_AVDS, TRACK14_UI_AVD)
+    return bool(lines) and lines[0].strip() in (AVD, RECOVERY_AVD, *MATRIX_AVDS, TRACK14_UI_AVD, ANDROID17_LOCAL_AVD)

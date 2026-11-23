@@ -1,3 +1,5 @@
+> **Active stack (2026-11-24):** Android 17 API37-only Kotlin/Compose; native CallLog/CalendarContract + WorkManager. Room 3.0.3 is selected but its preserving migration has **not** replaced SQLite. `app/build.gradle` is authoritative for SDK/versions; the rest of this file includes prior checkpoints. [Architecture](architecture-android17.md) · [scope](active-scope.json).
+
 # Technology stack and decision status
 
 ## Toolchain and Android dependencies — 2026-11-24
@@ -5,13 +7,13 @@
 The active app and cold Linux release gate select Temurin JDK 25.0.5.1+2,
 Gradle 9.7.0, AGP 9.3.1 and Kotlin/Compose compiler 2.4.21. AGP supplies the
 app's Kotlin plugin and the first-party Kotlin Multiplatform Android library
-plugin supplies the shared module. The upstream comparison fixtures retain
+plugin was used by a historical shared module (no longer in the active app). The upstream comparison fixtures retain
 their JDK 11 and JDK 17 runtimes.
 
 Compose BOM 2026.11.01 requires compile SDK 37.1. The app compiles to JVM 11
-bytecode, targets Android 17 and supports Android 8.0 onward. The hosted
-acceptance matrix exercises API 26, 33 and 36. The Android 17.2 emulator adds
-API 37 and a 16 KB page size to local acceptance. The
+bytecode, targets **and requires** Android 17 API37. The sole active hosted
+UI acceptance is API37. Prior API26/33/36 evidence is archival; the Android 17.2
+16 KB emulator is the current native acceptance target. The
 [runtime audit](tracks/release_20261020/canonical-runtime-audit-20261124.json)
 and [source inventory](../qualification/release/runtime-sources.json) bind
 91 runtime artifacts to their canonical publications.
