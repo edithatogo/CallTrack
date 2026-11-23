@@ -25,6 +25,28 @@ buildscript {
     }
 }
 
+// AGP resolves the lint engine in detached project configurations, separately
+// from the buildscript classpath. Keep its vulnerable transitives patched too.
+allprojects {
+    dependencies {
+        components {
+            withModule('com.android.tools.lint:lint-gradle') {
+                allVariants {
+                    withDependencyConstraints {
+                        add('com.google.guava:guava:33.8.0-jre')
+                        add('org.apache.commons:commons-lang3:3.22.0')
+                        add('org.apache.httpcomponents:httpclient:4.5.14')
+                        add('org.apache.httpcomponents:httpmime:4.5.14')
+                        add('org.bouncycastle:bcprov-jdk18on:1.87')
+                        add('org.bouncycastle:bcpkix-jdk18on:1.87')
+                        add('org.bouncycastle:bcutil-jdk18on:1.87')
+                    }
+                }
+            }
+        }
+    }
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }

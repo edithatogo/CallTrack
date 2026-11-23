@@ -4632,6 +4632,353 @@
       <artifact name="junit-bom-5.13.1.pom">
         <sha256 value="fa68451ea830572ed43ffe51d75b6a05f7a5e665a602a51f49d6be02063a65f3" origin="Canonical HTTPS repository byte comparison 2026-11-23; build-tool security qualification" />
       </artifact>
+      <artifact name="junit-bom-5.13.1.module">
+        <sha256 value="33c07ab9724790a6e5859ba07d69117ac530439724545a81c4179e3272c75de8" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools" name="annotations" version="32.3.3">
+      <artifact name="annotations-32.3.3.jar">
+        <sha256 value="32e90226ae4c7b59ed61b06689ae8356bab080cd79f6569455fd92925439a339" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="annotations-32.3.3.pom">
+        <sha256 value="d11185200a26255d15a3675885628c712f2c77c2aa5ae1e0b24b2c973655b6a1" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools" name="common" version="32.3.3">
+      <artifact name="common-32.3.3.jar">
+        <sha256 value="fad897dad2dc892cb8f09a6621d34e6166738e602002ac3a7625494a64d63d7e" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="common-32.3.3.pom">
+        <sha256 value="71643e03d1186a16225a90d5363557dffa34a307dd9c2227fc6bb0a22b3ef533" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools" name="dvlib" version="32.3.3">
+      <artifact name="dvlib-32.3.3.jar">
+        <sha256 value="52e27f1364cdb5d4f531f52e4eec5ae48da040daa9417d4f06ddf6a1799a065e" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="dvlib-32.3.3.pom">
+        <sha256 value="1580ba0129a3aad412a586fa751fe7d104b8d5f862d4449353e0bf74bb9d53bf" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools" name="play-sdk-proto" version="32.3.3">
+      <artifact name="play-sdk-proto-32.3.3.jar">
+        <sha256 value="43951d8d287f27b3c1242139179899af5c564e862b760353d558e4f73a881e03" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="play-sdk-proto-32.3.3.pom">
+        <sha256 value="8a2012b2f3dacbce3a39db5c869364ef073e1803c4a8a53076f48d863bdfedef" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools" name="repository" version="32.3.3">
+      <artifact name="repository-32.3.3.jar">
+        <sha256 value="b9470bb01fbd8fcad4847e1d10967b20fa93255361c0d2b2103fc6dcff13b177" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="repository-32.3.3.pom">
+        <sha256 value="186e56920aaab06306e850ebd2fc1a4c8276b3d99be8d06520a34fb2990c7430" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools" name="sdk-common" version="32.3.3">
+      <artifact name="sdk-common-32.3.3.jar">
+        <sha256 value="7d34308241071e482f47ccb7c5ba53e83858366905061979ae4ed4623c6dcdd6" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="sdk-common-32.3.3.pom">
+        <sha256 value="8134ee2b325a67da5a5a31a1a60c1119e354ba0b476c9870bb5346685da653f2" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools" name="sdklib" version="32.3.3">
+      <artifact name="sdklib-32.3.3.jar">
+        <sha256 value="4433ca379db0a9f7bd0a5d5b931b0ac671747b10791706dc0d42a348dacbb782" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="sdklib-32.3.3.pom">
+        <sha256 value="869350c798e644465ecd07ae7f778e1388611266c83e07c52e06e8e5059cb6ee" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools.analytics-library" name="protos" version="32.3.3">
+      <artifact name="protos-32.3.3.jar">
+        <sha256 value="e9e3f5021b8ec64169b2e9a49232bbe8b2a23e2dcf31223f982163216b32d30f" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="protos-32.3.3.pom">
+        <sha256 value="f6ea792699001b2a902d5f84511b865979e13977f738b2a7606e4ce01f260e36" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools.analytics-library" name="shared" version="32.3.3">
+      <artifact name="shared-32.3.3.jar">
+        <sha256 value="172a037b11dae0f2cb6b5c47a001c901afcf3631c637526f545e4517b973b68b" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="shared-32.3.3.pom">
+        <sha256 value="064b57c95f0559bb80ac4c423f1d7c10659eb48e2581694b17ac5924ba455480" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools.analytics-library" name="tracker" version="32.3.3">
+      <artifact name="tracker-32.3.3.jar">
+        <sha256 value="f083e82627981dbe1312b5e805e9470d26b4ff56d09ae8fddcce8f862d2e807a" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="tracker-32.3.3.pom">
+        <sha256 value="373a0a2fbdf5f54ea7bfc8d592af2d853788293d70607994058762a320996238" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools.build" name="aapt2-proto" version="9.3.3-15703166">
+      <artifact name="aapt2-proto-9.3.3-15703166.jar">
+        <sha256 value="5bcdd71fde7863c68c67ee4a69cf86206fbd3a2de66f5a3e4625ce5fb4ead2b5" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="aapt2-proto-9.3.3-15703166.module">
+        <sha256 value="23ef363ac65f85ddac6e777aee00755ee77e00541e4012c00fdad163a130293d" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools.build" name="builder-model" version="9.3.3">
+      <artifact name="builder-model-9.3.3.jar">
+        <sha256 value="5c81a6da78e4df5cc5fdfa6b46f7cd39f40adb88a538c8ec8dc7d90a425d6c86" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="builder-model-9.3.3.module">
+        <sha256 value="6c27facc22efa83042db44b530c5884f94242d9f50abd503b34d7a49ad5abf37" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools.build" name="manifest-merger" version="32.3.3">
+      <artifact name="manifest-merger-32.3.3.jar">
+        <sha256 value="e35ff7aa0a4b29660d58b0a667df7b543aa85f7f1dd462a1dd2b021a3a175a30" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="manifest-merger-32.3.3.module">
+        <sha256 value="cbc8f2bfa263af09be410566601cd758cd24d9fbe0a8e4da1cddf65628b2f3e3" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools.ddms" name="ddmlib" version="32.3.3">
+      <artifact name="ddmlib-32.3.3.jar">
+        <sha256 value="8bc8edf0637a9b520febf83b10b57f3120de5f5f3295cb232c90464f65d44318" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="ddmlib-32.3.3.pom">
+        <sha256 value="42cca2f4c5c903089401d11996072fb9f586d2badf5c4b4e31c7c928fd225d8e" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools.external.com-intellij" name="intellij-core" version="32.3.3">
+      <artifact name="intellij-core-32.3.3.jar">
+        <sha256 value="3aa6ed3c10d3c44ba6d2e75975cb05230851b6ce818ce63f20d7ffbbbc3cddaa" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="intellij-core-32.3.3.pom">
+        <sha256 value="a07d6285013c3b03a6423bcc712a228e5fd1cb0f2375ba5a63ccf4c1d1a5a8ae" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools.external.com-intellij" name="kotlin-compiler" version="32.3.3">
+      <artifact name="kotlin-compiler-32.3.3.jar">
+        <sha256 value="2238d5eeec47355deff9f675f6243dc103a93807bfdaf9e6fa71096d92b8edf8" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="kotlin-compiler-32.3.3.pom">
+        <sha256 value="6a716b0415ddee6a79a7fe6be098a69330d3088652878027dc81413fc74ce45e" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools.external.org-jetbrains" name="uast" version="32.3.3">
+      <artifact name="uast-32.3.3.jar">
+        <sha256 value="9247a598b5cdbd32ed618f312b1dd64d2db247d87ffffe5566d313ab559f86ec" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="uast-32.3.3.pom">
+        <sha256 value="534614f76f1d0625c1b38638bd965a3ebfffacac8054c76d91b0740ce3f7df1f" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools.layoutlib" name="layoutlib-api" version="32.3.3">
+      <artifact name="layoutlib-api-32.3.3.jar">
+        <sha256 value="124f04eba80033e5080748a05797003a81c906deb5b76663abc289d009943e82" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="layoutlib-api-32.3.3.pom">
+        <sha256 value="03bfe1a4456ae74a0de9fc7a2e5202b044fbe8d88294a449cfcacba23b266ea3" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools.lint" name="lint" version="32.3.3">
+      <artifact name="lint-32.3.3.jar">
+        <sha256 value="178c00adc88b769a6fc555725907efcd4defa318726e888b9fcc49be6eeadf5f" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="lint-32.3.3.pom">
+        <sha256 value="ff43bdb4429c1925753982cdd52a150e0dda0945a6da6a56e63009918ad95076" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools.lint" name="lint-api" version="32.3.3">
+      <artifact name="lint-api-32.3.3.jar">
+        <sha256 value="dd3c0c1f12e04c8b61854119d0f29558b96b581b71685318d7808fc83b0ea6b7" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="lint-api-32.3.3.pom">
+        <sha256 value="e72e6093c441bdd40565bcd38b89a87ab6e76b63ac4b534dbce2025f96620949" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools.lint" name="lint-checks" version="32.3.3">
+      <artifact name="lint-checks-32.3.3.jar">
+        <sha256 value="1e794f3d8536b3ab4e445dc4eec2a760d229473e49b01f49d9d248963569571d" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="lint-checks-32.3.3.pom">
+        <sha256 value="15884015804ab0b8bbbcbd018a4820cbf889ddab4c41143b27b1d5da7a2fb62d" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools.lint" name="lint-gradle" version="32.3.3">
+      <artifact name="lint-gradle-32.3.3.jar">
+        <sha256 value="9e457a5bdb3e59428eab1e8b745db2362b4395131e31a346c7a1b74ccaf77a23" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="lint-gradle-32.3.3.pom">
+        <sha256 value="fd4b2ad191c1d735e6faaaef86a25a66112ae7a0d61a4cc550b72371bae965c9" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools.lint" name="lint-model" version="32.3.3">
+      <artifact name="lint-model-32.3.3.jar">
+        <sha256 value="dba7719ec2ba9f7e800147dd21fb57be65e0ef315a37356f6878d81222e82fc6" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="lint-model-32.3.3.pom">
+        <sha256 value="1e29417b6b932d02e870cae77e0339adc754be9a2e77feab7508e329fb9dbec4" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.android.tools.lint" name="lint-typedef-remover" version="32.3.3">
+      <artifact name="lint-typedef-remover-32.3.3.jar">
+        <sha256 value="e281e90a6ffc831800e64517be8f1b230a6367bec226f1b0ce1a80d4573deade" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="lint-typedef-remover-32.3.3.pom">
+        <sha256 value="b2c3540701362625e6f3965bdaeebcc3422f1ff99553ed64fd3232f52712f6e6" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="com.google.guava" name="guava-parent" version="33.8.0-jre">
+      <artifact name="guava-parent-33.8.0-jre.pom">
+        <sha256 value="31b614120ff2858dd84fded11a96b8c00cb75abc8bfcdd14b6551050e27bcdc1" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="commons-codec" name="commons-codec" version="1.17.1">
+      <artifact name="commons-codec-1.17.1.jar">
+        <sha256 value="f9f6cb103f2ddc3c99a9d80ada2ae7bf0685111fd6bffccb72033d1da4e6ff23" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="commons-codec-1.17.1.pom">
+        <sha256 value="7fa0db4d8150daf932958b8aea89ee24abb4d18e2316a5de535278fc131512a0" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="org.apache" name="apache" version="32">
+      <artifact name="apache-32.pom">
+        <sha256 value="cfd872c0ec27f53ae68f43dbc0fecded8add773079a53afbd390e407b42ce72f" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="org.apache" name="apache" version="33">
+      <artifact name="apache-33.pom">
+        <sha256 value="d78bd8524c5f8380a190a6525686629a95dfe512df21111383a6d8c0923a4415" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="org.apache" name="apache" version="40">
+      <artifact name="apache-40.pom">
+        <sha256 value="9c79f575a59ab5b622f591169411a4fdcfab71f8dc0440beaed87ac6b9b941f7" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="org.apache.commons" name="commons-compress" version="1.27.1">
+      <artifact name="commons-compress-1.27.1.jar">
+        <sha256 value="293d80f54b536b74095dcd7ea3cf0a29bbfc3402519281332495f4420d370d16" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="commons-compress-1.27.1.pom">
+        <sha256 value="df8cc1a8387d4ce842363b7209fdc6d35df9763839fd3fcab558a0f83f9d841c" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="org.apache.commons" name="commons-lang3" version="3.22.0">
+      <artifact name="commons-lang3-3.22.0.jar">
+        <sha256 value="2ea88052c8662bf51874f4159467ba24b040b22dfd54d2596e11936896c76192" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="commons-lang3-3.22.0.pom">
+        <sha256 value="f2d1b011aa010af1b40c7c7ac3067914ca101f13da7f9cf6fc6771c8a9e82518" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="org.apache.commons" name="commons-parent" version="107">
+      <artifact name="commons-parent-107.pom">
+        <sha256 value="3b38ba6b152b096162e883b3f10ef1c40a8f37cf9d9392a34cab8fd580a98ffa" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="org.apache.commons" name="commons-parent" version="71">
+      <artifact name="commons-parent-71.pom">
+        <sha256 value="95b7be70f316ae4ca22f6fbdd08de2182e87cd874a650de7c3d3386a747a82a3" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="org.apache.commons" name="commons-parent" version="72">
+      <artifact name="commons-parent-72.pom">
+        <sha256 value="4345debfc767b1aeac68abdd72fc67d18b521d4b390372a11b63ff0c586b2320" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="org.apache.httpcomponents" name="httpmime" version="4.5.14">
+      <artifact name="httpmime-4.5.14.jar">
+        <sha256 value="d401243d5c6eae928a37121b6e819158c8c32ea0584793e7285bb489ab2a3d17" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="httpmime-4.5.14.pom">
+        <sha256 value="e0fec4ad7ff9259c02de86e333761c9a03df9a05b646397e3a325d1c34f8feb1" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="org.jetbrains.kotlin" name="kotlin-reflect" version="2.2.10">
+      <artifact name="kotlin-reflect-2.2.10.jar">
+        <sha256 value="c48db4f8cd1bfd67f72d59255065fb41bfda43ca2942dac4d9deb897aa126ba4" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="kotlin-reflect-2.2.10.pom">
+        <sha256 value="ae46614906414404cefc41a467435205d6dee67a2390598328a639ad2bacbd11" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="org.jetbrains.kotlin" name="kotlin-stdlib" version="2.2.10">
+      <artifact name="kotlin-stdlib-2.2.10.jar">
+        <sha256 value="9c67cc79efd6b9215b49d2a4308f5f3433537376c7c88e89bdd6729bd096e61a" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="kotlin-stdlib-2.2.10.module">
+        <sha256 value="db78df08283591cb67c8b9d2796109eb52b6088d4dfe102b545f20118249713f" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="org.jetbrains.kotlin" name="kotlin-stdlib-jdk7" version="2.2.10">
+      <artifact name="kotlin-stdlib-jdk7-2.2.10.jar">
+        <sha256 value="cf95eccc6cc784dff479dee0b8834f3584b93292cc5d91972e82f5d7b9e13e3b" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="kotlin-stdlib-jdk7-2.2.10.pom">
+        <sha256 value="be494907e0e19c78bb821154afa1776d5ad7a058b4ab30090f74354b0e1338de" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="org.jetbrains.kotlin" name="kotlin-stdlib-jdk8" version="2.2.10">
+      <artifact name="kotlin-stdlib-jdk8-2.2.10.jar">
+        <sha256 value="8974bfdd08b1d81843fe8d11f0729ab6e5b3c1f88d671ebe0c006358129ce149" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="kotlin-stdlib-jdk8-2.2.10.pom">
+        <sha256 value="2569cf5a980724f140157501db36dffab919cd0d443d2e14b5a35a2f96f84fac" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="org.junit" name="junit-bom" version="5.11.0-M2">
+      <artifact name="junit-bom-5.11.0-M2.pom">
+        <sha256 value="4a3ffc4a4edcfec2cb5d619922706a9407161798571939f854dfda73e4e17cc8" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="junit-bom-5.11.0-M2.module">
+        <sha256 value="86477abcf490d6ca059aa9973cb108d22a506f49d1a5569bb32cc6cbf43c2cce" origin="Canonical HTTPS repository byte comparison 2026-11-23; cold lint metadata qualification" />
+      </artifact>
+    </component>
+    <component group="org.junit" name="junit-bom" version="5.14.4">
+      <artifact name="junit-bom-5.14.4.pom">
+        <sha256 value="5706e8f29a0a07f56efbbea4a0670793414194bb8d24d8143ba1e787a2f32856" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="junit-bom-5.14.4.module">
+        <sha256 value="8a5e98d131de7d7aadb1ee88bfd86d66e62a7c2e2a4074a3b2498b03d236eb64" origin="Canonical HTTPS repository byte comparison 2026-11-23; cold lint metadata qualification" />
+      </artifact>
+    </component>
+    <component group="org.mockito" name="mockito-bom" version="4.11.0">
+      <artifact name="mockito-bom-4.11.0.pom">
+        <sha256 value="d8531a746c988f7f68ed5f188cdea945006aea993ec5df9e524e0d27d61491da" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="org.ow2.asm" name="asm" version="9.9">
+      <artifact name="asm-9.9.jar">
+        <sha256 value="03d99a74ad1ee5c71334ef67437f4ef4fe3488caa7c96d8645abc73c8e2017d4" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="asm-9.9.pom">
+        <sha256 value="cf861ef1e745d57154af79ae14df340ed5341e5dcd0157cefcd2eb7f1aa05c57" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="org.ow2.asm" name="asm-analysis" version="9.9">
+      <artifact name="asm-analysis-9.9.jar">
+        <sha256 value="6a15d28e8bd29ba4fd5bca4baf9b50e8fba2d7b51fbf78cfa0c875a7214c678b" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="asm-analysis-9.9.pom">
+        <sha256 value="909f24a710c728e0e5d643ec0b4834a63cb3d30022100d583d5dd6a26e35cda6" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="org.ow2.asm" name="asm-commons" version="9.9">
+      <artifact name="asm-commons-9.9.jar">
+        <sha256 value="db2f6f26150bbe7c126606b4a1151836bcc22a1e05a423b3585698bece995ff8" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="asm-commons-9.9.pom">
+        <sha256 value="18a5d3ef1377e7544b3ca3210f261396b987f6010ef591d3872adae63119ee43" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+    </component>
+    <component group="org.ow2.asm" name="asm-tree" version="9.9">
+      <artifact name="asm-tree-9.9.jar">
+        <sha256 value="42178f3775c9c63f9e5e1446747d29b4eca4d91bd6e75e5c43cfa372a47d38c6" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
+      <artifact name="asm-tree-9.9.pom">
+        <sha256 value="d01788ed8e6e8e24acaf6cb4a7bdcc2733416252faa00232959e3e2e9df1bf44" origin="Canonical HTTPS repository byte comparison 2026-11-23; lint security qualification" />
+      </artifact>
     </component>
   </components>
 </verification-metadata>
