@@ -1,6 +1,5 @@
 plugins {
     id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.compose'
 }
 
@@ -43,7 +42,7 @@ dependencies {
     implementation 'androidx.fragment:fragment:1.9.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.1'
     // These remain Material/AppCompat transitives after legacy screens are removed.
-    // Preserve qualified selections without restoring unused direct API dependencies.
+    // Select their versions without restoring unused direct API dependencies.
     constraints {
         implementation('androidx.constraintlayout:constraintlayout:2.2.2') {
             because 'Keep the selected transitive AndroidX version'
@@ -62,7 +61,7 @@ dependencies {
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
 }
-// Match the Java bytecode target; retain JDK17 as the build runtime.
+// Keep Android Java and Kotlin bytecode targets aligned.
 kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
