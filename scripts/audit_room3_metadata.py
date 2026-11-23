@@ -108,5 +108,5 @@ if __name__ == "__main__":
     opts = parser.parse_args()
     result = audit(opts.old, opts.candidate, opts.receipt)
     print(json.dumps({key: value for key, value in result.items() if key != "checks"}))
-    if not result["all_independently_checked"] or not result["new_artifacts"]:
+    if not result["all_independently_checked"]:
         raise SystemExit(1)

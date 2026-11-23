@@ -75,7 +75,7 @@ jobs:
             app/src/main/kotlin/com/markobl/calllogsync/slice/RoomSqliteCompat.kt \
             app/src/main/kotlin/com/markobl/calllogsync/slice/SqliteLedger.kt \
             app/src/main/kotlin/com/markobl/calllogsync/slice/SqliteImportStore.kt \
-            app/src/androidTest/java/com/markobl/calllogsync/slice/KotlinPackageUpdateTest.java
+            app/src/androidTest/java/com/markobl/calllogsync/slice/KotlinPackageUpdateTest.java \
             app/src/androidTest/java/com/markobl/calllogsync/slice/Room3MigrationTest.java
           if git diff --cached --quiet; then
             echo 'Already admitted and formatted; no new commit'
