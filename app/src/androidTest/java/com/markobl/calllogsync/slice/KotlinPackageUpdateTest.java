@@ -76,8 +76,7 @@ public class KotlinPackageUpdateTest {
     }
 
     private static long countRows(RoomSqliteCompat db, String table) {
-        try (android.database.Cursor cursor =
-                db.rawQuery("SELECT COUNT(*) FROM " + table, null)) {
+        try (android.database.Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + table, null)) {
             assertTrue(cursor.moveToFirst());
             return cursor.getLong(0);
         }

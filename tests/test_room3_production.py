@@ -16,8 +16,10 @@ class Room3ProductionContract(unittest.TestCase):
         room = (SOURCE / "RoomPersistence.kt").read_text()
         self.assertIn("Room.databaseBuilder", room)
         self.assertIn("AndroidSQLiteDriver", room)
-        self.assertIn("calltrack-ledger.db", room)
-        self.assertIn("calltrack-imports.db", room)
+        ledger = (SOURCE / "SqliteLedger.kt").read_text()
+        imports = (SOURCE / "SqliteImportStore.kt").read_text()
+        self.assertIn("calltrack-ledger.db", ledger)
+        self.assertIn("calltrack-imports.db", imports)
         self.assertIn("room3-sqlite-wrapper", build)
         for file in ("SqliteLedger.kt", "SqliteImportStore.kt"):
             self.assertNotIn("SQLiteOpenHelper(", (SOURCE / file).read_text())
