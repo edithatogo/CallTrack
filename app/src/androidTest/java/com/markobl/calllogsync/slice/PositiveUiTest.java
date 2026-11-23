@@ -369,13 +369,10 @@ public class PositiveUiTest {
                     android.view.WindowInsets insets =
                             activity.getWindow().getDecorView().getRootWindowInsets();
                     requiredTop[0] =
-                            android.os.Build.VERSION.SDK_INT >= 30
-                                    ? insets.getInsets(
-                                                    android.view.WindowInsets.Type.systemBars()
-                                                            | android.view.WindowInsets.Type
-                                                                    .displayCutout())
-                                            .top
-                                    : insets.getSystemWindowInsetTop();
+                            insets.getInsets(
+                                            android.view.WindowInsets.Type.systemBars()
+                                                    | android.view.WindowInsets.Type.displayCutout())
+                                    .top;
                 });
                 assertTrue(
                         names[i]
