@@ -123,6 +123,7 @@ final class RenderedUi {
             }
         }
         assertNotNull("The original activity task was not retained", savedTask);
+        int taskId = savedTask.getTaskInfo().id;
         assertTrue(
                 automation.performGlobalAction(
                         android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME));
@@ -140,10 +141,20 @@ final class RenderedUi {
                 "Android did not retain the stopped activity state");
         android.os.Process.killProcess(pid);
         await(() -> mainProcess() == null, "App process survived the background kill");
-        savedTask.moveToFront();
+        // The driver is backgrounded; use the system's task-return permission to
+        // simulate selecting this existing task from Recents on Android 10+.
+        if (android.os.Build.VERSION.SDK_INT >= 29)
+            automation.adoptShellPermissionIdentity(
+                    "android.permission.START_ACTIVITIES_FROM_BACKGROUND");
+        try {
+            savedTask.moveToFront();
+        } finally {
+            if (android.os.Build.VERSION.SDK_INT >= 29) automation.dropShellPermissionIdentity();
+        }
         await(
                 () -> mainProcess() != null && mainProcess().pid != pid,
                 "App did not restart in a new process");
+        assertEquals("Returning must keep the original task", taskId, savedTask.getTaskInfo().id);
     }
 
     AccessibilityNodeInfo find(String value, boolean id) {

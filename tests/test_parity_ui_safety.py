@@ -146,6 +146,20 @@ class UiSafety(unittest.TestCase):
         self.assertNotIn('SomeClass', diagnostic)
         self.assertNotIn('private text', diagnostic)
 
+    def test_runtime_diagnostic_keeps_driver_and_known_frame_without_private_text(self):
+        logcat = (
+            'E AndroidRuntime: FATAL EXCEPTION: main\n'
+            'E AndroidRuntime: Process: org.calltrack.community.dev:recovery_driver, PID: 4321\n'
+            'E AndroidRuntime: java.lang.IllegalStateException: private call details\n'
+            'E AndroidRuntime: \tat com.markobl.calllogsync.slice.RenderedUi.killStoppedProcessAndReturn(RenderedUi.java:141)\n'
+        )
+        summary = device.instrumentation_failure_summary('restore', '', logcat=logcat)
+        self.assertIn('runtime-fatal-process=driver', summary)
+        self.assertIn('runtime-fatal-source=project', summary)
+        self.assertIn('runtime-project-frame=RenderedUi.killStoppedProcessAndReturn', summary)
+        self.assertNotIn('private call details', summary)
+        self.assertNotIn('4321', summary)
+
     def test_nonzero_instrumentation_failure_uses_bounded_host_diagnostics(self):
         activity_dump = (
             '* Hist #0: ActivityRecord{prompt '
@@ -377,6 +391,7 @@ class UiSafety(unittest.TestCase):
         self.systemui_anr = False
         self.files = 'screen.png\nscreen.txt'
         self.fail_cleanup = False
+        self.fail_ui = False
         self.install_timeout = False
         self.app_permission = ''
         self.avd = RECOVERY_AVD
@@ -400,7 +415,16 @@ class UiSafety(unittest.TestCase):
         elif args[:4] == ['shell', 'cmd', 'package', 'compile']:
             output = 'Success'
         elif args[:3] == ['shell', 'am', 'instrument']:
-            output = 'FAILURES' if self.fail_cleanup and ('renderedPermissions' in ' '.join(args) or 'cleanupFixture' in ' '.join(args)) else 'OK (1 test)'
+            if self.fail_ui and 'renderedAccessibilityLabelsTargetsAndKeyboardFocus' in ' '.join(args):
+                output = 'FAILURES!!!\nINSTRUMENTATION_STATUS_CODE: -1\nprivate display text'
+            else:
+                output = 'FAILURES' if self.fail_cleanup and ('renderedPermissions' in ' '.join(args) or 'cleanupFixture' in ' '.join(args)) else 'OK (1 test)'
+        elif args == ['shell', 'dumpsys', 'activity', 'activities']:
+            output = 'mResumedActivity: ActivityRecord{abc u0 com.example.launcher/.Home t4}'
+        elif args == ['logcat', '-d', '-t', '800']:
+            output = ('FATAL EXCEPTION: main\n'
+                      'Process: org.calltrack.community.dev:recovery_driver, PID: 4321\n'
+                      'java.lang.IllegalStateException: private call details\n')
         elif args[:3] == ['shell', 'run-as', device.PACKAGE]:
             output = self.files
         elif args[0] == 'exec-out':
@@ -414,7 +438,7 @@ class UiSafety(unittest.TestCase):
         environment = Mock()
         environment.snapshot.return_value = {'awake': 'Awake'}
         environment.restore.return_value = {'verified': True}
-        with patch.object(device, 'ROOT', self.root), patch.object(device, 'inputs', return_value={}), patch.object(device.subprocess, 'check_output', side_effect=identities), patch.object(device.subprocess, 'run', side_effect=self.command), patch.object(device, 'EmulatorEnvironment', return_value=environment):
+        with patch.object(device, 'ROOT', self.root), patch.object(device, 'inputs', return_value={}), patch.object(device.subprocess, 'check_output', side_effect=identities + [''] * 20), patch.object(device.subprocess, 'run', side_effect=self.command), patch.object(device, 'EmulatorEnvironment', return_value=environment):
             return device.qualify('emulator-5582', suite, receipt_dir)
 
     def test_guest_anr_refuses_ui_acceptance_before_install(self):
@@ -445,6 +469,16 @@ class UiSafety(unittest.TestCase):
         receipt = json.loads((self.root / '.local/slice-evidence/parity-ui-accessibility-receipt.json').read_text())
         self.assertTrue(receipt['packages_removed'])
         self.assertTrue(receipt['fixture_cleanup_verified'])
+
+    def test_failed_instrumentation_collects_only_bounded_diagnostics(self):
+        self.fail_ui = True
+        self.assertEqual(1, self.run_fixture('accessibility'))
+        receipt = json.loads((self.root / '.local/slice-evidence/parity-ui-accessibility-receipt.json').read_text())
+        self.assertIn('activity-top=other', receipt['error'])
+        self.assertIn('runtime-fatal-process=driver', receipt['error'])
+        self.assertNotIn('private', receipt['error'])
+        self.assertTrue(receipt['fixture_cleanup_verified'])
+        self.assertTrue(receipt['packages_removed'])
 
     def test_physical_target_refused_before_tools(self):
         with patch.object(device.subprocess, 'run') as run:

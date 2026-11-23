@@ -1130,3 +1130,21 @@ same-host release builds on that revision produced identical unsigned APKs;
 they used a shared dependency cache and are not independent-host reproduction.
 The current test-only refinements and the controlled Google retest still need
 their own applicable qualification.
+
+Hosted run `45092254258` passed API36 and failed API26 and API33. API26
+progressed beyond the saved-state wait but the instrumentation terminated with
+an `IllegalStateException`; its cause was not available in the sanitized log.
+The same source passed both the import and recovery suites on a dedicated
+API26 ARM emulator, with cleanup and environment restoration verified. API33
+passed the immediate pending-record and zero-event checks, but its active
+window was not the app when the recovery action was sought.
+
+Android 13's [task-return implementation](https://android.googlesource.com/platform/frameworks/base/+/android-13.0.0_r1/services/core/java/com/android/server/wm/AppTaskImpl.java)
+can reject a background caller's `moveToFront`. The test driver now briefly
+adopts only the system permission for that task-return operation on API29+
+to emulate selecting the retained task from Recents, drops it immediately,
+and checks the original task ID. It does not grant an app permission or change
+the recovery assertions. The hosted API26 crash's cause and the effect of this
+task-return change still require verification; the physical user journey
+remains a separate gate. Sanitized failure diagnostics now also classify the
+driver and known project frames without emitting rendered or call data.

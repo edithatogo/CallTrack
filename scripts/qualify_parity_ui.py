@@ -76,6 +76,18 @@ def native_failure_summary(method, output, declared_permissions=None):
     )
     if runtime_exception:
         detail += '; runtime-exception=' + runtime_exception.group(1)
+    for name, allowed in (
+        ('runtime-fatal-process', 'app|driver|test|permission-controller|input-method|platform|other'),
+        ('runtime-fatal-source', 'app|test|project|permission-controller|input-method|platform'),
+    ):
+        category = re.search(r'\b' + name + r'=(' + allowed + r')(?![a-z-])', output)
+        if category:
+            detail += '; ' + category.group(0)
+    project_frame = re.search(
+        r'\bruntime-project-frame=((?:HistoricalImportActivity|ReceiptRecoveryActivity|'
+        r'ImportUiTest|RecoveryUiTest|RenderedUi)(?:\$[A-Za-z0-9_$]+)?\.[A-Za-z0-9_$]+)', output)
+    if project_frame:
+        detail += '; ' + project_frame.group(0)
     # The rendered accessibility gate may fail on an unlabeled control. Retain
     # only its resource ID and widget class; suppress its visible text/label.
     control = re.search(
@@ -342,7 +354,7 @@ def runtime_failure_summary(logcat):
     if fatal:
         body = fatal.group('body')
         process = re.search(
-            r'^[^\n]*\bProcess:\s*([A-Za-z0-9_.]+)(?:,|\s|$)', body, re.MULTILINE
+            r'^[^\n]*\bProcess:\s*([A-Za-z0-9_.:]+)(?:,|\s|$)', body, re.MULTILINE
         )
         if process:
             package = process.group(1)
@@ -350,6 +362,8 @@ def runtime_failure_summary(logcat):
                 categories.append('runtime-fatal-process=test')
             elif package == PACKAGE:
                 categories.append('runtime-fatal-process=app')
+            elif package == PACKAGE + ':recovery_driver':
+                categories.append('runtime-fatal-process=driver')
             elif package in ('com.android.permissioncontroller',
                              'com.google.android.permissioncontroller'):
                 categories.append('runtime-fatal-process=permission-controller')
@@ -358,6 +372,8 @@ def runtime_failure_summary(logcat):
                 categories.append('runtime-fatal-process=input-method')
             elif package.startswith(('android.', 'com.android.')):
                 categories.append('runtime-fatal-process=platform')
+            else:
+                categories.append('runtime-fatal-process=other')
         frame = re.search(r'^[^\n]*\bat\s+([A-Za-z0-9_.$]+)\(', body, re.MULTILINE)
         if frame:
             owner = frame.group(1)
@@ -365,6 +381,8 @@ def runtime_failure_summary(logcat):
                 categories.append('runtime-fatal-source=test')
             elif owner.startswith(PACKAGE + '.'):
                 categories.append('runtime-fatal-source=app')
+            elif owner.startswith('com.markobl.calllogsync.slice.'):
+                categories.append('runtime-fatal-source=project')
             elif owner.startswith(('com.android.permissioncontroller.',
                                    'com.google.android.permissioncontroller.')):
                 categories.append('runtime-fatal-source=permission-controller')
@@ -373,6 +391,12 @@ def runtime_failure_summary(logcat):
                 categories.append('runtime-fatal-source=input-method')
             elif owner.startswith(('android.', 'com.android.')):
                 categories.append('runtime-fatal-source=platform')
+        project_frame = re.search(
+            r'\bat\s+com\.markobl\.calllogsync\.slice\.'
+            r'((?:HistoricalImportActivity|ReceiptRecoveryActivity|ImportUiTest|RecoveryUiTest|'
+            r'RenderedUi)(?:\$[A-Za-z0-9_$]+)?\.[A-Za-z0-9_$]+)\(', body)
+        if project_frame:
+            categories.append('runtime-project-frame=' + project_frame.group(1))
     return ' '.join(categories)
 
 
@@ -440,6 +464,19 @@ def qualify(serial, suite="settings", receipt_dir=None):
             raise RuntimeError('ADB command failed: ' + ' '.join(args))
         return result.stdout.strip()
 
+    def failure_summary(method, output):
+        try:
+            activity_dump = command('shell', 'dumpsys', 'activity', 'activities')
+        except Exception:
+            activity_dump = ''
+        try:
+            logcat = command('logcat', '-d', '-t', '800')
+        except Exception:
+            logcat = ''
+        apk_permissions = apk_runtime_permission_summary(apks[0], apks[1], aapt)
+        return instrumentation_failure_summary(
+            method, output, activity_dump, logcat, apk_permissions)
+
     def check(method, class_name=None, runner='androidx.test.runner.AndroidJUnitRunner'):
         selected_class = class_name or test_class
         instrument_args = (
@@ -457,25 +494,11 @@ def qualify(serial, suite="settings", receipt_dir=None):
             # Nonzero instrumentation exits can still contain a useful JUnit
             # failure. Keep raw output in the ignored receipt; only emit the
             # same allowlisted summary used for normal assertion failures.
-            try:
-                activity_dump = command('shell', 'dumpsys', 'activity', 'activities')
-            except Exception:
-                activity_dump = ''
-            try:
-                logcat = command('logcat', '-d', '-t', '800')
-            except Exception:
-                logcat = ''
-            apk_permissions = apk_runtime_permission_summary(apks[0], apks[1], aapt)
-            raise RuntimeError(instrumentation_failure_summary(
-                method, step.get('output', ''), activity_dump, logcat, apk_permissions
-            )) from failure
+            raise RuntimeError(failure_summary(method, step.get('output', ''))) from failure
         if 'OK (1 test)' not in output or 'FAILURES' in output or 'INSTRUMENTATION_FAILED' in output:
             # The full output stays in the ignored receipt; public CI only gets
             # source locations, never rendered labels or fixture values.
-            apk_permissions = apk_runtime_permission_summary(
-                apks[0], apks[1], aapt)
-            raise RuntimeError(native_failure_summary(
-                method, output, declared_permissions=apk_permissions))
+            raise RuntimeError(failure_summary(method, output))
 
     def capture_ui():
         directory = evidence / ('ui-' + receipt['fixture_token'])
