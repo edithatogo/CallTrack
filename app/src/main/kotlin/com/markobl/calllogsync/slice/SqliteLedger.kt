@@ -3,15 +3,12 @@ package com.markobl.calllogsync.slice
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
 import java.io.Closeable
 import java.util.Collections
 import java.util.function.LongSupplier
 
 /** Durable source/destination receipts; SQL transactions serialize concurrent instances. */
-// SQLiteOpenHelper did not implement AutoCloseable on API26. Keep Kotlin use safe there.
 class SqliteLedger(context: Context?, name: String?, private val clock: LongSupplier?) :
-    SQLiteOpenHelper(context, name, null, 6),
     SliceEngine.Ledger,
     AutomaticDelivery.Progress,
     Closeable {
@@ -22,47 +19,17 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
         name: String?,
     ) : this(context, name, LongSupplier { System.currentTimeMillis() })
 
+    private val room = RoomPersistence.ledger(requireNotNull(context), requireNotNull(name))
+    private val adapter = RoomPersistence.adapter(room)
+    val writableDatabase: RoomSqliteCompat get() = adapter
+    val readableDatabase: RoomSqliteCompat get() = adapter
+
+    override fun close() = room.close()
+
     private fun now(): Long {
         val time = clock!!.asLong
         check(time >= 0) { "Invalid storage clock" }
         return time
-    }
-
-    override fun onCreate(db: SQLiteDatabase) {
-        db.execSQL(
-            "CREATE TABLE receipts (source TEXT NOT NULL, calendar INTEGER NOT NULL, event INTEGER NOT NULL, fingerprint TEXT NOT NULL, PRIMARY KEY(source,calendar))",
-        )
-        createOutbox(db)
-        createScans(db)
-    }
-
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        check(newVersion == 6 && oldVersion in 1..5) { "A preserving ledger migration is required" }
-        if (oldVersion == 1) {
-            createOutbox(db)
-            db.execSQL(
-                "INSERT INTO outbox (source,calendar,state,event,fingerprint) SELECT source,calendar,'LEGACY',event,fingerprint FROM receipts",
-            )
-        } else {
-            if (oldVersion == 2) {
-                db.execSQL("ALTER TABLE outbox ADD COLUMN operation_owner TEXT")
-                db.execSQL(
-                    "ALTER TABLE outbox ADD COLUMN operation_generation INTEGER NOT NULL DEFAULT 0",
-                )
-            }
-            if (oldVersion < 4) {
-                db.execSQL("ALTER TABLE outbox ADD COLUMN source_start INTEGER")
-                db.execSQL("ALTER TABLE outbox ADD COLUMN source_seconds INTEGER")
-                db.execSQL("ALTER TABLE outbox ADD COLUMN source_type INTEGER")
-                db.execSQL("ALTER TABLE outbox ADD COLUMN source_presentation INTEGER")
-                db.execSQL("ALTER TABLE outbox ADD COLUMN source_presentation_supplied INTEGER")
-            }
-        }
-        if (oldVersion < 5) createScans(db)
-        if (oldVersion != 1) db.execSQL("ALTER TABLE outbox ADD COLUMN payload_saved_at INTEGER")
-        val migrated = ContentValues()
-        migrated.put("payload_saved_at", now())
-        db.update("outbox", migrated, "payload_title IS NOT NULL", null)
     }
 
     class RecoveryCursor(@JvmField val started: Long, key: String?, @JvmField val calendar: Long) {
@@ -538,18 +505,4 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
         }
     }
 
-    companion object {
-        private fun createScans(db: SQLiteDatabase) {
-            db.execSQL(
-                "CREATE TABLE scan_cursors (owner TEXT NOT NULL, generation INTEGER NOT NULL, namespace TEXT NOT NULL, upper_id INTEGER NOT NULL, upper_binding TEXT, last_id INTEGER NOT NULL, last_binding TEXT, PRIMARY KEY(owner,generation))",
-            )
-        }
-
-        private fun createOutbox(db: SQLiteDatabase) {
-            db.execSQL(
-                "CREATE TABLE outbox (source TEXT NOT NULL, calendar INTEGER NOT NULL, state TEXT NOT NULL, event INTEGER NOT NULL, signature TEXT, marker TEXT, fingerprint TEXT NOT NULL, payload_title TEXT, payload_description TEXT, payload_start INTEGER, payload_end INTEGER, payload_timezone TEXT, operation_owner TEXT, operation_generation INTEGER NOT NULL DEFAULT 0, source_start INTEGER, source_seconds INTEGER, source_type INTEGER, source_presentation INTEGER, source_presentation_supplied INTEGER, payload_saved_at INTEGER, PRIMARY KEY(source,calendar))",
-            )
-            db.execSQL("CREATE INDEX outbox_state ON outbox(calendar,state)")
-        }
-    }
 }
