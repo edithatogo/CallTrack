@@ -383,6 +383,11 @@ public class DurableDeliveryTest {
         assertEquals(3, receipt.facts.type);
         assertEquals(Integer.valueOf(3), receipt.facts.presentation);
         assertEquals(60000, sink.rows.get(1L).end - sink.rows.get(1L).start);
+        sink.rows.put(1L, wholeSecondCopy(sink.rows.get(1L)));
+        assertEquals(
+                DurableDelivery.Result.ALREADY_LOGGED,
+                delivery(store, sink).deliver(zero, 7, "UTC", () -> true));
+        assertEquals(1, sink.inserts);
     }
 
     @Test
