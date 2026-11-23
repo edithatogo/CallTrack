@@ -26,7 +26,7 @@ class CandidateTrust(unittest.TestCase):
     def test_reject_dropping_or_changing_existing_approved_hash(self):
         previous = policy([("example", "core", "1.0", "core-1.0.jar", "a" * 64)])
         with self.assertRaisesRegex(ValueError, "may not be removed"):
-            audit.pending(previous, policy([]))
+            audit.pending(previous, policy([("example", "other", "1.0", "other-1.0.jar", "c" * 64)]))
         with self.assertRaisesRegex(ValueError, "may not be removed"):
             audit.pending(previous, policy([("example", "core", "1.0", "core-1.0.jar", "b" * 64)]))
 
