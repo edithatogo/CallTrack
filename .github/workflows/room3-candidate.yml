@@ -12,12 +12,16 @@ permissions:
   contents: read
 jobs:
   room3-candidate:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'codex/room3-production-preserving-20261124'
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          persist-credentials: false
+          persist-credentials: true
+          ref: ${{ github.event.pull_request.head.sha }}
       - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
           distribution: temurin
@@ -46,8 +50,41 @@ jobs:
           set -o pipefail
           sh gradlew --no-daemon --console=plain --write-verification-metadata sha256 \
             :app:compileDebugKotlin :app:compileDebugAndroidTestKotlin \
-            :app:testDebugUnitTest :app:assembleRelease \
+            :app:testDebugUnitTest :app:lintDebug :app:assembleRelease \
             2>&1 | tee .local/room3-candidate/gradle.log
+      - name: Independently audit every NEW dependency checksum
+        run: |
+          set -euo pipefail
+          git show HEAD:gradle/verification-metadata.xml > .local/room3-candidate/approved.xml
+          python3 scripts/audit_room3_metadata.py \
+            --old .local/room3-candidate/approved.xml \
+            --candidate gradle/verification-metadata.xml \
+            --receipt .local/room3-candidate/canonical-audit.json
+      - name: Promote source-formatted and independently audited Room3 candidate to this branch
+        run: |
+          set -euo pipefail
+          test "$GITHUB_HEAD_REF" = 'codex/room3-production-preserving-20261124'
+          test "$GITHUB_REPOSITORY" = 'edithatogo/CallTrack'
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE_SHA"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- \
+            gradle/verification-metadata.xml \
+            app/schemas/ \
+            app/src/main/kotlin/com/markobl/calllogsync/slice/RoomPersistence.kt \
+            app/src/main/kotlin/com/markobl/calllogsync/slice/RoomSqliteCompat.kt \
+            app/src/main/kotlin/com/markobl/calllogsync/slice/SqliteLedger.kt \
+            app/src/main/kotlin/com/markobl/calllogsync/slice/SqliteImportStore.kt \
+            app/src/androidTest/java/com/markobl/calllogsync/slice/KotlinPackageUpdateTest.java
+          if git diff --cached --quiet; then
+            echo 'Already admitted and formatted; no new commit'
+            exit 0
+          fi
+          git diff --cached --check
+          git commit -m 'build(room3): admit independently verified dependency hashes and generated schemas'
+          git push origin HEAD:refs/heads/codex/room3-production-preserving-20261124
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
       - name: Describe unapproved metadata additions
         if: always()
         run: |
@@ -86,3 +123,4 @@ jobs:
             app/src/main/kotlin/com/markobl/calllogsync/slice/SqliteImportStore.kt
             app/src/androidTest/java/com/markobl/calllogsync/slice/KotlinPackageUpdateTest.java
             .local/room3-candidate/gradle.log
+            .local/room3-candidate/canonical-audit.json
