@@ -698,7 +698,17 @@ class UiSafety(unittest.TestCase):
     def test_import_suite_uses_its_own_class_and_receipt(self):
         self.assertEqual(0, self.run_fixture('imports'))
         methods = [' '.join(c) for c in self.calls if c[:3] == ['shell', 'am', 'instrument']]
-        self.assertTrue(all('ImportUiTest#' in method for method in methods))
+        selectors = [c[c.index('class') + 1] for c in self.calls
+                     if c[:3] == ['shell', 'am', 'instrument']]
+        self.assertEqual([
+            'com.markobl.calllogsync.slice.HistoricalImportActionsPanelTest'
+            '#runActionsRequireEnabledStateAndExplicitTaps',
+            'com.markobl.calllogsync.slice.HistoricalImportDestinationPanelTest'
+            '#destinationListIsPresentedAndOnlyExplicitSelectionReturnsOpaqueToken',
+        ], selectors[:2])
+        self.assertTrue(all(method.startswith('com.markobl.calllogsync.slice.ImportUiTest#')
+                            for method in selectors[2:]))
+        self.assertEqual('com.markobl.calllogsync.slice.ImportUiTest#cleanupFixture', selectors[-1])
         self.assertTrue(any('latestCallUsesNewestDateAndHighestIdOnTies' in method for method in methods))
         self.assertTrue(any('renderedDestinationAndFiltersSurviveProcessDeathWithoutPreview' in method
                             and 'ProcessRecoveryRunner' in method for method in methods))
