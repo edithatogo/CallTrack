@@ -521,7 +521,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
 
     public override fun onRequestPermissionsResult(
         code: Int,
-        permissions: Array<out String>,
+        permissions: Array<String>,
         grants: IntArray,
     ) {
         super.onRequestPermissionsResult(code, permissions, grants)
