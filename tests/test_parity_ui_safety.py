@@ -318,6 +318,15 @@ class UiSafety(unittest.TestCase):
         self.assertIn('system-inset screen=manual content_top=17 required_top=24', summary)
         self.assertNotIn('private rendered label', summary)
 
+    def test_failure_summary_reports_instrumentation_exception_class_only(self):
+        summary = device.native_failure_summary(
+            'renderedExplicitRetentionClearsOnlyExpiredPayload',
+            'INSTRUMENTATION_STATUS: stack=java.lang.IllegalStateException: private fixture\n'
+            'INSTRUMENTATION_STATUS_CODE: -2\n',
+        )
+        self.assertIn('instrumentation-exception=java.lang.IllegalStateException', summary)
+        self.assertNotIn('private fixture', summary)
+
     def test_failure_summary_exposes_fixture_source_frame_without_call_details(self):
         summary = device.native_failure_summary(
             'prepareCalendarAndTaggedHistory',
@@ -698,7 +707,17 @@ class UiSafety(unittest.TestCase):
     def test_import_suite_uses_its_own_class_and_receipt(self):
         self.assertEqual(0, self.run_fixture('imports'))
         methods = [' '.join(c) for c in self.calls if c[:3] == ['shell', 'am', 'instrument']]
-        self.assertTrue(all('ImportUiTest#' in method for method in methods))
+        selectors = [c[c.index('class') + 1] for c in self.calls
+                     if c[:3] == ['shell', 'am', 'instrument']]
+        self.assertEqual([
+            'com.markobl.calllogsync.slice.HistoricalImportActionsPanelTest'
+            '#runActionsRequireEnabledStateAndExplicitTaps',
+            'com.markobl.calllogsync.slice.HistoricalImportDestinationPanelTest'
+            '#destinationListIsPresentedAndOnlyExplicitSelectionReturnsOpaqueToken',
+        ], selectors[:2])
+        self.assertTrue(all(method.startswith('com.markobl.calllogsync.slice.ImportUiTest#')
+                            for method in selectors[2:]))
+        self.assertEqual('com.markobl.calllogsync.slice.ImportUiTest#cleanupFixture', selectors[-1])
         self.assertTrue(any('latestCallUsesNewestDateAndHighestIdOnTies' in method for method in methods))
         self.assertTrue(any('renderedDestinationAndFiltersSurviveProcessDeathWithoutPreview' in method
                             and 'ProcessRecoveryRunner' in method for method in methods))

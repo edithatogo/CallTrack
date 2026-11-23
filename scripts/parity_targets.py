@@ -1,7 +1,11 @@
 """Exact dedicated emulator identities; never infer authorization from an emulator prefix."""
 AVD = 'calltrack-parity-api36-20261020'
 RECOVERY_AVD = 'calltrack-parity-api36-recovery-20261021'
-MATRIX_AVDS = ('calltrack-release-api26-20261022', 'calltrack-release-api33-20261022')
+MATRIX_AVDS = (
+    'calltrack-release-api26-20261022',
+    'calltrack-release-api33-20261022',
+    'calltrack-qualification-api37',
+)
 TRACK14_UI_AVD = 'calltrack-track14-api37'
 ANDROID17_LOCAL_AVD = 'calltrack-android17-local'
 

@@ -1,4 +1,4 @@
-> **Active stack:** Android 17-only Kotlin/Compose, CallLog/CalendarContract and WorkManager. Room 3.0.3 is the selected *pending preserving migration*; current SQLite ledger remains authoritative until qualified. Source of SDK versions is `app/build.gradle`, not historical entries below. [Architecture](architecture-android17.md) · [scope](active-scope.json).
+> **Active stack (2026-11-24):** Android 17 API37-only Kotlin/Compose; native CallLog/CalendarContract + WorkManager. Room 3.0.3 is selected but its preserving migration has **not** replaced SQLite. `app/build.gradle` is authoritative for SDK/versions; the rest of this file includes prior checkpoints. [Architecture](architecture-android17.md) · [scope](active-scope.json).
 
 # Technology stack and decision status
 
@@ -7,21 +7,31 @@
 The active app and cold Linux release gate select Temurin JDK 25.0.5.1+2,
 Gradle 9.7.0, AGP 9.3.1 and Kotlin/Compose compiler 2.4.21. AGP supplies the
 app's Kotlin plugin and the first-party Kotlin Multiplatform Android library
-plugin supplies the shared module. The upstream comparison fixtures retain
+plugin was used by a historical shared module (no longer in the active app). The upstream comparison fixtures retain
 their JDK 11 and JDK 17 runtimes.
 
 Compose BOM 2026.11.01 requires compile SDK 37.1. The app compiles to JVM 11
-bytecode, targets Android 16 and supports Android 8.0 onward. The hosted
-acceptance matrix still exercises API 26, 33 and 36. Android 17.2 is available
-locally for testing. The [runtime audit](tracks/release_20261020/canonical-runtime-audit-20261124.json)
+bytecode, targets **and requires** Android 17 API37. The sole active hosted
+UI acceptance is API37. Prior API26/33/36 evidence is archival; the Android 17.2
+16 KB emulator is the current native acceptance target. The
+[runtime audit](tracks/release_20261020/canonical-runtime-audit-20261124.json)
 and [source inventory](../qualification/release/runtime-sources.json) bind
 91 runtime artifacts to their canonical publications.
 
-The published Kotlin compatibility range supports Gradle 9.7.0 and AGP
-9.3.1. The root buildscript resolves the Netty 4.1.141 BOM alone; a Netty 4.2
-change needs qualification when a consumer is selected. Current Android
-providers and WorkManager continue to serve Calendar, CallLog and durable
-scheduling, with SQLite retaining the verified receipt and recovery behavior.
+Renovate proposes AGP 9.5.2 and Gradle 9.9.2, above the fully supported
+range for Kotlin 2.4.21. The Android and multiplatform plugins use AGP
+9.3.1 with Gradle 9.7.0. The Actions proposal covers the pinned Ubuntu
+runner images and the historical JDK 17 comparison fixture. The app and
+release gate use JDK 25. The pinned actionlint rejects the explicit
+Ubuntu 26.04 runner label. [Renovate dashboard](https://github.com/edithatogo/CallTrack/issues/91),
+[Kotlin compatibility range](https://kotlinlang.org/docs/gradle-configure-project.html),
+[actionlint runner-label support](https://github.com/rhysd/actionlint/pull/683).
+
+Strict dependency resolution found the Netty 4.1.141 BOM as the only Netty
+entry in the root buildscript and release runtime graphs. The proposed 4.2
+BOM offers no runtime update for this graph. CallTrack uses the Android
+Calendar and CallLog providers, WorkManager for scheduling, and SQLite
+for durable receipts and recovery.
 
 ## Dependency refresh — 2026-10-23
 
