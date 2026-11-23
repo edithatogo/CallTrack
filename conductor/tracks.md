@@ -16,6 +16,6 @@
 - [ ] **Track 19 — Consolidated cross-platform qualification**: [Deferral](tracks/cross_platform_20261021/deferral.md)
 - [ ] **Track 20 — iOS companion**: [Deferral](tracks/ios_companion_20261021/deferral.md)
 
-Completed baseline/parity/python research and historical Android 26/33/36 evidence remain in [archive](archive/index.md). Older Android versions are *not supported targets* in active CI; their schema upgrade fixtures still protect existing user data. Python runtime selection comes from [`.python-version`](../.python-version), not copied prose.
+Completed baseline/parity/python research and historical Android 26/33/36 evidence remain in [archive](archive/index.md). Older Android versions are *not supported targets* in active CI; their schema upgrade fixtures still protect existing user data. Python runtime selection comes from `.python-version`, not copied prose.
 
 **Evidence discipline:** link exact immutable historical receipts or Actions run artifact, identify source SHA and test command, and keep one current checkpoint per accepted change. Do not replicate large JSON test logs as a second mutable evidence copy.

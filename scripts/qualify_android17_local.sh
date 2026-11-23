@@ -8,7 +8,7 @@ serial="${1:?Usage: scripts/qualify_android17_local.sh emulator-5554}"
 : "${JAVA_HOME:?Set JAVA_HOME to the qualified JDK 25}"
 adb="$ANDROID_HOME/platform-tools/adb"
 test -x "$adb"
-test -d "$ANDROID_HOME/platforms/android-37"
+test -d "$ANDROID_HOME/platforms/android-37.1"
 actual_avd="$("$adb" -s "$serial" emu avd name | sed -n '1p' | tr -d '\r')"
 actual_sdk="$("$adb" -s "$serial" shell getprop ro.build.version.sdk | tr -d '\r')"
 if [[ "$actual_avd" != 'calltrack-android17-local' || "$actual_sdk" != 37 ]]; then

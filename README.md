@@ -2,7 +2,7 @@
 
 The single active product target is **native Android 17 (API 37)**: Kotlin, Jetpack Compose, system CallLog/CalendarContract and WorkManager. [Active architecture](conductor/architecture-android17.md), [scope](conductor/active-scope.json), and [Conductor ownership](conductor/tracks.md) supersede older roadmaps below. macOS, iOS, KMP, desktop and older Android APIs are deferred; historical evidence is preserved.
 
-Local Android 17 emulator acceptance is the preferred path: `scripts/qualify_android17_local.sh emulator-5554` against the dedicated `calltrack-android17-local` AVD, after a source-bound build and with pre-commit hooks configured. Room 3.0.3 has been selected for a **preserving** migration; the existing SQLite stores continue to own data until tested replacement. This repo is not yet an approved production release.
+Local Android 17 emulator acceptance is the preferred path. Install hooks via `.venv/bin/pre-commit install --hook-type pre-commit --hook-type pre-push`, and use a dedicated `calltrack-android17-local` AVD on your native Mac. Confirm the installed Android 17 system image and matching ARM64 host architecture before launching it. Then run: `scripts/qualify_android17_local.sh emulator-5554` against the dedicated `calltrack-android17-local` AVD, after a source-bound build and with pre-commit hooks configured. Room 3.0.3 has been selected for a **preserving** migration; the existing SQLite stores continue to own data until tested replacement. This repo is not yet an approved production release.
 
 ---
 
