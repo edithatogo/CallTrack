@@ -258,9 +258,6 @@ def reproduce_relocation(path):
 
 
 def run(output, archives_from=None):
-    gradle_home = selected_toolchain_path('GRADLE_USER_HOME', '.local/toolchain/gradle-home')
-    sdk = selected_toolchain_path('ANDROID_HOME', '.local/android-sdk')
-    jdk_home = selected_toolchain_path('JAVA_HOME', '.local/toolchain/temurin-jdk25/Contents/Home')
     output.mkdir(parents=True, exist_ok=False)
     receipt = dict(scope=__doc__, release_ready=False, independently_signed=False, success=False,
                    reused_download_archives=archives_from is not None,
@@ -269,6 +266,9 @@ def run(output, archives_from=None):
                    redirect_policy_sha256=sha(Path(__file__).with_name('redirect_validation.py').resolve()),
                    xml_policy_sha256=sha(Path(__file__).with_name('xml_safety.py').resolve()))
     try:
+        gradle_home = selected_toolchain_path('GRADLE_USER_HOME', '.local/toolchain/gradle-home')
+        sdk = selected_toolchain_path('ANDROID_HOME', '.local/android-sdk')
+        jdk_home = selected_toolchain_path('JAVA_HOME', '.local/toolchain/temurin-jdk25/Contents/Home')
         wrapper_url = 'https://services.gradle.org/distributions/gradle-9.7.0-wrapper.jar.sha256'
         wrapper_expected = published_checksum(wrapper_url, output / 'wrapper.sha256')
         wrapper_actual = sha(ROOT / 'gradle/wrapper/gradle-wrapper.jar')

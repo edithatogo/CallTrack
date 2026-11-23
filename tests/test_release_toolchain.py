@@ -31,6 +31,18 @@ class ToolTrustTest(unittest.TestCase):
                     os.environ[variable] = str(expected)
                     self.assertEqual(expected, tools.selected_toolchain_path(variable, relative))
 
+    def test_invalid_environment_retains_failed_receipt_before_download(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with patch.object(tools, 'ROOT', root), patch.dict(os.environ, {'GRADLE_USER_HOME': '/tmp/untrusted'}, clear=True), \
+                 patch.object(tools, 'fetch') as download:
+                with self.assertRaisesRegex(RuntimeError, 'GRADLE_USER_HOME must select'):
+                    tools.run(root / 'output')
+            download.assert_not_called()
+            receipt = json.loads((root / 'output/receipt.json').read_text())
+            self.assertFalse(receipt['success'])
+            self.assertIn('GRADLE_USER_HOME must select', receipt['error'])
+
     def test_sdk_archive_names_are_single_safe_filenames(self):
         for name in ('build-tools_r36_macosx.zip', 'platform-37.1_r01.zip'):
             self.assertEqual(name, tools.sdk_archive_name(name))
