@@ -44,7 +44,7 @@ jobs:
         run: |
           curl --fail --location --silent --show-error https://repo.maven.apache.org/maven2/com/google/googlejavaformat/google-java-format/2.0.0/google-java-format-2.0.0-all-deps.jar -o .local/room3-candidate/google-java-format.jar
           echo 'c78feb48c549fa7114b7ea11db3b456808f7b371ffe84e6643a44dd2f9588639  .local/room3-candidate/google-java-format.jar' | sha256sum --check
-          java -jar .local/room3-candidate/google-java-format.jar --aosp --cleanup=false --replace app/src/androidTest/java/com/markobl/calllogsync/slice/KotlinPackageUpdateTest.java
+          java -jar .local/room3-candidate/google-java-format.jar --aosp --cleanup=false --replace app/src/androidTest/java/com/markobl/calllogsync/slice/KotlinPackageUpdateTest.java app/src/androidTest/java/com/markobl/calllogsync/slice/Room3MigrationTest.java
       - name: Resolve candidate hashes and compile serial KSP variants
         run: |
           set -o pipefail
@@ -76,6 +76,7 @@ jobs:
             app/src/main/kotlin/com/markobl/calllogsync/slice/SqliteLedger.kt \
             app/src/main/kotlin/com/markobl/calllogsync/slice/SqliteImportStore.kt \
             app/src/androidTest/java/com/markobl/calllogsync/slice/KotlinPackageUpdateTest.java
+            app/src/androidTest/java/com/markobl/calllogsync/slice/Room3MigrationTest.java
           if git diff --cached --quiet; then
             echo 'Already admitted and formatted; no new commit'
             exit 0

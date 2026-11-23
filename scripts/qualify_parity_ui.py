@@ -670,6 +670,13 @@ def qualify(serial, suite="settings", receipt_dir=None):
             check('renderedPermissionsFiltersConfirmPauseAndReopen')
             command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.READ_CALENDAR')
             check('revokedCalendarAndVisibleRestoreDoNotEnableLogging')
+            # Synthetic Room3 preserving upgrades, no provider/calendar write authority.
+            check('preservesLedgerSixAndImportTwoOnRoomUpgradeWithoutProviderEffects',
+                  'com.markobl.calllogsync.slice.Room3MigrationTest')
+            check('kotlinMappingRecognisesPreservedJavaReceiptWithoutReinsert',
+                  'com.markobl.calllogsync.slice.ParityStoreTest')
+            check('schemaOneMigrationPreservesAggregateProgressWithoutInventingOutcomes',
+                  'com.markobl.calllogsync.slice.HistoricalImportStoreTest')
         elif suite == 'imports':
             check('runActionsRequireEnabledStateAndExplicitTaps',
                   'com.markobl.calllogsync.slice.HistoricalImportActionsPanelTest')
