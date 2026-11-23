@@ -63,7 +63,7 @@ jobs:
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
         with:
           distribution: temurin
-          java-version: '17.0.21+9'
+          java-version: '17.0.21+100000002'
       - name: Create the repository Python environment
         run: |
           python -m venv .venv
