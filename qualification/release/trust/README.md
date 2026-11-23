@@ -50,7 +50,8 @@ source/cold-cache acceptance. The subsequent Track5 Linux evidence owns the resu
 The manually dispatched cold reproduction runs with GitHub Actions cache access
 set to `none` and checks the effective mode before candidate checkout. Its
 successful hosted qualification verified the same historical candidate and APK
-hash with fresh SDK and Gradle directories. This blocks Actions cache reads and
-writes for the job; it does not make arbitrary candidate code or its generated
-evidence trusted. The candidate still requires review, and the separate
-untrusted-checkout finding remains open.
+hash with fresh SDK and Gradle directories. GitHub enforces the cache isolation for the entire job.
+Dispatch from a repository branch containing the reviewed candidate. The workflow
+checks the full commit SHA against that branch's history before creating the
+candidate worktree. The reviewed Track 5 snapshot remains available by its
+recorded immutable commit. APK comparison still applies to the selected commit.
