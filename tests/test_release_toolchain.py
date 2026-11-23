@@ -1,4 +1,3 @@
-import io
 import json
 from pathlib import Path
 import sys
@@ -45,7 +44,7 @@ class ToolTrustTest(unittest.TestCase):
     def test_parent_pom_licence_evidence_is_retained(self):
         child = b'<project xmlns="http://maven.apache.org/POM/4.0.0"><parent><groupId>org.test</groupId><artifactId>parent</artifactId><version>1</version></parent></project>'
         parent = b'<project xmlns="http://maven.apache.org/POM/4.0.0"><licenses><license><name>Apache-2.0</name></license></licenses></project>'
-        with patch.object(artifacts.urllib.request, 'urlopen', return_value=io.BytesIO(parent)):
+        with patch.object(artifacts, 'read_publication', return_value=parent):
             evidence = []
             self.assertEqual('Apache-2.0', artifacts.inherited_licences(child, evidence)[0]['name'])
             self.assertEqual(artifacts.digest(parent), evidence[0]['sha256'])

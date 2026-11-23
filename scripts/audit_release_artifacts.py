@@ -19,10 +19,21 @@ import zipfile
 LIMIT = 64 * 1024 * 1024
 
 
+class HTTPSPublicationRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, request, response, code, message, headers, new_url):
+        if urlsplit(new_url).scheme != 'https':
+            response.close()
+            raise ValueError('Insecure publication redirect')
+        return super().redirect_request(request, response, code, message, headers, new_url)
+
+
+PUBLICATION_OPENER = urllib.request.build_opener(HTTPSPublicationRedirectHandler())
+
+
 def read_publication(url):
     if not url.startswith('https://'):
         raise ValueError('HTTPS publication required')
-    with urllib.request.urlopen(url, timeout=60) as response:
+    with PUBLICATION_OPENER.open(url, timeout=60) as response:
         if not getattr(response, 'url', url).startswith('https://'):
             raise ValueError('Insecure publication redirect')
         data = response.read(LIMIT + 1)
