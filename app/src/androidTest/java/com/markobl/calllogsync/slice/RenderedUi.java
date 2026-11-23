@@ -78,6 +78,10 @@ final class RenderedUi {
                                         .addFlags(
                                                 Intent.FLAG_ACTIVITY_NEW_TASK
                                                         | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)));
+        if (android.os.Build.VERSION.SDK_INT == 33) {
+            await(() -> activityTask(activity) != null, "Initial activity task was not retained");
+            if (!waitForAppWindow(10000)) returnFromRecents();
+        }
     }
 
     private void withSystemTaskStart(Runnable action) {
@@ -90,6 +94,18 @@ final class RenderedUi {
         } finally {
             if (android.os.Build.VERSION.SDK_INT >= 29) automation.dropShellPermissionIdentity();
         }
+    }
+
+    private ActivityManager.AppTask activityTask(Class<? extends Activity> activity) {
+        ActivityManager manager =
+                (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.AppTask task : manager.getAppTasks()) {
+            ActivityManager.RecentTaskInfo info = task.getTaskInfo();
+            if (info.baseIntent.getComponent() != null
+                    && activity.getName().equals(info.baseIntent.getComponent().getClassName()))
+                return task;
+        }
+        return null;
     }
 
     private boolean stoppedWithSavedState(Class<? extends Activity> activity) {
@@ -130,17 +146,7 @@ final class RenderedUi {
         int pid = before.pid;
         assertNotEquals(
                 "The driver must run in a separate process", android.os.Process.myPid(), pid);
-        ActivityManager manager =
-                (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        ActivityManager.AppTask savedTask = null;
-        for (ActivityManager.AppTask task : manager.getAppTasks()) {
-            ActivityManager.RecentTaskInfo info = task.getTaskInfo();
-            if (info.baseIntent.getComponent() != null
-                    && activity.getName().equals(info.baseIntent.getComponent().getClassName())) {
-                savedTask = task;
-                break;
-            }
-        }
+        ActivityManager.AppTask savedTask = activityTask(activity);
         assertNotNull("The original activity task was not retained", savedTask);
         int taskId = savedTask.getTaskInfo().id;
         assertTrue(
@@ -161,11 +167,96 @@ final class RenderedUi {
         android.os.Process.killProcess(pid);
         await(() -> mainProcess() == null, "App process survived the background kill");
         ActivityManager.AppTask task = savedTask;
-        withSystemTaskStart(task::moveToFront);
+        if (android.os.Build.VERSION.SDK_INT == 33) returnFromRecents();
+        else withSystemTaskStart(task::moveToFront);
         await(
                 () -> mainProcess() != null && mainProcess().pid != pid,
                 "App did not restart in a new process");
         assertEquals("Returning must keep the original task", taskId, savedTask.getTaskInfo().id);
+    }
+
+    private void returnFromRecents() {
+        if (appWindowFocused()) return;
+        assertTrue(
+                automation.performGlobalAction(
+                        android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_RECENTS));
+        settle();
+        final AccessibilityNodeInfo[] card = new AccessibilityNodeInfo[1];
+        await(
+                () -> {
+                    if (appWindowFocused()) return true;
+                    card[0] = centeredRecentsCard();
+                    return card[0] != null;
+                },
+                "Could not identify the centered Recents task");
+        if (!appWindowFocused()) {
+            assertNotNull("Recents task disappeared before touch", card[0]);
+            injectTouch(card[0]);
+        }
+        await(this::appWindowFocused, "Recents selection did not foreground the app");
+        settle();
+        assertTrue("App lost focus after leaving Recents", appWindowFocused());
+    }
+
+    private boolean waitForAppWindow(long timeoutMillis) {
+        long end = SystemClock.elapsedRealtime() + timeoutMillis;
+        do {
+            if (appWindowFocused()) return true;
+            SystemClock.sleep(100);
+        } while (SystemClock.elapsedRealtime() < end);
+        return false;
+    }
+
+    private boolean appWindowFocused() {
+        for (android.view.accessibility.AccessibilityWindowInfo window : automation.getWindows()) {
+            AccessibilityNodeInfo root = window.getRoot();
+            if (window.isActive()
+                    && window.isFocused()
+                    && root != null
+                    && root.getPackageName() != null
+                    && context.getPackageName().contentEquals(root.getPackageName())) return true;
+        }
+        return false;
+    }
+
+    private AccessibilityNodeInfo centeredRecentsCard() {
+        CharSequence label = context.getApplicationInfo().loadLabel(context.getPackageManager());
+        if (label == null || label.length() == 0) return null;
+        for (android.view.accessibility.AccessibilityWindowInfo window : automation.getWindows()) {
+            AccessibilityNodeInfo root = window.getRoot();
+            CharSequence owner = root == null ? null : root.getPackageName();
+            if (owner == null
+                    || !("com.android.launcher3".contentEquals(owner)
+                            || "com.google.android.apps.nexuslauncher".contentEquals(owner)))
+                continue;
+            Rect viewport = new Rect();
+            root.getBoundsInScreen(viewport);
+            java.util.List<AccessibilityNodeInfo> cards = new java.util.ArrayList<>();
+            collectCenteredRecentsCards(root, owner, label, viewport, cards);
+            if (cards.size() == 1) return cards.get(0);
+        }
+        return null;
+    }
+
+    private void collectCenteredRecentsCards(
+            AccessibilityNodeInfo node,
+            CharSequence owner,
+            CharSequence label,
+            Rect viewport,
+            java.util.List<AccessibilityNodeInfo> cards) {
+        if (node == null) return;
+        CharSequence description = node.getContentDescription();
+        Rect bounds = new Rect();
+        node.getBoundsInScreen(bounds);
+        if (node.isVisibleToUser()
+                && node.isClickable()
+                && node.getPackageName() != null
+                && owner.toString().contentEquals(node.getPackageName())
+                && description != null
+                && description.toString().contains(label)
+                && bounds.contains(viewport.centerX(), viewport.centerY())) cards.add(node);
+        for (int i = 0; i < node.getChildCount(); i++)
+            collectCenteredRecentsCards(node.getChild(i), owner, label, viewport, cards);
     }
 
     AccessibilityNodeInfo find(String value, boolean id) {
@@ -654,6 +745,10 @@ final class RenderedUi {
                 "Refusing a control in an unexpected package: " + packageName,
                 packageName.equals(context.getPackageName())
                         || selector.startsWith("permission_") && permissionPackage(packageName));
+        injectTouch(node);
+    }
+
+    private void injectTouch(AccessibilityNodeInfo node) {
         Rect bounds = new Rect();
         node.getBoundsInScreen(bounds);
         assertFalse(bounds.isEmpty());

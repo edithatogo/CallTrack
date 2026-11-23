@@ -1176,3 +1176,17 @@ failure as well as a failed return, and the harness reports only fixed
 launcher/activity-record categories and bounded runtime diagnostics. It no
 longer labels unrelated nonfatal log entries as the failure's exception.
 These diagnostics retain the existing screen, cleanup and recovery gates.
+
+Hosted run `45098167798` on `a4a5a87` passed API26 and API36, but API33
+failed after process death: the pending record and zero-event checks passed,
+while the launcher remained active. The failure screenshot, fixture cleanup
+and package removal were verified. The same recovery suite passed on a local
+API33 ARM emulator. On that isolated emulator a physical touch on the centered
+Recents card returned the test app to the foreground. The API33 driver now
+waits for a focused app window and, when needed, uses that explicit system UI
+interaction with a unique centered, launcher-owned card. It still checks the
+original task ID and restored content. After correcting focus and transition
+races, the local API33 ARM import and recovery suites passed with fixture
+cleanup, package removal and emulator restoration verified. The hosted API33
+failure's underlying platform cause remains unconfirmed, and the candidate
+still requires the full hosted matrix.

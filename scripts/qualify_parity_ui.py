@@ -237,7 +237,7 @@ def native_failure_summary(method, output, declared_permissions=None):
     if activity_top:
         detail = (detail + '; ' if detail else '') + activity_top.group(0)
     activity_records = re.search(
-        r'activity-records=(none|import|recovery|import,recovery)(?![a-z,-])', output)
+        r'activity-records=(none|import|recovery|import,recovery|unavailable)(?![a-z,-])', output)
     if activity_records:
         detail = (detail + '; ' if detail else '') + activity_records.group(0)
     system_controls = re.findall(
@@ -333,6 +333,8 @@ def activity_top_summary(activity_dump):
 
 def activity_record_summary(activity_dump):
     """Report only whether either of the two fixed test activities has a record."""
+    if not activity_dump.strip():
+        return 'activity-records=unavailable'
     records = []
     for name, activity in (('import', 'HistoricalImportActivity'),
                            ('recovery', 'ReceiptRecoveryActivity')):

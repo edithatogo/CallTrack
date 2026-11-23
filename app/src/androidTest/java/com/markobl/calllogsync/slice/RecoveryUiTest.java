@@ -156,7 +156,17 @@ public class RecoveryUiTest {
         ui.startActivity(ReceiptRecoveryActivity.class);
         awaitPendingAction(ui, "initial");
         tap(ui, R.string.reapproval_open);
-        ui.await(() -> ui.find("button1", true) != null, "Reapproval dialog did not open");
+        try {
+            ui.await(() -> ui.find("button1", true) != null, "Reapproval dialog did not open");
+        } catch (AssertionError failure) {
+            try {
+                ui.capture("recovery-reapproval-dialog-failure");
+            } catch (Throwable capture) {
+                failure.addSuppressed(capture);
+            }
+            throw new AssertionError(
+                    "Reapproval dialog did not open; " + ui.dialogActionSummary(), failure);
+        }
         assertEquals(DurableDelivery.State.READY, saved("pending").state);
         assertEquals(0, fixture.events(calendar()));
         ui.capture("recovery-before-process-death");

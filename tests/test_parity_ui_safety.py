@@ -129,6 +129,7 @@ class UiSafety(unittest.TestCase):
         self.assertIn('dialog-active=launcher', windows)
         self.assertIn('dialog-windows=launcher:application', windows)
         self.assertNotIn('private', windows)
+        self.assertEqual('activity-records=unavailable', device.activity_record_summary(''))
 
     def test_unrelated_nonfatal_exception_is_not_reported(self):
         summary = device.runtime_failure_summary(
