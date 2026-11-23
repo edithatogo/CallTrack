@@ -1190,3 +1190,12 @@ races, the local API33 ARM import and recovery suites passed with fixture
 cleanup, package removal and emulator restoration verified. The hosted API33
 failure's underlying platform cause remains unconfirmed, and the candidate
 still requires the full hosted matrix.
+
+Hosted run `45101787725` passed settings, imports, recovery and accessibility
+on API26, API33 and API36 at `6a01121`. The recorded methods include latest-call
+ordering, both process-death journeys, the recovery approval check and keyboard
+focus. Every suite reported fixture cleanup, package removal and screenshot
+hashes. The two build qualifications and privacy check passed on that head.
+The local API33 ARM settings and accessibility suites also passed after the
+import and recovery runs. The Google Calendar phone retest, manual assistive
+technology checks and broader operational acceptance remain open.
