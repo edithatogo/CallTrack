@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 internal data class HistoricalImportHistoryItem(val token: String, val label: String)
 
 internal data class HistoricalImportHistoryUiState(
-    val items: List<HistoricalImportHistoryItem> = emptyList()
+    val items: List<HistoricalImportHistoryItem> = emptyList(),
 )
 
 @Composable

@@ -28,7 +28,7 @@ class AutomaticSettingsCallTypesTest {
             assertFalse(
                 activity
                     .getSharedPreferences("slice", Context.MODE_PRIVATE)
-                    .contains("automaticActivation")
+                    .contains("automaticActivation"),
             )
         }
     }

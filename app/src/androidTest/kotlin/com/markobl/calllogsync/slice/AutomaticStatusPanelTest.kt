@@ -34,7 +34,7 @@ class AutomaticStatusPanelTest {
                     SemanticsMatcher.expectValue(
                         SemanticsProperties.LiveRegion,
                         LiveRegionMode.Polite,
-                    )
+                    ),
             )
             .assertIsDisplayed()
         compose.onNodeWithText(uiState.state).assertIsDisplayed()

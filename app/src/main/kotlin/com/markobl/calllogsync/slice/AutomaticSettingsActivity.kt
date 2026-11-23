@@ -90,7 +90,7 @@ class AutomaticSettingsActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.auto_intro_panel
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent { AutomaticSettingsIntroPanel(text = getString(R.string.auto_intro)) }
             }
@@ -99,7 +99,7 @@ class AutomaticSettingsActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.auto_permissions
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     AutomaticSettingsAccessPanel(
@@ -123,7 +123,7 @@ class AutomaticSettingsActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.auto_calendar_picker_panel
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     CalendarDestinationPicker(
@@ -139,7 +139,7 @@ class AutomaticSettingsActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.auto_call_types
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     AutomaticCallTypesPanel(
@@ -160,7 +160,7 @@ class AutomaticSettingsActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.auto_actions
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     AutomaticSettingsActionsPanel(
@@ -183,7 +183,7 @@ class AutomaticSettingsActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.auto_navigation
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     AutomaticSettingsNavigationPanel(
@@ -194,7 +194,7 @@ class AutomaticSettingsActivity : ComponentActivity() {
                                 Intent(
                                     this@AutomaticSettingsActivity,
                                     HistoricalImportActivity::class.java,
-                                )
+                                ),
                             )
                         },
                         onOpenRecovery = {
@@ -202,7 +202,7 @@ class AutomaticSettingsActivity : ComponentActivity() {
                                 Intent(
                                     this@AutomaticSettingsActivity,
                                     ReceiptRecoveryActivity::class.java,
-                                )
+                                ),
                             )
                         },
                     )

@@ -18,7 +18,7 @@ class HistoricalImportStatusPanelTest {
                 HistoricalImportStatusUiState(
                     summary = "No import session selected.",
                     feedback = "",
-                )
+                ),
             )
 
         compose.setContent { HistoricalImportStatusPanel(state = state.value) }

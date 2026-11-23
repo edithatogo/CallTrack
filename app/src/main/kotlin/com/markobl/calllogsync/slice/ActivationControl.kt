@@ -28,7 +28,7 @@ class ActivationControl(store: Store?) {
                     calendar >= 0 &&
                     start >= 0 &&
                     timezone != null &&
-                    TimeZone.getAvailableIDs().contains(timezone)
+                    TimeZone.getAvailableIDs().contains(timezone),
             ) {
                 "Invalid activation settings"
             }

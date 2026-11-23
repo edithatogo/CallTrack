@@ -38,7 +38,7 @@ class ReadyReapproval(
                         saved.payload,
                         approval,
                         saved.facts,
-                    )
+                    ),
                 )
                 DurableDelivery(store, sink).resume(saved.key, saved.calendar, approval, confirmed)
             } catch (denied: SecurityException) {

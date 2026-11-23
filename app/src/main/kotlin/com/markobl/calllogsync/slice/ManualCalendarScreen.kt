@@ -31,7 +31,7 @@ internal fun ManualCalendarScreen(
             Modifier.fillMaxWidth().padding(16.dp).semantics {
                 testTagsAsResourceId = true
                 testTag = "slice_screen"
-            }
+            },
     ) {
         BasicText(
             intro,
@@ -45,7 +45,7 @@ internal fun ManualCalendarScreen(
             Modifier.fillMaxWidth().semantics {
                 testTagsAsResourceId = true
                 testTag = "slice_calendar_controls_panel"
-            }
+            },
         ) {
             ManualCalendarControlsPanel(
                 state = calendarState,
@@ -60,7 +60,7 @@ internal fun ManualCalendarScreen(
             Modifier.fillMaxWidth().semantics {
                 testTagsAsResourceId = true
                 testTag = "slice_manual_panel"
-            }
+            },
         ) {
             ManualLogPanel(state = logState, onLogLatest = onLogLatest)
         }

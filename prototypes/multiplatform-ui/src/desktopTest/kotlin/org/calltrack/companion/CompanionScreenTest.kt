@@ -16,13 +16,12 @@ import org.junit.Test
 class CompanionScreenTest {
     @get:Rule val compose = createComposeRule()
 
-    private fun show() =
-        compose.setContent {
-            var state by remember { mutableStateOf(CompanionUiState()) }
-            MaterialTheme {
-                CompanionScreen(state) { action -> state = reduceCompanionUi(state, action) }
-            }
+    private fun show() = compose.setContent {
+        var state by remember { mutableStateOf(CompanionUiState()) }
+        MaterialTheme {
+            CompanionScreen(state) { action -> state = reduceCompanionUi(state, action) }
         }
+    }
 
     @Test
     fun previewRequiresExplicitDestination() {

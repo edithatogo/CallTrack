@@ -21,7 +21,7 @@ class CallIdentity private constructor() {
                         .digest(material.toByteArray(StandardCharsets.UTF_8))
                 return buildString {
                     for (value in bytes) append(
-                        String.format(Locale.ROOT, "%02x", value.toInt() and 255)
+                        String.format(Locale.ROOT, "%02x", value.toInt() and 255),
                     )
                 }
             } catch (e: NoSuchAlgorithmException) {

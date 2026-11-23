@@ -21,10 +21,10 @@ class SqliteImportStore(context: Context?, name: String?) :
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
-            "CREATE TABLE sessions (id TEXT PRIMARY KEY NOT NULL, revision INTEGER NOT NULL, body TEXT NOT NULL)"
+            "CREATE TABLE sessions (id TEXT PRIMARY KEY NOT NULL, revision INTEGER NOT NULL, body TEXT NOT NULL)",
         )
         db.execSQL(
-            "CREATE TABLE candidates (session TEXT NOT NULL REFERENCES sessions(id), source_id INTEGER NOT NULL, source_key TEXT NOT NULL, binding TEXT NOT NULL, outcome TEXT, PRIMARY KEY(session,source_id))"
+            "CREATE TABLE candidates (session TEXT NOT NULL REFERENCES sessions(id), source_id INTEGER NOT NULL, source_key TEXT NOT NULL, binding TEXT NOT NULL, outcome TEXT, PRIMARY KEY(session,source_id))",
         )
     }
 
@@ -56,7 +56,7 @@ class SqliteImportStore(context: Context?, name: String?) :
             )
             .use { cursor ->
                 while (cursor.moveToNext()) rows.add(
-                    ListedSession(cursor.getLong(0), decode(cursor.getString(1)))
+                    ListedSession(cursor.getLong(0), decode(cursor.getString(1))),
                 )
             }
         return Collections.unmodifiableList(rows)
@@ -71,7 +71,7 @@ class SqliteImportStore(context: Context?, name: String?) :
                 current.processedId == -1L &&
                 current.saved == 0L &&
                 current.review == 0L &&
-                current.checkpoint.lastId == -1L
+                current.checkpoint.lastId == -1L,
         ) {
             "Invalid initial import"
         }
@@ -109,7 +109,7 @@ class SqliteImportStore(context: Context?, name: String?) :
         require(
             candidate != null &&
                 outcome != null &&
-                expected!!.phase == HistoricalImport.Phase.CONFIRMED
+                expected!!.phase == HistoricalImport.Phase.CONFIRMED,
         ) {
             "Invalid candidate result"
         }
@@ -151,7 +151,7 @@ class SqliteImportStore(context: Context?, name: String?) :
                     pending.isNotEmpty() &&
                         pending[0].sourceId == handled.sourceId &&
                         pending[0].key == handled.key &&
-                        pending[0].binding == handled.binding
+                        pending[0].binding == handled.binding,
                 ) {
                     "Candidate changed before result"
                 }
@@ -163,7 +163,7 @@ class SqliteImportStore(context: Context?, name: String?) :
                         outcome == DurableDelivery.Result.SOURCE_CHANGED
                 require(
                     if (terminal) updated.processedId == handled.sourceId
-                    else updated.processedId == prior.processedId
+                    else updated.processedId == prior.processedId,
                 ) {
                     "Outcome disagrees with progress"
                 }
@@ -173,7 +173,7 @@ class SqliteImportStore(context: Context?, name: String?) :
                         outcome == DurableDelivery.Result.ALREADY_LOGGED
                 require(
                     updated.saved == prior.saved + (if (verified) 1 else 0) &&
-                        updated.review == prior.review + (if (terminal && !verified) 1 else 0)
+                        updated.review == prior.review + (if (terminal && !verified) 1 else 0),
                 ) {
                     "Outcome disagrees with counts"
                 }
@@ -185,7 +185,7 @@ class SqliteImportStore(context: Context?, name: String?) :
                         result,
                         "session=? AND source_id=?",
                         arrayOf(prior.id, handled.sourceId.toString()),
-                    ) == 1
+                    ) == 1,
                 ) {
                     "Candidate outcome not stored"
                 }
@@ -199,7 +199,7 @@ class SqliteImportStore(context: Context?, name: String?) :
                     values,
                     "id=? AND revision=?",
                     arrayOf(prior.id, prior.revision.toString()),
-                ) == 1
+                ) == 1,
             ) {
                 "Import progress not stored"
             }
@@ -235,7 +235,7 @@ class SqliteImportStore(context: Context?, name: String?) :
                         cursor.getString(2),
                         if (cursor.isNull(3)) null
                         else DurableDelivery.Result.valueOf(cursor.getString(3)),
-                    )
+                    ),
                 )
             }
         return Collections.unmodifiableList(rows)
@@ -268,7 +268,7 @@ class SqliteImportStore(context: Context?, name: String?) :
                     next.processedId >= old.processedId &&
                     next.saved >= old.saved &&
                     next.review >= old.review &&
-                    next.count == Math.addExact(old.count, added.size.toLong())
+                    next.count == Math.addExact(old.count, added.size.toLong()),
             ) {
                 "Invalid import transition"
             }
@@ -293,7 +293,7 @@ class SqliteImportStore(context: Context?, name: String?) :
             require(
                 permitted &&
                     (old.phase == HistoricalImport.Phase.BUILDING ||
-                        added.isEmpty() && PagedCalls.equal(old.checkpoint, next.checkpoint))
+                        added.isEmpty() && PagedCalls.equal(old.checkpoint, next.checkpoint)),
             ) {
                 "Import phase cannot change this way"
             }
@@ -301,7 +301,7 @@ class SqliteImportStore(context: Context?, name: String?) :
                 !(next.phase == HistoricalImport.Phase.PREVIEW &&
                     next.checkpoint.lastId != next.checkpoint.upperId ||
                     next.phase == HistoricalImport.Phase.COMPLETE &&
-                        next.saved + next.review != next.count)
+                        next.saved + next.review != next.count),
             ) {
                 "Import is incomplete"
             }
@@ -317,7 +317,7 @@ class SqliteImportStore(context: Context?, name: String?) :
             } else
                 require(
                     if (next.processedId == old.processedId) nextDone == oldDone
-                    else nextDone == Math.addExact(oldDone, 1)
+                    else nextDone == Math.addExact(oldDone, 1),
                 ) {
                     "Import progress must handle one candidate"
                 }
@@ -327,7 +327,7 @@ class SqliteImportStore(context: Context?, name: String?) :
                 require(
                     candidate.outcome == null &&
                         candidate.sourceId > previous &&
-                        candidate.sourceId <= next.checkpoint.lastId
+                        candidate.sourceId <= next.checkpoint.lastId,
                 ) {
                     "Invalid candidate order"
                 }
@@ -335,7 +335,7 @@ class SqliteImportStore(context: Context?, name: String?) :
             }
             require(
                 next.checkpoint.lastId != old.checkpoint.lastId ||
-                    next.checkpoint.lastBinding == old.checkpoint.lastBinding
+                    next.checkpoint.lastBinding == old.checkpoint.lastBinding,
             ) {
                 "Import anchor cannot be rebound"
             }

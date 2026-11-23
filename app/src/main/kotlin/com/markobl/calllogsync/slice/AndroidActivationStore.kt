@@ -9,7 +9,7 @@ import org.json.JSONObject
 class AndroidActivationStore(private val preferences: SharedPreferences?) :
     ActivationControl.Store {
     constructor(
-        context: Context?
+        context: Context?,
     ) : this(context!!.applicationContext.getSharedPreferences("slice", Context.MODE_PRIVATE))
 
     override fun get(): ActivationControl.Settings? {

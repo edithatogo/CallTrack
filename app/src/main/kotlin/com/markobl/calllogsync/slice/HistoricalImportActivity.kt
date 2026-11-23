@@ -72,7 +72,7 @@ class HistoricalImportActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.import_intro_panel
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent { HistoricalImportIntroPanel(getString(R.string.import_intro, zone)) }
             }
@@ -81,7 +81,7 @@ class HistoricalImportActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.import_access_panel
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     HistoricalImportAccessPanel(
@@ -104,7 +104,7 @@ class HistoricalImportActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.import_calendar_picker_panel
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     CalendarDestinationPicker(
@@ -122,7 +122,7 @@ class HistoricalImportActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.import_filters
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     HistoricalImportFiltersPanel(
@@ -144,7 +144,7 @@ class HistoricalImportActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.import_actions
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     HistoricalImportCreateActionPanel(
@@ -160,7 +160,7 @@ class HistoricalImportActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.import_summary
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent { HistoricalImportSummaryText(summaryText) }
             }
@@ -168,7 +168,7 @@ class HistoricalImportActivity : ComponentActivity() {
         val runActions =
             ComposeView(this).apply {
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     HistoricalImportRunActionsPanel(
@@ -196,7 +196,7 @@ class HistoricalImportActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.import_feedback
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent { HistoricalImportFeedbackText(feedbackText) }
             }
@@ -205,7 +205,7 @@ class HistoricalImportActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.import_history
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     HistoricalImportHistoryPanel(
@@ -220,7 +220,7 @@ class HistoricalImportActivity : ComponentActivity() {
         val historyNavigation =
             ComposeView(this).apply {
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     HistoricalImportPaginationPanel(
@@ -299,15 +299,14 @@ class HistoricalImportActivity : ComponentActivity() {
                 runOnUiThread {
                     if (isDestroyed) return@runOnUiThread
                     destinationTargets.clear()
-                    val options =
-                        loaded.map { choice ->
-                            val token = UUID.randomUUID().toString()
-                            destinationTargets[token] = choice.id
-                            CalendarDestinationOption(
-                                token,
-                                choice.name ?: getString(R.string.auto_destination_unavailable),
-                            )
-                        }
+                    val options = loaded.map { choice ->
+                        val token = UUID.randomUUID().toString()
+                        destinationTargets[token] = choice.id
+                        CalendarDestinationOption(
+                            token,
+                            choice.name ?: getString(R.string.auto_destination_unavailable),
+                        )
+                    }
                     selectedDestinationToken =
                         options.firstOrNull { destinationTargets[it.token] == preferred }?.token
                     selected = selectedDestinationToken?.let(destinationTargets::get) ?: -1L
@@ -391,7 +390,7 @@ class HistoricalImportActivity : ComponentActivity() {
                     value.count,
                     destinationName(value),
                     dates(value),
-                )
+                ),
             )
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(R.string.import_confirm) { _, _ ->

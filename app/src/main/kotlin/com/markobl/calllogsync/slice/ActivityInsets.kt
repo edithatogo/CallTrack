@@ -41,7 +41,7 @@ internal class ActivityInsets private constructor() {
                         insets.getInsets(
                             WindowInsets.Type.systemBars() or
                                 WindowInsets.Type.displayCutout() or
-                                WindowInsets.Type.ime()
+                                WindowInsets.Type.ime(),
                         )
                     view.setPadding(
                         left + bars.left,

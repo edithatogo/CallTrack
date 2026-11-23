@@ -63,7 +63,7 @@ class AutomaticScheduling private constructor() {
                             deadlineNanos,
                         )
                         null
-                    }
+                    },
                 )
             try {
                 admitted.get(remainingBudget(deadlineNanos), TimeUnit.NANOSECONDS)

@@ -113,7 +113,7 @@ class HistoricalImport(
                     saved <= count &&
                     review <= count - saved &&
                     phase != null &&
-                    checkpoint != null
+                    checkpoint != null,
             ) {
                 "Invalid import session"
             }
@@ -284,7 +284,7 @@ class HistoricalImport(
                 val candidate = entry!!
                 check(
                     candidate.sourceId > session.processedId &&
-                        candidate.sourceId <= session.checkpoint.upperId
+                        candidate.sourceId <= session.checkpoint.upperId,
                 ) {
                     "Invalid candidate order"
                 }

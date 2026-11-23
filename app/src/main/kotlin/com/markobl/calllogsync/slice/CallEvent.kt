@@ -24,7 +24,7 @@ class CallEvent(
                 end +
                 ":" +
                 field(timezone) +
-                field(marker)
+                field(marker),
         )
 
     companion object {
@@ -80,7 +80,7 @@ class CallEvent(
                         .digest(text.toByteArray(StandardCharsets.UTF_8))
                 return buildString {
                     for (value in bytes) append(
-                        String.format(Locale.ROOT, "%02x", value.toInt() and 255)
+                        String.format(Locale.ROOT, "%02x", value.toInt() and 255),
                     )
                 }
             } catch (e: NoSuchAlgorithmException) {

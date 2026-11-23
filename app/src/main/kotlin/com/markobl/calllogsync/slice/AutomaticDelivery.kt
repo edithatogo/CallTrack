@@ -42,7 +42,7 @@ class AutomaticDelivery(
                 check(
                     pending != null &&
                         pending.size <= limit &&
-                        HashSet(pending).size == pending.size
+                        HashSet(pending).size == pending.size,
                 ) {
                     "Invalid pending batch"
                 }

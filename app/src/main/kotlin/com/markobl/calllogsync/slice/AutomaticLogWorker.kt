@@ -87,7 +87,7 @@ class AutomaticLogWorker(context: Context, parameters: WorkerParameters) :
                 Data.Builder()
                     .putString("status", "UNKNOWN")
                     .putBoolean("statusStored", false)
-                    .build()
+                    .build(),
             )
         }
         if (retry) return Result.retry()
@@ -96,7 +96,7 @@ class AutomaticLogWorker(context: Context, parameters: WorkerParameters) :
                 .putString("status", code)
                 .putInt("delivered", delivered)
                 .putInt("review", review)
-                .build()
+                .build(),
         )
     }
 

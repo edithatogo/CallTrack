@@ -25,7 +25,7 @@ class ManualLogPanelTest {
                     logLabel = "Log latest call",
                     status = "Choose a calendar before logging a call.",
                     actionEnabled = false,
-                )
+                ),
             )
         var actions = 0
 
@@ -59,7 +59,7 @@ class ManualLogPanelTest {
                     options = listOf(CalendarDestinationOption(currentToken, "Work calendar")),
                     selectedToken = staleToken,
                     enabled = true,
-                )
+                ),
             )
         var selectedToken: String? = null
         var accessRequests = 0
