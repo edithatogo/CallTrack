@@ -6,11 +6,11 @@ No version-increase, production-signing, provider, cloud or physical-device proo
 import argparse
 import hashlib
 import json
-import os
 from pathlib import Path
 import re
 import subprocess
 import uuid
+from audit_release_toolchain import qualified_java_environment, qualified_local_jdk
 from parity_targets import is_dedicated_avd
 from run_slice_build import inputs
 
@@ -32,6 +32,7 @@ def require_successful_receipt(receipt):
 def qualify(serial):
     if not re.fullmatch(r'emulator-\d+', serial):
         raise RuntimeError('Update harness refuses physical-device serials')
+    jdk, jdk_evidence = qualified_local_jdk()
     baseline_dir = ROOT / '.local/kotlin-evidence/expanded-java-baseline'
     baseline = json.loads((baseline_dir / 'build-receipt.json').read_text())
     current = json.loads((ROOT / '.local/slice-evidence/build-receipt.json').read_text())
@@ -59,8 +60,7 @@ def qualify(serial):
         if current['artifacts'].get(str(apk.relative_to(ROOT))) != sha(apk):
             raise RuntimeError('Candidate APK hash mismatch')
     sdk = ROOT / '.local/android-sdk'
-    jdk = '/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home'
-    env = dict(os.environ, JAVA_HOME=jdk)
+    env = qualified_java_environment(jdk)
     certs = []
     versions = []
     for apk, package in ((original, PACKAGE), (candidate, PACKAGE), (tests, TEST_PACKAGE)):
@@ -86,6 +86,7 @@ def qualify(serial):
                    baseline_inputs=baseline['inputs'], candidate_inputs=current['inputs'],
                    artifacts={str(p): sha(p) for p in (original, candidate, tests)},
                    version_code=versions[0], signer_sha256=certs[0], steps=[], result='failed', packages_removed=False)
+    receipt['jdk'] = jdk_evidence
     attempted = []
     out = ROOT / '.local/kotlin-evidence'
     out.mkdir(parents=True, exist_ok=True)
