@@ -1,0 +1,29 @@
+name: Android 17 official local self-hosted runner
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: android17-owned-local-avd
+  cancel-in-progress: false
+jobs:
+  android17-local:
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, macOS, ARM64, calltrack-android17]
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version-file: .python-version
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          distribution: temurin
+          java-version: '25.0.5+100000002.0.LTS'
+      - name: Verify owner-provisioned Android 17 AVD and run native tests
+        run: |
+          test -n "$ANDROID_HOME"
+          python -m venv .venv
+          bash scripts/qualify_android17_local.sh emulator-5554

@@ -1,23 +1,26 @@
 package com.markobl.calllogsync.slice
 
-import org.calltrack.core.CallTimeRange
-import org.calltrack.core.CallTypeSelection
-
-/** Independent CallLog type switches. Extended/unknown types are excluded, never reclassified. */
+/** Native Android CallLog selection; unknown/extended types are never reclassified. */
 class CallSelection(
     @JvmField val incoming: Boolean,
     @JvmField val outgoing: Boolean,
     @JvmField val missed: Boolean,
 ) {
-    private val rules = CallTypeSelection(incoming, outgoing, missed)
-
-    fun accepts(call: CallRecord?): Boolean = rules.accepts(call!!.type)
+    fun accepts(call: CallRecord?): Boolean =
+        when (call!!.type) {
+            1 -> incoming
+            2 -> outgoing
+            3 -> missed
+            else -> false
+        }
 
     companion object {
         @JvmStatic
         fun inRange(call: CallRecord?, startInclusive: Long, endExclusive: Long): Boolean {
-            val range = CallTimeRange(startInclusive, endExclusive)
-            return range.contains(call!!.start)
+            require(startInclusive >= 0 && endExclusive > startInclusive) {
+                "Invalid call range"
+            }
+            return call!!.start >= startInclusive && call.start < endExclusive
         }
     }
 }
