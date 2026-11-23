@@ -1241,3 +1241,72 @@ The local release build, lint and 119 release JVM tests passed without errors
 or skips, and the shared-core JVM suite passed. Hosted API 26/33/36 acceptance
 is recorded separately. This one controlled outgoing case does not close the
 broader physical-release, operational, accessibility or observation gates.
+
+## Android 17 emulator qualification — 2026-11-24
+
+The app targets API 37, compiles against SDK 37.1 and retains API 26 as
+its minimum. The isolated Android 17.2 ARM64 Google APIs emulator used
+image revision 7, build `CP41.260831.015`, 16 KB pages and the default
+Android app memory limits. SDK Build Tools 37.0 verified 16 KB ZIP alignment.
+Every packaged native library had 16 KB load-segment alignment across the
+four ABIs. [Android 17 behavior changes](https://developer.android.com/about/versions/17/behavior-changes-all),
+[16 KB compatibility guidance](https://developer.android.com/guide/practices/page-sizes).
+
+At source `8bcfec1c0195a1ad98130902122153cbd99253f8`, the settings,
+historical import, recovery and accessibility suites passed on Android
+17.2 with verified fixture cleanup and package removal. These runs
+included user-facing permission revocation, keyboard focus, font scale,
+RTL and process death returning to the same task. The new import test
+removed only its selected LOCAL calendar after preview. The confirmation
+reported the unavailable destination, delivery stopped, and the second
+calendar kept its event count. Provider, worker, simulated incoming
+telephony, offline, Doze and actual guest reboot acceptance passed.
+
+The same revision passed hosted API 26/33/36. Two macOS release builds
+and a fresh Linux build produced unsigned APK SHA-256
+`120052433e9765da1e39efcc1cc5f24fb394f2150beec38a3944606e64cfbf3c`.
+Using an existing development key, the exact release payload launched
+fresh and upgraded from version code 10 to 11 with synthetic historical
+schemas. Recovery preserved existing events and import progress, and
+downgrade and wrong-signer checks rejected the replacements. The
+qualification removed its fixtures and packages. [Hosted UI matrix](https://github.com/edithatogo/CallTrack/actions/runs/45226419047),
+[cold Linux reproduction](https://github.com/edithatogo/CallTrack/actions/runs/45227544562).
+
+On the separate assistive guest, TalkBack 17.0 read the action label three
+times. The shared Compose button now exposes one text value. With native
+emulator touch input, TalkBack displayed one label for both the disabled
+calendar picker and the disabled latest-call button. Native gestures
+opened Automatic logging settings, Historical imports and Delivery review
+and recovery. The hosted import suite now asserts
+the exact single label and explicit action behavior.
+
+Switch Access 1.17 used a disposable USB HID through the emulator's
+native `hid` command. Next moved the visible scan highlight through
+enabled controls. Select opened Automatic logging settings, Historical
+imports, and Delivery review and recovery. The fixture input device
+was removed and the app and inspection packages were uninstalled.
+
+A landscape run reported a 960 dp smallest width and passed rendered
+accessibility. The first import run located the Cancel action under
+the keyboard and failed to open the dialog. The test now scrolls the
+real content until the enabled action is outside the visible keyboard
+bounds. Cancellation still requires the visible keyboard, the app's
+confirmation and zero calendar effects. The full landscape import suite
+then passed, including process recovery and destination disappearance.
+
+One hosted API 26 run failed at the retention test's preference lookup.
+The fixture now binds its selected calendar before the SQLite update.
+The report records the platform exception class from instrumentation so
+a repeated failure can be diagnosed without displaying fixture contents.
+[API 26 failure in the retention journey](https://github.com/edithatogo/CallTrack/actions/runs/45229927663/job/137886385960).
+
+The native Contacts Picker and device handoff APIs are outside the
+current call-log and calendar flow. The app does not request contacts and
+binds durable receipts to provider and device state. AGP's experimental
+backup tests cover a different restoration path from the project's
+preserving upgrade and its app-data backup opt-out. Android 17's
+large-screen behavior and the observed runtime checks fit the current
+Compose, platform-provider and durable scheduling stack.
+[Android 17 APIs](https://developer.android.com/about/versions/17/features),
+[large-screen behavior](https://developer.android.com/about/versions/17/behavior-changes-17),
+[AGP backup testing](https://developer.android.com/build/releases/agp-9-5-0-release-notes).

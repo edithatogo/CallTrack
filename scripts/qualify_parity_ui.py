@@ -104,6 +104,12 @@ def native_failure_summary(method, output, declared_permissions=None):
     )
     if status_codes:
         detail += '; instrumentation-status-codes=' + ','.join(status_codes[:12])
+    exception = re.search(
+        r'^INSTRUMENTATION_STATUS: stack=((?:java|android|androidx)\.[A-Za-z0-9_.$]+'
+        r'(?:Exception|Error))(?::|$)', output, re.MULTILINE
+    )
+    if exception:
+        detail += '; instrumentation-exception=' + exception.group(1)
     for diagnostic in (
         'runtime-fatal-exception', 'runtime-anr', 'runtime-test-process-died',
         'runtime-app-process-died', 'runtime-permission-denial',
@@ -665,6 +671,10 @@ def qualify(serial, suite="settings", receipt_dir=None):
             command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.READ_CALENDAR')
             check('revokedCalendarAndVisibleRestoreDoNotEnableLogging')
         elif suite == 'imports':
+            check('runActionsRequireEnabledStateAndExplicitTaps',
+                  'com.markobl.calllogsync.slice.HistoricalImportActionsPanelTest')
+            check('destinationListIsPresentedAndOnlyExplicitSelectionReturnsOpaqueToken',
+                  'com.markobl.calllogsync.slice.HistoricalImportDestinationPanelTest')
             check('prepareCalendarAndTaggedHistory')
             command('shell', 'pm', 'grant', PACKAGE, 'android.permission.READ_CALL_LOG')
             check('latestCallUsesNewestDateAndHighestIdOnTies')
@@ -675,6 +685,7 @@ def qualify(serial, suite="settings", receipt_dir=None):
             check('renderedRangePreviewCancelConfirmAndRepeat')
             check('preparePersistedPartialImport')
             check('renderedExplicitHistoryResumeCompletesPartialWork')
+            check('removedDestinationBlocksDeliveryWithoutSwitchingCalendars')
         else:
             check('preparePendingWithoutCallAccess')
             ui_attempted = True

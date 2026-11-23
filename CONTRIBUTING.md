@@ -44,8 +44,8 @@ See [qualification](qualification/README.md) for the separate upstream reproduce
 Use google-java-format 2.0.0 with `--aosp --cleanup=false` for app-owned Java. CI includes the pinned
 formatter URL/checksum and exact command. Preserve the upstream notices; contribute
 only code and assets you have the right to distribute under compatible terms.
-For Kotlin use ktfmt0.59 with `--kotlinlang-style --dry-run --set-exit-if-changed`;
-CI pins its Maven URL and SHA256. Follow [Kotlin style](conductor/code_styleguides/kotlin.md).
+For Kotlin use ktfmt 0.65 with `--kotlinlang-style --dry-run --set-exit-if-changed`.
+CI pins its Maven URL and SHA-256. Follow [Kotlin style](conductor/code_styleguides/kotlin.md).
 Describe behaviour changes and their regression evidence in the pull request.
 Keep language/UI migrations separate from synchronization behaviour changes.
 

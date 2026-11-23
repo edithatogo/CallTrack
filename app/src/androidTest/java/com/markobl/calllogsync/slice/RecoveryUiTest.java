@@ -394,6 +394,7 @@ public class RecoveryUiTest {
 
     @Test
     public void renderedExplicitRetentionClearsOnlyExpiredPayload() {
+        long fixtureCalendar = calendar();
         seed("expired");
         journey(
                 "retention",
@@ -411,7 +412,7 @@ public class RecoveryUiTest {
                                         new Object[] {
                                             System.currentTimeMillis() - 8L * 24 * 60 * 60 * 1000,
                                             call("expired").key(),
-                                            calendar()
+                                            fixtureCalendar
                                         });
                     }
                     tap(ui, R.string.retention_run);
@@ -423,7 +424,7 @@ public class RecoveryUiTest {
                     assertNotNull(expired.marker);
                     assertNotNull(expired.facts);
                     assertEquals(DurableDelivery.State.SUPPRESSED, saved("pending").state);
-                    assertEquals(0, fixture.events(calendar()));
+                    assertEquals(0, fixture.events(fixtureCalendar));
                     ui.capture("recovery-expired-payload-metadata-retained");
                 });
     }

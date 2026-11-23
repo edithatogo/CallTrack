@@ -286,8 +286,8 @@ public class ImportUiTest {
             ui.await(
                     ui::keyboardVisible, "Date keyboard not visibly present for cancellation test");
             ui.capture("import-keyboard-visible-before-cancel");
-            ui.tapId("import_cancel");
-            ui.tapId("button1");
+            ui.tapAboveKeyboard("import_cancel");
+            ui.tapDialogPositive();
             ui.await(() -> phase(HistoricalImport.Phase.CANCELLED), "Cancel not persisted");
             assertEquals(0, fixture.events(calendar()));
             ui.revealId("import_summary");
@@ -427,6 +427,57 @@ public class ImportUiTest {
             throw failure;
         } finally {
             close(instrumentation, activity);
+        }
+    }
+
+    @Test
+    public void removedDestinationBlocksDeliveryWithoutSwitchingCalendars() {
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        RenderedUi ui = new RenderedUi(instrumentation);
+        String removedLabel = fixture.calendarDisplayName() + " temporary";
+        long removed = fixture.insertCalendar(removedLabel);
+        long remainingEvents = fixture.events(calendar());
+        try (ActivityScenario<HistoricalImportActivity> scenario =
+                ActivityScenario.launch(HistoricalImportActivity.class)) {
+            ui.tapId("import_calendar_picker");
+            ui.tapText(removedLabel);
+            ui.setTextId("import_from", today().minusDays(1).toString());
+            ui.setTextId("import_to", today().toString());
+            ui.dismissKeyboard();
+            preview(ui);
+            String sessionId = latest().id;
+            assertEquals(removed, latest().calendar);
+            assertEquals(0, fixture.events(removed));
+
+            fixture.removeCalendar(removed);
+            scenario.recreate();
+            assertEquals(sessionId, latest().id);
+            assertEquals(HistoricalImport.Phase.PREVIEW, latest().phase);
+            assertEquals(remainingEvents, fixture.events(calendar()));
+
+            ui.tapId("import_confirm");
+            String unavailable = context().getString(R.string.auto_destination_unavailable);
+            ui.await(
+                    () -> {
+                        android.view.accessibility.AccessibilityNodeInfo message =
+                                ui.find("message", true);
+                        return message != null
+                                && message.getText() != null
+                                && message.getText().toString().contains(unavailable);
+                    },
+                    "Confirmation did not disclose the missing calendar");
+            ui.capture("import-missing-destination-confirmation");
+            ui.tapDialogPositive();
+            ui.await(
+                    () -> latest().stopped == DurableDelivery.Result.DESTINATION_UNAVAILABLE,
+                    "Delivery did not stop when its approved calendar disappeared");
+            assertEquals(sessionId, latest().id);
+            assertEquals(removed, latest().calendar);
+            assertEquals(0, latest().saved);
+            assertEquals(0, fixture.events(removed));
+            assertEquals(remainingEvents, fixture.events(calendar()));
+            ui.revealId("import_summary");
+            ui.capture("import-destination-removed");
         }
     }
 
