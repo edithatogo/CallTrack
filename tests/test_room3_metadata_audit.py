@@ -40,13 +40,13 @@ class CandidateTrust(unittest.TestCase):
         ])
         records, names = audit.pending(prior, changed)
         self.assertEqual(1, len(records))
-        with patch.object(audit, "read_publication", return_value=body):
+        with patch.object(audit, "canonical_sha256", return_value=digest):
             verified = audit.verify_one(records[0], names)
         self.assertTrue(verified["sha256_verified"])
 
     def test_rejects_incorrect_bytes(self):
         entry = dict(coordinate="example:new:2.0", name="new-2.0.jar", sha256="0" * 64)
-        with patch.object(audit, "read_publication", return_value=b"not trusted"):
+        with patch.object(audit, "canonical_sha256", return_value=hashlib.sha256(b"not trusted").hexdigest()):
             with self.assertRaisesRegex(ValueError, "Canonical hash mismatch"):
                 audit.verify_one(entry, {})
 

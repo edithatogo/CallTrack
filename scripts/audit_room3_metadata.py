@@ -13,7 +13,31 @@ from pathlib import Path
 from urllib.error import HTTPError
 
 from audit_gradle_verification import module_artifact_url, rows
-from audit_release_artifacts import read_publication, repository_url
+from audit_release_artifacts import PUBLICATION_OPENER, read_publication, repository_url
+
+
+MAX_CANONICAL_ARTIFACT = 256 * 1024 * 1024
+BLOCK_BYTES = 1024 * 1024
+
+
+def canonical_sha256(url):
+    """Hash source bytes without buffering a >64 MB compiler/tool archive."""
+    if not url.startswith("https://"):
+        raise ValueError("Canonical artifact URL must be HTTPS")
+    digest = hashlib.sha256()
+    size = 0
+    with PUBLICATION_OPENER.open(url, timeout=60) as response:
+        if not getattr(response, "url", url).startswith("https://"):
+            raise ValueError("Non-HTTPS publication redirect")
+        while True:
+            block = response.read(BLOCK_BYTES)
+            if not block:
+                break
+            size += len(block)
+            if size > MAX_CANONICAL_ARTIFACT:
+                raise ValueError("Oversized canonical tool archive: " + url)
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def pending(prior_bytes, candidate_bytes):
@@ -36,7 +60,7 @@ def verify_one(entry, approved):
     primary = repository_url(candidate)
     attempts = []
     try:
-        actual = hashlib.sha256(read_publication(primary)).hexdigest()
+        actual = canonical_sha256(primary)
         attempts.append(dict(url=primary, sha256=actual))
         if actual == entry["sha256"]:
             return dict(entry, canonical_url=primary, sha256_verified=True)
@@ -52,7 +76,7 @@ def verify_one(entry, approved):
     if metadata_sha not in approved.get((entry["coordinate"], module + "-" + version + ".module"), set()):
         raise ValueError("Missing independently verified variant metadata: " + metadata_url)
     variant_url = module_artifact_url(candidate, json.loads(metadata))
-    actual = hashlib.sha256(read_publication(variant_url)).hexdigest()
+    actual = canonical_sha256(variant_url)
     if actual != entry["sha256"]:
         raise ValueError("Variant artifact mismatch: " + variant_url)
     return dict(entry, canonical_url=variant_url, sha256_verified=True, module_sha256=metadata_sha)
