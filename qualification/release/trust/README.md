@@ -44,3 +44,13 @@ remains enabled, without trust exceptions or automatic checksum generation.
 These are metadata for already resolved build dependencies, not new app libraries.
 Initial failure and diagnostic overlay results remain distinct from final clean
 source/cold-cache acceptance. The subsequent Track5 Linux evidence owns the result.
+
+## Cold reproduction cache scope — 2026-11-23
+
+The manually dispatched cold reproduction runs with GitHub Actions cache access
+set to `none` and checks the effective mode before candidate checkout. Its
+successful hosted qualification verified the same historical candidate and APK
+hash with fresh SDK and Gradle directories. This blocks Actions cache reads and
+writes for the job; it does not make arbitrary candidate code or its generated
+evidence trusted. The candidate still requires review, and the separate
+untrusted-checkout finding remains open.
