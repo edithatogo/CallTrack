@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     container:
-      image: eclipse-temurin@sha256:d1b500f1a2a8e2cb1b0fa84e21c4a52963050cbd46b8a53fcb6a8eec0f57675f
+      image: eclipse-temurin:17.0.21.1_2-jdk@sha256:7e63c63da8c2911d5a8c3b2f656e2d278a85224a1bd4dcbe318a6131bc617bf7
     steps:
       - name: Install Linux prerequisites
         run: |
