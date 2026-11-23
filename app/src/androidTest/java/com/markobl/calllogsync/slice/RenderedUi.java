@@ -94,7 +94,8 @@ final class RenderedUi {
                     if (target) return false;
                     target = line.contains(context.getPackageName() + "/" + activity.getName());
                 } else if (target) {
-                    if (line.contains("mHaveState=true")) saved = true;
+                    if (line.contains("mHaveState=true") || line.contains("haveState=true"))
+                        saved = true;
                     if (line.contains("state=STOPPED") && saved) return true;
                 }
             }
@@ -423,7 +424,7 @@ final class RenderedUi {
         return null;
     }
 
-    private String dialogActionSummary() {
+    String dialogActionSummary() {
         AccessibilityNodeInfo root = automation.getRootInActiveWindow();
         String activeOwner = packageCategory(root == null ? null : root.getPackageName());
         java.util.List<String> windows = new java.util.ArrayList<>();

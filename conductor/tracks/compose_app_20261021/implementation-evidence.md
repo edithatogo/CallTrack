@@ -1111,3 +1111,22 @@ lint passed, as did the import, recovery and accessibility suites. Each suite
 verified fixture cleanup, package removal and emulator restoration. The 38
 focused host safety tests passed. The corrected candidate still needs its own
 hosted API26/API33/API36 matrix and controlled phone/Google Calendar retest.
+
+The next hosted matrix, run `45081560752` on `c7d66de`, passed all four
+suites on API36. API26 failed while waiting for the saved-state diagnostic;
+[Android 8's activity dump](https://android.googlesource.com/platform/frameworks/base/+/android-8.0.0_r1/services/core/java/com/android/server/am/ActivityRecord.java)
+uses `haveState` where the probe expected `mHaveState`. The probe now accepts
+either spelling while still requiring saved state and a stopped activity.
+API33 passed settings and imports, then failed waiting for the restored
+recovery action; the available hosted summary did not establish why. The
+recovery test now checks the pending ledger and event count immediately after
+restart and records an allowlisted window/control diagnostic if the action
+does not return. Cleanup and package removal passed for both failed jobs.
+
+The local API36 lifecycle qualification passed on `c7d66de`, including a
+process killed after provider insertion, reboot, offline delivery and Doze
+deferral, with fixture cleanup and environment restoration. Two clean
+same-host release builds on that revision produced identical unsigned APKs;
+they used a shared dependency cache and are not independent-host reproduction.
+The current test-only refinements and the controlled Google retest still need
+their own applicable qualification.

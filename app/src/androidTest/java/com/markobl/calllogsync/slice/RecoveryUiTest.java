@@ -148,10 +148,22 @@ public class RecoveryUiTest {
         ui.capture("recovery-before-process-death");
 
         ui.killStoppedProcessAndReturn(ReceiptRecoveryActivity.class);
-        ui.await(
-                () -> ui.shown(context().getString(R.string.reapproval_open), false) != null,
-                "Pending recovery action did not return after process death",
-                90000);
+        assertEquals(DurableDelivery.State.READY, saved("pending").state);
+        assertEquals(0, fixture.events(calendar()));
+        try {
+            ui.await(
+                    () -> ui.shown(context().getString(R.string.reapproval_open), false) != null,
+                    "Pending recovery action did not return after process death",
+                    90000);
+        } catch (AssertionError failure) {
+            try {
+                ui.capture("recovery-after-process-death-failure");
+            } catch (Throwable capture) {
+                failure.addSuppressed(capture);
+            }
+            throw new AssertionError(
+                    "Pending recovery action did not return; " + ui.dialogActionSummary(), failure);
+        }
         assertNull(
                 "Process restoration must not revive the approval dialog",
                 ui.find("button1", true));
