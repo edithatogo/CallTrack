@@ -16,6 +16,7 @@ import androidx.room3.support.getSupportWrapper
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.driver.AndroidSQLiteDriver
 import androidx.sqlite.execSQL
+import java.util.function.LongSupplier
 
 // These entities describe the existing on-disk schema, not a new interchange format.
 // Retaining the original DB filenames is essential for preserving installed receipts.
@@ -142,7 +143,7 @@ internal object RoomPersistence {
             }
         }
 
-    private fun ledgerMigration(from: Int): Migration =
+    private fun ledgerMigration(from: Int, clock: LongSupplier): Migration =
         object : Migration(from, 7) {
             override suspend fun migrate(connection: SQLiteConnection) {
                 if (from == 1) {
@@ -175,7 +176,7 @@ internal object RoomPersistence {
                 if (from != 1) {
                     connection.execSQL("ALTER TABLE outbox ADD COLUMN payload_saved_at INTEGER")
                 }
-                val now = System.currentTimeMillis()
+                val now = clock.asLong
                 check(now >= 0) { "Invalid migration clock" }
                 connection.execSQL(
                     "UPDATE outbox SET payload_saved_at=" +
@@ -199,16 +200,16 @@ internal object RoomPersistence {
             }
         }
 
-    fun ledger(context: Context, name: String): RoomLedgerDatabase =
+    fun ledger(context: Context, name: String, clock: LongSupplier): RoomLedgerDatabase =
         Room.databaseBuilder<RoomLedgerDatabase>(context.applicationContext, name)
             .setDriver(AndroidSQLiteDriver())
             .addMigrations(
                 migration6To7,
-                ledgerMigration(1),
-                ledgerMigration(2),
-                ledgerMigration(3),
-                ledgerMigration(4),
-                ledgerMigration(5),
+                ledgerMigration(1, clock),
+                ledgerMigration(2, clock),
+                ledgerMigration(3, clock),
+                ledgerMigration(4, clock),
+                ledgerMigration(5, clock),
             )
             .build()
 
