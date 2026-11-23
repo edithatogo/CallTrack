@@ -13,10 +13,20 @@ import subprocess
 import struct
 import tarfile
 import urllib.request
-import xml.etree.ElementTree as ET
+from urllib.parse import urlsplit
 import zipfile
+from redirect_validation import ValidatingRedirectHandler
+from xml_safety import parse_xml
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def validate_tool_redirect(url):
+    if urlsplit(url).scheme != 'https':
+        raise ValueError('Insecure tool archive redirect')
+
+
+TOOL_OPENER = urllib.request.build_opener(ValidatingRedirectHandler(validate_tool_redirect))
 
 
 def sha(path, algorithm='sha256'):
@@ -30,7 +40,7 @@ def sha(path, algorithm='sha256'):
 def fetch(url, path):
     if not url.startswith('https://'):
         raise ValueError('HTTPS required')
-    with urllib.request.urlopen(url, timeout=120) as response, path.open('xb') as stream:
+    with TOOL_OPENER.open(url, timeout=120) as response, path.open('xb') as stream:
         if not response.url.startswith('https://'):
             raise ValueError('Insecure tool archive redirect')
         total = 0
@@ -174,7 +184,7 @@ def run(output, archives_from=None):
         receipt['gradle_distribution'] = zip_comparison(distribution, caches[0])
         repository = output / 'sdk-repository.xml'
         fetch('https://dl.google.com/android/repository/repository2-3.xml', repository)
-        root = ET.fromstring(repository.read_bytes())
+        root = parse_xml(repository.read_bytes())
         receipt['sdk_repository_sha256'] = sha(repository)
         receipt['sdk'] = []
         sdk = (ROOT / '.local/android-sdk').resolve()

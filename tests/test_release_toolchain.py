@@ -1,10 +1,10 @@
-import io
 import json
 from pathlib import Path
 import sys
 import tempfile
 import unittest
 from unittest.mock import patch
+import xml.etree.ElementTree as ET
 import zipfile
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import audit_release_toolchain as tools
@@ -42,13 +42,46 @@ class ToolTrustTest(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'exact official SHA256'):
                     tools.published_checksum('https://example.test/checksum', path)
 
+    def test_sdk_repository_dtd_fails_closed_and_retains_receipt(self):
+        sdk = '<sdk:sdk-repository xmlns:sdk="http://schemas.android.com/sdk/android/repo/repository2/03"><remotePackage path="other"><license>Terms &amp; conditions</license></remotePackage></sdk:sdk-repository>'
+        cases = [
+            ('dtd-utf8', ('<!DOCTYPE sdk:sdk-repository [<!ENTITY x "expanded">]>' + sdk).encode(), ET.ParseError, 'DTD declarations are not allowed'),
+            ('dtd-utf16', ('<!DOCTYPE sdk:sdk-repository [<!ENTITY x "expanded">]>' + sdk).encode('utf-16'), ET.ParseError, 'DTD declarations are not allowed'),
+            ('malformed', b'<sdk-repository>', ET.ParseError, 'no element found'),
+            ('normal', sdk.encode(), RuntimeError, 'Exact SDK package not found'),
+        ]
+        for name, xml, error_type, message in cases:
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                home = root / 'home'
+                (home / '.gradle/wrapper/dists/gradle-8.13-bin/test/gradle-8.13').mkdir(parents=True)
+                def fetch(_url, destination):
+                    destination.write_bytes(xml)
+                with patch.object(Path, 'home', return_value=home), \
+                     patch.object(tools, 'fetch', side_effect=fetch), \
+                     patch.object(tools, 'published_checksum', return_value='0' * 64), \
+                     patch.object(tools, 'sha', return_value='0' * 64), \
+                     patch.object(tools, 'zip_comparison', return_value={'all_archive_files_match': True}):
+                    with self.assertRaisesRegex(error_type, message):
+                        tools.run(root / 'output', archives_from=root / 'archives')
+                receipt = json.loads((root / 'output/receipt.json').read_text())
+                self.assertFalse(receipt['success'])
+                self.assertIn(message, receipt['error'])
+
     def test_parent_pom_licence_evidence_is_retained(self):
         child = b'<project xmlns="http://maven.apache.org/POM/4.0.0"><parent><groupId>org.test</groupId><artifactId>parent</artifactId><version>1</version></parent></project>'
         parent = b'<project xmlns="http://maven.apache.org/POM/4.0.0"><licenses><license><name>Apache-2.0</name></license></licenses></project>'
-        with patch.object(artifacts.urllib.request, 'urlopen', return_value=io.BytesIO(parent)):
+        with patch.object(artifacts, 'read_publication', return_value=parent):
             evidence = []
             self.assertEqual('Apache-2.0', artifacts.inherited_licences(child, evidence)[0]['name'])
             self.assertEqual(artifacts.digest(parent), evidence[0]['sha256'])
+
+    def test_untrusted_parent_pom_dtd_is_rejected(self):
+        child = b'<project xmlns="http://maven.apache.org/POM/4.0.0"><parent><groupId>org.test</groupId><artifactId>parent</artifactId><version>1</version></parent></project>'
+        parent = b'<!DOCTYPE project [<!ENTITY name "Apache-2.0">]><project xmlns="http://maven.apache.org/POM/4.0.0"><licenses><license><name>&name;</name></license></licenses></project>'
+        with patch.object(artifacts, 'read_publication', return_value=parent):
+            with self.assertRaisesRegex(ET.ParseError, 'DTD declarations are not allowed'):
+                artifacts.inherited_licences(child, [])
 
     def test_unresolved_parent_properties_do_not_invent_licence(self):
         child = b'<project xmlns="http://maven.apache.org/POM/4.0.0"><parent><groupId>org.test</groupId><artifactId>parent</artifactId><version>${version}</version></parent></project>'

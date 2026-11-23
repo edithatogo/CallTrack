@@ -11,12 +11,12 @@ import json
 from pathlib import Path
 import re
 from urllib.error import HTTPError
-import xml.etree.ElementTree as ET
 from audit_release_artifacts import module_artifact_url, repository_url, read_publication
+from xml_safety import parse_xml
 
 
 def rows(data):
-    root = ET.fromstring(data)
+    root = parse_xml(data)
     if root.findtext('./{*}configuration/{*}verify-metadata') != 'true':
         raise ValueError('Repository metadata verification must be enabled')
     if root.findall('.//{*}trust') or root.findall('.//{*}trusted-artifact'):
