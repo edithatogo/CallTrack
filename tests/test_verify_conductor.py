@@ -5,6 +5,8 @@ import io
 import json
 from pathlib import Path
 import shutil
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -13,6 +15,22 @@ MODULE = Path(__file__).resolve().parents[1] / 'scripts/verify_conductor.py'
 SPEC = importlib.util.spec_from_file_location('verify_conductor', MODULE)
 VERIFY = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(VERIFY)
+
+
+class OptimizationGuardTests(unittest.TestCase):
+    def test_optimized_execution_and_import_fail_closed(self):
+        commands = (
+            [sys.executable, '-O', str(MODULE)],
+            [sys.executable, '-O', '-c',
+             'import runpy, sys; runpy.run_path(sys.argv[1], run_name="conductor_import")',
+             str(MODULE)],
+        )
+        for command in commands:
+            with self.subTest(command=command):
+                result = subprocess.run(command, capture_output=True, text=True, timeout=30)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn('Conductor verification requires assertions', result.stderr)
+                self.assertNotIn('PASS:', result.stdout)
 
 
 class VerificationFailures(unittest.TestCase):
