@@ -17,3 +17,15 @@ boundary, minimum permissions, impact, containment, fix and regression test. Aud
 any release artifact that shipped the issue, update the supported-version table
 when one exists, and document an upgrade that preserves the ledger and user edits.
 Do not instruct users to erase app data to resolve a synchronization failure.
+
+## Optional staged private-key check
+
+With `pre-commit` 4.7.0 installed in the repository's `.venv`, run the SHA-pinned
+private-key header check on staged text without installing a Git hook:
+
+```sh
+PATH="$PWD/.venv/bin:$PATH" PRE_COMMIT_HOME="$PWD/.local/pre-commit" .venv/bin/pre-commit run detect-private-key
+```
+
+This optional check supplements the independent shared Presidio/Gitleaks gate;
+it does not replace its configuration or broader coverage.

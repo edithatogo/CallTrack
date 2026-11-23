@@ -5,11 +5,11 @@ on:
       candidate_sha:
         description: Exact reviewed candidate commit (40 hex characters)
         required: true
-        default: 94644086159137bab27767b6a1a46727409695b5
+        default: ae39ef9e109158191b33d7047e93bc3ae39a8fbd
       expected_apk_sha256:
         description: Expected unsigned macOS APK SHA256
         required: true
-        default: 0f672916f06afbc2ec4b0730c1df167d44dcb094b41385cb8a0bfc6b234f48df
+        default: 22e93744536a08ce8b94050c412e6bd3d5a6839a040d0fd513f25658af961180
 permissions:
   contents: read
 cache-mode: none
@@ -37,16 +37,30 @@ jobs:
           path: qualification-tools
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version-file: qualification-tools/.python-version
-      - name: Checkout exact candidate separately
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          path: candidate
-          ref: ${{ inputs.candidate_sha }}
-          fetch-depth: 1
-          persist-credentials: false
+      - name: Check out the candidate from the selected workflow history
+        shell: bash
+        env:
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+        run: |
+          set -euo pipefail
+          if ! [[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo '::error::Candidate must be a full Git commit SHA.'
+            exit 1
+          fi
+          if [[ "$CANDIDATE_SHA" == 'ae39ef9e109158191b33d7047e93bc3ae39a8fbd' ]]; then
+            # Track 5's reviewed reproduction baseline predates the current main history.
+            git -C qualification-tools fetch --no-tags origin "$CANDIDATE_SHA"
+          elif ! git -C qualification-tools merge-base --is-ancestor "$CANDIDATE_SHA" HEAD; then
+            echo '::error::Dispatch from a repository branch containing the reviewed candidate.'
+            exit 1
+          fi
+          # AGP reads the candidate's Git directory to embed the built revision.
+          git init --quiet "$GITHUB_WORKSPACE/candidate"
+          git -C candidate fetch --no-tags "$GITHUB_WORKSPACE/qualification-tools" "$CANDIDATE_SHA"
+          git -C candidate checkout --quiet --detach "$CANDIDATE_SHA"
       - name: Select repository Python runtime
         working-directory: qualification-tools
         run: |

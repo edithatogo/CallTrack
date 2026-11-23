@@ -6,6 +6,8 @@ import sys
 import unittest
 import tempfile
 import json
+import os
+import stat
 import xml.etree.ElementTree as ET
 from unittest.mock import patch
 from urllib.response import addinfourl
@@ -17,6 +19,10 @@ import qualify_linux_build as linux
 
 
 class AuditTest(unittest.TestCase):
+    def audit_under(self, root, inventory, output):
+        with patch.object(audit, 'OUTPUT_ROOT', root):
+            return audit.audit(inventory, output)
+
     def publication_transport(self, routes, visited, responses=None):
         def open_request(_handler, request):
             visited.append(request.full_url)
@@ -183,7 +189,7 @@ class AuditTest(unittest.TestCase):
             inventory.write_text(json.dumps({'artifacts': [dict(
                 coordinate='org.test:test:1', name='test-1.jar', sha256=hashlib.sha256(artifact).hexdigest())]}))
             with patch.object(audit.PUBLICATION_OPENER, 'open', side_effect=response):
-                result = audit.audit(inventory, root / 'output')
+                result = self.audit_under(root, inventory, root / 'output')
             self.assertTrue(result['artifacts'][0]['repository_bytes_match'])
             self.assertIn('DTD declarations are not allowed', result['artifacts'][0]['error'])
             self.assertFalse(result['all_repository_bytes_match'])
@@ -220,13 +226,178 @@ class AuditTest(unittest.TestCase):
             inventory.write_text(json.dumps({'artifacts': [dict(coordinate='org.test:test:1', name='test-1.jar', sha256='0' * 64)]}))
             output = root / 'audit'
             with patch.object(audit.PUBLICATION_OPENER, 'open', side_effect=response):
-                result = audit.audit(inventory, output)
+                result = self.audit_under(root, inventory, output)
             self.assertFalse(result['all_repository_bytes_match'])
             self.assertFalse(json.loads((output / 'receipt.json').read_text())['release_ready'])
             before = (output / 'receipt.json').read_bytes()
             with self.assertRaises(FileExistsError):
-                audit.audit(inventory, output)
+                self.audit_under(root, inventory, output)
             self.assertEqual(before, (output / 'receipt.json').read_bytes())
+
+    def test_download_does_not_follow_an_existing_output_link(self):
+        data = io.BytesIO()
+        with zipfile.ZipFile(data, 'w') as archive:
+            archive.writestr('LICENSE', 'licence')
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': [dict(
+                coordinate='org.test:test:1', name='test-1.jar', sha256=audit.digest(data.getvalue()))]}))
+            output = root / 'output'
+            sentinel = root / 'retain.txt'
+            sentinel.write_text('keep')
+
+            def publication(_url):
+                (output / '0-artifact').symlink_to(sentinel)
+                return data.getvalue()
+
+            with patch.object(audit, 'read_publication', side_effect=publication):
+                result = self.audit_under(root, inventory, output)
+            self.assertEqual('keep', sentinel.read_text())
+            self.assertFalse(result['all_repository_bytes_match'])
+            self.assertIn('error', result['artifacts'][0])
+            self.assertFalse(json.loads((output / 'receipt.json').read_text())['release_ready'])
+
+    def test_receipt_does_not_follow_an_existing_output_link(self):
+        data = io.BytesIO()
+        with zipfile.ZipFile(data, 'w') as archive:
+            archive.writestr('LICENSE', 'licence')
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': [dict(
+                coordinate='org.test:test:1', name='test-1.jar', sha256=audit.digest(data.getvalue()))]}))
+            output = root / 'output'
+            sentinel = root / 'retain.txt'
+            sentinel.write_text('keep')
+
+            def publication(url):
+                if url.endswith('.pom'):
+                    (output / 'receipt.json').symlink_to(sentinel)
+                    return b'<project xmlns="http://maven.apache.org/POM/4.0.0"/>'
+                return data.getvalue()
+
+            with patch.object(audit, 'read_publication', side_effect=publication):
+                with self.assertRaises(FileExistsError):
+                    self.audit_under(root, inventory, output)
+            self.assertEqual('keep', sentinel.read_text())
+
+    def test_replaced_output_directory_fails_without_writing_to_replacement(self):
+        data = io.BytesIO()
+        with zipfile.ZipFile(data, 'w') as archive:
+            archive.writestr('LICENSE', 'licence')
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': [dict(
+                coordinate='org.test:test:1', name='test-1.jar', sha256=audit.digest(data.getvalue()))]}))
+            output = root / 'output'
+            moved = root / 'moved'
+            replacement = root / 'replacement'
+            replacement.mkdir()
+            swapped = False
+
+            def publication(url):
+                nonlocal swapped
+                if not swapped:
+                    output.rename(moved)
+                    output.symlink_to(replacement, target_is_directory=True)
+                    swapped = True
+                return (b'<project xmlns="http://maven.apache.org/POM/4.0.0"/>'
+                        if url.endswith('.pom') else data.getvalue())
+
+            with patch.object(audit, 'read_publication', side_effect=publication):
+                with self.assertRaisesRegex(RuntimeError, 'output directory changed'):
+                    self.audit_under(root, inventory, output)
+            self.assertEqual([], list(replacement.iterdir()))
+            self.assertFalse((moved / 'receipt.json').exists())
+
+    def test_audit_rejects_output_outside_the_evidence_root(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            evidence = root / 'evidence'
+            evidence.mkdir()
+            outside = root / 'outside'
+            outside.mkdir()
+            sibling = root / 'evidence-sibling'
+            sibling.mkdir()
+            (evidence / 'link').symlink_to(outside, target_is_directory=True)
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': []}))
+            for output in (outside / 'audit', evidence / '..' / 'outside' / 'audit',
+                           sibling / 'audit', evidence / 'link' / 'audit'):
+                with self.subTest(output=output):
+                    with self.assertRaisesRegex(ValueError, 'evidence root'):
+                        self.audit_under(evidence, inventory, output)
+            self.assertEqual([], list(outside.iterdir()))
+            self.assertEqual([], list(sibling.iterdir()))
+
+    def test_audit_rejects_an_existing_dangling_output_link(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            evidence = root / 'evidence'
+            evidence.mkdir()
+            output = evidence / 'output'
+            target = evidence / 'target'
+            output.symlink_to(target, target_is_directory=True)
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': []}))
+            with self.assertRaises(FileExistsError):
+                self.audit_under(evidence, inventory, output)
+            self.assertFalse(target.exists())
+            self.assertTrue(output.is_symlink())
+
+    def test_audit_rejects_parent_replaced_by_a_link_during_creation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            evidence = root / 'evidence'
+            nested = evidence / 'nested'
+            nested.mkdir(parents=True)
+            outside = root / 'outside'
+            outside.mkdir()
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': []}))
+            original_open = os.open
+            swapped = False
+            def open_with_swap(path, flags, *args, **kwargs):
+                nonlocal swapped
+                if path == 'nested' and not swapped:
+                    nested.rename(evidence / 'retained')
+                    nested.symlink_to(outside, target_is_directory=True)
+                    swapped = True
+                return original_open(path, flags, *args, **kwargs)
+            with patch.object(audit.os, 'open', side_effect=open_with_swap):
+                with self.assertRaises(OSError):
+                    self.audit_under(evidence, inventory, nested / 'output')
+            self.assertTrue(swapped)
+            self.assertEqual([], list(outside.iterdir()))
+            self.assertEqual([], list((evidence / 'retained').iterdir()))
+
+    def test_audit_output_is_private_with_a_zero_umask(self):
+        archive = io.BytesIO()
+        with zipfile.ZipFile(archive, 'w') as bundle:
+            bundle.writestr('LICENSE', 'license')
+        artifact = archive.getvalue()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            evidence = root / 'evidence'
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': [dict(
+                coordinate='org.test:test:1', name='test-1.jar', sha256=audit.digest(artifact))]}))
+            output = evidence / 'nested' / 'output'
+            def publication(url):
+                return b'<project xmlns="http://maven.apache.org/POM/4.0.0"/>' if url.endswith('.pom') else artifact
+            original_umask = os.umask(0)
+            try:
+                with patch.object(audit, 'read_publication', side_effect=publication):
+                    result = self.audit_under(evidence, inventory, output)
+            finally:
+                os.umask(original_umask)
+            self.assertTrue(result['all_repository_bytes_match'])
+            for path in (evidence, output.parent, output):
+                self.assertEqual(0o700, stat.S_IMODE(path.stat().st_mode))
+            for name in ('0-artifact', '0-pom', 'receipt.json'):
+                self.assertEqual(0o600, stat.S_IMODE((output / name).stat().st_mode))
 
     def test_classes_named_notice_are_not_licence_documents(self):
         data = io.BytesIO()

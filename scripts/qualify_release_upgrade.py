@@ -57,18 +57,29 @@ def frozen_release_apk(receipt_path, revision, sdk, env):
             build.get('revision') != revision or len(records) != 2):
         raise RuntimeError('Matching frozen unsigned build receipt required')
     from qualify_release_build import verify_unsigned
+    output = receipt_path.resolve(strict=True).parent
     hashes = []
-    for record in records:
-        apk = Path(record['apk'])
+    apks = []
+    for number, record in enumerate(records, 1):
+        # qualify_release_build creates two separate checkouts beside the receipt.
+        # Do not let a changed receipt make this probe read an unrelated file.
+        apk = output / f'checkout-{number}/app/build/outputs/apk/release/app-release-unsigned.apk'
+        try:
+            declared = Path(record['apk']).resolve(strict=True)
+        except (KeyError, TypeError, ValueError, OSError, RuntimeError) as error:
+            raise RuntimeError('Frozen artifact path invalid') from error
+        if declared != apk or not apk.is_file():
+            raise RuntimeError('Frozen artifact path outside expected build output')
         if (record.get('exit_code') != 0 or
                 record.get('signature_check', {}).get('unsigned_verified') is not True or
                 sha(apk) != record.get('apk_sha256')):
             raise RuntimeError('Frozen unsigned artifact changed or failed')
         verify_unsigned(apk, sdk, env)
         hashes.append(sha(apk))
+        apks.append(apk)
     if hashes[0] != hashes[1]:
         raise RuntimeError('Frozen unsigned artifacts differ')
-    return Path(records[0]['apk'])
+    return apks[0]
 
 
 def require_identical_payload(unsigned, signed):

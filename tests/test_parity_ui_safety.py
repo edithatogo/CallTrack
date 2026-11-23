@@ -426,7 +426,7 @@ class UiSafety(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.root = Path(self.temp.name)
+        self.root = Path(self.temp.name).resolve()
         evidence = self.root / '.local/slice-evidence'
         evidence.mkdir(parents=True)
         artifacts = {}
@@ -500,7 +500,7 @@ class UiSafety(unittest.TestCase):
         self.assertTrue(receipt['packages_removed'])
 
     def test_matrix_receipt_isolated_and_cannot_overwrite_a_prior_run(self):
-        output = self.root / 'matrix' / 'first'
+        output = self.root / '.local/matrix/first'
         self.assertEqual(0, self.run_fixture('accessibility', output))
         receipt = output / 'parity-ui-accessibility-receipt.json'
         original = receipt.read_bytes()
@@ -529,6 +529,121 @@ class UiSafety(unittest.TestCase):
         self.assertNotIn('private', receipt['error'])
         self.assertTrue(receipt['fixture_cleanup_verified'])
         self.assertTrue(receipt['packages_removed'])
+
+    def test_default_receipt_does_not_follow_a_link(self):
+        sentinel = self.root / 'retain.txt'
+        sentinel.write_text('keep')
+        output = self.root / '.local/slice-evidence/parity-ui-receipt.json'
+        output.symlink_to(sentinel)
+        with self.assertRaises(OSError):
+            self.run_fixture()
+        self.assertEqual('keep', sentinel.read_text())
+        self.assertTrue(any(c[0] == 'uninstall' for c in self.calls))
+
+    def test_default_receipt_does_not_modify_a_hard_link(self):
+        sentinel = self.root / 'retain.txt'
+        sentinel.write_text('keep')
+        output = self.root / '.local/slice-evidence/parity-ui-receipt.json'
+        output.hardlink_to(sentinel)
+        with self.assertRaisesRegex(RuntimeError, 'Unsafe receipt file'):
+            self.run_fixture()
+        self.assertEqual('keep', sentinel.read_text())
+        self.assertTrue(any(c[0] == 'uninstall' for c in self.calls))
+
+    def test_default_regular_receipt_remains_replaceable(self):
+        output = self.root / '.local/slice-evidence/parity-ui-receipt.json'
+        output.write_text('previous receipt')
+        self.assertEqual(0, self.run_fixture())
+        self.assertEqual('passed', json.loads(output.read_text())['result'])
+        self.assertEqual(0o600, output.stat().st_mode & 0o777)
+
+    def test_matrix_receipt_refuses_outside_and_linked_directories(self):
+        sibling = self.root / '.local-other'
+        sibling.mkdir()
+        link = self.root / '.local/link'
+        link.symlink_to(sibling, target_is_directory=True)
+        for output in (sibling / 'receipt', link / 'receipt',
+                       self.root / '.local/../.local-other/receipt'):
+            with self.subTest(output=output), self.assertRaisesRegex(ValueError, 'under the repository'):
+                self.run_fixture('accessibility', output)
+        self.assertEqual([], self.calls)
+        self.assertEqual([], list(sibling.iterdir()))
+
+    def test_new_matrix_receipt_rejects_a_link_created_during_the_run(self):
+        output = self.root / '.local/selected output'
+        sentinel = self.root / 'retain.txt'
+        sentinel.write_text('keep')
+        original = self.command
+
+        def command(args, **kwargs):
+            if any('cleanupFixture' in str(arg) for arg in args):
+                (output / 'parity-ui-accessibility-receipt.json').symlink_to(sentinel)
+            return original(args, **kwargs)
+
+        self.command = command
+        with self.assertRaises(FileExistsError):
+            self.run_fixture('accessibility', output)
+        self.assertEqual('keep', sentinel.read_text())
+        self.assertTrue(any(c[0] == 'uninstall' for c in self.calls))
+
+    def test_changed_matrix_receipt_directory_is_refused(self):
+        output = self.root / '.local/selected output'
+        moved = self.root / 'moved'
+        replacement = self.root / 'replacement'
+        replacement.mkdir()
+        original = self.command
+
+        def command(args, **kwargs):
+            if any('cleanupFixture' in str(arg) for arg in args):
+                output.rename(moved)
+                output.symlink_to(replacement, target_is_directory=True)
+            return original(args, **kwargs)
+
+        self.command = command
+        with self.assertRaises(OSError):
+            self.run_fixture('accessibility', output)
+        self.assertEqual([], list(replacement.iterdir()))
+        self.assertTrue(any(c[0] == 'uninstall' for c in self.calls))
+
+    def test_new_matrix_directory_replaced_before_use_is_refused(self):
+        output = self.root / '.local/selected output'
+        replacement = self.root / 'replacement'
+        replacement.mkdir()
+        original_mkdir = Path.mkdir
+
+        def mkdir(path, *args, **kwargs):
+            result = original_mkdir(path, *args, **kwargs)
+            if path == output:
+                output.rmdir()
+                output.symlink_to(replacement, target_is_directory=True)
+            return result
+
+        with patch.object(Path, 'mkdir', new=mkdir):
+            with self.assertRaisesRegex(RuntimeError, 'Receipt directory changed'):
+                self.run_fixture('accessibility', output)
+        self.assertFalse(self.calls)
+        self.assertEqual([], list(replacement.iterdir()))
+
+    def test_default_receipt_directory_replaced_after_build_read_is_refused(self):
+        evidence = self.root / '.local/slice-evidence'
+        moved = self.root / '.local/moved-evidence'
+        replacement = self.root / '.local/replacement'
+        replacement.mkdir()
+        identities = iter("package: name='" + p + "'" for p in (device.PACKAGE, device.TEST_PACKAGE))
+
+        def identity(_args, **_kwargs):
+            if not evidence.is_symlink():
+                evidence.rename(moved)
+                evidence.symlink_to(replacement, target_is_directory=True)
+            return next(identities)
+
+        with patch.object(device, 'ROOT', self.root), patch.object(device, 'inputs', return_value={}), \
+             patch.object(device.subprocess, 'check_output', side_effect=identity), \
+             patch.object(device.subprocess, 'run') as run:
+            with self.assertRaisesRegex(RuntimeError, 'Receipt directory changed'):
+                device.qualify('emulator-5582')
+            run.assert_not_called()
+        self.assertEqual([], list(replacement.iterdir()))
 
     def test_physical_target_refused_before_tools(self):
         with patch.object(device.subprocess, 'run') as run:
