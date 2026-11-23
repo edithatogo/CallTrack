@@ -1280,6 +1280,26 @@ opened Automatic logging settings, Historical imports and Delivery review
 and recovery. The hosted import suite now asserts
 the exact single label and explicit action behavior.
 
+Switch Access 1.17 used a disposable USB HID through the emulator's
+native `hid` command. Next moved the visible scan highlight through
+enabled controls. Select opened Automatic logging settings, Historical
+imports, and Delivery review and recovery. The fixture input device
+was removed and the app and inspection packages were uninstalled.
+
+A landscape run reported a 960 dp smallest width and passed rendered
+accessibility. The first import run located the Cancel action under
+the keyboard and failed to open the dialog. The test now scrolls the
+real content until the enabled action is outside the visible keyboard
+bounds. Cancellation still requires the visible keyboard, the app's
+confirmation and zero calendar effects. The full landscape import suite
+then passed, including process recovery and destination disappearance.
+
+One hosted API 26 run failed at the retention test's preference lookup.
+The fixture now binds its selected calendar before the SQLite update.
+The report records the platform exception class from instrumentation so
+a repeated failure can be diagnosed without displaying fixture contents.
+[API 26 failure in the retention journey](https://github.com/edithatogo/CallTrack/actions/runs/45229927663/job/137886385960).
+
 The native Contacts Picker and device handoff APIs are outside the
 current call-log and calendar flow. The app does not request contacts and
 binds durable receipts to provider and device state. AGP's experimental

@@ -318,6 +318,15 @@ class UiSafety(unittest.TestCase):
         self.assertIn('system-inset screen=manual content_top=17 required_top=24', summary)
         self.assertNotIn('private rendered label', summary)
 
+    def test_failure_summary_reports_instrumentation_exception_class_only(self):
+        summary = device.native_failure_summary(
+            'renderedExplicitRetentionClearsOnlyExpiredPayload',
+            'INSTRUMENTATION_STATUS: stack=java.lang.IllegalStateException: private fixture\n'
+            'INSTRUMENTATION_STATUS_CODE: -2\n',
+        )
+        self.assertIn('instrumentation-exception=java.lang.IllegalStateException', summary)
+        self.assertNotIn('private fixture', summary)
+
     def test_failure_summary_exposes_fixture_source_frame_without_call_details(self):
         summary = device.native_failure_summary(
             'prepareCalendarAndTaggedHistory',

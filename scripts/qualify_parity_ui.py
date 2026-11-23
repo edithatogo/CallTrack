@@ -104,6 +104,12 @@ def native_failure_summary(method, output, declared_permissions=None):
     )
     if status_codes:
         detail += '; instrumentation-status-codes=' + ','.join(status_codes[:12])
+    exception = re.search(
+        r'^INSTRUMENTATION_STATUS: stack=((?:java|android|androidx)\.[A-Za-z0-9_.$]+'
+        r'(?:Exception|Error))(?::|$)', output, re.MULTILINE
+    )
+    if exception:
+        detail += '; instrumentation-exception=' + exception.group(1)
     for diagnostic in (
         'runtime-fatal-exception', 'runtime-anr', 'runtime-test-process-died',
         'runtime-app-process-died', 'runtime-permission-denial',

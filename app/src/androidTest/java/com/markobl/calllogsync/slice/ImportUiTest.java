@@ -286,8 +286,8 @@ public class ImportUiTest {
             ui.await(
                     ui::keyboardVisible, "Date keyboard not visibly present for cancellation test");
             ui.capture("import-keyboard-visible-before-cancel");
-            ui.tapId("import_cancel");
-            ui.tapId("button1");
+            ui.tapAboveKeyboard("import_cancel");
+            ui.tapDialogPositive();
             ui.await(() -> phase(HistoricalImport.Phase.CANCELLED), "Cancel not persisted");
             assertEquals(0, fixture.events(calendar()));
             ui.revealId("import_summary");

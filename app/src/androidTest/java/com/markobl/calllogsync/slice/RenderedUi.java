@@ -349,12 +349,44 @@ final class RenderedUi {
         return true;
     }
 
-    boolean keyboardVisible() {
-        for (android.view.accessibility.AccessibilityWindowInfo window : automation.getWindows())
+    private Rect keyboardBounds() {
+        for (android.view.accessibility.AccessibilityWindowInfo window : automation.getWindows()) {
             if (window.getType()
-                    == android.view.accessibility.AccessibilityWindowInfo.TYPE_INPUT_METHOD)
-                return true;
-        return false;
+                    == android.view.accessibility.AccessibilityWindowInfo.TYPE_INPUT_METHOD) {
+                Rect bounds = new Rect();
+                window.getBoundsInScreen(bounds);
+                return bounds;
+            }
+        }
+        return null;
+    }
+
+    boolean keyboardVisible() {
+        return keyboardBounds() != null;
+    }
+
+    void tapAboveKeyboard(String id) {
+        final AccessibilityNodeInfo[] reachable = new AccessibilityNodeInfo[1];
+        await(
+                () -> {
+                    Rect keyboard = keyboardBounds();
+                    if (keyboard == null) return false;
+                    AccessibilityNodeInfo node = find(id, true);
+                    if (node != null && node.isEnabled()) {
+                        Rect control = new Rect();
+                        node.getBoundsInScreen(control);
+                        if (!control.isEmpty() && !Rect.intersects(control, keyboard)) {
+                            reachable[0] = node;
+                            return true;
+                        }
+                    }
+                    AccessibilityNodeInfo scroll = scrollable(automation.getRootInActiveWindow());
+                    if (scroll != null)
+                        scroll.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
+                    return false;
+                },
+                "Control not reachable above the visible keyboard: " + id);
+        touch(reachable[0], id);
     }
 
     void dismissKeyboard() {
