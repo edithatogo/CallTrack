@@ -127,6 +127,11 @@ jobs:
           java-version: '25.0.5+100000002.0.LTS'
       - name: Verify Java runtime
         run: java -version 2>&1 | grep -F 'Temurin-25.0.5.1+2'
+      - name: Install the prototype Android SDK
+        run: |
+          sdkmanager_path="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          test -n "$sdkmanager_path"
+          "$sdkmanager_path" "platforms;android-37.0" "build-tools;36.0.0"
       - name: Check multiplatform UI Kotlin formatting
         run: |
           mkdir -p .local/toolchain
@@ -134,4 +139,4 @@ jobs:
           echo "a493271c137074436a133d72e9e323f91604c97e0c40555629ec39598efead54  .local/toolchain/ktfmt-0.59.jar" | sha256sum --check
           find prototypes/multiplatform-ui/src -type f -name '*.kt' -print0 | xargs -0 java -jar .local/toolchain/ktfmt-0.59.jar --kotlinlang-style --dry-run --set-exit-if-changed
       - name: Test headless desktop UI and package JAR
-        run: sh gradlew --no-daemon --console=plain -p prototypes/multiplatform-ui desktopTest desktopJar
+        run: sh gradlew --no-daemon --console=plain --dependency-verification=strict -p prototypes/multiplatform-ui desktopTest desktopJar :android-host:assembleDebug
