@@ -1,10 +1,10 @@
 {
   "track_id": "ios_companion_20261021",
   "type": "research-led-development",
-  "status": "in_progress",
+  "status": "new",
   "milestone": "M9",
   "created_at": "2026-10-21",
-  "updated_at": "2026-10-24",
+  "updated_at": "2026-11-24",
   "depends_on": [
     "kotlin_20261020",
     "release_20261020",
@@ -19,7 +19,7 @@
   "track_number": 20,
   "execution_stage": 9,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
-  "implementation_status": "scoped-readiness-research-only; iOS-product-implementation-blocked-pending-stages1-8",
+  "implementation_status": "deferred",
   "readiness_document": "readiness.md",
   "decision_document": "decisions.md",
   "implementation_commit": "b89d14d",
@@ -31,5 +31,10 @@
   "draft_pr_url": "https://github.com/edithatogo/CallTrack/pull/24",
   "draft_pr_base": "codex/track19-cross-platform",
   "draft_pr_hosted_ci": "failed-before-job-steps-no-logs",
-  "production_adopted": false
+  "production_adopted": false,
+  "deferral": {
+    "reason": "Android 17-only scope supersedes previous iOS-last implementation timing.",
+    "consequences": "No iOS sources, signing, simulator or publication are authorised; retain readiness research.",
+    "reconsideration_trigger": "A completed Android 17 release followed by a justified iOS companion requirement."
+  }
 }

@@ -1,3 +1,11 @@
+# Active development — Android 17 only
+
+The single active product target is **native Android 17 (API 37)**: Kotlin, Jetpack Compose, system CallLog/CalendarContract and WorkManager. [Active architecture](conductor/architecture-android17.md), [scope](conductor/active-scope.json), and [Conductor ownership](conductor/tracks.md) supersede older roadmaps below. macOS, iOS, KMP, desktop and older Android APIs are deferred; historical evidence is preserved.
+
+Local Android 17 emulator acceptance is the preferred path: `scripts/qualify_android17_local.sh emulator-5554` against the dedicated `calltrack-android17-local` AVD, after a source-bound build and with pre-commit hooks configured. Room 3.0.3 has been selected for a **preserving** migration; the existing SQLite stores continue to own data until tested replacement. This repo is not yet an approved production release.
+
+---
+
 # CallTrack community development
 
 A GPL-3.0 development fork of AndroidCallLogSync, working toward a maintainable

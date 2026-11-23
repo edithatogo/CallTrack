@@ -1,10 +1,10 @@
 {
   "track_id": "shared_core_20261021",
   "type": "research-led-development",
-  "status": "in_progress",
+  "status": "new",
   "milestone": "M7",
   "created_at": "2026-10-21",
-  "updated_at": "2026-10-24",
+  "updated_at": "2026-11-24",
   "depends_on": [
     "compose_app_20261021"
   ],
@@ -12,7 +12,7 @@
   "track_number": 15,
   "execution_stage": 4,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
-  "implementation_status": "bounded-selection-range-shared-jvm-android-macos-native-fixtures-qualified",
+  "implementation_status": "deferred",
   "implementation_commit": "32ae39b",
   "review_commit": "5092e9c",
   "review_status": "toolchain-and-native-fixture-slice-reviewed-broader-track-pending",
@@ -31,5 +31,10 @@
       "note": "Superseded by PR #55 for this bounded checksum and evidence update; original implementation remains on main."
     }
   ],
-  "pull_request_merge_commit": "aebe4e553d4e090d7f0cd310311f4e3d08748542"
+  "pull_request_merge_commit": "aebe4e553d4e090d7f0cd310311f4e3d08748542",
+  "deferral": {
+    "reason": "The active Android 17 app is native Kotlin; a second platform consumer is not currently justified.",
+    "consequences": "Historic KMP fixtures remain archived; production shared-core usage will be retired after a native Android-only parity check.",
+    "reconsideration_trigger": "A second supported platform and measured net code reuse."
+  }
 }

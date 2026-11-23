@@ -1,5 +1,8 @@
 # Repository instructions
 
+**Active scope (2026-11-24):** [Android 17-only native architecture](conductor/architecture-android17.md) and [current scope](conductor/active-scope.json) supersede historical KMP/macOS/iOS stages. Use pre-commit hooks before commits; qualify Android 17 on the dedicated local emulator before hosted acceptance whenever available. Persist source-bound evidence once, link to it instead of duplicating it. Room 3.0.3 adoption is mandatory but no legacy DB writer is replaced until exact preserving migration tests pass.
+
+
 ## Dependency and runtime versions
 
 Prefer the newest qualified stable version for application, provider, tooling
@@ -12,7 +15,7 @@ Keep security and functional acceptance gates intact.
 ## Python runtime selection
 
 Prefer the newest qualified stable Python version. `.python-version` is the
-active selection and currently names Python 3.15.1. A different version is
+active selection and is authoritative for the currently selected Python patch. A different version is
 allowed when a concrete compatibility or task requirement calls for it; choose
 the newest suitable version, record the reason and scope in the active Conductor
 evidence, and verify its actual repo-local interpreter and relevant tests.

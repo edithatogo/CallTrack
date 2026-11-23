@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "effective_date": "2026-11-24",
+  "decision": "Android 17-only native development",
+  "source_of_truth": {
+    "android_sdk": "app/build.gradle",
+    "python": ".python-version",
+    "dependency_graph": "Gradle resolution and verification metadata",
+    "release_checks": ".github/workflows",
+    "evidence": "immutable Conductor history and source-bound local/hosted receipts"
+  },
+  "active_platform": "Android 17 (API 37)",
+  "required_android": {
+    "min_sdk": 37,
+    "target_sdk": 37,
+    "compile_sdk_minor": "37.1"
+  },
+  "native_stack": [
+    "Kotlin",
+    "Jetpack Compose",
+    "Android CallLog",
+    "Android CalendarContract",
+    "WorkManager",
+    "Room 3.0.3 (preserving migration in progress)"
+  ],
+  "local_primary_avd": "calltrack-android17-local",
+  "active_tracks": [
+    "kotlin_20261020",
+    "release_20261020",
+    "compose_app_20261021",
+    "room3_android17_20261124"
+  ],
+  "deferred_tracks": [
+    "shared_core_20261021",
+    "macos_companion_20261021",
+    "shared_ui_20261021",
+    "cross_platform_20261021",
+    "ios_companion_20261021"
+  ],
+  "additional_deferred": [
+    "Android API <37",
+    "macOS",
+    "iOS",
+    "Windows",
+    "Linux desktop",
+    "Compose Multiplatform UI",
+    "production Rust",
+    "direct cloud APIs"
+  ],
+  "promotion_gates": [
+    "Android 17 source-matched host and emulator tests",
+    "existing schema 1-6 and import 1-2 preserving migrations",
+    "no implicit duplicate or calendar write",
+    "physical phone and provider readback",
+    "signing/licence/release gates"
+  ]
+}

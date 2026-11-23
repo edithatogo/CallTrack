@@ -1,10 +1,10 @@
 {
   "track_id": "macos_companion_20261021",
   "type": "research-led-development",
-  "status": "in_progress",
+  "status": "new",
   "milestone": "M7-companion",
   "created_at": "2026-10-21",
-  "updated_at": "2026-10-25",
+  "updated_at": "2026-11-24",
   "depends_on": [
     "shared_core_20261021"
   ],
@@ -13,7 +13,7 @@
   "execution_stage": 5,
   "production_adopted": false,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
-  "implementation_status": "preview-and-durable-delivery-prototypes-hosted-qualified-native-eventkit-acceptance-pending",
+  "implementation_status": "deferred",
   "native_eventkit_accepted": false,
   "macos_app_packaging_accepted": false,
   "pull_request": "https://github.com/edithatogo/CallTrack/pull/82",
@@ -26,5 +26,10 @@
     40147890419,
     40147893652,
     40147890495
-  ]
+  ],
+  "deferral": {
+    "reason": "Android 17 is the sole active product; macOS import/calendar scope is not on the current critical path.",
+    "consequences": "Existing Swift parser/EventKit prototypes and historical test evidence are preserved but no active packaging work is authorised.",
+    "reconsideration_trigger": "Accepted Android 17 release and a demonstrated macOS import workflow."
+  }
 }

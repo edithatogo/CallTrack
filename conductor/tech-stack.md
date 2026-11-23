@@ -1,3 +1,5 @@
+> **Active stack:** Android 17-only Kotlin/Compose, CallLog/CalendarContract and WorkManager. Room 3.0.3 is the selected *pending preserving migration*; current SQLite ledger remains authoritative until qualified. Source of SDK versions is `app/build.gradle`, not historical entries below. [Architecture](architecture-android17.md) · [scope](active-scope.json).
+
 # Technology stack and decision status
 
 ## Toolchain and Android dependencies — 2026-11-24

@@ -1,49 +1,21 @@
-# Tracks registry
+# Tracks registry — current Android 17 scope (2026-11-24)
 
-Execution follows the [approved future architecture sequence](future-architecture.md).
-Existing track numbers are retained; Track6 Kotlin comes before the remaining
-Track5 release qualification. Both remain active, and full M4/M5 operational
-acceptance is not inferred from local migration. Successor Tracks14–20 implement
-the archived research decisions; research Tracks7–13 remain unchanged.
+**Authority:** [active-scope.json](active-scope.json) · [native architecture](architecture-android17.md). The [former nine-stage execution order](future-architecture.md) is a historical evidence ordering only. A deferred track is not active merely because an old plan has unchecked items.
 
----
-- [~] **Track: Kotlin migration and dependency reassessment** (Track6)
-  *Link: [Track](tracks/kotlin_20261020/index.md)*
+- [~] **Track 6 — Kotlin native migration / retaining source contracts**: [Track](tracks/kotlin_20261020/index.md) — verify exact Android 17 source/release integration.
+- [~] **Track 5 — Android 17 release qualification**: [Track](tracks/release_20261020/index.md) — retain signing, physical call/account, preservation and distribution gates.
+- [~] **Track 14 — Native Jetpack Compose UI completion**: [Track](tracks/compose_app_20261021/index.md) — remove residual hybrid/custom controls only after Android 17 rendered parity.
+- [~] **Track 22 — Room 3.0.3 preserving migration**: [Track](tracks/room3_android17_20261124/index.md) — migration not yet applied; old stores authoritative.
 
----
-- [~] **Track: Community distribution and release readiness** (Track5)
-  *Link: [Track](tracks/release_20261020/index.md)*
+## Deferred: no active implementation or automatic CI
 
----
-- [~] **Track: Jetpack Compose Android implementation** (Track14)
-  *Link: [Track](tracks/compose_app_20261021/index.md)*
+- [ ] **Track 15 — Kotlin Multiplatform shared core**: [Deferral](tracks/shared_core_20261021/deferral.md)
+- [ ] **Track 16 — macOS companion**: [Deferral](tracks/macos_companion_20261021/deferral.md)
+- [ ] **Track 17 — Compose Multiplatform shared UI**: [Deferral](tracks/shared_ui_20261021/deferral.md)
+- [x] **Track 18 — Rust component evaluation**: [Track](tracks/rust_component_20261021/index.md) — production Rust previously deferred.
+- [ ] **Track 19 — Consolidated cross-platform qualification**: [Deferral](tracks/cross_platform_20261021/deferral.md)
+- [ ] **Track 20 — iOS companion**: [Deferral](tracks/ios_companion_20261021/deferral.md)
 
----
-- [~] **Track: KMP shared core implementation** (Track15)
-  *Link: [Track](tracks/shared_core_20261021/index.md)*
+Completed baseline/parity/python research and historical Android 26/33/36 evidence remain in [archive](archive/index.md). Older Android versions are *not supported targets* in active CI; their schema upgrade fixtures still protect existing user data. Python runtime selection comes from [`.python-version`](../.python-version), not copied prose.
 
----
-- [~] **Track: macOS import and calendar companion** (Track16)
-  *Link: [Track](tracks/macos_companion_20261021/index.md)*
-
----
-- [~] **Track: Compose Multiplatform Android and macOS UI** (Track17)
-  *Link: [Track](tracks/shared_ui_20261021/index.md)*
-
----
-- [x] **Track: Rust component evaluation and conditional integration** (Track18; completed with production Rust deferred)
-  *Link: [Track](tracks/rust_component_20261021/index.md)*
-
----
-- [~] **Track: Consolidated Android and macOS qualification** (Track19)
-  *Link: [Track](tracks/cross_platform_20261021/index.md)*
-
----
-- [~] **Track: iOS companion implementation — last** (Track20)
-  *Link: [Track](tracks/ios_companion_20261021/index.md)*
-
-Completed tracks are retained in the [archive index](archive/index.md).
-
----
-- [x] **Track: Python3.15 migration and qualification** (Track21; completed and reviewed 2026-10-24)
-  *Link: [Track](tracks/python315_20261023/index.md)*
+**Evidence discipline:** link exact immutable historical receipts or Actions run artifact, identify source SHA and test command, and keep one current checkpoint per accepted change. Do not replicate large JSON test logs as a second mutable evidence copy.

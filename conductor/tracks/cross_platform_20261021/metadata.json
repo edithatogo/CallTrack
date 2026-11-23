@@ -1,10 +1,10 @@
 {
   "track_id": "cross_platform_20261021",
   "type": "research-led-development",
-  "status": "in_progress",
+  "status": "new",
   "milestone": "M8-acceptance",
   "created_at": "2026-10-21",
-  "updated_at": "2026-10-24",
+  "updated_at": "2026-11-24",
   "depends_on": [
     "rust_component_20261021"
   ],
@@ -12,7 +12,7 @@
   "track_number": 19,
   "execution_stage": 8,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
-  "implementation_status": "bounded-evidence-reconciliation-plus-prototype-android-swift-schema-v1-golden; app-integration-and-cross-platform-native-acceptance-pending",
+  "implementation_status": "deferred",
   "implementation_commit": "57fce24",
   "reviewed_at": "2026-10-24",
   "review_commit": "be22967",
@@ -71,5 +71,10 @@
   "draft_pr_url": "https://github.com/edithatogo/CallTrack/pull/23",
   "draft_pr_base": "codex/track18-rust-evaluation",
   "draft_pr_hosted_ci": "failed-before-job-steps-no-logs",
-  "production_adopted": false
+  "production_adopted": false,
+  "deferral": {
+    "reason": "A second platform is explicitly out of scope under Android 17-only direction.",
+    "consequences": "Consolidated cross-platform verification is not an active release requirement; historical receipts remain.",
+    "reconsideration_trigger": "Restored second-platform product scope."
+  }
 }
