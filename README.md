@@ -55,6 +55,16 @@ to that archive; other platforms are not yet qualified for these local checks.
 The Kotlin check retains its frozen historical Java baseline and validates its
 original receipt separately from the active application's current JDK.
 
+The local toolchain audit additionally requires its selected roots to use the
+repository aliases below. The aliases may link to verified SDK and Gradle cache
+storage on another volume; `--output` and `--archives-from` are unchanged.
+
+```sh
+export JAVA_HOME="$PWD/.local/toolchain/temurin-jdk25/Contents/Home"
+export ANDROID_HOME="$PWD/.local/android-sdk"
+export GRADLE_USER_HOME="$PWD/.local/toolchain/gradle-home"
+```
+
 The build runs JVM tests, builds app/test APKs and lints. Receipts and logs stay under
 excluded `.local/slice-evidence`. The app uses Compose controls and Kotlin shared
 call-selection rules. The [live plan](conductor/index.md#current-checkpoint) links

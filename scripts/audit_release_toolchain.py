@@ -5,18 +5,21 @@ Never installs tools, accepts licences or treats HTTPS checksums as independent 
 Success qualifies payload-origin comparison only; JDK bundle-resource sealing is separate.
 """
 import argparse
+import errno
 import hashlib
 import json
 import os
 from pathlib import Path, PurePosixPath
 import platform
 import re
+import stat
 import subprocess
 import struct
 import tarfile
 import urllib.request
 from urllib.parse import urlsplit
 import zipfile
+import audit_release_artifacts
 from redirect_validation import ValidatingRedirectHandler
 from xml_safety import parse_xml
 
@@ -64,20 +67,62 @@ def published_checksum(url, path):
     return value
 
 
+def selected_toolchain_path(name, relative):
+    """Bind environment selections to an explicitly provisioned local alias."""
+    selected = ROOT / relative
+    if os.environ.get(name) != str(selected):
+        raise RuntimeError(f'{name} must select {selected}')
+    return selected
+
+
+def sdk_archive_name(name):
+    if not isinstance(name, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]*\.zip', name) or '..' in name:
+        raise ValueError('Unsafe SDK archive name')
+    return name
+
+
+def archive_relative(name):
+    if not isinstance(name, str) or name.startswith('/') or '\\' in name:
+        raise ValueError('Unsafe archive path')
+    parts = name.split('/')
+    if len(parts) < 2 or any(part in ('', '.', '..') for part in parts):
+        raise ValueError('Unsafe archive path')
+    return Path(*parts[1:])
+
+
+def sha_installed(installed, relative):
+    """Hash a regular file beneath a trusted root without following child links."""
+    parent = None
+    try:
+        parent = audit_release_artifacts.open_directory(os.path.realpath(installed), relative.parts[:-1])
+        descriptor = os.open(relative.name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK,
+                             dir_fd=parent)
+        with os.fdopen(descriptor, 'rb') as stream:
+            if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+                return None
+            return hashlib.file_digest(stream, 'sha256').hexdigest()
+    except OSError as error:
+        if error.errno in (errno.ENOENT, errno.ENOTDIR, errno.ELOOP):
+            return None
+        raise
+    finally:
+        if parent is not None:
+            os.close(parent)
+
+
 def zip_comparison(archive, installed):
-    rows = []
+    rows, seen = [], set()
     with zipfile.ZipFile(archive) as bundle:
         for member in bundle.infolist():
             if member.is_dir():
                 continue
-            parts = Path(member.filename).parts
-            if len(parts) < 2 or '..' in parts or member.filename.startswith('/'):
-                raise ValueError('Unsafe archive path')
-            relative = Path(*parts[1:])
-            actual = installed / relative
+            relative = archive_relative(member.filename)
+            if relative in seen:
+                raise ValueError('Duplicate archive path')
+            seen.add(relative)
             expected = hashlib.sha256(bundle.read(member)).hexdigest()
             rows.append(dict(path=str(relative), archive_sha256=expected,
-                             installed_sha256=sha(actual) if actual.is_file() else None))
+                             installed_sha256=sha_installed(installed, relative)))
     return dict(files=rows, all_archive_files_match=bool(rows) and all(
         r['archive_sha256'] == r['installed_sha256'] for r in rows))
 
@@ -94,19 +139,16 @@ def temurin_comparison(archive, installed):
                 continue
             if not member.isfile() or len(path.parts) < 2:
                 raise ValueError('Unexpected JDK archive member')
-            relative = Path(*path.parts[1:])
+            relative = archive_relative(member.name)
             if relative in expected_paths:
                 raise ValueError('Duplicate JDK archive member')
             expected_paths.add(relative)
-            target = installed / relative
             with bundle.extractfile(member) as stream:
                 expected = hashlib.file_digest(stream, 'sha256').hexdigest()
-            safe = (target.is_file() and not installed.is_symlink() and
-                    all(not installed.joinpath(*relative.parts[:index]).is_symlink()
-                        for index in range(1, len(relative.parts) + 1)))
+            actual = None if installed.is_symlink() else sha_installed(installed, relative)
             rows.append(dict(path=str(relative), archive_sha256=expected,
-                             installed_sha256=sha(target) if safe else None))
-    actual_paths = {p.relative_to(installed) for p in installed.rglob('*') if p.is_file() or p.is_symlink()}
+                             installed_sha256=actual))
+    actual_paths = {p.relative_to(installed) for p in installed.rglob('*') if p.is_symlink() or p.is_file()}
     return dict(files=rows, unexpected_files=sorted(str(p) for p in actual_paths - expected_paths),
                 all_jdk_files_match=bool(rows) and actual_paths == expected_paths and all(
                     r['archive_sha256'] == r['installed_sha256'] for r in rows))
@@ -125,7 +167,8 @@ def qualified_local_jdk():
         raise RuntimeError('The local Temurin 25 bundle differs from the pinned archive')
     return bundle / 'Contents/Home', {'archive_sha256': TEMURIN25_SHA256,
                                       'bundle': str(bundle.resolve()),
-                                      'verification_script_sha256': sha(Path(__file__).resolve())}
+                                      'verification_script_sha256': sha(Path(__file__).resolve()),
+                                      'path_helper_sha256': sha(Path(audit_release_artifacts.__file__).resolve())}
 
 
 def qualified_java_environment(jdk):
@@ -215,9 +258,16 @@ def reproduce_relocation(path):
 
 
 def run(output, archives_from=None):
+    gradle_home = selected_toolchain_path('GRADLE_USER_HOME', '.local/toolchain/gradle-home')
+    sdk = selected_toolchain_path('ANDROID_HOME', '.local/android-sdk')
+    jdk_home = selected_toolchain_path('JAVA_HOME', '.local/toolchain/temurin-jdk25/Contents/Home')
     output.mkdir(parents=True, exist_ok=False)
     receipt = dict(scope=__doc__, release_ready=False, independently_signed=False, success=False,
-                   reused_download_archives=archives_from is not None)
+                   reused_download_archives=archives_from is not None,
+                   toolchain_script_sha256=sha(Path(__file__).resolve()),
+                   path_helper_sha256=sha(Path(audit_release_artifacts.__file__).resolve()),
+                   redirect_policy_sha256=sha(Path(__file__).with_name('redirect_validation.py').resolve()),
+                   xml_policy_sha256=sha(Path(__file__).with_name('xml_safety.py').resolve()))
     try:
         wrapper_url = 'https://services.gradle.org/distributions/gradle-9.7.0-wrapper.jar.sha256'
         wrapper_expected = published_checksum(wrapper_url, output / 'wrapper.sha256')
@@ -237,7 +287,6 @@ def run(output, archives_from=None):
             fetch('https://services.gradle.org/distributions/gradle-9.7.0-bin.zip', distribution)
         if sha(distribution) != expected:
             raise RuntimeError('Gradle distribution checksum mismatch')
-        gradle_home = Path(os.environ.get('GRADLE_USER_HOME', Path.home() / '.gradle'))
         caches = list((gradle_home / 'wrapper/dists/gradle-9.7.0-bin').glob('*/gradle-9.7.0'))
         if len(caches) != 1:
             raise RuntimeError('Exact installed Gradle distribution required')
@@ -247,7 +296,6 @@ def run(output, archives_from=None):
         root = parse_xml(repository.read_bytes())
         receipt['sdk_repository_sha256'] = sha(repository)
         receipt['sdk'] = []
-        sdk = Path(os.environ.get('ANDROID_HOME', ROOT / '.local/android-sdk')).resolve()
         targets = {'build-tools;36.0.0': sdk / 'build-tools/36.0.0',
                    'platforms;android-36': sdk / 'platforms/android-36',
                    'platforms;android-37.1': sdk / 'platforms/android-37.1',
@@ -264,8 +312,9 @@ def run(output, archives_from=None):
             if len(archives) != 1:
                 raise RuntimeError('Ambiguous SDK archive: ' + package)
             complete = archives[0]
-            archive = output / complete.findtext('url')
-            url = 'https://dl.google.com/android/repository/' + complete.findtext('url')
+            archive_name = sdk_archive_name(complete.findtext('url'))
+            archive = output / archive_name
+            url = 'https://dl.google.com/android/repository/' + archive_name
             if archives_from is not None:
                 archive.symlink_to((archives_from / archive.name).resolve())
             else:
@@ -295,12 +344,9 @@ def run(output, archives_from=None):
             fetch(jdk_url, jdk_archive)
         if sha(jdk_archive) != TEMURIN25_SHA256:
             raise RuntimeError('Temurin archive checksum mismatch')
-        if not os.environ.get('JAVA_HOME'):
-            raise RuntimeError('JAVA_HOME must select the audited Temurin JDK')
-        jdk_home = Path(os.environ['JAVA_HOME']).resolve()
         if jdk_home.name != 'Home' or jdk_home.parent.name != 'Contents':
             raise RuntimeError('Expected a macOS JDK bundle JAVA_HOME')
-        jdk_bundle = jdk_home.parent.parent
+        jdk_bundle = jdk_home.parent.parent.resolve()
         comparison = temurin_comparison(jdk_archive, jdk_bundle)
         if not comparison['all_jdk_files_match']:
             raise RuntimeError('Installed Temurin bundle differs from publisher archive')

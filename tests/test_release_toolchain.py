@@ -15,6 +15,66 @@ import audit_release_artifacts as artifacts
 
 
 class ToolTrustTest(unittest.TestCase):
+    def test_environment_tool_roots_must_match_local_aliases(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            aliases = {'GRADLE_USER_HOME': '.local/toolchain/gradle-home',
+                       'ANDROID_HOME': '.local/android-sdk',
+                       'JAVA_HOME': '.local/toolchain/temurin-jdk25/Contents/Home'}
+            with patch.object(tools, 'ROOT', root), patch.dict(os.environ, {}, clear=True):
+                for variable, relative in aliases.items():
+                    expected = root / relative
+                    for bad in ('/tmp/unrelated', str(expected) + '/../../escape', ''):
+                        os.environ[variable] = bad
+                        with self.assertRaisesRegex(RuntimeError, 'must select'):
+                            tools.selected_toolchain_path(variable, relative)
+                    os.environ[variable] = str(expected)
+                    self.assertEqual(expected, tools.selected_toolchain_path(variable, relative))
+
+    def test_sdk_archive_names_are_single_safe_filenames(self):
+        for name in ('build-tools_r36_macosx.zip', 'platform-37.1_r01.zip'):
+            self.assertEqual(name, tools.sdk_archive_name(name))
+        for name in (None, '', '../other.zip', '/tmp/other.zip', 'a/other.zip',
+                     'https://other.test/a.zip', 'a%2fb.zip', 'a..b.zip', 'a.zip?x=1',
+                     'a\\b.zip'):
+            with self.subTest(name=name), self.assertRaisesRegex(ValueError, 'Unsafe SDK archive'):
+                tools.sdk_archive_name(name)
+
+    def test_zip_comparison_rejects_symlinked_installed_files_and_directories(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            archive = root / 'archive.zip'
+            with zipfile.ZipFile(archive, 'w') as bundle:
+                bundle.writestr('tool/bin/tool', 'expected')
+            installed = root / 'installed'
+            external = root / 'external'
+            external.mkdir()
+            (external / 'tool').write_text('expected')
+            installed.mkdir()
+            (installed / 'bin').symlink_to(external, target_is_directory=True)
+            self.assertFalse(tools.zip_comparison(archive, installed)['all_archive_files_match'])
+            (installed / 'bin').unlink()
+            (installed / 'bin').mkdir()
+            (installed / 'bin/tool').symlink_to(external / 'tool')
+            self.assertFalse(tools.zip_comparison(archive, installed)['all_archive_files_match'])
+            self.assertEqual('expected', (external / 'tool').read_text())
+
+    def test_archive_duplicate_and_ambiguous_paths_are_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in ('tool/../outside', '/tool/bin/a', 'tool\\bin\\a', 'tool/bin//a'):
+                archive = root / 'unsafe.zip'
+                with zipfile.ZipFile(archive, 'w') as bundle:
+                    bundle.writestr(name, 'data')
+                with self.subTest(name=name), self.assertRaisesRegex(ValueError, 'Unsafe archive'):
+                    tools.zip_comparison(archive, root)
+            archive = root / 'duplicate.zip'
+            with zipfile.ZipFile(archive, 'w') as bundle:
+                bundle.writestr('first/bin/a', 'data')
+                bundle.writestr('second/bin/a', 'data')
+            with self.assertRaisesRegex(ValueError, 'Duplicate archive path'):
+                tools.zip_comparison(archive, root)
+
     def test_local_jdk_selection_requires_original_archive_and_unchanged_bundle(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -39,6 +99,7 @@ class ToolTrustTest(unittest.TestCase):
                 self.assertEqual(toolchain / 'temurin-jdk25/Contents/Home', selected)
                 self.assertEqual(tools.sha(archive), evidence['archive_sha256'])
                 self.assertEqual(tools.sha(Path(tools.__file__).resolve()), evidence['verification_script_sha256'])
+                self.assertEqual(tools.sha(Path(artifacts.__file__).resolve()), evidence['path_helper_sha256'])
                 (binaries / 'keytool').write_bytes(b'tampered')
                 with self.assertRaisesRegex(RuntimeError, 'bundle differs'):
                     tools.qualified_local_jdk()
@@ -123,11 +184,16 @@ class ToolTrustTest(unittest.TestCase):
         for name, xml, error_type, message in cases:
             with self.subTest(name=name), tempfile.TemporaryDirectory() as directory:
                 root = Path(directory)
-                gradle_home = root / 'gradle-home'
+                gradle_home = root / '.local/toolchain/gradle-home'
                 (gradle_home / 'wrapper/dists/gradle-9.7.0-bin/test/gradle-9.7.0').mkdir(parents=True)
+                (root / 'gradle/wrapper').mkdir(parents=True)
+                (root / 'gradle/wrapper/gradle-wrapper.properties').write_text('distributionSha256Sum=' + '0' * 64)
                 def fetch(_url, destination):
                     destination.write_bytes(xml)
-                with patch.dict(tools.os.environ, {'GRADLE_USER_HOME': str(gradle_home)}), \
+                selected = {'GRADLE_USER_HOME': str(gradle_home),
+                            'ANDROID_HOME': str(root / '.local/android-sdk'),
+                            'JAVA_HOME': str(root / '.local/toolchain/temurin-jdk25/Contents/Home')}
+                with patch.object(tools, 'ROOT', root), patch.dict(tools.os.environ, selected), \
                      patch.object(tools, 'fetch', side_effect=fetch), \
                      patch.object(tools, 'published_checksum', return_value='0' * 64), \
                      patch.object(tools, 'sha', return_value='0' * 64), \
@@ -137,6 +203,35 @@ class ToolTrustTest(unittest.TestCase):
                 receipt = json.loads((root / 'output/receipt.json').read_text())
                 self.assertFalse(receipt['success'])
                 self.assertIn(message, receipt['error'])
+                for name in ('toolchain_script_sha256', 'path_helper_sha256',
+                             'redirect_policy_sha256', 'xml_policy_sha256'):
+                    self.assertEqual('0' * 64, receipt[name])
+
+    def test_sdk_repository_cannot_redirect_archive_outside_evidence_directory(self):
+        xml = b'<sdk:sdk-repository xmlns:sdk="http://schemas.android.com/sdk/android/repo/repository2/03"><remotePackage path="build-tools;36.0.0"><archives><archive><host-os>macosx</host-os><complete><url>../escape.zip</url><size>1</size><checksum type="sha1">0</checksum></complete></archive></archives></remotePackage></sdk:sdk-repository>'
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            gradle_home = root / '.local/toolchain/gradle-home'
+            (gradle_home / 'wrapper/dists/gradle-9.7.0-bin/test/gradle-9.7.0').mkdir(parents=True)
+            (root / 'gradle/wrapper').mkdir(parents=True)
+            (root / 'gradle/wrapper/gradle-wrapper.properties').write_text('distributionSha256Sum=' + '0' * 64)
+            selected = {'GRADLE_USER_HOME': str(gradle_home),
+                        'ANDROID_HOME': str(root / '.local/android-sdk'),
+                        'JAVA_HOME': str(root / '.local/toolchain/temurin-jdk25/Contents/Home')}
+            def fetch(_url, destination):
+                destination.write_bytes(xml)
+            with patch.object(tools, 'ROOT', root), patch.dict(tools.os.environ, selected), \
+                 patch.object(tools, 'fetch', side_effect=fetch) as download, \
+                 patch.object(tools, 'published_checksum', return_value='0' * 64), \
+                 patch.object(tools, 'sha', return_value='0' * 64), \
+                 patch.object(tools, 'zip_comparison', return_value={'all_archive_files_match': True}):
+                with self.assertRaisesRegex(ValueError, 'Unsafe SDK archive name'):
+                    tools.run(root / 'output', archives_from=root / 'archives')
+            download.assert_called_once()
+            self.assertFalse((root / 'escape.zip').exists())
+            receipt = json.loads((root / 'output/receipt.json').read_text())
+            self.assertFalse(receipt['success'])
+            self.assertIn('Unsafe SDK archive name', receipt['error'])
 
     def test_parent_pom_licence_evidence_is_retained(self):
         child = b'<project xmlns="http://maven.apache.org/POM/4.0.0"><parent><groupId>org.test</groupId><artifactId>parent</artifactId><version>1</version></parent></project>'
