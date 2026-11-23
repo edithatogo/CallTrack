@@ -15,19 +15,17 @@ import urllib.request
 from urllib.parse import urljoin, urlsplit
 import xml.etree.ElementTree as ET
 import zipfile
+from redirect_validation import ValidatingRedirectHandler
 
 LIMIT = 64 * 1024 * 1024
 
 
-class HTTPSPublicationRedirectHandler(urllib.request.HTTPRedirectHandler):
-    def redirect_request(self, request, response, code, message, headers, new_url):
-        if urlsplit(new_url).scheme != 'https':
-            response.close()
-            raise ValueError('Insecure publication redirect')
-        return super().redirect_request(request, response, code, message, headers, new_url)
+def validate_publication_redirect(url):
+    if urlsplit(url).scheme != 'https':
+        raise ValueError('Insecure publication redirect')
 
 
-PUBLICATION_OPENER = urllib.request.build_opener(HTTPSPublicationRedirectHandler())
+PUBLICATION_OPENER = urllib.request.build_opener(ValidatingRedirectHandler(validate_publication_redirect))
 
 
 def read_publication(url):

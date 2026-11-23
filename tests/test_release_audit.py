@@ -1,4 +1,5 @@
 import io
+import hashlib
 from email.message import Message
 from pathlib import Path
 import sys
@@ -10,6 +11,8 @@ from urllib.response import addinfourl
 import zipfile
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import audit_release_artifacts as audit
+import audit_release_toolchain as toolchain
+import qualify_linux_build as linux
 
 
 class AuditTest(unittest.TestCase):
@@ -54,6 +57,62 @@ class AuditTest(unittest.TestCase):
              patch.object(audit.urllib.request.HTTPHandler, 'http_open', new=transport):
             self.assertEqual(b'artifact', audit.read_publication(start))
         self.assertEqual([start, mirror, final], visited)
+
+    def test_tool_download_blocks_insecure_intermediate_before_contact(self):
+        start = 'https://tools.example.test/archive'
+        insecure = 'http://relay.example.test/archive'
+        final = 'https://tools.example.test/final'
+        routes = {start: (302, insecure), insecure: (302, final), final: (200, b'tool')}
+        visited = []
+        transport = self.publication_transport(routes, visited)
+        with tempfile.TemporaryDirectory() as directory, \
+             patch.object(audit.urllib.request.HTTPSHandler, 'https_open', new=transport), \
+             patch.object(audit.urllib.request.HTTPHandler, 'http_open', new=transport):
+            destination = Path(directory) / 'archive'
+            with self.assertRaisesRegex(ValueError, 'Insecure tool archive redirect'):
+                toolchain.fetch(start, destination)
+            self.assertFalse(destination.exists())
+        self.assertEqual([start], visited)
+
+    def test_tool_download_allows_secure_mirror_redirect(self):
+        start = 'https://tools.example.test/archive'
+        mirror = 'https://mirror.example.test/archive'
+        payload = b'tool'
+        visited = []
+        transport = self.publication_transport({start: (302, mirror), mirror: (200, payload)}, visited)
+        with tempfile.TemporaryDirectory() as directory, \
+             patch.object(audit.urllib.request.HTTPSHandler, 'https_open', new=transport):
+            destination = Path(directory) / 'archive'
+            self.assertEqual(hashlib.sha256(payload).hexdigest(), toolchain.fetch(start, destination))
+            self.assertEqual(payload, destination.read_bytes())
+        self.assertEqual([start, mirror], visited)
+
+    def test_sdk_download_rejects_unapproved_hop_and_accepts_official_redirect(self):
+        start = 'https://dl.google.com/android/repository/start'
+        outside = 'https://other.example.test/android/repository/archive'
+        final = 'https://dl.google.com/android/repository/archive'
+        payload = b'sdk'
+        row = {'size': len(payload), 'checksum_algorithm': 'sha1',
+               'checksum': hashlib.sha1(payload).hexdigest()}
+        for redirect, accepted in [(outside, False),
+                                   ('http://dl.google.com/android/repository/archive', False),
+                                   ('https://dl.google.com/android/repository/%2e%2e/other', False),
+                                   ('/android/repository/archive', True)]:
+            with self.subTest(redirect=redirect), tempfile.TemporaryDirectory() as directory:
+                visited = []
+                routes = {start: (302, redirect), final: (200, payload)}
+                transport = self.publication_transport(routes, visited)
+                destination = Path(directory) / 'archive'
+                with patch.object(audit.urllib.request.HTTPSHandler, 'https_open', new=transport), \
+                     patch.object(audit.urllib.request.HTTPHandler, 'http_open', new=transport):
+                    if accepted:
+                        linux.download_sdk_archive(start, destination, row)
+                        self.assertEqual(payload, destination.read_bytes())
+                    else:
+                        with self.assertRaisesRegex(ValueError, 'Unapproved SDK archive origin'):
+                            linux.download_sdk_archive(start, destination, row)
+                        self.assertFalse(destination.exists())
+                self.assertEqual([start, final] if accepted else [start], visited)
 
     def test_uses_original_artifact_name_and_canonical_repository(self):
         row = dict(coordinate='androidx.room:room-runtime-android:2.7.0', name='room-runtime-android-2.7.0.aar')

@@ -18,6 +18,7 @@ import urllib.request
 from urllib.parse import urlsplit
 import xml.etree.ElementTree as ET
 import zipfile
+from redirect_validation import ValidatingRedirectHandler
 
 TOOLS = Path(__file__).resolve().parents[1]
 
@@ -43,8 +44,12 @@ def approved_url(url):
     parsed = urlsplit(url)
     if (parsed.scheme != 'https' or parsed.netloc != 'dl.google.com' or
             not parsed.path.startswith('/android/repository/') or
-            '..' in parsed.path.split('/') or parsed.query or parsed.fragment):
+            '..' in parsed.path.split('/') or '%' in parsed.path or
+            parsed.query or parsed.fragment):
         raise ValueError('Unapproved SDK archive origin')
+
+
+SDK_OPENER = urllib.request.build_opener(ValidatingRedirectHandler(approved_url))
 
 
 def verify_download(path, row):
@@ -52,6 +57,19 @@ def verify_download(path, row):
             sha(path, row['checksum_algorithm']) != row['checksum'] or
             (row.get('sha256') and sha(path) != row['sha256'])):
         raise ValueError('SDK archive checksum/size mismatch')
+
+
+def download_sdk_archive(url, archive, row):
+    approved_url(url)
+    with SDK_OPENER.open(url, timeout=120) as response, archive.open('xb') as stream:
+        approved_url(response.url)
+        total = 0
+        while block := response.read(1024 * 1024):
+            total += len(block)
+            if total > row['size']:
+                raise ValueError('SDK archive exceeds declared size')
+            stream.write(block)
+    verify_download(archive, row)
 
 
 def extract_sdk(path, destination):
@@ -102,7 +120,9 @@ def run(source, output, revision, expected_apk):
                    physical_host_independence=False, hosted_ci=False,
                    cache_empty_before=not cache.exists(), sdk_empty_before=not sdk.exists(),
                    sdk_packages=[], source_files_unchanged=False,
-                   script_sha256=sha(Path(__file__)), sdk_manifest_sha256=sha(TOOLS / 'qualification/release/linux-sdk-inputs.json'))
+                   script_sha256=sha(Path(__file__)),
+                   redirect_policy_sha256=sha(Path(__file__).with_name('redirect_validation.py')),
+                   sdk_manifest_sha256=sha(TOOLS / 'qualification/release/linux-sdk-inputs.json'))
     start = time.monotonic()
     names = subprocess.check_output(['git', 'ls-files', '-z'], cwd=source).decode().split('\0')[:-1]
     before = {name: sha(source / name) for name in names}
@@ -121,15 +141,7 @@ def run(source, output, revision, expected_apk):
             if row.get('licence') != 'android-sdk-license':
                 raise ValueError('Different SDK licence needs separate qualification')
             archive = output / row['url'].rsplit('/', 1)[-1]
-            with urllib.request.urlopen(row['url'], timeout=120) as response, archive.open('xb') as stream:
-                approved_url(response.url)
-                total = 0
-                while block := response.read(1024 * 1024):
-                    total += len(block)
-                    if total > row['size']:
-                        raise ValueError('SDK archive exceeds declared size')
-                    stream.write(block)
-            verify_download(archive, row)
+            download_sdk_archive(row['url'], archive, row)
             extract_sdk(archive, destinations[row['package']])
             receipt['sdk_packages'].append(dict(row, sha256=sha(archive)))
             print('Fresh SDK package verified: ' + row['package'], flush=True)

@@ -13,10 +13,20 @@ import subprocess
 import struct
 import tarfile
 import urllib.request
+from urllib.parse import urlsplit
 import xml.etree.ElementTree as ET
 import zipfile
+from redirect_validation import ValidatingRedirectHandler
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def validate_tool_redirect(url):
+    if urlsplit(url).scheme != 'https':
+        raise ValueError('Insecure tool archive redirect')
+
+
+TOOL_OPENER = urllib.request.build_opener(ValidatingRedirectHandler(validate_tool_redirect))
 
 
 def sha(path, algorithm='sha256'):
@@ -30,7 +40,7 @@ def sha(path, algorithm='sha256'):
 def fetch(url, path):
     if not url.startswith('https://'):
         raise ValueError('HTTPS required')
-    with urllib.request.urlopen(url, timeout=120) as response, path.open('xb') as stream:
+    with TOOL_OPENER.open(url, timeout=120) as response, path.open('xb') as stream:
         if not response.url.startswith('https://'):
             raise ValueError('Insecure tool archive redirect')
         total = 0

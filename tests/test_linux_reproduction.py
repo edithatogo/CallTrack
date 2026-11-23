@@ -2,11 +2,15 @@
 import hashlib
 import importlib.util
 import io
+import json
 from pathlib import Path
+import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 import zipfile
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 SPEC = importlib.util.spec_from_file_location('linux_build', Path(__file__).resolve().parents[1] / 'scripts/qualify_linux_build.py')
 linux = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(linux)
@@ -32,7 +36,9 @@ class LinuxBoundaries(unittest.TestCase):
             self.assertEqual('old', (path/'cached-artifact').read_text())
 
     def test_sdk_origin_and_path_are_restricted(self):
-        for url in ['http://dl.google.com/android/repository/a.zip', 'https://example.org/a.zip', 'https://dl.google.com/other/a.zip']:
+        for url in ['http://dl.google.com/android/repository/a.zip', 'https://example.org/a.zip',
+                    'https://dl.google.com/other/a.zip',
+                    'https://dl.google.com/android/repository/%2e%2e/other']:
             with self.subTest(url=url), self.assertRaises(ValueError):
                 linux.approved_url(url)
 
@@ -58,3 +64,20 @@ class LinuxBoundaries(unittest.TestCase):
         for value in ['main','HEAD','abc; echo bad','0'*39]:
             with self.assertRaises(ValueError):linux.validate_revision(value)
         linux.validate_revision('a'*40)
+
+    def test_failed_receipt_binds_redirect_policy(self):
+        revision = 'a' * 40
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / 'source'
+            source.mkdir()
+            output = root / 'output'
+            calls = [revision + '\n', b'', b'', 'openjdk version "25.0.1"']
+            with patch.object(linux.platform, 'system', return_value='Linux'), \
+                 patch.object(linux.subprocess, 'check_output', side_effect=calls):
+                with self.assertRaisesRegex(ValueError, 'JDK17 required'):
+                    linux.run(source, output, revision, '0' * 64)
+            receipt = json.loads((output / 'evidence/receipt.json').read_text())
+            helper = Path(linux.__file__).with_name('redirect_validation.py')
+            self.assertEqual(hashlib.sha256(helper.read_bytes()).hexdigest(), receipt['redirect_policy_sha256'])
+            self.assertFalse(receipt['success'])
