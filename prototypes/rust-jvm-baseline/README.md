@@ -1,17 +1,18 @@
 # Current JVM source baseline
 
 Standalone Kotlin/JVM project outside root Gradle settings. It compiles the actual
-CallIdentity.kt and CallRecord.java from the app via narrowly filtered source sets;
-it does not copy or replace those implementations. The main function checks their
+CallIdentity.kt and CallRecord.kt from the app via narrowly filtered source sets.
+The main function checks their
 four existing golden source signatures before running exploratory host timings.
 
-From the repository root with JDK17:
+From the repository root with JDK 25:
 
 ```sh
-JAVA_HOME=/path/to/jdk17 bash ./gradlew -p prototypes/rust-jvm-baseline run --console=plain
+sh gradlew -p prototypes/rust-jvm-baseline run --console=plain
 ```
 
-Kotlin2.3.21/Gradle8.13, JDK17.10000 warmup calls,5 batches of10000 synthetic
+Kotlin 2.4.21 and Gradle 9.7.0. The trial uses 10,000 warmup calls and five
+batches of 10,000 synthetic
 signatures; checksum prevents simply discarding the outputs. No call/provider
 access or Android dependency is used. JVM compilation does not qualify Android
 runtime timing or app acceptance. Future changes to app source intentionally change

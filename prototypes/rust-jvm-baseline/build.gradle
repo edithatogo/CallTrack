@@ -1,16 +1,19 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '2.3.21'
+    id 'org.jetbrains.kotlin.jvm' version '2.4.21'
     id 'application'
 }
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(25)
+    compilerOptions.jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     sourceSets.main.kotlin {
         srcDirs '../../app/src/main/kotlin', 'src/main/kotlin'
-        include 'com/markobl/calllogsync/slice/CallIdentity.kt', 'org/calltrack/benchmark/Main.kt'
+        include 'com/markobl/calllogsync/slice/CallIdentity.kt',
+                'com/markobl/calllogsync/slice/CallRecord.kt',
+                'org/calltrack/benchmark/Main.kt'
     }
 }
-sourceSets.main.java {
-    srcDirs = ['../../app/src/main/java']
-    include 'com/markobl/calllogsync/slice/CallRecord.java'
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 application { mainClass = 'org.calltrack.benchmark.MainKt' }
