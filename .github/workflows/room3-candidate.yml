@@ -1,0 +1,82 @@
+name: Room 3 candidate compilation and independent trust preparation
+on:
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'build.gradle'
+      - 'settings.gradle'
+      - '.github/workflows/room3-candidate.yml'
+      - 'gradle/verification-metadata.xml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  room3-candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          distribution: temurin
+          java-version: '25.0.5+100000002.0.LTS'
+      - name: Install native Android 17 build platform
+        run: |
+          test -n "$ANDROID_HOME"
+          path="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          test -n "$path"
+          "$path" 'platforms;android-37.1' 'build-tools;35.0.0' 'build-tools;36.0.0'
+      - name: Prepare source-formatted candidate, never publish it as accepted
+        run: |
+          mkdir -p .local/room3-candidate
+          curl --fail --location --silent --show-error https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/ktfmt/0.65/ktfmt-0.65-with-dependencies.jar -o .local/room3-candidate/ktfmt.jar
+          echo 'aba9753b6ab387926179ab7318ba8e0c33dad483ebc72f633e79522265b15214  .local/room3-candidate/ktfmt.jar' | sha256sum --check
+          for file in RoomPersistence.kt RoomSqliteCompat.kt SqliteLedger.kt SqliteImportStore.kt; do
+            java -jar .local/room3-candidate/ktfmt.jar --kotlinlang-style --format "app/src/main/kotlin/com/markobl/calllogsync/slice/$file"
+          done
+      - name: Resolve candidate hashes and compile with KSP
+        run: |
+          set -o pipefail
+          sh gradlew --no-daemon --console=plain --write-verification-metadata sha256 \
+            :app:compileDebugKotlin :app:compileDebugAndroidTestKotlin \
+            :app:testDebugUnitTest :app:assembleRelease \
+            2>&1 | tee .local/room3-candidate/gradle.log
+      - name: Describe unapproved metadata additions
+        if: always()
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          import subprocess
+          old = subprocess.check_output(['git', 'show', 'HEAD:gradle/verification-metadata.xml'])
+          new = Path('gradle/verification-metadata.xml').read_bytes()
+          def entries(blob):
+              root = ET.fromstring(blob)
+              return {(c.attrib['group'], c.attrib['name'], c.attrib['version'], a.attrib['name'], s.attrib['value'])
+                      for c in root.findall('./{*}components/{*}component')
+                      for a in c.findall('./{*}artifact')
+                      for s in a.findall('./{*}sha256')}
+          added = entries(new) - entries(old)
+          removed = entries(old) - entries(new)
+          print('Candidate new hashes:', len(added), 'replaced/removed:', len(removed))
+          for group, name, version, artifact, _ in sorted(added)[:100]:
+              print(group, name, version, artifact)
+          if removed:
+              raise SystemExit('Candidate would delete previously approved hash records')
+          PY
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v4.6.2
+        if: always()
+        with:
+          name: room3-unapproved-candidate-${{ github.run_id }}
+          retention-days: 7
+          if-no-files-found: warn
+          path: |
+            gradle/verification-metadata.xml
+            app/schemas/
+            app/src/main/kotlin/com/markobl/calllogsync/slice/RoomPersistence.kt
+            app/src/main/kotlin/com/markobl/calllogsync/slice/RoomSqliteCompat.kt
+            app/src/main/kotlin/com/markobl/calllogsync/slice/SqliteLedger.kt
+            app/src/main/kotlin/com/markobl/calllogsync/slice/SqliteImportStore.kt
+            .local/room3-candidate/gradle.log
