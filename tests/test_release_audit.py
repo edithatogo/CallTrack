@@ -19,8 +19,9 @@ import qualify_linux_build as linux
 
 
 class AuditTest(unittest.TestCase):
-    def audit_under(self, root, inventory, output):
-        with patch.object(audit, 'OUTPUT_ROOT', root):
+    def audit_under(self, root, inventory, output, inventory_root=None):
+        with patch.object(audit, 'OUTPUT_ROOT', root), \
+             patch.object(audit, 'REPOSITORY_ROOT', inventory_root or inventory.parent):
             return audit.audit(inventory, output)
 
     def publication_transport(self, routes, visited, responses=None):
@@ -311,6 +312,54 @@ class AuditTest(unittest.TestCase):
                     self.audit_under(root, inventory, output)
             self.assertEqual([], list(replacement.iterdir()))
             self.assertFalse((moved / 'receipt.json').exists())
+
+    def test_audit_rejects_inventory_outside_the_repository_root(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            repository = root / 'repository'
+            repository.mkdir()
+            outside = root / 'outside'
+            outside.mkdir()
+            sibling = root / 'repository-sibling'
+            sibling.mkdir()
+            for folder in (outside, sibling):
+                (folder / 'inventory.json').write_text(json.dumps({'artifacts': []}))
+            (repository / 'link').symlink_to(outside, target_is_directory=True)
+            output = repository / 'evidence' / 'output'
+            for inventory in (outside / 'inventory.json',
+                              repository / '..' / 'outside' / 'inventory.json',
+                              sibling / 'inventory.json', repository / 'link' / 'inventory.json'):
+                with self.subTest(inventory=inventory):
+                    with self.assertRaisesRegex(ValueError, 'repository root'):
+                        self.audit_under(output.parent, inventory, output, inventory_root=repository)
+            self.assertFalse(output.exists())
+
+    def test_audit_rejects_inventory_parent_replaced_by_link_during_open(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            repository = root / 'repository'
+            nested = repository / 'nested'
+            nested.mkdir(parents=True)
+            inventory = nested / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': []}))
+            outside = root / 'outside'
+            outside.mkdir()
+            (outside / 'inventory.json').write_text(json.dumps({'artifacts': []}))
+            original_open = os.open
+            swapped = False
+            def open_with_swap(path, flags, *args, **kwargs):
+                nonlocal swapped
+                if path == 'nested' and not swapped:
+                    nested.rename(repository / 'retained')
+                    nested.symlink_to(outside, target_is_directory=True)
+                    swapped = True
+                return original_open(path, flags, *args, **kwargs)
+            output = repository / 'evidence' / 'output'
+            with patch.object(audit.os, 'open', side_effect=open_with_swap):
+                with self.assertRaises(OSError):
+                    self.audit_under(output.parent, inventory, output, inventory_root=repository)
+            self.assertTrue(swapped)
+            self.assertFalse(output.exists())
 
     def test_audit_rejects_output_outside_the_evidence_root(self):
         with tempfile.TemporaryDirectory() as directory:

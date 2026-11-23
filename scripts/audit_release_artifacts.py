@@ -11,6 +11,7 @@ import io
 import json
 import os
 import re
+import stat
 from pathlib import Path
 import urllib.request
 from urllib.parse import urljoin, urlsplit
@@ -19,7 +20,8 @@ from redirect_validation import ValidatingRedirectHandler
 from xml_safety import parse_xml
 
 LIMIT = 64 * 1024 * 1024
-OUTPUT_ROOT = Path(__file__).resolve().parents[1] / '.local' / 'release-evidence'
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+OUTPUT_ROOT = REPOSITORY_ROOT / '.local' / 'release-evidence'
 
 
 def validate_publication_redirect(url):
@@ -116,6 +118,43 @@ def embedded_notices(data, depth=0):
     return rows
 
 
+def open_directory(root, parts, create=False):
+    flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+    parent = os.open(root, flags)
+    try:
+        for part in parts:
+            if create:
+                try:
+                    os.mkdir(part, mode=0o700, dir_fd=parent)
+                except FileExistsError:
+                    pass
+            child = os.open(part, flags, dir_fd=parent)
+            os.close(parent)
+            parent = child
+        return parent
+    except BaseException:
+        os.close(parent)
+        raise
+
+
+def read_inventory(inventory):
+    root = os.path.realpath(REPOSITORY_ROOT)
+    resolved = os.path.realpath(inventory)
+    if not resolved.startswith(root + os.sep):
+        raise ValueError('Inventory must be inside the repository root')
+    parts = Path(os.path.relpath(resolved, root)).parts
+    parent = open_directory(root, parts[:-1])
+    try:
+        descriptor = os.open(parts[-1], os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK,
+                             dir_fd=parent)
+        with os.fdopen(descriptor, 'rb') as stream:
+            if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+                raise ValueError('Inventory must be a regular file')
+            return stream.read()
+    finally:
+        os.close(parent)
+
+
 def create_output_directory(output):
     """Create a fresh output below the local evidence root without following links."""
     root = os.path.realpath(OUTPUT_ROOT)
@@ -128,16 +167,8 @@ def create_output_directory(output):
     OUTPUT_ROOT.mkdir(mode=0o700, parents=True, exist_ok=True)
     parts = Path(os.path.relpath(resolved, root)).parts
     flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
-    parent = os.open(root, flags)
+    parent = open_directory(root, parts[:-1], create=True)
     try:
-        for part in parts[:-1]:
-            try:
-                os.mkdir(part, mode=0o700, dir_fd=parent)
-            except FileExistsError:
-                pass
-            child = os.open(part, flags, dir_fd=parent)
-            os.close(parent)
-            parent = child
         os.mkdir(parts[-1], mode=0o700, dir_fd=parent)
         return os.open(parts[-1], flags, dir_fd=parent)
     finally:
@@ -145,7 +176,7 @@ def create_output_directory(output):
 
 
 def audit(inventory, output):
-    source = inventory.read_bytes()
+    source = read_inventory(inventory)
     rows = json.loads(source)['artifacts']
     unique = {(r['coordinate'], r['name'], r['sha256']): r for r in rows}
     directory = create_output_directory(output)
@@ -215,7 +246,8 @@ def _audit_output(source, rows, unique, output, directory):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--inventory', type=Path, required=True)
+    parser.add_argument('--inventory', type=Path, required=True,
+                        help='Inventory file under the repository root')
     parser.add_argument('--output', type=Path, required=True,
                         help='New directory under .local/release-evidence')
     args = parser.parse_args()
