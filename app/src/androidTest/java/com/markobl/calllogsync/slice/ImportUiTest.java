@@ -122,24 +122,22 @@ public class ImportUiTest {
     public void prepareCalendarAndTaggedHistory() {
         assertNull(new ActivationControl(new AndroidActivationStore(context())).current());
         long id = fixture.createCalendar();
-        shellCalls(
-                () -> {
-                    try (Cursor c =
-                            FixtureCallLog.query(
-                                    context(), new String[] {Calls._ID}, null, null, null)) {
-                        assertNotNull(c);
-                        assertEquals("Refusing nonempty call provider", 0, c.getCount());
-                    }
-                    assertTrue(
-                            state().edit()
-                                    .putLong("calendar", id)
-                                    .putString("today", LocalDate.now(zone()).toString())
-                                    .putBoolean("ownsCalls", true)
-                                    .commit());
-                    long yesterday = day(today().minusDays(1)) + 12 * 60 * 60 * 1000;
-                    for (int type = 1; type <= 3; type++) add(yesterday + type * 1000, type);
-                    add(day(today().minusDays(8)), 1);
-                });
+        shellCalls(() -> {
+            try (Cursor c =
+                    FixtureCallLog.query(context(), new String[] {Calls._ID}, null, null, null)) {
+                assertNotNull(c);
+                assertEquals("Refusing nonempty call provider", 0, c.getCount());
+            }
+            assertTrue(
+                    state().edit()
+                            .putLong("calendar", id)
+                            .putString("today", LocalDate.now(zone()).toString())
+                            .putBoolean("ownsCalls", true)
+                            .commit());
+            long yesterday = day(today().minusDays(1)) + 12 * 60 * 60 * 1000;
+            for (int type = 1; type <= 3; type++) add(yesterday + type * 1000, type);
+            add(day(today().minusDays(8)), 1);
+        });
     }
 
     @Test
@@ -156,15 +154,14 @@ public class ImportUiTest {
                     Long.toString(tiedId[0]),
                     latest.id);
         } finally {
-            shellCalls(
-                    () -> {
-                        assertEquals(
-                                1,
-                                FixtureCallLog.delete(
-                                        context(),
-                                        Calls._ID + "=? AND " + Calls.PHONE_ACCOUNT_ID + "=?",
-                                        new String[] {Long.toString(tiedId[0]), tag()}));
-                    });
+            shellCalls(() -> {
+                assertEquals(
+                        1,
+                        FixtureCallLog.delete(
+                                context(),
+                                Calls._ID + "=? AND " + Calls.PHONE_ACCOUNT_ID + "=?",
+                                new String[] {Long.toString(tiedId[0]), tag()}));
+            });
         }
     }
 
@@ -321,11 +318,10 @@ public class ImportUiTest {
     public void preparePersistedPartialImport() {
         assertEquals(3, fixture.events(calendar()));
         long today = day(today()), tomorrow = day(today().plusDays(1));
-        shellCalls(
-                () -> {
-                    for (int item = 1; item <= PARTIAL_COUNT; item++)
-                        add(today + 60 * 60 * 1000 + item * 1000, (item - 1) % 3 + 1);
-                });
+        shellCalls(() -> {
+            for (int item = 1; item <= PARTIAL_COUNT; item++)
+                add(today + 60 * 60 * 1000 + item * 1000, (item - 1) % 3 + 1);
+        });
         try (SqliteImportStore store = new SqliteImportStore(context());
                 SqliteLedger ledger = new SqliteLedger(context())) {
             HistoricalImport importer =
@@ -438,21 +434,20 @@ public class ImportUiTest {
     public void cleanupFixture() {
         new ActivationControl(new AndroidActivationStore(context())).pause();
         if (state().getBoolean("ownsCalls", false))
-            shellCalls(
-                    () -> {
-                        FixtureCallLog.delete(
-                                context(), Calls.PHONE_ACCOUNT_ID + "=?", new String[] {tag()});
-                        try (Cursor c =
-                                FixtureCallLog.query(
-                                        context(),
-                                        new String[] {Calls._ID},
-                                        Calls.PHONE_ACCOUNT_ID + "=?",
-                                        new String[] {tag()},
-                                        null)) {
-                            assertNotNull(c);
-                            assertEquals(0, c.getCount());
-                        }
-                    });
+            shellCalls(() -> {
+                FixtureCallLog.delete(
+                        context(), Calls.PHONE_ACCOUNT_ID + "=?", new String[] {tag()});
+                try (Cursor c =
+                        FixtureCallLog.query(
+                                context(),
+                                new String[] {Calls._ID},
+                                Calls.PHONE_ACCOUNT_ID + "=?",
+                                new String[] {tag()},
+                                null)) {
+                    assertNotNull(c);
+                    assertEquals(0, c.getCount());
+                }
+            });
         fixture.cleanupFixture();
     }
 }

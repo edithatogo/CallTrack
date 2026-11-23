@@ -30,7 +30,7 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
-            "CREATE TABLE receipts (source TEXT NOT NULL, calendar INTEGER NOT NULL, event INTEGER NOT NULL, fingerprint TEXT NOT NULL, PRIMARY KEY(source,calendar))"
+            "CREATE TABLE receipts (source TEXT NOT NULL, calendar INTEGER NOT NULL, event INTEGER NOT NULL, fingerprint TEXT NOT NULL, PRIMARY KEY(source,calendar))",
         )
         createOutbox(db)
         createScans(db)
@@ -41,13 +41,13 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
         if (oldVersion == 1) {
             createOutbox(db)
             db.execSQL(
-                "INSERT INTO outbox (source,calendar,state,event,fingerprint) SELECT source,calendar,'LEGACY',event,fingerprint FROM receipts"
+                "INSERT INTO outbox (source,calendar,state,event,fingerprint) SELECT source,calendar,'LEGACY',event,fingerprint FROM receipts",
             )
         } else {
             if (oldVersion == 2) {
                 db.execSQL("ALTER TABLE outbox ADD COLUMN operation_owner TEXT")
                 db.execSQL(
-                    "ALTER TABLE outbox ADD COLUMN operation_generation INTEGER NOT NULL DEFAULT 0"
+                    "ALTER TABLE outbox ADD COLUMN operation_generation INTEGER NOT NULL DEFAULT 0",
                 )
             }
             if (oldVersion < 4) {
@@ -224,7 +224,7 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
                         prior.upperId == next.upperId &&
                         prior.upperBinding == next.upperBinding &&
                         next.lastId >= prior.lastId &&
-                        (next.lastId != prior.lastId || prior.lastBinding == next.lastBinding)
+                        (next.lastId != prior.lastId || prior.lastBinding == next.lastBinding),
             ) {
                 "Frozen checkpoint cannot be reset or rebound"
             }
@@ -242,7 +242,7 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
                     null,
                     values,
                     SQLiteDatabase.CONFLICT_REPLACE,
-                ) >= 0
+                ) >= 0,
             ) {
                 "Checkpoint not stored"
             }
@@ -266,7 +266,7 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
                 next.upperId >= expected.upperId &&
                 next.lastId == expected.lastId &&
                 next.lastBinding == expected.lastBinding &&
-                (next.upperId != expected.upperId || next.upperBinding == expected.upperBinding)
+                (next.upperId != expected.upperId || next.upperBinding == expected.upperBinding),
         ) {
             "Invalid scan rollover"
         }
@@ -286,7 +286,7 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
                     values,
                     "owner=? AND generation=?",
                     arrayOf(operation.owner, operation.generation.toString()),
-                ) == 1
+                ) == 1,
             ) {
                 "Rollover not stored"
             }
@@ -352,7 +352,7 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
             if (time < PayloadRetention.WINDOW_MILLIS) return 0
             writableDatabase
                 .compileStatement(
-                    "UPDATE outbox SET state=CASE WHEN state='READY' AND event<0 THEN 'EXPIRED_READY' ELSE state END, payload_title=NULL,payload_description=NULL,payload_start=NULL,payload_end=NULL,payload_timezone=NULL,payload_saved_at=NULL WHERE rowid IN (SELECT rowid FROM outbox WHERE payload_title IS NOT NULL AND payload_saved_at<=? ORDER BY payload_saved_at ASC,source ASC,calendar ASC LIMIT ?)"
+                    "UPDATE outbox SET state=CASE WHEN state='READY' AND event<0 THEN 'EXPIRED_READY' ELSE state END, payload_title=NULL,payload_description=NULL,payload_start=NULL,payload_end=NULL,payload_timezone=NULL,payload_saved_at=NULL WHERE rowid IN (SELECT rowid FROM outbox WHERE payload_title IS NOT NULL AND payload_saved_at<=? ORDER BY payload_saved_at ASC,source ASC,calendar ASC LIMIT ?)",
                 )
                 .use { statement ->
                     statement.bindLong(1, time - PayloadRetention.WINDOW_MILLIS)
@@ -528,7 +528,7 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
                     )) values.putNull(column)
             check(
                 db.insertWithOnConflict("outbox", null, values, SQLiteDatabase.CONFLICT_REPLACE) >=
-                    0
+                    0,
             ) {
                 "Outbox write was not committed"
             }
@@ -541,13 +541,13 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
     companion object {
         private fun createScans(db: SQLiteDatabase) {
             db.execSQL(
-                "CREATE TABLE scan_cursors (owner TEXT NOT NULL, generation INTEGER NOT NULL, namespace TEXT NOT NULL, upper_id INTEGER NOT NULL, upper_binding TEXT, last_id INTEGER NOT NULL, last_binding TEXT, PRIMARY KEY(owner,generation))"
+                "CREATE TABLE scan_cursors (owner TEXT NOT NULL, generation INTEGER NOT NULL, namespace TEXT NOT NULL, upper_id INTEGER NOT NULL, upper_binding TEXT, last_id INTEGER NOT NULL, last_binding TEXT, PRIMARY KEY(owner,generation))",
             )
         }
 
         private fun createOutbox(db: SQLiteDatabase) {
             db.execSQL(
-                "CREATE TABLE outbox (source TEXT NOT NULL, calendar INTEGER NOT NULL, state TEXT NOT NULL, event INTEGER NOT NULL, signature TEXT, marker TEXT, fingerprint TEXT NOT NULL, payload_title TEXT, payload_description TEXT, payload_start INTEGER, payload_end INTEGER, payload_timezone TEXT, operation_owner TEXT, operation_generation INTEGER NOT NULL DEFAULT 0, source_start INTEGER, source_seconds INTEGER, source_type INTEGER, source_presentation INTEGER, source_presentation_supplied INTEGER, payload_saved_at INTEGER, PRIMARY KEY(source,calendar))"
+                "CREATE TABLE outbox (source TEXT NOT NULL, calendar INTEGER NOT NULL, state TEXT NOT NULL, event INTEGER NOT NULL, signature TEXT, marker TEXT, fingerprint TEXT NOT NULL, payload_title TEXT, payload_description TEXT, payload_start INTEGER, payload_end INTEGER, payload_timezone TEXT, operation_owner TEXT, operation_generation INTEGER NOT NULL DEFAULT 0, source_start INTEGER, source_seconds INTEGER, source_type INTEGER, source_presentation INTEGER, source_presentation_supplied INTEGER, payload_saved_at INTEGER, PRIMARY KEY(source,calendar))",
             )
             db.execSQL("CREATE INDEX outbox_state ON outbox(calendar,state)")
         }

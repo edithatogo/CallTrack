@@ -42,7 +42,7 @@ class HistoricalImportHistoryPanelTest {
                     listOf(
                         HistoricalImportHistoryItem("12", "Import 12 — complete"),
                         HistoricalImportHistoryItem("13", "Import 13 — needs review"),
-                    )
+                    ),
             )
 
         compose.setContent {

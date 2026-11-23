@@ -149,26 +149,25 @@ public class ParityStoreTest {
         try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
             CallRecord call = new CallRecord("fixture", "1", 1, 0, "Missed", null, null, false);
             CallEvent event = CallEvent.from(call, "UTC");
-            ledger.transaction(
-                    () -> {
-                        try {
-                            ledger.outbox()
-                                    .put(
-                                            new DurableDelivery.Intent(
-                                                    DurableDelivery.State.READY,
-                                                    call.key(),
-                                                    7,
-                                                    CallIdentity.signature(call),
-                                                    event.marker,
-                                                    event.fingerprint(),
-                                                    -1,
-                                                    event));
-                            fail("Outbox boundary must not hide an uncommitted intent");
-                        } catch (IllegalStateException expected) {
-                            /* Required guard. */
-                        }
-                        return SliceEngine.Result.NO_CALL;
-                    });
+            ledger.transaction(() -> {
+                try {
+                    ledger.outbox()
+                            .put(
+                                    new DurableDelivery.Intent(
+                                            DurableDelivery.State.READY,
+                                            call.key(),
+                                            7,
+                                            CallIdentity.signature(call),
+                                            event.marker,
+                                            event.fingerprint(),
+                                            -1,
+                                            event));
+                    fail("Outbox boundary must not hide an uncommitted intent");
+                } catch (IllegalStateException expected) {
+                    /* Required guard. */
+                }
+                return SliceEngine.Result.NO_CALL;
+            });
         } finally {
             context().deleteDatabase(name);
         }

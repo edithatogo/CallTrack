@@ -9,18 +9,21 @@ Contents:
 - source/: the exact tracked Git tree, including preferred app/vector source,
   build scripts, wrapper, dependency verification policy, qualification tests,
   contributor instructions, GPL licence, attribution and modification notices.
-- dependency-sources/: published Java/Kotlin source JARs and POMs at all63 runtime
+- dependency-sources/: published source JARs and POMs for all 91 runtime
   coordinates, with URLs, SHA256 and matching audited runtime binary hashes.
-  Copyright and licence headers remain intact in their original source files.
+  Eight source JARs contain only metadata and licence text; their corresponding
+  runtime artifacts contain no JVM class entries. Copyright and licence headers
+  remain intact in the published source archives.
 - licences/: convenient copies of app notices and retained legal documents.
 - candidate-runtime-inventory.json: newly resolved candidate artifact names/hashes.
 
 Build/modification:
 Read source/CONTRIBUTING.md, source/qualification/README.md and source/RELEASING.md.
-Use JDK17, Gradle8.13, AGP8.13.2, Kotlin2.3.21, SDK36/build-tools35.0.0 and an Android
-SDK licensed separately by the builder. The wrapper downloads the SHA256-pinned
-Gradle distribution; normal Maven resolution must satisfy the reviewed736-entry
-verification policy. sh gradlew :app:assembleRelease produces an unsigned app.
+Use JDK 25, Gradle 9.7.0, AGP 9.3.1, Kotlin 2.4.21, Android SDK platforms 36 and
+37.1, build-tools 36.0.0 and an Android SDK licensed separately by the builder.
+The wrapper downloads the SHA256-pinned Gradle distribution; normal Maven
+resolution must satisfy the committed dependency-verification policy.
+sh gradlew :app:assembleRelease produces an unsigned app.
 No private reference APK/checkouts, production key or credentials are needed.
 
 The build uses audited prebuilt library artifacts. Published source JARs are

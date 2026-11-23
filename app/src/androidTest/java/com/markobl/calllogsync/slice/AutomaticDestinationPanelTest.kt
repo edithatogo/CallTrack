@@ -23,7 +23,7 @@ class AutomaticDestinationPanelTest {
                 CalendarDestinationUiState(
                     options = listOf(CalendarDestinationOption(opaqueToken, "Work calendar")),
                     enabled = true,
-                )
+                ),
             )
         var selectedToken: String? = null
 

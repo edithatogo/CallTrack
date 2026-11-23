@@ -28,11 +28,10 @@ public class ActivationCommitGuardTest {
         assertThrows(
                 IllegalStateException.class,
                 () ->
-                        guard.commit(
-                                () -> {
-                                    cacheEnabled[0] = true;
-                                    throw new IllegalStateException("uncertain fixture outcome");
-                                }));
+                        guard.commit(() -> {
+                            cacheEnabled[0] = true;
+                            throw new IllegalStateException("uncertain fixture outcome");
+                        }));
         assertTrue(cacheEnabled[0]);
         assertThrows(IllegalStateException.class, guard::checkReadable);
         assertThrows(IllegalStateException.class, () -> guard.commit(() -> true));
@@ -41,11 +40,10 @@ public class ActivationCommitGuardTest {
     @Test
     public void cacheCannotBeReadAsCommittedWhileWriteIsInProgress() {
         ActivationCommitGuard guard = new ActivationCommitGuard();
-        guard.commit(
-                () -> {
-                    assertThrows(IllegalStateException.class, guard::checkReadable);
-                    return true;
-                });
+        guard.commit(() -> {
+            assertThrows(IllegalStateException.class, guard::checkReadable);
+            return true;
+        });
         guard.checkReadable();
     }
 }

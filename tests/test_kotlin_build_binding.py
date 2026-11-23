@@ -20,6 +20,7 @@ class KotlinBuildBinding(unittest.TestCase):
             root = Path(directory)
             for relative in ('build.gradle', 'settings.gradle', 'gradle.properties', 'gradlew',
                              'app/build.gradle', 'app/proguard-rules.pro',
+                             'shared-core/build.gradle',
                              'app/src/main/kotlin/Fixture.kt'):
                 path = root / relative
                 path.parent.mkdir(parents=True, exist_ok=True)

@@ -47,7 +47,7 @@ class WorkStatus(
                 code != null &&
                 delivered >= 0 &&
                 review >= 0 &&
-                failures >= 0
+                failures >= 0,
         ) {
             "Invalid work status"
         }

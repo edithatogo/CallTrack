@@ -16,11 +16,16 @@ import subprocess
 import time
 import urllib.request
 from urllib.parse import urlsplit
+from xml.etree import ElementTree
 import zipfile
 from redirect_validation import ValidatingRedirectHandler
-from xml_safety import parse_xml_file
+from xml_safety import parse_xml, parse_xml_file
 
 TOOLS = Path(__file__).resolve().parents[1]
+SDK_CATALOGUE = 'https://dl.google.com/android/repository/repository2-3.xml'
+SDK_REPOSITORY_NAMESPACE = 'http://schemas.android.com/sdk/android/repo/repository2/03'
+COMMON_REPOSITORY_NAMESPACE = 'http://schemas.android.com/repository/android/common/02'
+XSI_TYPE = '{http://www.w3.org/2001/XMLSchema-instance}type'
 
 
 def sha(path, algorithm='sha256'):
@@ -94,6 +99,52 @@ def extract_sdk(path, destination):
             target.chmod((mode & 0o777) or 0o644)
 
 
+def install_minor_platform_metadata(destination, row):
+    """Write the SDK manager's local descriptor for a verified minor-platform ZIP."""
+    limit = 8 * 1024 * 1024
+    with SDK_OPENER.open(SDK_CATALOGUE, timeout=60) as response:
+        if response.url != SDK_CATALOGUE:
+            raise ValueError('Unexpected SDK catalogue URL')
+        catalogue = response.read(limit + 1)
+    if len(catalogue) > limit:
+        raise ValueError('SDK catalogue exceeds size limit')
+    repository = parse_xml(catalogue)
+    if repository.tag != f'{{{SDK_REPOSITORY_NAMESPACE}}}sdk-repository':
+        raise ValueError('Unexpected SDK catalogue schema')
+    packages = [node for node in repository.findall('remotePackage') if node.get('path') == row['package']]
+    if len(packages) != 1:
+        raise ValueError('Exact minor platform is required in the SDK catalogue')
+    package, = packages
+    archives = package.findall('archives/archive/complete')
+    expected_url = row['url'].rsplit('/', 1)[-1]
+    if not any(archive.findtext('url') == expected_url and
+               archive.findtext('size') == str(row['size']) and
+               archive.findtext(f'checksum[@type="{row["checksum_algorithm"]}"]') == row['checksum']
+               for archive in archives):
+        raise ValueError('SDK catalogue does not bind the pinned platform archive')
+    details, revision, display_name, usage = (
+        package.find(field) for field in ('type-details', 'revision', 'display-name', 'uses-license')
+    )
+    licences = [node for node in repository.findall('license') if node.get('id') == row['licence']]
+    if (any(element is None for element in (details, revision, display_name, usage)) or
+            details.get(XSI_TYPE) != 'sdk:platformDetailsType' or
+            details.findtext('api-level') != row['package'].removeprefix('platforms;android-') or
+            usage.get('ref') != row['licence'] or len(licences) != 1 or not licences[0].text):
+        raise ValueError('Unexpected SDK platform details or licence reference')
+    local_repository = ElementTree.Element('repo:repository', {
+        'xmlns:repo': COMMON_REPOSITORY_NAMESPACE,
+        'xmlns:sdk': SDK_REPOSITORY_NAMESPACE,
+    })
+    local_repository.append(licences[0])
+    local = ElementTree.SubElement(local_repository, 'localPackage', path=row['package'], obsolete='false')
+    local.extend([details, revision, display_name, usage])
+    metadata = ElementTree.tostring(local_repository, encoding='utf-8', xml_declaration=True)
+    with (destination / 'package.xml').open('xb') as stream:
+        stream.write(metadata)
+    return {'catalogue_url': SDK_CATALOGUE, 'catalogue_sha256': hashlib.sha256(catalogue).hexdigest(),
+            'package_xml_sha256': hashlib.sha256(metadata).hexdigest()}
+
+
 def junit_counts(source):
     counts = dict(tests=0, failures=0, errors=0, skipped=0)
     for path in (source / 'app/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'):
@@ -131,20 +182,26 @@ def run(source, output, revision, expected_apk):
     env.pop('ANDROID_SDK_ROOT', None)
     try:
         receipt['java_version'] = subprocess.check_output(['java', '-version'], stderr=subprocess.STDOUT, text=True)
-        if not re.search(r'version "17[.]', receipt['java_version']):
-            raise ValueError('JDK17 required')
+        if not re.search(r'version "25[.]', receipt['java_version']):
+            raise ValueError('JDK25 required')
         packages = json.loads((TOOLS / 'qualification/release/linux-sdk-inputs.json').read_text())
         destinations = {'cmdline-tools;19.0': sdk / 'cmdline-tools/19.0',
                         'platforms;android-36': sdk / 'platforms/android-36',
-                        'build-tools;35.0.0': sdk / 'build-tools/35.0.0'}
+                        'platforms;android-37.1': sdk / 'platforms/android-37.1',
+                        'platform-tools': sdk / 'platform-tools',
+                        'build-tools;36.0.0': sdk / 'build-tools/36.0.0'}
         for row in packages:
             approved_url(row['url'])
             if row.get('licence') != 'android-sdk-license':
                 raise ValueError('Different SDK licence needs separate qualification')
             archive = output / row['url'].rsplit('/', 1)[-1]
             download_sdk_archive(row['url'], archive, row)
-            extract_sdk(archive, destinations[row['package']])
-            receipt['sdk_packages'].append(dict(row, sha256=sha(archive)))
+            destination = destinations[row['package']]
+            extract_sdk(archive, destination)
+            package = dict(row, sha256=sha(archive))
+            if row['package'] == 'platforms;android-37.1':
+                package.update(install_minor_platform_metadata(destination, row))
+            receipt['sdk_packages'].append(package)
             print('Fresh SDK package verified: ' + row['package'], flush=True)
         graph = evidence / 'runtime-inventory.json'
         env['CALLTRACK_RUNTIME_OUT'] = str(graph)
@@ -174,7 +231,7 @@ def run(source, output, revision, expected_apk):
         apk = source / 'app/build/outputs/apk/release/app-release-unsigned.apk'
         receipt['apk_sha256'] = sha(apk)
         (evidence / apk.name).write_bytes(apk.read_bytes())
-        check = subprocess.run([str(sdk / 'build-tools/35.0.0/apksigner'), 'verify', str(apk)],
+        check = subprocess.run([str(sdk / 'build-tools/36.0.0/apksigner'), 'verify', str(apk)],
                                env=env, capture_output=True, text=True)
         receipt['unsigned_verified'] = check.returncode != 0 and 'ERROR: Missing META-INF/MANIFEST.MF' in check.stdout + check.stderr
         if not receipt['unsigned_verified']:

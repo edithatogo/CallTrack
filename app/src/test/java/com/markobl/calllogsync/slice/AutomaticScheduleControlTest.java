@@ -50,18 +50,16 @@ public class AutomaticScheduleControlTest {
         ExecutorService threads = Executors.newFixedThreadPool(2);
         try {
             Future<?> first =
-                    threads.submit(
-                            () -> {
-                                if (pause) control.pause();
-                                else control.reconcile();
-                            });
+                    threads.submit(() -> {
+                        if (pause) control.pause();
+                        else control.reconcile();
+                    });
             assertTrue(entered.await(1, TimeUnit.SECONDS));
             Future<?> second =
-                    threads.submit(
-                            () -> {
-                                started.countDown();
-                                control.activate(8, "UTC", 2000, true, true, true);
-                            });
+                    threads.submit(() -> {
+                        started.countDown();
+                        control.activate(8, "UTC", 2000, true, true, true);
+                    });
             assertTrue(started.await(1, TimeUnit.SECONDS));
             assertThrows(TimeoutException.class, () -> second.get(100, TimeUnit.MILLISECONDS));
             release.countDown();
@@ -97,14 +95,12 @@ public class AutomaticScheduleControlTest {
         try {
             synchronized (DurableDelivery.DELIVERY_LOCK) {
                 result =
-                        thread.submit(
-                                () ->
-                                        control.reconcile(
-                                                () -> {
-                                                    boolean allowed = permitted.get();
-                                                    started.countDown();
-                                                    return allowed;
-                                                }));
+                        thread.submit(() ->
+                                control.reconcile(() -> {
+                                    boolean allowed = permitted.get();
+                                    started.countDown();
+                                    return allowed;
+                                }));
                 assertTrue(started.await(1, TimeUnit.SECONDS));
                 permitted.set(false);
             }

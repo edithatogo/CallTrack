@@ -5,11 +5,9 @@ on:
       candidate_sha:
         description: Exact reviewed candidate commit (40 hex characters)
         required: true
-        default: ae39ef9e109158191b33d7047e93bc3ae39a8fbd
       expected_apk_sha256:
         description: Expected unsigned macOS APK SHA256
         required: true
-        default: 22e93744536a08ce8b94050c412e6bd3d5a6839a040d0fd513f25658af961180
 permissions:
   contents: read
 cache-mode: none
@@ -18,7 +16,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     container:
-      image: eclipse-temurin:17.0.21.1_2-jdk@sha256:7e63c63da8c2911d5a8c3b2f656e2d278a85224a1bd4dcbe318a6131bc617bf7
+      image: eclipse-temurin:25.0.5.1_2-jdk@sha256:ce2ef9d2d67a68de5e196d4de9d743327c44a10b57fe02ec39f572c652cacfd3
     steps:
       - name: Verify Actions cache is disabled
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
@@ -50,10 +48,7 @@ jobs:
             echo '::error::Candidate must be a full Git commit SHA.'
             exit 1
           fi
-          if [[ "$CANDIDATE_SHA" == 'ae39ef9e109158191b33d7047e93bc3ae39a8fbd' ]]; then
-            # Track 5's reviewed reproduction baseline predates the current main history.
-            git -C qualification-tools fetch --no-tags origin "$CANDIDATE_SHA"
-          elif ! git -C qualification-tools merge-base --is-ancestor "$CANDIDATE_SHA" HEAD; then
+          if ! git -C qualification-tools merge-base --is-ancestor "$CANDIDATE_SHA" HEAD; then
             echo '::error::Dispatch from a repository branch containing the reviewed candidate.'
             exit 1
           fi

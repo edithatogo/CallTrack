@@ -33,7 +33,7 @@ class PagedCalls private constructor() {
                     lastId >= -1 &&
                     lastId <= upperId &&
                     (upperId == -1L) == (upperBinding == null) &&
-                    (lastId == -1L) == (lastBinding == null)
+                    (lastId == -1L) == (lastBinding == null),
             ) {
                 "Invalid source checkpoint"
             }

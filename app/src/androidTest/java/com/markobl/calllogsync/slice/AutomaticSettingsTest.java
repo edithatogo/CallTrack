@@ -34,12 +34,10 @@ public class AutomaticSettingsTest {
             AtomicBoolean ready = new AtomicBoolean();
             long deadline = SystemClock.elapsedRealtime() + 10000;
             do {
-                instrumentation.runOnMainSync(
-                        () ->
-                                ready.set(
-                                        activity.findViewById(R.id.auto_state)
-                                                instanceof
-                                                androidx.compose.ui.platform.ComposeView));
+                instrumentation.runOnMainSync(() ->
+                        ready.set(
+                                activity.findViewById(R.id.auto_state)
+                                        instanceof androidx.compose.ui.platform.ComposeView));
                 if (ready.get()) break;
                 SystemClock.sleep(50);
             } while (SystemClock.elapsedRealtime() < deadline);

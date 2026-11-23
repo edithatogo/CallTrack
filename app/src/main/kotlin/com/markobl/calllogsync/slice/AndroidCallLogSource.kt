@@ -51,7 +51,7 @@ class AndroidCallLogSource(context: Context?) : SliceEngine.CallSource, PagedCal
             afterExclusive >= -1 &&
                 upperInclusive >= 0 &&
                 afterExclusive < upperInclusive &&
-                limit in 1..500
+                limit in 1..500,
         ) {
             "Invalid source page"
         }
@@ -112,7 +112,7 @@ class AndroidCallLogSource(context: Context?) : SliceEngine.CallSource, PagedCal
             synchronized(AndroidCallLogSource::class.java) {
                 if (namespaceCommitUncertain)
                     throw IllegalStateException(
-                        "Source identity commit uncertain; restart required"
+                        "Source identity commit uncertain; restart required",
                     )
                 val prefs = context.getSharedPreferences("slice", Context.MODE_PRIVATE)
                 var id = prefs.getString("sourceNamespace", null)

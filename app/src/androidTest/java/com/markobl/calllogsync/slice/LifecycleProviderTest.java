@@ -44,25 +44,24 @@ public class LifecycleProviderTest {
         int prior = state().getInt("expected", 0);
         assertEquals(prior, fixture.events(calendar));
         long at = System.currentTimeMillis();
-        shellCalls(
-                () -> {
-                    ContentValues call = new ContentValues();
-                    call.put(Calls.NUMBER, "0000000000");
-                    call.put(Calls.CACHED_NAME, "Synthetic Lifecycle Fixture");
-                    call.put(Calls.DATE, at);
-                    call.put(Calls.DURATION, 7);
-                    call.put(Calls.TYPE, Calls.INCOMING_TYPE);
-                    call.put(Calls.NUMBER_PRESENTATION, Calls.PRESENTATION_ALLOWED);
-                    call.put(Calls.PHONE_ACCOUNT_ID, tag());
-                    android.net.Uri uri = FixtureCallLog.insert(context(), call);
-                    assertNotNull(uri);
-                    assertTrue(
-                            state().edit()
-                                    .putLong("callId", ContentUris.parseId(uri))
-                                    .putLong("sourceAt", at)
-                                    .putInt("expected", prior + 1)
-                                    .commit());
-                });
+        shellCalls(() -> {
+            ContentValues call = new ContentValues();
+            call.put(Calls.NUMBER, "0000000000");
+            call.put(Calls.CACHED_NAME, "Synthetic Lifecycle Fixture");
+            call.put(Calls.DATE, at);
+            call.put(Calls.DURATION, 7);
+            call.put(Calls.TYPE, Calls.INCOMING_TYPE);
+            call.put(Calls.NUMBER_PRESENTATION, Calls.PRESENTATION_ALLOWED);
+            call.put(Calls.PHONE_ACCOUNT_ID, tag());
+            android.net.Uri uri = FixtureCallLog.insert(context(), call);
+            assertNotNull(uri);
+            assertTrue(
+                    state().edit()
+                            .putLong("callId", ContentUris.parseId(uri))
+                            .putLong("sourceAt", at)
+                            .putInt("expected", prior + 1)
+                            .commit());
+        });
         Bundle metadata = new Bundle();
         metadata.putLong("fixtureCalendar", calendar);
         metadata.putInt("expectedEvents", prior + 1);
@@ -73,15 +72,13 @@ public class LifecycleProviderTest {
     @Test
     public void prepareReopenFixtureWithoutScheduledWork() {
         long calendar = fixture.createCalendar();
-        shellCalls(
-                () -> {
-                    try (Cursor c =
-                            FixtureCallLog.query(
-                                    context(), new String[] {Calls._ID}, null, null, null)) {
-                        assertNotNull(c);
-                        assertEquals("Dedicated empty call provider required", 0, c.getCount());
-                    }
-                });
+        shellCalls(() -> {
+            try (Cursor c =
+                    FixtureCallLog.query(context(), new String[] {Calls._ID}, null, null, null)) {
+                assertNotNull(c);
+                assertEquals("Dedicated empty call provider required", 0, c.getCount());
+            }
+        });
         assertTrue(state().edit().putLong("calendar", calendar).putInt("expected", 0).commit());
         ActivationControl control = new ActivationControl(new AndroidActivationStore(context()));
         assertNull(control.current());
@@ -257,21 +254,19 @@ public class LifecycleProviderTest {
         WorkManager manager = WorkManager.getInstance(context());
         manager.cancelAllWorkByTag(AutomaticScheduling.TAG).getResult().get(15, TimeUnit.SECONDS);
         manager.cancelUniqueWork(tag()).getResult().get(15, TimeUnit.SECONDS);
-        shellCalls(
-                () -> {
-                    FixtureCallLog.delete(
-                            context(), Calls.PHONE_ACCOUNT_ID + "=?", new String[] {tag()});
-                    try (Cursor c =
-                            FixtureCallLog.query(
-                                    context(),
-                                    new String[] {Calls._ID},
-                                    Calls.PHONE_ACCOUNT_ID + "=?",
-                                    new String[] {tag()},
-                                    null)) {
-                        assertNotNull(c);
-                        assertEquals(0, c.getCount());
-                    }
-                });
+        shellCalls(() -> {
+            FixtureCallLog.delete(context(), Calls.PHONE_ACCOUNT_ID + "=?", new String[] {tag()});
+            try (Cursor c =
+                    FixtureCallLog.query(
+                            context(),
+                            new String[] {Calls._ID},
+                            Calls.PHONE_ACCOUNT_ID + "=?",
+                            new String[] {tag()},
+                            null)) {
+                assertNotNull(c);
+                assertEquals(0, c.getCount());
+            }
+        });
         fixture.cleanupFixture();
     }
 }

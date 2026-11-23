@@ -59,7 +59,7 @@ class AndroidCalendarSink(suppliedContext: Context?) : SliceEngine.CalendarSink 
             .use { cursor ->
                 checkNotNull(cursor) { "Calendar provider unavailable" }
                 while (cursor.moveToNext()) result.add(
-                    Choice(cursor.getLong(0), cursor.getString(1), cursor.getString(2))
+                    Choice(cursor.getLong(0), cursor.getString(1), cursor.getString(2)),
                 )
             }
         return result

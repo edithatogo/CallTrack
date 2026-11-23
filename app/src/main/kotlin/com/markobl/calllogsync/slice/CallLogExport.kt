@@ -47,7 +47,8 @@ object CallLogExport {
                     ExportRecord(id, direction, source.start, source.seconds)
                 }
                 .sortedWith(
-                    compareBy<ExportRecord> { it.startedAtMilliseconds }.thenBy { it.id.toString() }
+                    compareBy<ExportRecord> { it.startedAtMilliseconds }
+                        .thenBy { it.id.toString() },
                 )
 
         val callsJson =

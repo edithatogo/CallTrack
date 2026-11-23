@@ -27,12 +27,13 @@ calendar account software controls remote sync.
 
 ## Build and verify
 
-Use JDK17, Android SDK platform36/build-tools35.0.0 and the included Gradle8.13
-wrapper and Kotlin/KGP2.3.21. Set `JAVA_HOME` and `ANDROID_HOME` to those installed toolchains, then:
+Use Temurin JDK 25.0.5.1+2, Android SDK platforms 36 and 37.1, Build Tools 36.0.0, the
+included Gradle 9.7.0 wrapper and Kotlin/KGP 2.4.21. Set `JAVA_HOME` and
+`ANDROID_HOME` to those installed toolchains, then:
 
 Create the selected Python runtime from `.python-version` and verify the actual
 interpreter before running these commands. The current preferred selection is
-Python 3.15.1; choose another version only for a concrete compatibility or task need,
+Python 3.15.2; choose another version only for a concrete compatibility or task need,
 record the reason and scope, and qualify it as described in the
 [runtime policy](conductor/python-runtime-policy.md).
 
@@ -43,6 +44,25 @@ test "$(.venv/bin/python --version)" = "Python $python_version"
 .venv/bin/python scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"
 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python scripts/verify_conductor.py
+```
+
+The local release- and Kotlin-upgrade emulator checks use the qualified macOS ARM64
+JDK bundle at `.local/toolchain/temurin-jdk25` and its original publisher archive,
+`OpenJDK25U-jdk_aarch64_mac_hotspot_25.0.5.1_2.tar.gz`, in the same directory.
+These may be links to the verified toolchain storage. Before using the JDK, the
+checks compare the archive to its pinned digest and every installed bundle file
+to that archive; other platforms are not yet qualified for these local checks.
+The Kotlin check retains its frozen historical Java baseline and validates its
+original receipt separately from the active application's current JDK.
+
+The local toolchain audit additionally requires its selected roots to use the
+repository aliases below. The aliases may link to verified SDK and Gradle cache
+storage on another volume; `--output` and `--archives-from` are unchanged.
+
+```sh
+export JAVA_HOME="$PWD/.local/toolchain/temurin-jdk25/Contents/Home"
+export ANDROID_HOME="$PWD/.local/android-sdk"
+export GRADLE_USER_HOME="$PWD/.local/toolchain/gradle-home"
 ```
 
 The build runs JVM tests, builds app/test APKs and lints. Receipts and logs stay under
@@ -74,8 +94,8 @@ calendar availability or remote sync.
 
 ## Development and recovery
 
-Run new Java files through google-java-format1.24.0 with `--aosp`; the checksum and
-download recipe are in CI. Kotlin uses ktfmt0.59 with `--kotlinlang-style`;
+Run new Java files through google-java-format 2.0.0 with `--aosp --cleanup=false`; the checksum and
+download recipe are in CI. Kotlin uses ktfmt 0.65 with `--kotlinlang-style`;
 CI checks both languages. The upstream build reproducer remains available through
 [qualification instructions](qualification/README.md). CI definitions are local
 configuration until a hosted run is observed.

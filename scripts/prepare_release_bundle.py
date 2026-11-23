@@ -16,7 +16,7 @@ import tarfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-AUDIT = 'conductor/tracks/release_20261020/canonical-runtime-audit-20261024.json'
+AUDIT = 'conductor/tracks/release_20261020/canonical-runtime-audit-20261124.json'
 SOURCES = 'qualification/release/runtime-sources.json'
 
 

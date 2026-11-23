@@ -34,7 +34,7 @@ class CalendarSliceActivity : ComponentActivity() {
         val screen =
             ComposeView(this).apply {
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     ManualCalendarScreen(
@@ -53,7 +53,7 @@ class CalendarSliceActivity : ComponentActivity() {
                                 Intent(
                                     this@CalendarSliceActivity,
                                     AutomaticSettingsActivity::class.java,
-                                )
+                                ),
                             )
                         },
                     )
@@ -189,7 +189,7 @@ class CalendarSliceActivity : ComponentActivity() {
                                 token,
                                 choice.name?.takeIf(String::isNotBlank)
                                     ?: getString(R.string.slice_unnamed_calendar),
-                            )
+                            ),
                         )
                         if (choice.id == saved) selectedToken = token
                     }
@@ -207,7 +207,7 @@ class CalendarSliceActivity : ComponentActivity() {
                             .apply()
                     }
                     setStatus(
-                        if (loaded.isEmpty()) R.string.slice_no_calendars else R.string.slice_ready
+                        if (loaded.isEmpty()) R.string.slice_no_calendars else R.string.slice_ready,
                     )
                     updateButton()
                 }
@@ -228,7 +228,7 @@ class CalendarSliceActivity : ComponentActivity() {
 
     public override fun onRequestPermissionsResult(
         code: Int,
-        permissions: Array<out String>,
+        permissions: Array<String>,
         grants: IntArray,
     ) {
         super.onRequestPermissionsResult(code, permissions, grants)

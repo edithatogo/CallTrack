@@ -15,8 +15,9 @@ track's scope; use a separately authorised execution after these gates pass.
    route. The current `org.calltrack.community.dev`, versionCode10/0.1.0-dev is a
    disposable development identity. Do not overwrite the old CallTrack installation
    or claim its signing/branding rights. Audit inherited assets/translations.
-3. Freeze a clean Git commit. Build from a fresh checkout with JDK17, Gradle8.13,
-   AGP8.13.2, Kotlin/KGP2.3.21, compile/target36 and build-tools35.0.0, or explicitly qualify any
+3. Freeze a clean Git commit. Build from a fresh checkout with JDK 25, Gradle 9.7.0,
+   AGP 9.3.1, Kotlin/KGP 2.4.21, compile SDK 37.1, target SDK 36 and Build Tools
+   36.0.0, or explicitly qualify any
    changes. Follow CONTRIBUTING.md and preserve all test/build evidence. No private
    reference checkout or APK may be required for the root build.
 4. Capture the actual releaseRuntimeClasspath graph and all artifact licences and
@@ -65,7 +66,8 @@ development identity remains unchanged.
   --output "$PWD/.local/release-evidence/UNIQUE-UPGRADE-RUN"
 ```
 
-Only the exact dedicated emulator is accepted; both development packages must be
+Set up the verified local JDK bundle and archive as described in [README](README.md)
+before running this check. Only the exact dedicated emulator is accepted; both development packages must be
 absent. Requires the existing debug key and successful source-matched debug/test
 receipt. A clean committed-source checkout uses a recorded temporary Gradle
 `finalizeDsl` overlay to build release mode at versionCode11 with that existing
@@ -86,7 +88,7 @@ full matrix below before supported release acceptance.
 
 ```sh
 .venv/bin/python scripts/audit_release_artifacts.py \
-  --inventory conductor/tracks/kotlin_20261020/runtime-artifacts-20261021.json \
+  --inventory .local/release-runtime.json \
   --output .local/release-evidence/UNIQUE-RUNTIME-AUDIT
 ```
 
@@ -223,7 +225,7 @@ The bundle rejects dirty/mismatched source, changed runtime graphs, incomplete o
 modified source/POM inputs, missing APK notices and private/unsafe archive paths.
 It includes the Git snapshot, exact-source revision, build/qualification scripts,
 preferred vector sources, licences/notices and published source/POM material for
-all63 runtime coordinates. Every payload is hashed and read back after archiving;
+all selected runtime coordinates. Every payload is hashed and read back after archiving;
 two independently written archive files must match. It never includes Git history,
 private `.local` inputs, signing keys, SDK/JDK archives or original CallTrack APKs.
 
@@ -238,13 +240,16 @@ implied. Retain previous source/artifact evidence rather than relabelling it.
 ## Cold Linux reproduction
 
 The manual `.github/workflows/release-reproduction.yml` workflow builds an exact
-candidate using the digest-pinned Temurin17 Linux image, new SDK downloads and a
+candidate using the digest-pinned Temurin 25 Linux image, new SDK downloads and a
 new Gradle user home. It uses separate tooling and candidate checkouts and uploads
 only the unsigned APK and evidence. No cache restore, signing credential, device,
 cloud-account integration or SDK licence acceptance command is configured.
 The SDK terms must already be authorised for the builder; package origins/sizes,
 Google checksums and reviewed SHA256 values are in
 `qualification/release/linux-sdk-inputs.json`.
+The cold build reads Google's matching package descriptor for the pinned Android
+37.1 archive so AGP recognises the installed minor SDK. The receipt records the
+catalogue and descriptor hashes.
 
 Use `scripts/qualify_linux_build.py --help` for a direct Linux runner. Its output
 directory must not exist; a dirty/wrong candidate, reused output, wrong SDK origin,

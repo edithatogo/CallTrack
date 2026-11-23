@@ -47,7 +47,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.recovery_intro_panel
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     RecoveryCopyPanel(
@@ -61,7 +61,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.recovery_access_panel
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     RecoveryAccessPanel(
@@ -77,7 +77,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.recovery_refresh
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     RecoveryRefreshPanel(
@@ -97,7 +97,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.recovery_retention_copy
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     RecoveryCopyPanel(
@@ -111,7 +111,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.recovery_retention
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     RecoveryRetentionPanel(
@@ -126,7 +126,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.recovery_feedback
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent { RecoveryStatusPanel(feedbackText) }
             }
@@ -138,7 +138,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.recovery_empty
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     RecoveryEmptyPanel(
@@ -152,7 +152,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.recovery_cards
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     RecoveryCardsPanel(
@@ -183,7 +183,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
             ComposeView(this).apply {
                 id = R.id.recovery_navigation
                 setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
                 )
                 setContent {
                     RecoveryNavigationPanel(
@@ -253,10 +253,9 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                             }
                         val keyedRecords = records.map { nextCardToken++ to it }
                         visibleRecords = keyedRecords.toMap()
-                        cards =
-                            keyedRecords.map { (token, record) ->
-                                cardState(token, record.first, record.second)
-                            }
+                        cards = keyedRecords.map { (token, record) ->
+                            cardState(token, record.first, record.second)
+                        }
                         emptyState = size == 0
                         next = if (page.size > 10) page[9].cursor else null
                         navigation()
@@ -345,7 +344,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                 Intent(
                     Intent.ACTION_VIEW,
                     ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, intent.eventId),
-                )
+                ),
             )
         } catch (unavailable: RuntimeException) {
             setFeedback(R.string.recovery_open_failed)
@@ -521,7 +520,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
 
     public override fun onRequestPermissionsResult(
         code: Int,
-        permissions: Array<out String>,
+        permissions: Array<String>,
         grants: IntArray,
     ) {
         super.onRequestPermissionsResult(code, permissions, grants)

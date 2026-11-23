@@ -9,7 +9,7 @@ def run():
     raise RuntimeError(
         'Retired retained-class JVM fallback: expanded Kotlin migration cannot be verified '
         'by compiling only remaining Java sources. Use scripts/run_slice_build.py with '
-        'the qualified JDK17/Android SDK; reconnect the qualified toolchain if unavailable.'
+        'the qualified JDK 25/Android SDK; reconnect the qualified toolchain if unavailable.'
     )
 
 

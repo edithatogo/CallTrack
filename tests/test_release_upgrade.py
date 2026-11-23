@@ -19,6 +19,13 @@ class UpgradeSafetyTest(unittest.TestCase):
                 upgrade.qualify('phone', Path('/unused'))
             read.assert_not_called()
 
+    def test_unqualified_jdk_stops_before_any_subprocess_or_native_action(self):
+        with patch.object(upgrade, 'qualified_local_jdk', side_effect=RuntimeError('unqualified JDK')):
+            with patch.object(upgrade.subprocess, 'check_output') as read:
+                with self.assertRaisesRegex(RuntimeError, 'unqualified JDK'):
+                    upgrade.qualify('emulator-1234', Path('/unused'))
+                read.assert_not_called()
+
     def test_rejection_requires_failure_and_exact_android_reason(self):
         for code, error in ((0, 'INSTALL_FAILED_VERSION_DOWNGRADE'), (1, 'device offline'), (1, 'INSTALL_FAILED_UPDATE_INCOMPATIBLE')):
             with self.assertRaisesRegex(RuntimeError, 'controlled rejection'):
@@ -133,6 +140,8 @@ class UpgradeSafetyTest(unittest.TestCase):
                     return b''
                 if args[:2] == ['git', 'rev-parse']:
                     return 'frozen\n'
+                if args[-1] == '-version':
+                    return 'openjdk version "25.0.5.1"'
                 return 'synthetic badging'
 
             def run(args, **kwargs):

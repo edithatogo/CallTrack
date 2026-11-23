@@ -63,12 +63,11 @@ public class TelephonyProviderTest {
     @Test
     public void prepareEmptyProviderAndCalendar() {
         long calendar = fixture.createCalendar(); // READ_CALL_LOG must still be denied here.
-        shellCalls(
-                () -> {
-                    try (Cursor c = calls(null, null)) {
-                        assertEquals("Refusing nonempty call provider", 0, c.getCount());
-                    }
-                });
+        shellCalls(() -> {
+            try (Cursor c = calls(null, null)) {
+                assertEquals("Refusing nonempty call provider", 0, c.getCount());
+            }
+        });
         assertTrue(
                 state().edit()
                         .putLong("calendar", calendar)
@@ -171,30 +170,28 @@ public class TelephonyProviderTest {
                 .getResult()
                 .get(15, TimeUnit.SECONDS);
         if (state().getBoolean("emptyBaseline", false)) {
-            shellCalls(
-                    () -> {
-                        java.util.List<Long> ids = new java.util.ArrayList<>();
-                        try (Cursor c = calls(selection(), args())) {
-                            while (c.moveToNext()) ids.add(c.getLong(0));
-                        }
-                        for (long id : ids) {
-                            String[] scoped =
-                                    new String[] {
-                                        Long.toString(id), NUMBER, NUMBER.substring(1), args()[2]
-                                    };
-                            FixtureCallLog.delete(
-                                    context(), Calls._ID + "=? AND " + selection(), scoped);
-                        }
-                        try (Cursor c = calls(selection(), args())) {
-                            assertEquals(0, c.getCount());
-                        }
-                        try (Cursor c = calls(null, null)) {
-                            assertEquals(
-                                    "Unexpected call rows remain; inspect before uninstall",
-                                    0,
-                                    c.getCount());
-                        }
-                    });
+            shellCalls(() -> {
+                java.util.List<Long> ids = new java.util.ArrayList<>();
+                try (Cursor c = calls(selection(), args())) {
+                    while (c.moveToNext()) ids.add(c.getLong(0));
+                }
+                for (long id : ids) {
+                    String[] scoped =
+                            new String[] {
+                                Long.toString(id), NUMBER, NUMBER.substring(1), args()[2]
+                            };
+                    FixtureCallLog.delete(context(), Calls._ID + "=? AND " + selection(), scoped);
+                }
+                try (Cursor c = calls(selection(), args())) {
+                    assertEquals(0, c.getCount());
+                }
+                try (Cursor c = calls(null, null)) {
+                    assertEquals(
+                            "Unexpected call rows remain; inspect before uninstall",
+                            0,
+                            c.getCount());
+                }
+            });
         }
         fixture.cleanupFixture();
     }

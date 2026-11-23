@@ -95,7 +95,7 @@ private fun ImportDateField(
                     modifier =
                         Modifier.fillMaxWidth()
                             .border(1.dp, colorResource(R.color.purple_500))
-                            .padding(horizontal = 12.dp, vertical = 10.dp)
+                            .padding(horizontal = 12.dp, vertical = 10.dp),
                 ) {
                     if (value.isEmpty()) {
                         BasicText("YYYY-MM-DD", style = TextStyle(fontSize = 16.sp))

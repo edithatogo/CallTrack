@@ -91,7 +91,7 @@ class RecoveryCardsPanelTest {
                             suppressEnabled = false,
                             reapproveVisible = false,
                             openEventVisible = true,
-                        )
+                        ),
                     ),
                 busy = true,
                 checkLabel = "Check existing effect only",

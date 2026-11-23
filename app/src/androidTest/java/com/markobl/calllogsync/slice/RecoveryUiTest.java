@@ -233,15 +233,14 @@ public class RecoveryUiTest {
             java.util.concurrent.ExecutorService executor =
                     (java.util.concurrent.ExecutorService) field(activity, "executor");
             // Hold only the executor: real UI confirmation is queued behind simulated delayed IO.
-            executor.execute(
-                    () -> {
-                        entered.countDown();
-                        try {
-                            release.await();
-                        } catch (InterruptedException interrupted) {
-                            Thread.currentThread().interrupt();
-                        }
-                    });
+            executor.execute(() -> {
+                entered.countDown();
+                try {
+                    release.await();
+                } catch (InterruptedException interrupted) {
+                    Thread.currentThread().interrupt();
+                }
+            });
             assertTrue(entered.await(10, java.util.concurrent.TimeUnit.SECONDS));
             tap(ui, R.string.reapproval_open);
             ui.tapId("button1");
@@ -250,15 +249,14 @@ public class RecoveryUiTest {
                     ui.automation.performGlobalAction(
                             android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME));
             ui.await(() -> !(Boolean) field(activity, "resumed"), "Leaving did not pause activity");
-            i.runOnMainSync(
-                    () ->
-                            context()
-                                    .startActivity(
-                                            new Intent(context(), ReceiptRecoveryActivity.class)
-                                                    .addFlags(
-                                                            Intent.FLAG_ACTIVITY_NEW_TASK
-                                                                    | Intent
-                                                                            .FLAG_ACTIVITY_REORDER_TO_FRONT)));
+            i.runOnMainSync(() ->
+                    context()
+                            .startActivity(
+                                    new Intent(context(), ReceiptRecoveryActivity.class)
+                                            .addFlags(
+                                                    Intent.FLAG_ACTIVITY_NEW_TASK
+                                                            | Intent
+                                                                    .FLAG_ACTIVITY_REORDER_TO_FRONT)));
             ui.await(
                     () -> (Boolean) field(activity, "resumed"),
                     "Returning did not resume same activity");

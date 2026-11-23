@@ -8,7 +8,7 @@ import java.util.WeakHashMap
 /** Generation-checked atomic status; publication never grants delivery authority. */
 class AndroidWorkStatusStore(private val preferences: SharedPreferences?) {
     constructor(
-        context: Context?
+        context: Context?,
     ) : this(context!!.applicationContext.getSharedPreferences("slice", Context.MODE_PRIVATE))
 
     fun read(generation: Long): WorkStatus? =

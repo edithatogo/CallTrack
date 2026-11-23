@@ -17,6 +17,8 @@ def inputs():
     paths += [p for p in (ROOT / 'gradle/verification-metadata.xml',) if p.is_file()]
     paths += [ROOT / 'app/build.gradle', ROOT / 'app/proguard-rules.pro']
     paths += sorted(p for p in (ROOT / 'app/src').rglob('*') if p.is_file())
+    paths += [ROOT / 'shared-core/build.gradle']
+    paths += sorted(p for p in (ROOT / 'shared-core/src').rglob('*') if p.is_file())
     return {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
 
 

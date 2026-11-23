@@ -1,21 +1,29 @@
+buildscript {
+    dependencies {
+        constraints {
+            classpath('com.google.guava:guava:33.8.0-jre')
+            classpath('org.apache.commons:commons-lang3:3.22.0')
+        }
+    }
+}
 plugins {
     id 'org.jetbrains.kotlin.multiplatform' version '2.4.21'
     id 'org.jetbrains.kotlin.plugin.compose' version '2.4.21'
-    // 1.12.x requires API 37.1 / AGP 9.1; keep this Android-host prototype
-    // buildable on the qualified API 36 / AGP 8.13 toolchain.
-    id 'org.jetbrains.compose' version '1.10.3'
-    id 'com.android.kotlin.multiplatform.library' version '8.13.2'
-    id 'com.android.application' version '8.13.2' apply false
-    id 'org.jetbrains.kotlin.android' version '2.4.21' apply false
+    id 'org.jetbrains.compose' version '1.12.2'
+    id 'com.android.kotlin.multiplatform.library' version '9.3.1'
+    id 'com.android.application' version '9.3.1' apply false
 }
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(25)
     android {
         namespace 'org.calltrack.companion.shared'
-        compileSdk 36
+        compileSdk 37
         minSdk 26
+        compilerOptions.jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
-    jvm('desktop')
+    jvm('desktop') {
+        compilerOptions.jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
     sourceSets {
         commonMain.dependencies {
             api compose.runtime
@@ -34,6 +42,13 @@ kotlin {
 
 compose.desktop {
     application { mainClass = 'org.calltrack.companion.MainKt' }
+}
+dependencies {
+    constraints {
+        add('desktopTestImplementation', 'com.google.guava:guava:33.8.0-jre') {
+            because 'Use the patched Guava with the desktop test library'
+        }
+    }
 }
 tasks.withType(Test).configureEach {
     maxParallelForks = 1

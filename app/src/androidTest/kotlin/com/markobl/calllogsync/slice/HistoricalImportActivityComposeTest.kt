@@ -29,7 +29,7 @@ class HistoricalImportActivityComposeTest {
         compose.onNodeWithText(compose.activity.getString(R.string.import_none)).assertIsDisplayed()
         assertTrue(compose.activity.findViewById<ComposeView>(R.id.import_filters) != null)
         assertTrue(
-            compose.activity.findViewById<ComposeView>(R.id.import_calendar_picker_panel) != null
+            compose.activity.findViewById<ComposeView>(R.id.import_calendar_picker_panel) != null,
         )
         assertTrue(compose.activity.findViewById<ComposeView>(R.id.import_intro_panel) != null)
         assertTrue(compose.activity.findViewById<ComposeView>(R.id.import_access_panel) != null)
@@ -40,7 +40,7 @@ class HistoricalImportActivityComposeTest {
                 compose.activity.getString(
                     R.string.import_intro,
                     java.time.ZoneId.systemDefault().id,
-                )
+                ),
             )
             .assertIsDisplayed()
         compose.onNodeWithTag("import_calendar_picker").assertIsNotEnabled()
