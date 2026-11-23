@@ -228,6 +228,84 @@ class AuditTest(unittest.TestCase):
                 audit.audit(inventory, output)
             self.assertEqual(before, (output / 'receipt.json').read_bytes())
 
+    def test_download_does_not_follow_an_existing_output_link(self):
+        data = io.BytesIO()
+        with zipfile.ZipFile(data, 'w') as archive:
+            archive.writestr('LICENSE', 'licence')
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': [dict(
+                coordinate='org.test:test:1', name='test-1.jar', sha256=audit.digest(data.getvalue()))]}))
+            output = root / 'output'
+            sentinel = root / 'retain.txt'
+            sentinel.write_text('keep')
+
+            def publication(_url):
+                (output / '0-artifact').symlink_to(sentinel)
+                return data.getvalue()
+
+            with patch.object(audit, 'read_publication', side_effect=publication):
+                result = audit.audit(inventory, output)
+            self.assertEqual('keep', sentinel.read_text())
+            self.assertFalse(result['all_repository_bytes_match'])
+            self.assertIn('error', result['artifacts'][0])
+            self.assertFalse(json.loads((output / 'receipt.json').read_text())['release_ready'])
+
+    def test_receipt_does_not_follow_an_existing_output_link(self):
+        data = io.BytesIO()
+        with zipfile.ZipFile(data, 'w') as archive:
+            archive.writestr('LICENSE', 'licence')
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': [dict(
+                coordinate='org.test:test:1', name='test-1.jar', sha256=audit.digest(data.getvalue()))]}))
+            output = root / 'output'
+            sentinel = root / 'retain.txt'
+            sentinel.write_text('keep')
+
+            def publication(url):
+                if url.endswith('.pom'):
+                    (output / 'receipt.json').symlink_to(sentinel)
+                    return b'<project xmlns="http://maven.apache.org/POM/4.0.0"/>'
+                return data.getvalue()
+
+            with patch.object(audit, 'read_publication', side_effect=publication):
+                with self.assertRaises(FileExistsError):
+                    audit.audit(inventory, output)
+            self.assertEqual('keep', sentinel.read_text())
+
+    def test_replaced_output_directory_fails_without_writing_to_replacement(self):
+        data = io.BytesIO()
+        with zipfile.ZipFile(data, 'w') as archive:
+            archive.writestr('LICENSE', 'licence')
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': [dict(
+                coordinate='org.test:test:1', name='test-1.jar', sha256=audit.digest(data.getvalue()))]}))
+            output = root / 'output'
+            moved = root / 'moved'
+            replacement = root / 'replacement'
+            replacement.mkdir()
+            swapped = False
+
+            def publication(url):
+                nonlocal swapped
+                if not swapped:
+                    output.rename(moved)
+                    output.symlink_to(replacement, target_is_directory=True)
+                    swapped = True
+                return (b'<project xmlns="http://maven.apache.org/POM/4.0.0"/>'
+                        if url.endswith('.pom') else data.getvalue())
+
+            with patch.object(audit, 'read_publication', side_effect=publication):
+                with self.assertRaisesRegex(RuntimeError, 'output directory changed'):
+                    audit.audit(inventory, output)
+            self.assertEqual([], list(replacement.iterdir()))
+            self.assertFalse((moved / 'receipt.json').exists())
+
     def test_classes_named_notice_are_not_licence_documents(self):
         data = io.BytesIO()
         with zipfile.ZipFile(data, 'w') as archive:
