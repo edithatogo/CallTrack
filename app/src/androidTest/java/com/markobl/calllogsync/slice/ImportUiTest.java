@@ -451,22 +451,22 @@ public class ImportUiTest {
 
             fixture.removeCalendar(removed);
             scenario.recreate();
-            ui.revealId("import_summary");
-            String unavailable = context().getString(R.string.auto_destination_unavailable);
-            ui.await(
-                    () -> {
-                        android.view.accessibility.AccessibilityNodeInfo summary =
-                                ui.find("import_summary", true);
-                        return summary != null
-                                && summary.getText() != null
-                                && summary.getText().toString().contains(unavailable);
-                    },
-                    "Restored preview did not report the missing calendar");
             assertEquals(sessionId, latest().id);
             assertEquals(HistoricalImport.Phase.PREVIEW, latest().phase);
             assertEquals(remainingEvents, fixture.events(calendar()));
 
             ui.tapId("import_confirm");
+            String unavailable = context().getString(R.string.auto_destination_unavailable);
+            ui.await(
+                    () -> {
+                        android.view.accessibility.AccessibilityNodeInfo message =
+                                ui.find("message", true);
+                        return message != null
+                                && message.getText() != null
+                                && message.getText().toString().contains(unavailable);
+                    },
+                    "Confirmation did not disclose the missing calendar");
+            ui.capture("import-missing-destination-confirmation");
             ui.tapDialogPositive();
             ui.await(
                     () -> latest().stopped == DurableDelivery.Result.DESTINATION_UNAVAILABLE,
