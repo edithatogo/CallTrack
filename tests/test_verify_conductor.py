@@ -91,6 +91,7 @@ class VerificationFailures(unittest.TestCase):
         path = self.root / 'conductor/tracks/ios_companion_20261021/metadata.json'
         data = json.loads(path.read_text())
         data['status'] = 'in_progress'
+        data['implementation_status'] = 'in-progress'
         path.write_text(json.dumps(data))
         with self.assertRaisesRegex(AssertionError, 'iOS must remain last'):
             self.run_verifier()
@@ -115,6 +116,7 @@ class VerificationFailures(unittest.TestCase):
         path = self.root / 'conductor/tracks/compose_app_20261021/metadata.json'
         data = json.loads(path.read_text())
         data['status'] = 'in_progress'
+        data['implementation_status'] = 'in-progress'
         data.pop('prerequisite_deferral_document', None)
         path.write_text(json.dumps(data))
         with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
@@ -124,6 +126,7 @@ class VerificationFailures(unittest.TestCase):
         compose = self.root / 'conductor/tracks/compose_app_20261021/metadata.json'
         data = json.loads(compose.read_text())
         data['status'] = 'in_progress'
+        data['implementation_status'] = 'in-progress'
         data['prerequisite_deferral_document'] = 'prerequisite-deferral.md'
         compose.write_text(json.dumps(data))
         self.run_verifier()
@@ -131,6 +134,7 @@ class VerificationFailures(unittest.TestCase):
         shared_core = self.root / 'conductor/tracks/shared_core_20261021/metadata.json'
         data = json.loads(shared_core.read_text())
         data['status'] = 'in_progress'
+        data['implementation_status'] = 'in-progress'
         data.pop('prerequisite_deferral_document', None)
         shared_core.write_text(json.dumps(data))
         with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
@@ -150,6 +154,7 @@ class VerificationFailures(unittest.TestCase):
         path = shared_core / 'metadata.json'
         data = json.loads(path.read_text())
         data['status'] = 'in_progress'
+        data['implementation_status'] = 'in-progress'
         data['prerequisite_deferral_document'] = 'prerequisite-deferral.md'
         path.write_text(json.dumps(data))
         (shared_core / 'prerequisite-deferral.md').write_text(
@@ -163,11 +168,13 @@ class VerificationFailures(unittest.TestCase):
             self.run_verifier()
 
         data['status'] = 'in_progress'
+        data['implementation_status'] = 'in-progress'
         path.write_text(json.dumps(data))
 
         macos = self.root / 'conductor/tracks/macos_companion_20261021/metadata.json'
         data = json.loads(macos.read_text())
         data['status'] = 'in_progress'
+        data['implementation_status'] = 'in-progress'
         data.pop('prerequisite_deferral_document', None)
         macos.write_text(json.dumps(data))
         with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
@@ -178,6 +185,7 @@ class VerificationFailures(unittest.TestCase):
         path = macos / 'metadata.json'
         data = json.loads(path.read_text())
         data['status'] = 'in_progress'
+        data['implementation_status'] = 'in-progress'
         data['prerequisite_deferral_document'] = 'prerequisite-deferral.md'
         path.write_text(json.dumps(data))
         (macos / 'prerequisite-deferral.md').write_text(
@@ -188,6 +196,7 @@ class VerificationFailures(unittest.TestCase):
         shared_ui = self.root / 'conductor/tracks/shared_ui_20261021/metadata.json'
         data = json.loads(shared_ui.read_text())
         data['status'] = 'in_progress'
+        data['implementation_status'] = 'in-progress'
         data.pop('prerequisite_deferral_document', None)
         shared_ui.write_text(json.dumps(data))
         with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
@@ -204,6 +213,7 @@ class VerificationFailures(unittest.TestCase):
         path = shared_ui / 'metadata.json'
         data = json.loads(path.read_text())
         data['status'] = 'in_progress'
+        data['implementation_status'] = 'in-progress'
         data['prerequisite_deferral_document'] = 'prerequisite-deferral.md'
         path.write_text(json.dumps(data))
         (shared_ui / 'prerequisite-deferral.md').write_text(
@@ -219,6 +229,7 @@ class VerificationFailures(unittest.TestCase):
 
         data = json.loads(rust.read_text())
         data['status'] = 'in_progress'
+        data['implementation_status'] = 'in-progress'
         rust.write_text(json.dumps(data))
         with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
             self.run_verifier()
@@ -251,6 +262,7 @@ class VerificationFailures(unittest.TestCase):
         cross_platform = self.root / 'conductor/tracks/cross_platform_20261021/metadata.json'
         data = json.loads(cross_platform.read_text())
         data['status'] = 'in_progress'
+        data['implementation_status'] = 'in-progress'
         cross_platform.write_text(json.dumps(data))
         with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
             self.run_verifier()
@@ -261,6 +273,7 @@ class VerificationFailures(unittest.TestCase):
         path = rust / 'metadata.json'
         data = json.loads(path.read_text())
         data['status'] = 'in_progress'
+        data['implementation_status'] = 'in-progress'
         data['implementation_status'] = 'scoped-evaluation-only'
         data['prerequisite_deferral_document'] = 'prerequisite-deferral.md'
         path.write_text(json.dumps(data))
@@ -272,6 +285,7 @@ class VerificationFailures(unittest.TestCase):
         cross_platform = self.root / 'conductor/tracks/cross_platform_20261021/metadata.json'
         data = json.loads(cross_platform.read_text())
         data['status'] = 'in_progress'
+        data['implementation_status'] = 'in-progress'
         cross_platform.write_text(json.dumps(data))
         with self.assertRaisesRegex(AssertionError, 'Unresolved earlier execution sequence'):
             self.run_verifier()
@@ -288,6 +302,7 @@ class VerificationFailures(unittest.TestCase):
         path = cross_platform / 'metadata.json'
         data = json.loads(path.read_text())
         data['status'] = 'in_progress'
+        data['implementation_status'] = 'in-progress'
         data['prerequisite_deferral_document'] = 'prerequisite-deferral.md'
         path.write_text(json.dumps(data))
         (cross_platform / 'prerequisite-deferral.md').write_text(
@@ -298,6 +313,7 @@ class VerificationFailures(unittest.TestCase):
         ios = self.root / 'conductor/tracks/ios_companion_20261021/metadata.json'
         data = json.loads(ios.read_text())
         data['status'] = 'in_progress'
+        data['implementation_status'] = 'in-progress'
         ios.write_text(json.dumps(data))
         with self.assertRaisesRegex(AssertionError, 'iOS must remain last'):
             self.run_verifier()
@@ -324,6 +340,7 @@ class VerificationFailures(unittest.TestCase):
         path = self.root / 'conductor/tracks/ios_companion_20261021/metadata.json'
         data = json.loads(path.read_text())
         data['status'] = 'in_progress'
+        data['implementation_status'] = 'in-progress'
         path.write_text(json.dumps(data))
         self.run_verifier()
 
@@ -332,6 +349,7 @@ class VerificationFailures(unittest.TestCase):
         path = ios / 'metadata.json'
         data = json.loads(path.read_text())
         data['status'] = 'in_progress'
+        data['implementation_status'] = 'in-progress'
         data['prerequisite_deferral_document'] = 'prerequisite-deferral.md'
         path.write_text(json.dumps(data))
         (ios / 'prerequisite-deferral.md').write_text(
