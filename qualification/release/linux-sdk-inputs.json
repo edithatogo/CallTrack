@@ -18,12 +18,12 @@
     "sha256": "37607369a28c5b640b3a7998868d45898ebcb777565a0e85f9acf36f29631d2e"
   },
   {
-    "package": "build-tools;35.0.0",
-    "url": "https://dl.google.com/android/repository/build-tools_r35_linux.zip",
-    "size": 61958799,
+    "package": "build-tools;36.0.0",
+    "url": "https://dl.google.com/android/repository/build-tools_r36_linux.zip",
+    "size": 63737259,
     "checksum_algorithm": "sha1",
-    "checksum": "2cfaa0bbb2336e9ec18ed3ecea84fa2e2af607bc",
+    "checksum": "b0b6376977657e8ad9b969bacf4093601da2c6fb",
     "licence": "android-sdk-license",
-    "sha256": "bd3a4966912eb8b30ed0d00b0cda6b6543b949d5ffe00bea54c04c81e1561d88"
+    "sha256": "5d9ac77fb6ff43d9da518a337b4fcf8f9097113df531d99ccefe80ef7ce8250b"
   }
 ]

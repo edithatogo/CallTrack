@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import time
 
@@ -27,7 +28,7 @@ def compare_artifacts(paths):
 
 
 def verify_unsigned(apk, sdk, env):
-    result = subprocess.run([str(sdk / 'build-tools/35.0.0/apksigner'), 'verify',
+    result = subprocess.run([str(sdk / 'build-tools/36.0.0/apksigner'), 'verify',
                              '--print-certs', str(apk)], env=env, capture_output=True, text=True)
     output = result.stdout + result.stderr
     if result.returncode == 0 or 'ERROR: Missing META-INF/MANIFEST.MF' not in output:
@@ -47,6 +48,10 @@ def run(output, jdk, sdk):
     start = time.monotonic()
     artifacts = []
     try:
+        receipt['java_version'] = subprocess.check_output(
+            [str(jdk / 'bin/java'), '-version'], stderr=subprocess.STDOUT, text=True)
+        if not re.search(r'version "25[.]', receipt['java_version']):
+            raise ValueError('JDK25 required')
         for number in (1, 2):
             checkout = output / f'checkout-{number}'
             subprocess.run(['git', 'clone', '--quiet', '--no-hardlinks', '--no-checkout',
@@ -73,7 +78,7 @@ def run(output, jdk, sdk):
             record['apk'] = str(apk)
             record['apk_sha256'] = digest(apk)
             record['badging'] = subprocess.check_output(
-                [str(sdk / 'build-tools/35.0.0/aapt'), 'dump', 'badging', str(apk)], text=True)
+                [str(sdk / 'build-tools/36.0.0/aapt'), 'dump', 'badging', str(apk)], text=True)
         receipt['comparison'] = compare_artifacts(artifacts)
         receipt['success'] = receipt['comparison']['identical']
         if not receipt['success']:

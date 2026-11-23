@@ -65,11 +65,12 @@ jobs:
       - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
           distribution: temurin
-          java-version: '17.0.21+100000002'
+          java-version: '25.0.5+100000002.0.LTS'
       - name: Create the repository Python environment
         run: |
           python -m venv .venv
           test "$(.venv/bin/python --version)" = "Python $(cat .python-version)"
+          java -version 2>&1 | grep -F 'Temurin-25.0.5.1+2'
       - name: Install API ${{ matrix.api-level }} emulator packages
         run: |
           set -euo pipefail
@@ -87,6 +88,7 @@ jobs:
           } >> "$GITHUB_PATH"
           "$sdkmanager_path" "platforms;android-36" \
             "build-tools;35.0.0" \
+            "build-tools;36.0.0" \
             "system-images;android-${{ matrix.api-level }};google_apis;x86_64"
           "$ANDROID_HOME/emulator/emulator" -accel-check
       - name: Build source-bound app and test APKs

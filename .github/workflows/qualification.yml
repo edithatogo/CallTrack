@@ -70,11 +70,12 @@ jobs:
       - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
           distribution: temurin
-          java-version: '17.0.21+100000002'
+          java-version: '25.0.5+100000002.0.LTS'
       - name: Select repository Python runtime
         run: |
           python -m venv .venv
           test "$(.venv/bin/python --version)" = "Python $(cat .python-version)"
+          java -version 2>&1 | grep -F 'Temurin-25.0.5.1+2'
       - name: Add Android SDK command-line tools to PATH
         run: |
           test -n "$ANDROID_HOME"
@@ -82,7 +83,7 @@ jobs:
           test -n "$sdkmanager_path"
           dirname "$sdkmanager_path" >> "$GITHUB_PATH"
       - name: Install slice SDK
-        run: sdkmanager "platforms;android-36" "build-tools;35.0.0"
+        run: sdkmanager "platforms;android-36" "build-tools;35.0.0" "build-tools;36.0.0"
       - name: Verify tooling and Conductor
         run: |
           .venv/bin/python -m unittest discover -s tests -v
@@ -90,9 +91,9 @@ jobs:
       - name: Check slice Java formatting
         run: |
           mkdir -p .local/toolchain
-          curl --fail --location --silent --show-error https://repo.maven.apache.org/maven2/com/google/googlejavaformat/google-java-format/1.24.0/google-java-format-1.24.0-all-deps.jar -o .local/toolchain/google-java-format-1.24.0.jar
-          echo "812f805f58112460edf01bf202a8e61d0fd1f35c0d4fabd54220640776ec57a1  .local/toolchain/google-java-format-1.24.0.jar" | sha256sum --check
-          java -jar .local/toolchain/google-java-format-1.24.0.jar --aosp --dry-run --set-exit-if-changed app/src/*/java/com/markobl/calllogsync/slice/*.java
+          curl --fail --location --silent --show-error https://repo.maven.apache.org/maven2/com/google/googlejavaformat/google-java-format/1.37.0/google-java-format-1.37.0-all-deps.jar -o .local/toolchain/google-java-format-1.37.0.jar
+          echo "834b2a0c38cb774953322a84b5ca3f2f40dd3156650b3cd44d3b744345962f7a  .local/toolchain/google-java-format-1.37.0.jar" | sha256sum --check
+          java -jar .local/toolchain/google-java-format-1.37.0.jar --aosp --dry-run --set-exit-if-changed app/src/*/java/com/markobl/calllogsync/slice/*.java
       - name: Check Kotlin formatting
         run: |
           mkdir -p .local/toolchain
@@ -103,6 +104,17 @@ jobs:
         run: .venv/bin/python scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"
       - name: Compile and package unsigned release variant
         run: sh gradlew --no-daemon --console=plain :app:assembleRelease
+      - name: Verify shared-core host tests
+        run: |
+          sh gradlew --no-daemon --console=plain :shared-core:jvmTest :shared-core:testAndroidHostTest
+          for result_dir in shared-core/build/test-results/jvmTest shared-core/build/test-results/testAndroidHostTest; do
+            test -d "$result_dir"
+            reports=$(find "$result_dir" -type f -name 'TEST-*.xml' -print)
+            test -n "$reports"
+            summaries=$(find "$result_dir" -type f -name 'TEST-*.xml' -exec grep -h '<testsuite' {} +)
+            printf '%s\n' "$summaries" | grep -Eq 'tests="[1-9][0-9]*"'
+            if printf '%s\n' "$summaries" | grep -Eq '(skipped|failures|errors)="[1-9][0-9]*"'; then exit 1; fi
+          done
   multiplatform-ui:
     runs-on: ubuntu-latest
     steps:
@@ -112,7 +124,9 @@ jobs:
       - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
           distribution: temurin
-          java-version: '17.0.21+100000002'
+          java-version: '25.0.5+100000002.0.LTS'
+      - name: Verify Java runtime
+        run: java -version 2>&1 | grep -F 'Temurin-25.0.5.1+2'
       - name: Check multiplatform UI Kotlin formatting
         run: |
           mkdir -p .local/toolchain

@@ -1,6 +1,8 @@
 import json
+import io
 from pathlib import Path
 import sys
+import tarfile
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -12,6 +14,26 @@ import audit_release_artifacts as artifacts
 
 
 class ToolTrustTest(unittest.TestCase):
+    def test_temurin_archive_comparison_rejects_missing_changed_and_extra_files(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            archive = root / 'jdk.tar.gz'
+            with tarfile.open(archive, 'w:gz') as bundle:
+                data = b'verified-java'
+                member = tarfile.TarInfo('jdk-25.0.5.1+2/Contents/Home/bin/java')
+                member.size = len(data)
+                bundle.addfile(member, io.BytesIO(data))
+            installed = root / 'jdk'
+            java = installed / 'Contents/Home/bin/java'
+            java.parent.mkdir(parents=True)
+            self.assertFalse(tools.temurin_comparison(archive, installed)['all_jdk_files_match'])
+            java.write_bytes(b'tampered')
+            self.assertFalse(tools.temurin_comparison(archive, installed)['all_jdk_files_match'])
+            java.write_bytes(data)
+            self.assertTrue(tools.temurin_comparison(archive, installed)['all_jdk_files_match'])
+            (java.parent / 'unexpected').write_bytes(b'extra')
+            self.assertFalse(tools.temurin_comparison(archive, installed)['all_jdk_files_match'])
+
     def test_changed_or_missing_installed_tool_does_not_pass(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

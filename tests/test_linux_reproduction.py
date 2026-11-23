@@ -89,10 +89,10 @@ class LinuxBoundaries(unittest.TestCase):
             source = root / 'source'
             source.mkdir()
             output = root / 'output'
-            calls = [revision + '\n', b'', b'', 'openjdk version "25.0.1"']
+            calls = [revision + '\n', b'', b'', 'openjdk version "17.0.21"']
             with patch.object(linux.platform, 'system', return_value='Linux'), \
                  patch.object(linux.subprocess, 'check_output', side_effect=calls):
-                with self.assertRaisesRegex(ValueError, 'JDK17 required'):
+                with self.assertRaisesRegex(ValueError, 'JDK25 required'):
                     linux.run(source, output, revision, '0' * 64)
             receipt = json.loads((output / 'evidence/receipt.json').read_text())
             helper = Path(linux.__file__).with_name('redirect_validation.py')
@@ -124,7 +124,7 @@ class LinuxBoundaries(unittest.TestCase):
                 apk.parent.mkdir(parents=True)
                 apk.write_bytes(b'candidate')
                 apk_hash = hashlib.sha256(b'candidate').hexdigest()
-                calls = [revision + '\n', b'', b'', 'openjdk version "17.0.21.1"', b'']
+                calls = [revision + '\n', b'', b'', 'openjdk version "25.0.5.1"', b'']
                 build = subprocess.CompletedProcess([], 0)
                 unsigned = subprocess.CompletedProcess([], 1, stdout='ERROR: Missing META-INF/MANIFEST.MF', stderr='')
                 def download(_url, archive, _row):
@@ -150,3 +150,18 @@ class LinuxBoundaries(unittest.TestCase):
                     self.assertEqual({'Error': 1}, receipt['lint'])
                 if name == 'warning':
                     self.assertEqual({'Warning': 1}, receipt['lint'])
+
+    def test_older_jdk_fails_and_retains_receipt(self):
+        revision = 'a' * 40
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / 'source'
+            source.mkdir()
+            calls = [revision + '\n', b'', b'', 'openjdk version "17.0.21"']
+            with patch.object(linux.platform, 'system', return_value='Linux'), \
+                 patch.object(linux.subprocess, 'check_output', side_effect=calls):
+                with self.assertRaisesRegex(ValueError, 'JDK25 required'):
+                    linux.run(source, root / 'output', revision, '0' * 64)
+            receipt = json.loads((root / 'output/evidence/receipt.json').read_text())
+            self.assertFalse(receipt['success'])
+            self.assertEqual('JDK25 required', receipt['error'])
