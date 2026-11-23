@@ -12,5 +12,6 @@
   "requirements": "Preserving import, receipt, recovery and no-duplicate authority",
   "implementation_status": "selected-Room3.0.3-migration-unimplemented",
   "production_adopted": false,
-  "reference": "../../architecture-android17.md"
+  "reference": "../../architecture-android17.md",
+  "github_issue": "https://github.com/edithatogo/CallTrack/issues/115"
 }

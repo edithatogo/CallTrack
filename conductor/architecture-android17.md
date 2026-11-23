@@ -59,3 +59,7 @@ Use a concise checkpoint per accepted release or major transition: source/artefa
 ## Explicit deferrals
 
 Android API 26/33/36 and all other OS/runtime targets, macOS, iOS, desktop and cross-platform UI, KMP production reuse, Rust and direct Graph/Google/CalDAV connectors are on the [historical roadmap](roadmap.md), **not** in active product development. Reopen only after an Android 17 production acceptance and a concrete requirement, with a new decision and exact regression evidence.
+
+## GitHub execution links
+
+[Native architecture and scope PR #114](https://github.com/edithatogo/CallTrack/pull/114) · [Room migration issue #115](https://github.com/edithatogo/CallTrack/issues/115) · [native UI cleanup issue #116](https://github.com/edithatogo/CallTrack/issues/116) · [local Apple Silicon runner issue #117](https://github.com/edithatogo/CallTrack/issues/117). These are task pointers only; an open issue or draft PR does not establish acceptance.
