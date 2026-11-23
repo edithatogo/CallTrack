@@ -247,6 +247,9 @@ cloud-account integration or SDK licence acceptance command is configured.
 The SDK terms must already be authorised for the builder; package origins/sizes,
 Google checksums and reviewed SHA256 values are in
 `qualification/release/linux-sdk-inputs.json`.
+The cold build reads Google's matching package descriptor for the pinned Android
+37.1 archive so AGP recognises the installed minor SDK. The receipt records the
+catalogue and descriptor hashes.
 
 Use `scripts/qualify_linux_build.py --help` for a direct Linux runner. Its output
 directory must not exist; a dirty/wrong candidate, reused output, wrong SDK origin,

@@ -70,6 +70,48 @@ class LinuxBoundaries(unittest.TestCase):
                     linux.extract_sdk(archive,path/'sdk')
                 self.assertFalse((path/'outside').exists())
 
+    def test_minor_platform_registers_verified_payload_without_accepting_licences(self):
+        catalogue = b'''<sdk:sdk-repository
+          xmlns:sdk="http://schemas.android.com/sdk/android/repo/repository2/03"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <license id="android-sdk-license" type="text">SDK terms fixture</license>
+          <remotePackage path="platforms;android-37.1">
+            <type-details xsi:type="sdk:platformDetailsType"><api-level>37.1</api-level></type-details>
+            <revision><major>1</major></revision><display-name>SDK platform fixture</display-name>
+            <uses-license ref="android-sdk-license"/>
+            <archives><archive><complete>
+              <size>12</size><url>platform-37.1_r01.zip</url><checksum type="sha1">fixture</checksum>
+            </complete></archive></archives>
+          </remotePackage>
+        </sdk:sdk-repository>'''
+        row = {'package': 'platforms;android-37.1', 'size': 12,
+               'url': 'https://dl.google.com/android/repository/platform-37.1_r01.zip',
+               'licence': 'android-sdk-license', 'checksum_algorithm': 'sha1', 'checksum': 'fixture'}
+        for selected, size, permission in ((True, 12, 'android-sdk-license'),
+                                           (False, 13, 'android-sdk-license'),
+                                           (False, 12, 'other-licence')):
+            with self.subTest(size=size, permission=permission), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                destination = root / 'platforms/android-37.1'
+                destination.mkdir(parents=True)
+                response = io.BytesIO(catalogue)
+                response.url = linux.SDK_CATALOGUE
+                with patch.object(linux.SDK_OPENER, 'open', return_value=response):
+                    record = dict(row, size=size, licence=permission)
+                    if selected:
+                        evidence = linux.install_minor_platform_metadata(destination, record)
+                        data = (destination / 'package.xml').read_bytes()
+                        self.assertEqual(hashlib.sha256(data).hexdigest(), evidence['package_xml_sha256'])
+                        metadata = ET.fromstring(data)
+                        self.assertEqual(row['package'], metadata.find('localPackage').get('path'))
+                        self.assertEqual('37.1', metadata.findtext('localPackage/type-details/api-level'))
+                        self.assertEqual(row['licence'], metadata.find('localPackage/uses-license').get('ref'))
+                    else:
+                        with self.assertRaisesRegex(ValueError, 'SDK catalogue|licence reference'):
+                            linux.install_minor_platform_metadata(destination, record)
+                        self.assertFalse((destination / 'package.xml').exists())
+                self.assertFalse((root / 'licenses').exists())
+
     def test_partial_or_changed_download_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             f=Path(tmp)/'archive';f.write_bytes(b'changed')
@@ -134,6 +176,7 @@ class LinuxBoundaries(unittest.TestCase):
                      patch.object(linux.subprocess, 'run', side_effect=[build, unsigned]), \
                      patch.object(linux, 'download_sdk_archive', side_effect=download), \
                      patch.object(linux, 'extract_sdk'), \
+                     patch.object(linux, 'install_minor_platform_metadata', return_value={}), \
                      patch.object(linux, 'junit_counts', return_value={
                          'tests':118 if name == 'missing-jvm-test' else 119,
                          'failures':0, 'errors':0, 'skipped':0}), \
