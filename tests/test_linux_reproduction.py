@@ -2,9 +2,11 @@
 import hashlib
 import importlib.util
 import io
+import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 import zipfile
 
 SPEC = importlib.util.spec_from_file_location('linux_build', Path(__file__).resolve().parents[1] / 'scripts/qualify_linux_build.py')
@@ -58,3 +60,18 @@ class LinuxBoundaries(unittest.TestCase):
         for value in ['main','HEAD','abc; echo bad','0'*39]:
             with self.assertRaises(ValueError):linux.validate_revision(value)
         linux.validate_revision('a'*40)
+
+    def test_older_jdk_fails_and_retains_receipt(self):
+        revision = 'a' * 40
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / 'source'
+            source.mkdir()
+            calls = [revision + '\n', b'', b'', 'openjdk version "17.0.21"']
+            with patch.object(linux.platform, 'system', return_value='Linux'), \
+                 patch.object(linux.subprocess, 'check_output', side_effect=calls):
+                with self.assertRaisesRegex(ValueError, 'JDK25 required'):
+                    linux.run(source, root / 'output', revision, '0' * 64)
+            receipt = json.loads((root / 'output/evidence/receipt.json').read_text())
+            self.assertFalse(receipt['success'])
+            self.assertEqual('JDK25 required', receipt['error'])

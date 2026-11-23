@@ -110,12 +110,12 @@ def run(source, output, revision, expected_apk):
     env.pop('ANDROID_SDK_ROOT', None)
     try:
         receipt['java_version'] = subprocess.check_output(['java', '-version'], stderr=subprocess.STDOUT, text=True)
-        if not re.search(r'version "17[.]', receipt['java_version']):
-            raise ValueError('JDK17 required')
+        if not re.search(r'version "25[.]', receipt['java_version']):
+            raise ValueError('JDK25 required')
         packages = json.loads((TOOLS / 'qualification/release/linux-sdk-inputs.json').read_text())
         destinations = {'cmdline-tools;19.0': sdk / 'cmdline-tools/19.0',
                         'platforms;android-36': sdk / 'platforms/android-36',
-                        'build-tools;35.0.0': sdk / 'build-tools/35.0.0'}
+                        'build-tools;36.0.0': sdk / 'build-tools/36.0.0'}
         for row in packages:
             approved_url(row['url'])
             if row.get('licence') != 'android-sdk-license':
@@ -161,7 +161,7 @@ def run(source, output, revision, expected_apk):
         apk = source / 'app/build/outputs/apk/release/app-release-unsigned.apk'
         receipt['apk_sha256'] = sha(apk)
         (evidence / apk.name).write_bytes(apk.read_bytes())
-        check = subprocess.run([str(sdk / 'build-tools/35.0.0/apksigner'), 'verify', str(apk)],
+        check = subprocess.run([str(sdk / 'build-tools/36.0.0/apksigner'), 'verify', str(apk)],
                                env=env, capture_output=True, text=True)
         receipt['unsigned_verified'] = check.returncode != 0 and 'ERROR: Missing META-INF/MANIFEST.MF' in check.stdout + check.stderr
         if not receipt['unsigned_verified']:

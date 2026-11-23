@@ -20,7 +20,7 @@ from qualify_kotlin_update import PACKAGE, TEST_PACKAGE, require_successful_rece
 from run_slice_build import inputs
 
 ROOT = Path(__file__).resolve().parents[1]
-JDK = Path(os.environ.get('JAVA_HOME', '/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home'))
+JDK = Path(os.environ['JAVA_HOME']) if os.environ.get('JAVA_HOME') else None
 
 
 def require_rejection(result, reason):
@@ -88,6 +88,8 @@ def require_identical_payload(unsigned, signed):
 def qualify(serial, output, provider_schema=False, release_build_receipt=None):
     if not re.fullmatch(r'emulator-\d+', serial):
         raise RuntimeError('Release upgrade probe refuses physical-device serials')
+    if JDK is None:
+        raise RuntimeError('JAVA_HOME must select the qualified JDK 25')
     if subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT).strip():
         raise RuntimeError('Commit source before release upgrade probe')
     key = Path.home() / '.android/debug.keystore'

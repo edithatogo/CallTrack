@@ -1,5 +1,5 @@
 #!/usr/bin/env -S uv run python
-"""Read-only comparison against official Gradle/SDK/Homebrew archive evidence.
+"""Read-only comparison against official Gradle, SDK and Temurin archive evidence.
 
 Never installs tools, accepts licences or treats HTTPS checksums as independent signatures.
 Success qualifies payload-origin comparison only; JDK bundle-resource sealing is separate.
@@ -7,7 +7,8 @@ Success qualifies payload-origin comparison only; JDK bundle-resource sealing is
 import argparse
 import hashlib
 import json
-from pathlib import Path
+import os
+from pathlib import Path, PurePosixPath
 import re
 import subprocess
 import struct
@@ -66,6 +67,36 @@ def zip_comparison(archive, installed):
                              installed_sha256=sha(actual) if actual.is_file() else None))
     return dict(files=rows, all_archive_files_match=bool(rows) and all(
         r['archive_sha256'] == r['installed_sha256'] for r in rows))
+
+
+def temurin_comparison(archive, installed):
+    """Match every regular bundle file to the pinned publisher archive."""
+    rows, expected_paths = [], set()
+    with tarfile.open(archive) as bundle:
+        for member in bundle:
+            path = PurePosixPath(member.name)
+            if not path.parts or path.parts[0] != 'jdk-25.0.5.1+2' or '..' in path.parts:
+                raise ValueError('Unsafe or unexpected JDK archive path')
+            if member.isdir():
+                continue
+            if not member.isfile() or len(path.parts) < 2:
+                raise ValueError('Unexpected JDK archive member')
+            relative = Path(*path.parts[1:])
+            if relative in expected_paths:
+                raise ValueError('Duplicate JDK archive member')
+            expected_paths.add(relative)
+            target = installed / relative
+            with bundle.extractfile(member) as stream:
+                expected = hashlib.file_digest(stream, 'sha256').hexdigest()
+            safe = (target.is_file() and not installed.is_symlink() and
+                    all(not installed.joinpath(*relative.parts[:index]).is_symlink()
+                        for index in range(1, len(relative.parts) + 1)))
+            rows.append(dict(path=str(relative), archive_sha256=expected,
+                             installed_sha256=sha(target) if safe else None))
+    actual_paths = {p.relative_to(installed) for p in installed.rglob('*') if p.is_file() or p.is_symlink()}
+    return dict(files=rows, unexpected_files=sorted(str(p) for p in actual_paths - expected_paths),
+                all_jdk_files_match=bool(rows) and actual_paths == expected_paths and all(
+                    r['archive_sha256'] == r['installed_sha256'] for r in rows))
 
 
 def macho_payload(data):
@@ -150,25 +181,26 @@ def run(output, archives_from=None):
     receipt = dict(scope=__doc__, release_ready=False, independently_signed=False, success=False,
                    reused_download_archives=archives_from is not None)
     try:
-        wrapper_url = 'https://services.gradle.org/distributions/gradle-7.0.2-wrapper.jar.sha256'
+        wrapper_url = 'https://services.gradle.org/distributions/gradle-9.7.0-wrapper.jar.sha256'
         wrapper_expected = published_checksum(wrapper_url, output / 'wrapper.sha256')
         wrapper_actual = sha(ROOT / 'gradle/wrapper/gradle-wrapper.jar')
-        receipt['wrapper'] = dict(official_matching_hash_reference='7.0.2 (shared bootstrap hash; not inferred from distribution URL)', url=wrapper_url,
+        receipt['wrapper'] = dict(official_matching_hash_reference='9.7.0', url=wrapper_url,
                                    expected=wrapper_expected, actual=wrapper_actual, matches=wrapper_actual == wrapper_expected,
-                                   execution_distribution='8.13')
-        distribution_url = 'https://services.gradle.org/distributions/gradle-8.13-bin.zip.sha256'
+                                   execution_distribution='9.7.0')
+        distribution_url = 'https://services.gradle.org/distributions/gradle-9.7.0-bin.zip.sha256'
         expected = published_checksum(distribution_url, output / 'gradle.sha256')
         properties = (ROOT / 'gradle/wrapper/gradle-wrapper.properties').read_text()
         receipt['distribution_pin'] = dict(url=distribution_url, sha256=expected,
                                            pin_matches=('distributionSha256Sum=' + expected) in properties)
-        distribution = output / 'gradle-8.13-bin.zip'
+        distribution = output / 'gradle-9.7.0-bin.zip'
         if archives_from is not None:
             distribution.symlink_to((archives_from / distribution.name).resolve())
         else:
-            fetch('https://services.gradle.org/distributions/gradle-8.13-bin.zip', distribution)
+            fetch('https://services.gradle.org/distributions/gradle-9.7.0-bin.zip', distribution)
         if sha(distribution) != expected:
             raise RuntimeError('Gradle distribution checksum mismatch')
-        caches = list((Path.home() / '.gradle/wrapper/dists/gradle-8.13-bin').glob('*/gradle-8.13'))
+        gradle_home = Path(os.environ.get('GRADLE_USER_HOME', Path.home() / '.gradle'))
+        caches = list((gradle_home / 'wrapper/dists/gradle-9.7.0-bin').glob('*/gradle-9.7.0'))
         if len(caches) != 1:
             raise RuntimeError('Exact installed Gradle distribution required')
         receipt['gradle_distribution'] = zip_comparison(distribution, caches[0])
@@ -177,8 +209,8 @@ def run(output, archives_from=None):
         root = ET.fromstring(repository.read_bytes())
         receipt['sdk_repository_sha256'] = sha(repository)
         receipt['sdk'] = []
-        sdk = (ROOT / '.local/android-sdk').resolve()
-        targets = {'build-tools;35.0.0': sdk / 'build-tools/35.0.0',
+        sdk = Path(os.environ.get('ANDROID_HOME', ROOT / '.local/android-sdk')).resolve()
+        targets = {'build-tools;36.0.0': sdk / 'build-tools/36.0.0',
                    'platforms;android-36': sdk / 'platforms/android-36',
                    'platform-tools': sdk / 'platform-tools',
                    'cmdline-tools;19.0': sdk / 'cmdline-tools/19.0'}
@@ -209,46 +241,39 @@ def run(output, archives_from=None):
             licence = next((e for e in node if e.tag.endswith('uses-license')), None)
             row['licence_id'] = licence.get('ref') if licence is not None else None
             receipt['sdk'].append(row)
-        formula_file = output / 'openjdk17-formula.json'
-        fetch('https://formulae.brew.sh/api/formula/openjdk@17.json', formula_file)
-        formula = json.loads(formula_file.read_text())
-        bottles = list((Path.home() / 'Library/Caches/Homebrew/downloads').glob('*openjdk@17--17.0.21.arm64_golden_gate.bottle.tar.gz'))
-        if len(bottles) != 1:
-            raise RuntimeError('Exact installed JDK bottle cache required')
-        bottle = bottles[0]
-        record = formula['bottle']['stable']['files']['arm64_golden_gate']
-        actual = sha(bottle)
-        if actual != record['sha256']:
-            raise RuntimeError('JDK bottle differs from current official formula evidence')
-        files = []
-        with tarfile.open(bottle) as archive:
-            for member in archive:
-                if not member.isfile() or '/libexec/openjdk.jdk/' not in member.name:
-                    continue
-                relative = member.name.split('/libexec/openjdk.jdk/', 1)[1]
-                installed = Path('/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk') / relative
-                expected_file = hashlib.sha256(archive.extractfile(member).read()).hexdigest()
-                row = dict(path=relative, archive_sha256=expected_file,
-                           installed_sha256=sha(installed) if installed.is_file() else None)
-                if row['installed_sha256'] != expected_file:
-                    copy = output / 'jdk-relocation' / relative
-                    copy.parent.mkdir(parents=True, exist_ok=True)
-                    copy.write_bytes(archive.extractfile(member).read())
-                    row['reproduced_relocation_options'] = reproduce_relocation(copy)
-                    row['reproduced_sha256'] = sha(copy)
-                    if row['reproduced_sha256'] != row['installed_sha256']:
-                        row['signature_check'] = verify_jdk_signature(installed, relative)
-                        subprocess.run(['codesign', '--verify', '--strict', str(copy)], capture_output=True, check=True)
-                        row['reproduced_payload_sha256'] = macho_payload(copy.read_bytes())
-                        row['installed_payload_sha256'] = macho_payload(installed.read_bytes())
-                        row['signature_allocation_only'] = row['reproduced_payload_sha256'] == row['installed_payload_sha256']
-                files.append(row)
-        receipt['jdk'] = dict(formula_url='https://formulae.brew.sh/api/formula/openjdk@17.json',
-                               formula_sha256=sha(formula_file), bottle_sha256=actual,
-                               licence=formula['license'], files=files,
-                               bundle_resource_seal_qualified=all(r.get('signature_check', {}).get('strict_valid', True) for r in files),
-                               all_jdk_files_match=bool(files) and all(r.get('reproduced_sha256', r['archive_sha256']) == r['installed_sha256'] for r in files),
-                               all_jdk_payloads_match=bool(files) and all(r.get('reproduced_sha256', r['archive_sha256']) == r['installed_sha256'] or r.get('signature_allocation_only') is True for r in files))
+        jdk_name = 'OpenJDK25U-jdk_aarch64_mac_hotspot_25.0.5.1_2.tar.gz'
+        jdk_url = ('https://github.com/adoptium/temurin25-binaries/releases/download/'
+                   'jdk-25.0.5.1%2B2/' + jdk_name)
+        checksum_file = output / 'temurin25.sha256'
+        fetch(jdk_url + '.sha256.txt', checksum_file)
+        if checksum_file.read_text().strip().split() != [
+                '248353ea41be39d5d2c1c67c7ce0ae4d1668966aacd0c5308464bc1be42f677b', jdk_name]:
+            raise RuntimeError('Temurin publisher checksum differs from the pinned release')
+        jdk_archive = output / jdk_name
+        if archives_from is not None:
+            jdk_archive.symlink_to((archives_from / jdk_name).resolve())
+        else:
+            fetch(jdk_url, jdk_archive)
+        if sha(jdk_archive) != '248353ea41be39d5d2c1c67c7ce0ae4d1668966aacd0c5308464bc1be42f677b':
+            raise RuntimeError('Temurin archive checksum mismatch')
+        if not os.environ.get('JAVA_HOME'):
+            raise RuntimeError('JAVA_HOME must select the audited Temurin JDK')
+        jdk_home = Path(os.environ['JAVA_HOME']).resolve()
+        if jdk_home.name != 'Home' or jdk_home.parent.name != 'Contents':
+            raise RuntimeError('Expected a macOS JDK bundle JAVA_HOME')
+        jdk_bundle = jdk_home.parent.parent
+        comparison = temurin_comparison(jdk_archive, jdk_bundle)
+        if not comparison['all_jdk_files_match']:
+            raise RuntimeError('Installed Temurin bundle differs from publisher archive')
+        subprocess.run(['/usr/bin/codesign', '--verify', '--deep', '--strict', str(jdk_bundle)],
+                       capture_output=True, text=True, check=True)
+        identity = subprocess.run(['/usr/bin/codesign', '-dv', '--verbose=4', str(jdk_bundle)],
+                                  capture_output=True, text=True, check=True).stderr
+        if 'TeamIdentifier=JCDTMS22B4' not in identity.splitlines():
+            raise RuntimeError('Temurin bundle signature has an unexpected publisher')
+        receipt['jdk'] = dict(url=jdk_url, archive_sha256=sha(jdk_archive), java_home=str(jdk_home),
+                               bundle_resource_seal_qualified=True, all_jdk_payloads_match=True,
+                               **comparison)
         receipt['success'] = receipt['wrapper']['matches'] and receipt['distribution_pin']['pin_matches'] and receipt['gradle_distribution']['all_archive_files_match'] and all(
             s['comparison']['all_archive_files_match'] for s in receipt['sdk']) and receipt['jdk']['all_jdk_payloads_match']
     except Exception as error:

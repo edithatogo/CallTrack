@@ -5,11 +5,9 @@ on:
       candidate_sha:
         description: Exact reviewed candidate commit (40 hex characters)
         required: true
-        default: 94644086159137bab27767b6a1a46727409695b5
       expected_apk_sha256:
         description: Expected unsigned macOS APK SHA256
         required: true
-        default: 0f672916f06afbc2ec4b0730c1df167d44dcb094b41385cb8a0bfc6b234f48df
 permissions:
   contents: read
 jobs:
@@ -17,7 +15,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     container:
-      image: eclipse-temurin@sha256:d1b500f1a2a8e2cb1b0fa84e21c4a52963050cbd46b8a53fcb6a8eec0f57675f
+      image: eclipse-temurin:25.0.5.1_2-jdk@sha256:ce2ef9d2d67a68de5e196d4de9d743327c44a10b57fe02ec39f572c652cacfd3
     steps:
       - name: Install Linux prerequisites
         run: |

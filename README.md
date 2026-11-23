@@ -27,12 +27,13 @@ calendar account software controls remote sync.
 
 ## Build and verify
 
-Use JDK17, Android SDK platform36/build-tools35.0.0 and the included Gradle8.13
-wrapper and Kotlin/KGP2.3.21. Set `JAVA_HOME` and `ANDROID_HOME` to those installed toolchains, then:
+Use Temurin JDK 25.0.5.1+2, Android SDK platform 36/build-tools 36.0.0, the
+included Gradle 9.7.0 wrapper and Kotlin/KGP 2.4.21. Set `JAVA_HOME` and
+`ANDROID_HOME` to those installed toolchains, then:
 
 Create the selected Python runtime from `.python-version` and verify the actual
 interpreter before running these commands. The current preferred selection is
-Python 3.15.1; choose another version only for a concrete compatibility or task need,
+Python 3.15.2; choose another version only for a concrete compatibility or task need,
 record the reason and scope, and qualify it as described in the
 [runtime policy](conductor/python-runtime-policy.md).
 
@@ -74,7 +75,7 @@ calendar availability or remote sync.
 
 ## Development and recovery
 
-Run new Java files through google-java-format1.24.0 with `--aosp`; the checksum and
+Run new Java files through google-java-format 1.37.0 with `--aosp`; the checksum and
 download recipe are in CI. Kotlin uses ktfmt0.59 with `--kotlinlang-style`;
 CI checks both languages. The upstream build reproducer remains available through
 [qualification instructions](qualification/README.md). CI definitions are local
