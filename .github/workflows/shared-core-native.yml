@@ -28,7 +28,7 @@ jobs:
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
         with:
           distribution: temurin
-          java-version: '17.0.20+101'
+          java-version: '17.0.21+100000002'
       - name: Select and verify the pinned Kotlin/Native Xcode toolchain
         run: |
           test "$(uname -m)" = arm64

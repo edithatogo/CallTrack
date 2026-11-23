@@ -28,7 +28,7 @@ jobs:
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
         with:
           distribution: temurin
-          java-version: '17.0.21+9'
+          java-version: '17.0.21+100000002'
       - name: Check qualification Java formatting
         run: |
           mkdir -p .local/toolchain
@@ -66,7 +66,7 @@ jobs:
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
         with:
           distribution: temurin
-          java-version: '17.0.21+9'
+          java-version: '17.0.21+100000002'
       - name: Select repository Python runtime
         run: |
           python -m venv .venv
@@ -106,7 +106,7 @@ jobs:
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
         with:
           distribution: temurin
-          java-version: '17.0.21+9'
+          java-version: '17.0.21+100000002'
       - name: Check multiplatform UI Kotlin formatting
         run: |
           mkdir -p .local/toolchain
