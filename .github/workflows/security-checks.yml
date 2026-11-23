@@ -1,0 +1,57 @@
+name: Security checks
+on:
+  pull_request:
+  push:
+    branches: [main]
+  merge_group:
+    types: [checks_requested]
+  schedule:
+    - cron: '17 3 * * 2'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  trufflehog-history:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install verified TruffleHog
+        run: |
+          curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
+            https://github.com/trufflesecurity/trufflehog/releases/download/v3.100.0/trufflehog_3.100.0_linux_amd64.tar.gz \
+            -o "$RUNNER_TEMP/trufflehog.tar.gz"
+          echo 'b2d85eba59865e98f45c9fc9f77d2c6d62df529fdd5755af121304ea5a7cecbb  '"$RUNNER_TEMP/trufflehog.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/trufflehog.tar.gz" -C "$RUNNER_TEMP" trufflehog
+      - name: Scan history without sending candidates to issuers
+        run: |
+          if "$RUNNER_TEMP/trufflehog" git "file://$GITHUB_WORKSPACE" \
+              --no-verification --no-update --no-ignore-tag --fail --fail-on-scan-errors \
+              --json --concurrency=4 --archive-max-depth=2 --archive-max-size=50MB \
+              > "$RUNNER_TEMP/trufflehog-results.jsonl" 2> "$RUNNER_TEMP/trufflehog.log"; then
+            echo 'History scan completed without candidates or scan errors.'
+          else
+            echo '::error::TruffleHog found a candidate or could not complete the scan. Reproduce locally to inspect the private results.'
+            exit 1
+          fi
+  workflow-lint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install verified actionlint
+        run: |
+          curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
+            https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz \
+            -o "$RUNNER_TEMP/actionlint.tar.gz"
+          echo '8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8  '"$RUNNER_TEMP/actionlint.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/actionlint.tar.gz" -C "$RUNNER_TEMP" actionlint
+      - name: Lint all GitHub Actions workflows
+        run: '"$RUNNER_TEMP/actionlint" -no-color'
+      - name: Lint the fuzz runner
+        run: shellcheck fuzz/run-jazzer.sh
