@@ -35,7 +35,7 @@ jobs:
         run: |
           sdkmanager_path="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager -print -quit)"
           test -n "$sdkmanager_path"
-          "$sdkmanager_path" "platforms;android-36" "build-tools;36.0.0"
+          "$sdkmanager_path" "platforms;android-36" "platforms;android-37.1" "build-tools;36.0.0"
       - name: Select and verify the pinned Kotlin/Native Xcode toolchain
         run: |
           test "$(uname -m)" = arm64
@@ -43,6 +43,7 @@ jobs:
           test "$(xcodebuild -version | sed -n '1p')" = 'Xcode 26.1.1'
           test "$(xcodebuild -version | sed -n '2p')" = 'Build version 17B100'
           test -d "$ANDROID_HOME/platforms/android-36"
+          test -d "$ANDROID_HOME/platforms/android-37.1"
           test -d "$ANDROID_HOME/build-tools/36.0.0"
           java -version 2>&1 | grep -F 'Temurin-25.0.5.1+2'
           xcode-select -p

@@ -75,11 +75,11 @@ class ToolTrustTest(unittest.TestCase):
         for name, xml, error_type, message in cases:
             with self.subTest(name=name), tempfile.TemporaryDirectory() as directory:
                 root = Path(directory)
-                home = root / 'home'
-                (home / '.gradle/wrapper/dists/gradle-8.13-bin/test/gradle-8.13').mkdir(parents=True)
+                gradle_home = root / 'gradle-home'
+                (gradle_home / 'wrapper/dists/gradle-9.7.0-bin/test/gradle-9.7.0').mkdir(parents=True)
                 def fetch(_url, destination):
                     destination.write_bytes(xml)
-                with patch.object(Path, 'home', return_value=home), \
+                with patch.dict(tools.os.environ, {'GRADLE_USER_HOME': str(gradle_home)}), \
                      patch.object(tools, 'fetch', side_effect=fetch), \
                      patch.object(tools, 'published_checksum', return_value='0' * 64), \
                      patch.object(tools, 'sha', return_value='0' * 64), \

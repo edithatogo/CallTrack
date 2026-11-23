@@ -83,7 +83,7 @@ jobs:
           test -n "$sdkmanager_path"
           dirname "$sdkmanager_path" >> "$GITHUB_PATH"
       - name: Install slice SDK
-        run: sdkmanager "platforms;android-36" "build-tools;35.0.0" "build-tools;36.0.0"
+        run: sdkmanager "platforms;android-36" "platforms;android-37.1" "build-tools;35.0.0" "build-tools;36.0.0"
       - name: Verify tooling and Conductor
         run: |
           .venv/bin/python -m unittest discover -s tests -v

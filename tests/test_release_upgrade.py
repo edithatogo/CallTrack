@@ -133,6 +133,8 @@ class UpgradeSafetyTest(unittest.TestCase):
                     return b''
                 if args[:2] == ['git', 'rev-parse']:
                     return 'frozen\n'
+                if args[-1] == '-version':
+                    return 'openjdk version "25.0.5.1"'
                 return 'synthetic badging'
 
             def run(args, **kwargs):

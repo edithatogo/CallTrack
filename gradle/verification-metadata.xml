@@ -5401,5 +5401,855 @@
         <sha256 value="04d525073469214d0c99e81aaa875dd548ba32b82945abd8326bc50229df700d" origin="Independent canonical repository byte comparison 2026-11-24" />
       </artifact>
     </component>
+    <component group="androidx.activity" name="activity" version="1.13.0">
+      <artifact name="activity-1.13.0.aar">
+        <sha256 value="bd4f19a5f00effed0eecad0a310b1f2169b9fc66236a3ba743a222eb77747ee1" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="activity-1.13.0.module">
+        <sha256 value="ab8d1e8159df971570558abb84e2a93ce82ec4f2871983f0ec32078eef08b299" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.activity" name="activity-ktx" version="1.13.0">
+      <artifact name="activity-ktx-1.13.0.aar">
+        <sha256 value="b5541dc5f74e35389f1e9fdca8b5770c49d2c1360de16f398ce5c1e07a003244" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="activity-ktx-1.13.0.module">
+        <sha256 value="f34b5f8747deb0a2a5bdb1359666d914cf32708596249659ee168e8ca6102f13" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.annotation" name="annotation" version="1.10.0">
+      <artifact name="annotation-1.10.0.module">
+        <sha256 value="5b2d4387f384e5913a4aec979a20ece13bb5ce992bc90a962dea1feea7fa89e9" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.annotation" name="annotation-jvm" version="1.10.0">
+      <artifact name="annotation-jvm-1.10.0.module">
+        <sha256 value="42afca374194273e4067b937cfc447bd3c8c4fd441f41d44f954050dfd6106dd" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="annotation-jvm-1.10.0.jar">
+        <sha256 value="ddd072ddbb553178e205517ce777b2f05aa9e412982d9ecb4eedc74f1212f697" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.appcompat" name="appcompat" version="1.8.0">
+      <artifact name="appcompat-1.8.0.aar">
+        <sha256 value="773f79306eb0ca2447af8752e923ce6269e201e7fe6b275cc76e2998ee87e838" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="appcompat-1.8.0.module">
+        <sha256 value="b98ad6065af0dc9873c55d53e7cbf5130592b6884e9fab17265ef3ca68b3a0c5" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.appcompat" name="appcompat-resources" version="1.8.0">
+      <artifact name="appcompat-resources-1.8.0.aar">
+        <sha256 value="3fe48cc3df409bed03063a4f5f5f9f8c51f1d63ea9e88d41e6489bf58495a5af" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="appcompat-resources-1.8.0.module">
+        <sha256 value="72b547663663e1e316777f860b296ac0d559bf96008833e5203c73a0fb3d51a6" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.collection" name="collection" version="1.6.0">
+      <artifact name="collection-1.6.0.module">
+        <sha256 value="2cad9397bf1cce162f14732b3cfcefa36081b422e35a17b6c3c9c0d617ec523b" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.collection" name="collection-jvm" version="1.6.0">
+      <artifact name="collection-jvm-1.6.0.module">
+        <sha256 value="28d88aee55c1b5c02640cfcda134a793e2cee40ea815561dd8f6174de883dc59" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="collection-jvm-1.6.0.jar">
+        <sha256 value="839fcec147704611a222159fa84e3e062f68eee80caa549ddd1222d5210a13df" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.collection" name="collection-ktx" version="1.6.0">
+      <artifact name="collection-ktx-1.6.0.module">
+        <sha256 value="9d79ed80238d17125ead24a57fd7f9032ac4cda71c99710f60d7eb62a34fffae" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="collection-ktx-1.6.0.jar">
+        <sha256 value="939b4a8697640e77d83e4e8b4c4a9d18f8130198c5961194af8dd9db9dc7c353" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose" name="compose-bom" version="2026.11.01">
+      <artifact name="compose-bom-2026.11.01.pom">
+        <sha256 value="abacd1599983d2b73ef26a8bd2172d9bc33990a7ccbbd55b60a46e04b2d3511d" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.animation" name="animation" version="1.13.0">
+      <artifact name="animation-1.13.0.module">
+        <sha256 value="64a0108f15d5a623be6d07a6656716807a025780eb928eaf237cb408356d162a" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.animation" name="animation-android" version="1.13.0">
+      <artifact name="animation-android-1.13.0.module">
+        <sha256 value="37043920b39dc94d435729b259d42f405ff3bede5d410c6b4ab898afcb818675" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="animation.aar">
+        <sha256 value="2ee220773b320285f19ae6234c01912e46aaf10eda55a7099875e4f9f22ce873" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.animation" name="animation-core" version="1.13.0">
+      <artifact name="animation-core-1.13.0.module">
+        <sha256 value="a0a4857892e6e30cd40c2e3dc3778a06bc45b6287f72bd8e3b16f1cf5910e1d9" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.animation" name="animation-core-android" version="1.13.0">
+      <artifact name="animation-core-android-1.13.0.module">
+        <sha256 value="f78cb7a2eea4087b23defc026f5c6bfbc26046fdc03861e12e8961aead6f399e" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="animation-core.aar">
+        <sha256 value="2b8fc2beedd30bff72faeb44515110ad5c0b651304dcf5b25fc61f251d589b79" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.foundation" name="foundation" version="1.13.0">
+      <artifact name="foundation-1.13.0.module">
+        <sha256 value="5ac0755b07e39c2dfa330f2401e1f507e16e7523cc054a1420f3f6f0b4582965" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.foundation" name="foundation-android" version="1.13.0">
+      <artifact name="foundation-android-1.13.0.module">
+        <sha256 value="1d5df192526272fd669f91bc4a1bfcbe7dfcd16dd65920942bde140b58722180" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="foundation.aar">
+        <sha256 value="9c97dbb937321607311a081ac095551f160293b78624df51129e17b25b627f2c" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.foundation" name="foundation-layout" version="1.13.0">
+      <artifact name="foundation-layout-1.13.0.module">
+        <sha256 value="df1eb0cff4903380ac2b773dce7428e45b551f93d6c1c63017e57a0befe599a6" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.foundation" name="foundation-layout-android" version="1.13.0">
+      <artifact name="foundation-layout-android-1.13.0.module">
+        <sha256 value="93c3fb6bdc77924b2eb8ed8bcc2322510cdb79f4794b79fde6cac294c7bd48ed" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="foundation-layout.aar">
+        <sha256 value="32d2dd25683e8b18fd88370241072acab1cf275646e37cfb6b7677f52e107975" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.runtime" name="runtime" version="1.13.0">
+      <artifact name="runtime-1.13.0.module">
+        <sha256 value="83d5433270be9dbd258a702dcb982d6cec903c1c26116b13f9d829a48017145c" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.runtime" name="runtime-android" version="1.13.0">
+      <artifact name="runtime-android-1.13.0.module">
+        <sha256 value="0957e5dfa605d1e51e49becc8d14e06ca8610f66fb59d66686fd05b81c1f0ebc" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="runtime.aar">
+        <sha256 value="39caa686185abd9b3366c04eb4691eb38828af9469d5df1cd6455b89d3b43bd3" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.runtime" name="runtime-annotation" version="1.13.0">
+      <artifact name="runtime-annotation-1.13.0.module">
+        <sha256 value="bc7e012e2d1d21df343f5792cd4330a172fe849d09ced26f4c337212edb64c1f" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.runtime" name="runtime-annotation-android" version="1.13.0">
+      <artifact name="runtime-annotation-android-1.13.0.module">
+        <sha256 value="1595af90bd86d5f4bde2cab57a2f8bb00b647c57fc2967dcd04644835e7460c6" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="runtime-annotation.aar">
+        <sha256 value="e2a54a464a34924dd824d54c4208cc69b3765adc981ad773bdc11297b1ce0781" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.runtime" name="runtime-retain" version="1.13.0">
+      <artifact name="runtime-retain-1.13.0.module">
+        <sha256 value="954de08fd6cbc1bd24709982c43200c97a25120360ab294c89ce3f6a91ac2e65" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.runtime" name="runtime-retain-android" version="1.13.0">
+      <artifact name="runtime-retain-android-1.13.0.module">
+        <sha256 value="3cd9d53f11f113501c0b917e9d729f61616bfd1d9c7d2db53781835ad4845965" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="runtime-retain.aar">
+        <sha256 value="cdd5001eaf098540aa7bf8d8b0b52c6d0f34deb116cdbd1eb6ef5bb02fa95c0b" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.runtime" name="runtime-saveable" version="1.13.0">
+      <artifact name="runtime-saveable-1.13.0.module">
+        <sha256 value="bb20db478d9f8dda52c5299c9e4757c35fa01621038ad1207b2284bcec9ca2bd" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.runtime" name="runtime-saveable-android" version="1.13.0">
+      <artifact name="runtime-saveable-android-1.13.0.module">
+        <sha256 value="102934d3676da6467f101017f333cca98c3941a944133813a329ad605611a20a" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="runtime-saveable.aar">
+        <sha256 value="b4adce846e4c5c5f557cb727897a329a46b8293d772b9f2f1be6e860b016ae49" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.ui" name="ui" version="1.13.0">
+      <artifact name="ui-1.13.0.module">
+        <sha256 value="f3e8d26ac2586d72f44b2b45ef9a20a85948e13a054fb998b466573e34dd1a59" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.ui" name="ui-android" version="1.13.0">
+      <artifact name="ui-android-1.13.0.module">
+        <sha256 value="5d20fe85fad09461bd896de901152894ccc8e23360792583990770e78bb9512c" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="ui.aar">
+        <sha256 value="b5d23c05886f9c441e3cb004f8ac4614f96e9c1901795742bd9ddb5b8bad1b61" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.ui" name="ui-geometry" version="1.13.0">
+      <artifact name="ui-geometry-1.13.0.module">
+        <sha256 value="66d029dddbda786222119bc53f37b4ae727cbb402e125ce20b8e710aa59357fc" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.ui" name="ui-geometry-android" version="1.13.0">
+      <artifact name="ui-geometry-android-1.13.0.module">
+        <sha256 value="15db4fe2114e988a9ee65242f4065ccd3ce53840f40842c79483c984395b0e77" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="ui-geometry.aar">
+        <sha256 value="d86f77f8f78b27c50755753d3e68bf4215c7071f9ee9ce6d3335f30b91eb0b18" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.ui" name="ui-graphics" version="1.13.0">
+      <artifact name="ui-graphics-1.13.0.module">
+        <sha256 value="2d3bb491d378e317b6992af48ef4b770bd58ee16e727daea8735dc96c6b5d396" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.ui" name="ui-graphics-android" version="1.13.0">
+      <artifact name="ui-graphics-android-1.13.0.module">
+        <sha256 value="a8e12c0c39ed01743bfadcbbcf8e4a7bbb295216031490ba1ce7ad3268ecd709" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="ui-graphics.aar">
+        <sha256 value="4b0db977082ad677338f471a2b97776162e7fcbf578c74a55af712c843cc5917" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.ui" name="ui-test-manifest" version="1.13.0">
+      <artifact name="ui-test-manifest-1.13.0.aar">
+        <sha256 value="9bf0cb5807e0da75d387917c3e8d9f46fcb5fea9efa0e85bf20a077e359f9fe4" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="ui-test-manifest-1.13.0.module">
+        <sha256 value="b66f17f2c581c139c8866b410d183765d6538bc8e0ed8d45ce062e7b25e07f8d" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.ui" name="ui-text" version="1.13.0">
+      <artifact name="ui-text-1.13.0.module">
+        <sha256 value="8cb375a67534f70231d015f105f1477739069f1062e59b640821c4b31d3a5c65" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.ui" name="ui-text-android" version="1.13.0">
+      <artifact name="ui-text-android-1.13.0.module">
+        <sha256 value="be098523359ddb82bd56319f69030460532b4af98c9734bb629724e3e015740f" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="ui-text.aar">
+        <sha256 value="da7a21ac01fde97c5377926719e8731ee4035e30a9bde77fae8ec56d1a09d115" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.ui" name="ui-unit" version="1.13.0">
+      <artifact name="ui-unit-1.13.0.module">
+        <sha256 value="f4b658b8eefbf7baf77044d70933de40787cc336fd6b67ad2325e3bf0f9bfc64" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.ui" name="ui-unit-android" version="1.13.0">
+      <artifact name="ui-unit-android-1.13.0.module">
+        <sha256 value="54b6f55f088bdfea00fe53548058d55e7cb1b6991a5928e4f83d8fdecc5329ca" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="ui-unit.aar">
+        <sha256 value="51dbb2719c5ffca99fb96afc7531b22225a69d2c455677558a4c6a89f40fe70e" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.ui" name="ui-util" version="1.13.0">
+      <artifact name="ui-util-1.13.0.module">
+        <sha256 value="f37eb02eafa8fa52cd48a2c647b76cb126be32006b82e597952a56b8588643ad" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.ui" name="ui-util-android" version="1.13.0">
+      <artifact name="ui-util-android-1.13.0.module">
+        <sha256 value="53dfd8977cf9f6ad78394fe7eb25f750e136ccc9cfa6345bde84ac9f7307e522" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="ui-util.aar">
+        <sha256 value="ef6862049e8eafc4e478e295aee38e015e11f6e35e3026c5ff45cdd626879f34" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.constraintlayout" name="constraintlayout" version="2.2.2">
+      <artifact name="constraintlayout-2.2.2.aar">
+        <sha256 value="0393b0bf7b11057e13b5330e862afb453cd31eba25c8309b6d2a7d345ca7be69" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="constraintlayout-2.2.2.module">
+        <sha256 value="2f2df945eef181abe058bbd55dec38456cbfe1f23c57afd8fbf1b59629bd0c6d" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.constraintlayout" name="constraintlayout-core" version="1.1.2">
+      <artifact name="constraintlayout-core-1.1.2.module">
+        <sha256 value="be83fce13a4fd3804e0fd475f92d81a5aa9b78a35a2f61d7a998b42e1bdbbddf" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="constraintlayout-core-1.1.2.jar">
+        <sha256 value="3c2054328328831eb6e69b4014f6ef9faa117fd4b811929f3a91d3db375f2c02" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.core" name="core" version="1.13.0">
+      <artifact name="core-1.13.0.module">
+        <sha256 value="2e0e6e5c1205b7462a0c5c3e32b58c2e525435812ed89946c7be6737493b51e3" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.core" name="core" version="1.18.0">
+      <artifact name="core-1.18.0.module">
+        <sha256 value="b67ff7a1f9be95687dfa86d6055147fc1d8bbe3b1dc19048c432afca18abfd95" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="core-1.18.0.aar">
+        <sha256 value="311d83ac67d394076ec21d12ed2d10a44b59cb2929b7dce00e5a90a93842e37d" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.core" name="core" version="1.19.0">
+      <artifact name="core-1.19.0.aar">
+        <sha256 value="55445ad0ff025963929892569a0bfc6b4c68e60d8b7c965dcffba09048c36c8e" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="core-1.19.0.module">
+        <sha256 value="54a4e456f3f7110e91a3d30196cadd98a7478691679f5d63f2c4023a48d2ec61" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.core" name="core-ktx" version="1.18.0">
+      <artifact name="core-ktx-1.18.0.module">
+        <sha256 value="3fa579c11de0f6f378002c0f0bb4bbe71100634f80f8b282951789ea7d0fb849" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="core-ktx-1.18.0.aar">
+        <sha256 value="c7c511e3df838fcbcb61ace36944de6bb7c10eb597be546974f001119939c85d" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.core" name="core-ktx" version="1.19.0">
+      <artifact name="core-ktx-1.19.0.aar">
+        <sha256 value="db1ae24b15c36358ad46497d561b19c325642565432d56479ebe47ee3baa0d7e" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="core-ktx-1.19.0.module">
+        <sha256 value="b46244e8f5b84fadef9a4c7a033af640836da52cd1b6e19fbda58f28be1383f9" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.customview" name="customview" version="1.2.0">
+      <artifact name="customview-1.2.0.aar">
+        <sha256 value="40e98bb388cdf5c53a52699b1f78a5abdcf22de1e7c1be43b2c12fd6eadc6f9d" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="customview-1.2.0.module">
+        <sha256 value="d875df87ca000e6fa43a5138899ccf7efeeffb4a71d8ec62849f4049d0db34d3" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.dynamicanimation" name="dynamicanimation" version="1.1.0">
+      <artifact name="dynamicanimation-1.1.0.aar">
+        <sha256 value="9062cc6637136a49ad17f8603c72519052ff9a569e617fc1b6db7086304da88f" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="dynamicanimation-1.1.0.module">
+        <sha256 value="9f5f44254b5ec6b17b4965b8b641851d2888dbd474c6ca81a9caf512718f0262" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.emoji2" name="emoji2" version="1.7.0">
+      <artifact name="emoji2-1.7.0.aar">
+        <sha256 value="121738bd60060c7bb3742f10c034edc93f2a38b6de8ca8648bc799eda65b1bbf" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="emoji2-1.7.0.module">
+        <sha256 value="4374cc5dc83e0a69d1e27c254596ec285f140c26ab70db6eedf3dce867377336" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.emoji2" name="emoji2-views-helper" version="1.2.0">
+      <artifact name="emoji2-views-helper-1.2.0.module">
+        <sha256 value="a3a9db581abf1787b01ff15c40f059530e8e64f3937caa2d788f42eb39893268" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.emoji2" name="emoji2-views-helper" version="1.7.0">
+      <artifact name="emoji2-views-helper-1.7.0.aar">
+        <sha256 value="351637d4ac71ddb3efb9ff25fe2017169311e10aeb3c73148883e132a57841cc" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="emoji2-views-helper-1.7.0.module">
+        <sha256 value="75b6eb83ba6e7ce94b9af3d6a13ec0b4f38aade9e1067bf0e7cef2368aeb013e" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.fragment" name="fragment" version="1.9.1">
+      <artifact name="fragment-1.9.1.aar">
+        <sha256 value="72f70815c0a4d502f15c57e5e6bc861e64c5338ea06de75aed83969b17a2a727" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="fragment-1.9.1.module">
+        <sha256 value="066557e66adc00d5d53f67890f15620170ecb8700a0f214393748156b70fa66a" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.graphics" name="graphics-path" version="1.1.0">
+      <artifact name="graphics-path-1.1.0.aar">
+        <sha256 value="d031370d45ba4129a175fe9de913328a512b01a3c267e0eaf6b9b759f35842ae" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="graphics-path-1.1.0.module">
+        <sha256 value="24c8535d6fe9b13f83f32a06debc28ac786ee32a53f65ef10beb3c390f704e9f" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.graphics" name="graphics-shapes" version="1.0.1">
+      <artifact name="graphics-shapes-1.0.1.module">
+        <sha256 value="2d7f6d55042299f9c4f8478aa094bc4099a346902779ff3091fed1dfc2b62f53" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.graphics" name="graphics-shapes-android" version="1.0.1">
+      <artifact name="graphics-shapes-android-1.0.1.module">
+        <sha256 value="9a5508caf02d78fcf2729394e97e7b27a43786273e17ccb65bf8e1b00a598324" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="graphics-shapes-release.aar">
+        <sha256 value="7171269a4122feabb071768df46d10b362e47ac75fd0aa8dbcafa1f44f61b40c" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-common" version="2.10.0">
+      <artifact name="lifecycle-common-2.10.0.module">
+        <sha256 value="5d1247b1edfbdc9ddedcbe525c9d2629567b1c538cb7a9c620cd044a124b5c73" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-common" version="2.11.1">
+      <artifact name="lifecycle-common-2.11.1.module">
+        <sha256 value="f8b7599758be9e9d2a6015bbb8d45e9d78c1a391ccd33ebb6bd132167b60ab93" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-common-jvm" version="2.11.1">
+      <artifact name="lifecycle-common-jvm-2.11.1.module">
+        <sha256 value="f421c39e7a02e955237bc27b9cc6b2df535eea53dbd775f7b2ea44233e5b73e4" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="lifecycle-common-jvm-2.11.1.jar">
+        <sha256 value="e6a66e67b9f63a0fb6344f165c1d872376e5fe6d235bffb138af45122cf452a9" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-livedata" version="2.11.1">
+      <artifact name="lifecycle-livedata-2.11.1.aar">
+        <sha256 value="917081edc738291d8764fa95aa796730a3a0e2b5b70ac9e22cd5345134ce6405" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="lifecycle-livedata-2.11.1.module">
+        <sha256 value="26be0321981a22f382a49262870862ef1429acabb44aa6b235c5a41a0af80453" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-livedata-core" version="2.10.0">
+      <artifact name="lifecycle-livedata-core-2.10.0.module">
+        <sha256 value="1d83bd5f3ccc1298eda25b9ed128e8c187f830e7f3af8d0294be688abb03c35d" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-livedata-core" version="2.11.1">
+      <artifact name="lifecycle-livedata-core-2.11.1.aar">
+        <sha256 value="ca91fb3d46a7ba74eceeba816abfd28e885aa2121daa74851f021e1600c06d0e" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="lifecycle-livedata-core-2.11.1.module">
+        <sha256 value="38a18935855191ebacd24a626392e8b18b05f93427b7cec3a5d7d878fe950ad7" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-livedata-core-ktx" version="2.11.1">
+      <artifact name="lifecycle-livedata-core-ktx-2.11.1.aar">
+        <sha256 value="7b2fa180b01bc15304bc68b9823f7ab553aa5760f5b65c8cd9745fd90de2c0d8" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="lifecycle-livedata-core-ktx-2.11.1.module">
+        <sha256 value="c879de89c3705fa1173a2f1820aa8131a588f16a168d39be67262bbc6c5731df" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-process" version="2.11.1">
+      <artifact name="lifecycle-process-2.11.1.aar">
+        <sha256 value="b5a3dcc64a185badb88784c16a1c9b229529410cc8776cec3c4b624a4189135a" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="lifecycle-process-2.11.1.module">
+        <sha256 value="0091ff1a97461521d0c3d251845f81fe12e9198780247a55aca5cd6ae3eef1b9" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-runtime" version="2.10.0">
+      <artifact name="lifecycle-runtime-2.10.0.module">
+        <sha256 value="da805fa017a4acce13f501469a75a3f306248eebc58f5bcc28019b0015dfba65" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-runtime" version="2.11.1">
+      <artifact name="lifecycle-runtime-2.11.1.module">
+        <sha256 value="8c0a1d566b51f68d7c61008cc4389c52c446a21d027405313d1a69e6e32c8d04" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-runtime-android" version="2.11.1">
+      <artifact name="lifecycle-runtime-android-2.11.1.module">
+        <sha256 value="a980884e9b613b544041d3cfd67d163b1c900e0336667ab08bf592ad477e71b7" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="lifecycle-runtime.aar">
+        <sha256 value="f2d47c2a332fe66a0119958c5d7e4ad8e8f9c1da0672adf00bbd728791c91481" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-runtime-compose" version="2.11.1">
+      <artifact name="lifecycle-runtime-compose-2.11.1.module">
+        <sha256 value="f62d7b09b7d9569d186f12a17e4f2bdce8e82ed0cbab318d3e8c85f4c5e68509" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-runtime-compose-android" version="2.11.1">
+      <artifact name="lifecycle-runtime-compose-android-2.11.1.module">
+        <sha256 value="b59e69152384708811179b74dc023fdb989fd75cd39adbf1456ff2f421b4385a" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="lifecycle-runtime-compose.aar">
+        <sha256 value="74ba4d662557b0d88d32301f63b1e995c9d1b7d9e48dd72d1476c1d252b2d944" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-runtime-ktx" version="2.11.1">
+      <artifact name="lifecycle-runtime-ktx-2.11.1.module">
+        <sha256 value="33239f54b018f3e1d53fcf8db0ab9f7c630f4f2236512d36447f6479a60cf95b" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-runtime-ktx-android" version="2.11.1">
+      <artifact name="lifecycle-runtime-ktx-android-2.11.1.module">
+        <sha256 value="9b9c8862b481dc5acece0e0f5beb61ec21409e408510710d6c72a3d8946c4a7b" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="lifecycle-runtime-ktx.aar">
+        <sha256 value="e455fb2d40292c6050d33fbfc5d7575487f957e17ddbbe38aa12f58088ce315a" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-service" version="2.11.1">
+      <artifact name="lifecycle-service-2.11.1.aar">
+        <sha256 value="741bb5eb9df9076cf737f391f66701a7c05546fd8929f338f968ef192f234df3" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="lifecycle-service-2.11.1.module">
+        <sha256 value="0cf1731c1350ebb6d9f13881988900cb83c54e738f551d455a0882ac0728d9a6" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-viewmodel" version="2.11.1">
+      <artifact name="lifecycle-viewmodel-2.11.1.aar">
+        <sha256 value="4b809cf9eb7323d200504e95921feb777ff080215cadb8237742d5ed0ba5b792" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="lifecycle-viewmodel-2.11.1.module">
+        <sha256 value="1fb18eba0468ce3da17247a9c63130a4cc571d139c60337bab3087adb5954c4a" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-viewmodel-android" version="2.11.1">
+      <artifact name="lifecycle-viewmodel-android-2.11.1.module">
+        <sha256 value="e100c28fb811d7290e775b14ea71393cfd3875ba11a8d1e269229fcab82817c2" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="lifecycle-viewmodel.aar">
+        <sha256 value="5305020bb0eb1944014407ec16b1c056eba196baa5a4693c05b2267d32e96331" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-viewmodel-ktx" version="2.11.1">
+      <artifact name="lifecycle-viewmodel-ktx-2.11.1.aar">
+        <sha256 value="9319f246bb273721a50cd03b50536cbb29f01694ce4df3c132787946dbb32070" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="lifecycle-viewmodel-ktx-2.11.1.module">
+        <sha256 value="6e82046ae4299d99f49908471404dc9acffae9f0eb6d22e09f80d9ff078b1b76" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-viewmodel-savedstate" version="2.10.0">
+      <artifact name="lifecycle-viewmodel-savedstate-2.10.0.module">
+        <sha256 value="50857781e3ddf8e39905e4e4a57a30496c245f9901d1b7d3f17382382188347d" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-viewmodel-savedstate" version="2.11.1">
+      <artifact name="lifecycle-viewmodel-savedstate-2.11.1.module">
+        <sha256 value="8b956b119f8fb1e76813a8445c18d9c8a12aa33eefdf2f27ab9f9e00b8295bed" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.lifecycle" name="lifecycle-viewmodel-savedstate-android" version="2.11.1">
+      <artifact name="lifecycle-viewmodel-savedstate-android-2.11.1.module">
+        <sha256 value="7d7f8b1123131a71176f60bc2ed2cb7db803144183a2ffbac5ddf13d09f9dfe8" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="lifecycle-viewmodel-savedstate.aar">
+        <sha256 value="0956b541392dbb4f05387b045829079433276c6fc221fc494e9cf4378cc95448" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.navigationevent" name="navigationevent" version="1.0.0">
+      <artifact name="navigationevent-1.0.0.module">
+        <sha256 value="f33f1e030a0a7d10aab608a5a5d3ff70d25df325ce825ca204aa19c0e0578b53" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.navigationevent" name="navigationevent" version="1.1.0">
+      <artifact name="navigationevent-1.1.0.module">
+        <sha256 value="300df304bc00e64121a1c7e1099c9c7c45b4c790501fe402e0bf239a7eb63b40" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.navigationevent" name="navigationevent-android" version="1.0.0">
+      <artifact name="navigationevent-android-1.0.0.module">
+        <sha256 value="6fc6224b01bf8fc576724bfd8eccaad6dc19e49150499100cb0cda24e28c947d" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="navigationevent.aar">
+        <sha256 value="cda4bb83d1c892a208732e99c2d59e4f247ab5c23a1d2524fc004db2e4e9a780" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.navigationevent" name="navigationevent-android" version="1.1.0">
+      <artifact name="navigationevent-android-1.1.0.module">
+        <sha256 value="fc73e6f90ac86371d374cb2ff6a06b127e8a454f9244e129466b568284c887cf" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="navigationevent.aar">
+        <sha256 value="ea7943bc61d52b42a7a2cbcbde14c9b10e7baf9e09a8fe54d8cb17d3bb5dbfd9" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.recyclerview" name="recyclerview" version="1.4.0">
+      <artifact name="recyclerview-1.4.0.aar">
+        <sha256 value="0f32ccaffcda74c3f87f0b4cfe6ae78e8aa4eb3ad7dda4f2edf06eedc947a5cf" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="recyclerview-1.4.0.module">
+        <sha256 value="631d996322198595129c1d02805346361d811c06f25545fa8bbca567355f6f98" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.resourceinspection" name="resourceinspection-annotation" version="1.0.1">
+      <artifact name="resourceinspection-annotation-1.0.1.module">
+        <sha256 value="352a11a8d8a4c1bd6cd2c2fefff9c94ca954d7b5202a0656959db95297f6a2b7" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="resourceinspection-annotation-1.0.1.jar">
+        <sha256 value="8cff870ec6fb31db48a52f4a792335b4bf8de07e03bd37823181526433ccd5cb" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.savedstate" name="savedstate" version="1.4.0">
+      <artifact name="savedstate-1.4.0.module">
+        <sha256 value="a0f2ac5a076063f0c813cf75a46dfb780bd5a5a2c8677240bca8551554da8fd2" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.savedstate" name="savedstate" version="1.5.0">
+      <artifact name="savedstate-1.5.0.module">
+        <sha256 value="96b0bac10979afb038bb29f6c047d478acf036ef12c5aea65ded3c9f4327795d" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.savedstate" name="savedstate-android" version="1.4.0">
+      <artifact name="savedstate-android-1.4.0.module">
+        <sha256 value="0062514dcb80c2ea7e0411fa8be54550853bab7bf6b1bf14c2517c2ef874ff50" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.savedstate" name="savedstate-android" version="1.5.0">
+      <artifact name="savedstate-android-1.5.0.module">
+        <sha256 value="e88ce76a17869cff39a4952032a82838fb8976bf3bc91e69393ab8f590cc9a38" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="savedstate.aar">
+        <sha256 value="c191b2b0d3ed2f765743e634f213c0e8150825547810789fc13487332bfc9cd3" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.savedstate" name="savedstate-compose" version="1.5.0">
+      <artifact name="savedstate-compose-1.5.0.module">
+        <sha256 value="a6098f4eb8a10bb2d751366557b4c011741d2c67d12e9705fc945b51942ac5b3" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.savedstate" name="savedstate-compose-android" version="1.5.0">
+      <artifact name="savedstate-compose-android-1.5.0.module">
+        <sha256 value="b0f8ba0ba240caff738cba76eaf866b9c834c10915c5d10cf66044a085a8941d" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="savedstate-compose.aar">
+        <sha256 value="01682c0de6796d31f9c7863bb18e65443e512e4dc95a13cc8c3d0d4931c2c10b" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.savedstate" name="savedstate-ktx" version="1.4.0">
+      <artifact name="savedstate-ktx-1.4.0.module">
+        <sha256 value="7cf86881220aa594c4ad1685ebd0f295e3d97b9c0fdc31b28300f4318a5045a8" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.savedstate" name="savedstate-ktx" version="1.5.0">
+      <artifact name="savedstate-ktx-1.5.0.aar">
+        <sha256 value="1de99f31e90d55828e1f00f856274410e6e3e997605a40d478e7065c38b3252e" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="savedstate-ktx-1.5.0.module">
+        <sha256 value="0cff213724980ad592d03252e5e5974926294b2ac79981550dd16453a32f7df7" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.tracing" name="tracing" version="2.0.0">
+      <artifact name="tracing-2.0.0.module">
+        <sha256 value="407139f993e891940a7f71a3cca099f5ee8d7828845bbb8239717eedf80c9553" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.tracing" name="tracing-android" version="2.0.0">
+      <artifact name="tracing-android-2.0.0.module">
+        <sha256 value="d2baa5464529169efa7ae5e7351b424c9b56d445f090d1824d1f87d1472e4510" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="tracing.aar">
+        <sha256 value="b21800b83ed0e3e214742c8a94edee90130e0a9970c85e59161d161546f5fe9a" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.tracing" name="tracing-ktx" version="2.0.0">
+      <artifact name="tracing-ktx-2.0.0.aar">
+        <sha256 value="7e7cf1386841b11310138723eb9f36b5eaf6c8caec896b16f99e579d220d6a0c" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="tracing-ktx-2.0.0.module">
+        <sha256 value="f30609942614488befb6edaa36aa4d3b4fb1c1b7b79780630d3ca3a02b08c0a5" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.transition" name="transition" version="1.7.2">
+      <artifact name="transition-1.7.2.aar">
+        <sha256 value="474411a356e78d94f1e82582b3f8cecf8f6466af48e5cb1e3d99688ca8b3a6eb" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="transition-1.7.2.module">
+        <sha256 value="3f1ff93975116a8267bcab200fac2e657ef08927dc89790edbcec8cf8af36614" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.viewpager2" name="viewpager2" version="1.1.0-beta02">
+      <artifact name="viewpager2-1.1.0-beta02.aar">
+        <sha256 value="bafac3ca991ed68a2c7ca6ff352966d200b12e66a342d10f497cb8168f59054a" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="viewpager2-1.1.0-beta02.module">
+        <sha256 value="1dd2ebd9c18d7299ac9c8d331ae39f2a38fa0c9ed32d6606e041ac34d0c38a3d" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="com.google.android.material" name="material" version="1.14.0">
+      <artifact name="material-1.14.0.aar">
+        <sha256 value="19e8fab43df6870f8e4322059624384be0279da56dc910529ff591dc674008cd" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="material-1.14.0.module">
+        <sha256 value="c423fccb98f5042e1bf0425df8fe8db6f7b0806d74a4b88b22266d4051900dce" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="com.google.errorprone" name="error_prone_annotations" version="2.15.0">
+      <artifact name="error_prone_annotations-2.15.0.pom">
+        <sha256 value="7bae617e32681ebbb289c203c905f646c2a0397598af786d961a54aaa3d2b1e6" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="error_prone_annotations-2.15.0.jar">
+        <sha256 value="067047714349e7789a5bdbfad9d1c0af9f3a1eb28c55a0ee3f68e682f905c4eb" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="com.google.errorprone" name="error_prone_parent" version="2.15.0">
+      <artifact name="error_prone_parent-2.15.0.pom">
+        <sha256 value="11dcacd17aaac69a99405273badfdaa5f9661d60d179b8a44f503958baa55f88" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="org.jetbrains.kotlin" name="kotlin-bom" version="1.8.22">
+      <artifact name="kotlin-bom-1.8.22.pom">
+        <sha256 value="c8d794eb761888d34369e677de8eaba0b01f9e8a756cfbff53215ccfa5c58c3f" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.savedstate" name="savedstate-ktx" version="1.2.1">
+      <artifact name="savedstate-ktx-1.2.1.module">
+        <sha256 value="94359184b2ba51c0f498a2b9055d37b372231ef9bcc54a4972ac99f0303afff1" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.savedstate" name="savedstate-ktx" version="1.3.0">
+      <artifact name="savedstate-ktx-1.3.0.module">
+        <sha256 value="dcf657881d46352128aa0bf48f32775b55e3661361ebf2d2c217ed117fad881f" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.activity" name="activity-compose" version="1.13.0">
+      <artifact name="activity-compose-1.13.0.aar">
+        <sha256 value="2b5da3033d4924e833868e140c3edfc0c03208710b6b9fb2c9d9a47560ba55fa" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="activity-compose-1.13.0.module">
+        <sha256 value="dbfd7c4af5d5828923416f18259ace13ceba1fb19563975fa3e5dee291ee9794" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.ui" name="ui-test" version="1.13.0">
+      <artifact name="ui-test-1.13.0.module">
+        <sha256 value="48362808d4f1924afd13f14568f43eb88d60fc4c74cefab949d23dded61f0853" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.ui" name="ui-test-android" version="1.13.0">
+      <artifact name="ui-test-android-1.13.0.module">
+        <sha256 value="91b23c7d944834a5450d7f7a36cc72e1d21d014cdd3ee3e529c12c68f3016c86" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="ui-test.aar">
+        <sha256 value="ba4f5f4ba9366d2faf7967c7a603b0e2738636f8d744cb40393e47033d96bb90" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.ui" name="ui-test-junit4" version="1.13.0">
+      <artifact name="ui-test-junit4-1.13.0.module">
+        <sha256 value="e66398c7ec36ace50d03312c51dd37067669e2f52e2eaaa5a6d0f4b6082f5b63" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.compose.ui" name="ui-test-junit4-android" version="1.13.0">
+      <artifact name="ui-test-junit4-android-1.13.0.module">
+        <sha256 value="bace60b2f3116dcb782ca632eab99baa5104a8cc9b84a1bebbf00e550517a2ae" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="ui-test-junit4.aar">
+        <sha256 value="4d5201f0b946b0e01099b6476403515418abf04cd213a48a7c1f7f334fcd2cd9" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.navigationevent" name="navigationevent-compose" version="1.0.0">
+      <artifact name="navigationevent-compose-1.0.0.module">
+        <sha256 value="a51c8f63cb5f188561903d8f2ef1496d9eff57e7acddf87d56859b09859baaaf" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.navigationevent" name="navigationevent-compose" version="1.1.0">
+      <artifact name="navigationevent-compose-1.1.0.module">
+        <sha256 value="ce77061c13da511ef132464650d48677a460ff061787ace64c194bb057b7e0a6" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.navigationevent" name="navigationevent-compose-android" version="1.0.0">
+      <artifact name="navigationevent-compose-android-1.0.0.module">
+        <sha256 value="38e11be3d6d544e1a00b987f74f56db52f77bbd4a1344f022c36c52f014e162f" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.navigationevent" name="navigationevent-compose-android" version="1.1.0">
+      <artifact name="navigationevent-compose-android-1.1.0.module">
+        <sha256 value="a1fac1490383d7a6b6bfe04851c97a4ef4d28ea315aa104cfda075a6a9e6f89c" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="navigationevent-compose.aar">
+        <sha256 value="487fd434793393f4c6d2ceac0a9f5fc6d23b682f508ff6ff18793907b5882032" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.test" name="core" version="1.7.0">
+      <artifact name="core-1.7.0.aar">
+        <sha256 value="f4dacd8edceeec48e0c76ecf28339b28f4b4f6b74f8e34e9e59b472c27d9eb81" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="core-1.7.0.pom">
+        <sha256 value="b97dd112cd684ad3686f5ccf581b92b106ca76565cf02ccfece060af3bc50743" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.test" name="monitor" version="1.8.0">
+      <artifact name="monitor-1.8.0.aar">
+        <sha256 value="56cb7496a06d9f2dca7d3ff76c50a8a30bd18e00a24a3b267d5a31437b278e67" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="monitor-1.8.0.pom">
+        <sha256 value="681cf08c41700c73b146953867c0ac826da9c2a810bd2a4a8f878ea11c64d40c" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.test" name="runner" version="1.7.0">
+      <artifact name="runner-1.7.0.aar">
+        <sha256 value="970311c47119928a2e406a88892a3d270387cc5a49a181a1c44511105b41b818" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="runner-1.7.0.pom">
+        <sha256 value="622831c6d31666fb3438cb0d2ee1fbbbc78cabcd49717699578d92550062207f" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.test.espresso" name="espresso-core" version="3.7.0">
+      <artifact name="espresso-core-3.7.0.aar">
+        <sha256 value="5dd90e366838bf044cb52eae06474debd285df18a7a77c40441ac8e8951bb00f" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="espresso-core-3.7.0.pom">
+        <sha256 value="b6e7f43cb396b89a4ce329a7e5acef79d375203a87a11a7639d18c0e6de50b56" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.test.espresso" name="espresso-idling-resource" version="3.7.0">
+      <artifact name="espresso-idling-resource-3.7.0.aar">
+        <sha256 value="5ff62326b49c308c1d060466ae3cf4aa0e3deaf9295f077a6886048dda3e9b14" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="espresso-idling-resource-3.7.0.pom">
+        <sha256 value="72c5f3dff213bd143cdfa2eb416d1bde1ced6656d9c54b69efca8f74a2cc831d" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.test.ext" name="junit" version="1.3.0">
+      <artifact name="junit-1.3.0.aar">
+        <sha256 value="3363df84da4540ba8daff02c3f7cd65471037a6a5370591a7e6deba377b36e7f" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="junit-1.3.0.pom">
+        <sha256 value="92af7f253e5eabe2caec5c56f308312653d123042b22754d6ff664e1752dcf3f" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.test.services" name="storage" version="1.6.0">
+      <artifact name="storage-1.6.0.aar">
+        <sha256 value="f97e3cf6aaf4e3fb97ef219d37a9c0a0720183c1f6db87b37642521e26fb6d30" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="storage-1.6.0.pom">
+        <sha256 value="8e5d72e2bceef6ef807bc38834dbc7aa53177fd20da349f53dce5a4f2a028bbf" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.annotation" name="annotation" version="1.7.0">
+      <artifact name="annotation-1.7.0.module">
+        <sha256 value="530708656d380605077ea8bca9ae1372fbd1af38e375f411d4e43263bd510c3c" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.concurrent" name="concurrent-futures" version="1.2.0">
+      <artifact name="concurrent-futures-1.2.0.jar">
+        <sha256 value="4810315a798690b5d3bb40c92bcd41c045fd2c36bbfc50b27cbac3d6a0eda190" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="concurrent-futures-1.2.0.module">
+        <sha256 value="afd7094d3a07422be2e991bc87048542ae9724a5c42bd54b5cae3029c7970a1d" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.concurrent" name="concurrent-futures-ktx" version="1.2.0">
+      <artifact name="concurrent-futures-ktx-1.2.0.jar">
+        <sha256 value="e1f3e17bb4358ccd6c77ca45f70635c9aba237261f19eaa4f64a0218c00e2a3e" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="concurrent-futures-ktx-1.2.0.module">
+        <sha256 value="823f469acd984adfd30b3d0a577eb4f7796a03742a526ef70c1583b594b43b80" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.tracing" name="tracing" version="1.1.0">
+      <artifact name="tracing-1.1.0.aar">
+        <sha256 value="5b78e2c618fc10b3d14decc01df76158f15954ad746aacf0607766721da081f6" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+      <artifact name="tracing-1.1.0.module">
+        <sha256 value="b1fed4309623b6f20bc817d8fbd70e4ea7085e40647694cd399ae58d2f0049e3" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="org.jetbrains.kotlinx" name="kotlinx-coroutines-bom" version="1.8.1">
+      <artifact name="kotlinx-coroutines-bom-1.8.1.pom">
+        <sha256 value="563e4aa29fa8fe09a6e1746d0a5b51308f7c7dedc468dc5a0ca810a485877030" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="org.jetbrains.kotlinx" name="kotlinx-coroutines-core-jvm" version="1.8.1">
+      <artifact name="kotlinx-coroutines-core-jvm-1.8.1.module">
+        <sha256 value="09b81c9d11c2deebf133ad87b707927c1f04099cb611ef008c7725b3eb308329" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
+    <component group="androidx.graphics" name="graphics-shapes-desktop" version="1.0.1">
+      <artifact name="graphics-shapes-desktop-1.0.1.module">
+        <sha256 value="d2523d73abbe2f1e787106ad4e1f7acee30a7c62370f85bb4d782700f0fd0701" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification" />
+      </artifact>
+    </component>
   </components>
 </verification-metadata>

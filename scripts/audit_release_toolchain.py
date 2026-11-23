@@ -222,6 +222,7 @@ def run(output, archives_from=None):
         sdk = Path(os.environ.get('ANDROID_HOME', ROOT / '.local/android-sdk')).resolve()
         targets = {'build-tools;36.0.0': sdk / 'build-tools/36.0.0',
                    'platforms;android-36': sdk / 'platforms/android-36',
+                   'platforms;android-37.1': sdk / 'platforms/android-37.1',
                    'platform-tools': sdk / 'platform-tools',
                    'cmdline-tools;19.0': sdk / 'cmdline-tools/19.0'}
         for package, installed in targets.items():

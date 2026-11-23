@@ -136,6 +136,7 @@ def run(source, output, revision, expected_apk):
         packages = json.loads((TOOLS / 'qualification/release/linux-sdk-inputs.json').read_text())
         destinations = {'cmdline-tools;19.0': sdk / 'cmdline-tools/19.0',
                         'platforms;android-36': sdk / 'platforms/android-36',
+                        'platforms;android-37.1': sdk / 'platforms/android-37.1',
                         'build-tools;36.0.0': sdk / 'build-tools/36.0.0'}
         for row in packages:
             approved_url(row['url'])
