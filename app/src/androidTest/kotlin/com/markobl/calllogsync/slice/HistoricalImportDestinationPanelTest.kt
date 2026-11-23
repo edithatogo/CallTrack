@@ -1,8 +1,8 @@
 package com.markobl.calllogsync.slice
 
-import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -35,9 +35,7 @@ class HistoricalImportDestinationPanelTest {
         }
 
         compose.onNodeWithTag("import_calendar_picker").assertIsDisplayed()
-        compose
-            .onNodeWithTag("import_calendar_picker")
-            .assertContentDescriptionEquals("Personal calendar")
+        compose.onNodeWithTag("import_calendar_picker").assertTextEquals("Personal calendar")
         compose.onNodeWithText("Personal calendar").assertIsDisplayed()
         compose.runOnIdle { assertEquals(emptyList<String>(), selected) }
 

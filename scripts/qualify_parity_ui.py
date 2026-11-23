@@ -665,6 +665,10 @@ def qualify(serial, suite="settings", receipt_dir=None):
             command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.READ_CALENDAR')
             check('revokedCalendarAndVisibleRestoreDoNotEnableLogging')
         elif suite == 'imports':
+            check('runActionsRequireEnabledStateAndExplicitTaps',
+                  'com.markobl.calllogsync.slice.HistoricalImportActionsPanelTest')
+            check('destinationListIsPresentedAndOnlyExplicitSelectionReturnsOpaqueToken',
+                  'com.markobl.calllogsync.slice.HistoricalImportDestinationPanelTest')
             check('prepareCalendarAndTaggedHistory')
             command('shell', 'pm', 'grant', PACKAGE, 'android.permission.READ_CALL_LOG')
             check('latestCallUsesNewestDateAndHighestIdOnTies')

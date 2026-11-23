@@ -9,17 +9,27 @@ plugin supplies the shared module. The upstream comparison fixtures retain
 their JDK 11 and JDK 17 runtimes.
 
 Compose BOM 2026.11.01 requires compile SDK 37.1. The app compiles to JVM 11
-bytecode, targets Android 16 and supports Android 8.0 onward. The hosted
-acceptance matrix still exercises API 26, 33 and 36. Android 17.2 is available
-locally for testing. The [runtime audit](tracks/release_20261020/canonical-runtime-audit-20261124.json)
+bytecode, targets Android 17 and supports Android 8.0 onward. The hosted
+acceptance matrix exercises API 26, 33 and 36. The Android 17.2 emulator adds
+API 37 and a 16 KB page size to local acceptance. The
+[runtime audit](tracks/release_20261020/canonical-runtime-audit-20261124.json)
 and [source inventory](../qualification/release/runtime-sources.json) bind
 91 runtime artifacts to their canonical publications.
 
-The published Kotlin compatibility range supports Gradle 9.7.0 and AGP
-9.3.1. The root buildscript resolves the Netty 4.1.141 BOM alone; a Netty 4.2
-change needs qualification when a consumer is selected. Current Android
-providers and WorkManager continue to serve Calendar, CallLog and durable
-scheduling, with SQLite retaining the verified receipt and recovery behavior.
+Renovate proposes AGP 9.5.2 and Gradle 9.9.2, above the fully supported
+range for Kotlin 2.4.21. The Android and multiplatform plugins use AGP
+9.3.1 with Gradle 9.7.0. The Actions proposal covers the pinned Ubuntu
+runner images and the historical JDK 17 comparison fixture. The app and
+release gate use JDK 25. The pinned actionlint rejects the explicit
+Ubuntu 26.04 runner label. [Renovate dashboard](https://github.com/edithatogo/CallTrack/issues/91),
+[Kotlin compatibility range](https://kotlinlang.org/docs/gradle-configure-project.html),
+[actionlint runner-label support](https://github.com/rhysd/actionlint/pull/683).
+
+Strict dependency resolution found the Netty 4.1.141 BOM as the only Netty
+entry in the root buildscript and release runtime graphs. The proposed 4.2
+BOM offers no runtime update for this graph. CallTrack uses the Android
+Calendar and CallLog providers, WorkManager for scheduling, and SQLite
+for durable receipts and recovery.
 
 ## Dependency refresh — 2026-10-23
 

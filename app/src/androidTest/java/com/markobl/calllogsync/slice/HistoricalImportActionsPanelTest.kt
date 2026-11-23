@@ -1,9 +1,12 @@
 package com.markobl.calllogsync.slice
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.test.assertContentDescriptionEquals
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -57,7 +60,10 @@ class HistoricalImportActionsPanelTest {
 
         val tags = listOf("import_continue", "import_confirm", "import_stop", "import_cancel")
         tags.forEach { compose.onNodeWithTag(it).assertIsNotEnabled() }
-        compose.onNodeWithTag("import_stop").assertContentDescriptionEquals("Stop")
+        compose
+            .onNodeWithTag("import_stop")
+            .assertTextEquals("Stop")
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.ContentDescription))
         compose.runOnIdle {
             assertEquals(listOf(0, 0, 0, 0), actions.toList())
             state.value =
