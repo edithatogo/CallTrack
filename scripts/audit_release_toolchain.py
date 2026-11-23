@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 from pathlib import Path, PurePosixPath
+import platform
 import re
 import subprocess
 import struct
@@ -113,6 +114,8 @@ def temurin_comparison(archive, installed):
 
 def qualified_local_jdk():
     """Select only the repo-local macOS JDK whose full payload matches the publisher archive."""
+    if platform.system() != 'Darwin' or platform.machine() != 'arm64':
+        raise RuntimeError('The local JDK upgrade probe is qualified only on macOS ARM64')
     toolchain = ROOT / '.local/toolchain'
     archive = toolchain / TEMURIN25_ARCHIVE
     bundle = toolchain / 'temurin-jdk25'

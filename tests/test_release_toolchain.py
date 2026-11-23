@@ -32,7 +32,7 @@ class ToolTrustTest(unittest.TestCase):
             for name in ('java', 'keytool'):
                 (binaries / name).write_bytes(('publisher-' + name).encode())
             (toolchain / 'temurin-jdk25').symlink_to(installed, target_is_directory=True)
-            with patch.object(tools, 'ROOT', root), patch.object(tools, 'TEMURIN25_SHA256', tools.sha(archive)):
+            with patch.object(tools, 'ROOT', root), patch.object(tools, 'TEMURIN25_SHA256', tools.sha(archive)), patch.object(tools.platform, 'system', return_value='Darwin'), patch.object(tools.platform, 'machine', return_value='arm64'):
                 with patch.dict(os.environ, {'JAVA_HOME': '/tmp/untrusted-jdk'}):
                     selected, evidence = tools.qualified_local_jdk()
                 self.assertEqual(toolchain / 'temurin-jdk25/Contents/Home', selected)
@@ -45,6 +45,12 @@ class ToolTrustTest(unittest.TestCase):
                 archive.write_bytes(b'tampered archive')
                 with self.assertRaisesRegex(RuntimeError, 'Publisher-pinned'):
                     tools.qualified_local_jdk()
+
+    def test_local_jdk_rejects_unqualified_host_before_reading_files(self):
+        with patch.object(tools.platform, 'system', return_value='Linux'), patch.object(tools, 'sha') as sha:
+            with self.assertRaisesRegex(RuntimeError, 'only on macOS ARM64'):
+                tools.qualified_local_jdk()
+            sha.assert_not_called()
 
     def test_java_environment_drops_injected_runtime_options(self):
         overrides = {'JAVA_HOME': '/tmp/untrusted-jdk', 'JAVA_TOOL_OPTIONS': '-agentlib:malicious',
