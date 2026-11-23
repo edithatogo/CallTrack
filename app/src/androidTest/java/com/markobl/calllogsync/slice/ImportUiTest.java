@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import android.app.Activity;
 import android.app.Instrumentation;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -59,7 +60,7 @@ public class ImportUiTest {
         FixtureCallLog.asShell(action);
     }
 
-    private void add(long at, int type) {
+    private long add(long at, int type) {
         ContentValues row = new ContentValues();
         row.put(Calls.NUMBER, "0000000000");
         row.put(Calls.CACHED_NAME, "Synthetic import fixture");
@@ -68,7 +69,9 @@ public class ImportUiTest {
         row.put(Calls.TYPE, type);
         row.put(Calls.NUMBER_PRESENTATION, Calls.PRESENTATION_ALLOWED);
         row.put(Calls.PHONE_ACCOUNT_ID, tag());
-        assertNotNull(FixtureCallLog.insert(context(), row));
+        android.net.Uri uri = FixtureCallLog.insert(context(), row);
+        assertNotNull(uri);
+        return ContentUris.parseId(uri);
     }
 
     private HistoricalImport.Session latest() {
@@ -137,6 +140,75 @@ public class ImportUiTest {
                     for (int type = 1; type <= 3; type++) add(yesterday + type * 1000, type);
                     add(day(today().minusDays(8)), 1);
                 });
+    }
+
+    @Test
+    public void latestCallUsesNewestDateAndHighestIdOnTies() {
+        long at = day(today().minusDays(1)) + 12 * 60 * 60 * 1000 + 3000;
+        long[] tiedId = new long[1];
+        shellCalls(() -> tiedId[0] = add(at, 2));
+        try {
+            CallRecord latest = new AndroidCallLogSource(context()).latest();
+            assertNotNull(latest);
+            assertEquals("Latest call must use the newest timestamp", at, latest.start);
+            assertEquals(
+                    "Equal timestamps must use the highest ID",
+                    Long.toString(tiedId[0]),
+                    latest.id);
+        } finally {
+            shellCalls(
+                    () -> {
+                        assertEquals(
+                                1,
+                                FixtureCallLog.delete(
+                                        context(),
+                                        Calls._ID + "=? AND " + Calls.PHONE_ACCOUNT_ID + "=?",
+                                        new String[] {Long.toString(tiedId[0]), tag()}));
+                    });
+        }
+    }
+
+    @Test
+    public void renderedDestinationAndFiltersSurviveProcessDeathWithoutPreview() {
+        RenderedUi ui = new RenderedUi(InstrumentationRegistry.getInstrumentation());
+        String from = today().minusDays(1).toString(), to = today().toString();
+        ui.startActivity(HistoricalImportActivity.class);
+        ui.await(
+                () -> ui.find("import_calendar_picker", true) != null,
+                "Import did not render",
+                90000);
+        ui.tapId("import_calendar_picker");
+        ui.tapText(fixture.calendarDisplayName());
+        ui.setTextId("import_from", from);
+        ui.setTextId("import_to", to);
+        ui.tapId("import_outgoing");
+        ui.await(
+                () -> {
+                    android.view.accessibility.AccessibilityNodeInfo node =
+                            ui.shown("import_outgoing", true);
+                    return node != null && node.isCheckable() && !node.isChecked();
+                },
+                "Outgoing filter did not switch off");
+        ui.dismissKeyboard();
+        assertNull("Editing must not create a preview", latest());
+        assertEquals(0, fixture.events(calendar()));
+        ui.capture("import-before-process-death");
+
+        ui.killStoppedProcessAndReturn(HistoricalImportActivity.class);
+        ui.await(
+                () -> ui.find("import_calendar_picker", true) != null,
+                "Import did not restore",
+                90000);
+        ui.revealId("import_calendar_picker");
+        ui.await(
+                () -> ui.find(fixture.calendarDisplayName(), false) != null,
+                "Selected destination did not return after process death");
+        assertEquals(from, ui.shown("import_from", true).getText().toString());
+        assertEquals(to, ui.shown("import_to", true).getText().toString());
+        assertFalse(ui.shown("import_outgoing", true).isChecked());
+        assertNull("Process restoration must not create a preview", latest());
+        assertEquals(0, fixture.events(calendar()));
+        ui.capture("import-after-process-death");
     }
 
     @Test
@@ -223,6 +295,8 @@ public class ImportUiTest {
             assertEquals(0, fixture.events(calendar()));
             ui.revealId("import_summary");
             ui.capture("import-cancelled");
+            ui.dismissKeyboard();
+            ui.revealId("import_create");
             preview(ui);
             confirm(ui);
             assertEquals(3, fixture.events(calendar()));

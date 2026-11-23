@@ -77,7 +77,7 @@ class ReceiptRecovery(
             event.id >= 0 &&
             event.calendar == intent.calendar &&
             event.event != null &&
-            intent.fingerprint == event.event.fingerprint()
+            intent.matchesEvent(event.event)
 
     private fun validate(key: String?, calendar: Long) {
         require(!key.isNullOrEmpty() && calendar >= 0) { "Invalid recovery key" }

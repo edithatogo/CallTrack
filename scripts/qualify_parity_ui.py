@@ -66,7 +66,8 @@ def native_failure_summary(method, output, declared_permissions=None):
     for diagnostic in (
         'runtime-fatal-exception', 'runtime-anr', 'runtime-test-process-died',
         'runtime-app-process-died', 'runtime-permission-denial',
-        'runtime-permission-controller',
+        'runtime-permission-controller', 'runtime-shell-pipe-failure',
+        'runtime-background-start-blocked',
     ):
         if diagnostic + '=true' in output:
             detail += '; ' + diagnostic
@@ -76,6 +77,18 @@ def native_failure_summary(method, output, declared_permissions=None):
     )
     if runtime_exception:
         detail += '; runtime-exception=' + runtime_exception.group(1)
+    for name, allowed in (
+        ('runtime-fatal-process', 'app|driver|test|permission-controller|input-method|platform|other'),
+        ('runtime-fatal-source', 'app|test|project|permission-controller|input-method|platform'),
+    ):
+        category = re.search(r'\b' + name + r'=(' + allowed + r')(?![a-z-])', output)
+        if category:
+            detail += '; ' + category.group(0)
+    project_frame = re.search(
+        r'\bruntime-project-frame=((?:HistoricalImportActivity|ReceiptRecoveryActivity|'
+        r'ImportUiTest|RecoveryUiTest|RenderedUi)(?:\$[A-Za-z0-9_$]+)?\.[A-Za-z0-9_$]+)', output)
+    if project_frame:
+        detail += '; ' + project_frame.group(0)
     # The rendered accessibility gate may fail on an unlabeled control. Retain
     # only its resource ID and widget class; suppress its visible text/label.
     control = re.search(
@@ -145,11 +158,11 @@ def native_failure_summary(method, output, declared_permissions=None):
     if 'Refusing a control in an unexpected package:' in output:
         detail = (detail + '; ' if detail else '') + 'dialog-action-owned-by-unexpected-window'
     dialog_active = re.search(
-        r'dialog-active=(app|permission|system-ui|input-method|other|unavailable)', output)
+        r'dialog-active=(app|permission|system-ui|launcher|input-method|other|unavailable)', output)
     if dialog_active:
         detail = (detail + '; ' if detail else '') + 'dialog-active=' + dialog_active.group(1)
     dialog_windows = re.findall(
-        r'(app|permission|system-ui|input-method|other|unavailable):'
+        r'(app|permission|system-ui|launcher|input-method|other|unavailable):'
         r'(application|input-method|other):', output)
     if dialog_windows:
         detail = (detail + '; ' if detail else '') + 'dialog-windows=' + ','.join(
@@ -218,11 +231,15 @@ def native_failure_summary(method, output, declared_permissions=None):
         detail = (detail + '; ' if detail else '') + (
             'permission-launcher=' + permission_launcher.group(1))
     activity_top = re.search(
-        r'activity-top=(app|test|permission-controller|input-method|system-ui|other|unavailable)',
+        r'activity-top=(app|test|permission-controller|input-method|system-ui|launcher|other|unavailable)',
         output,
     )
     if activity_top:
         detail = (detail + '; ' if detail else '') + activity_top.group(0)
+    activity_records = re.search(
+        r'activity-records=(none|import|recovery|import,recovery|unavailable)(?![a-z,-])', output)
+    if activity_records:
+        detail = (detail + '; ' if detail else '') + activity_records.group(0)
     system_controls = re.findall(
         r':id/([a-z0-9_]+):(android\.[A-Za-z0-9_.$]+):enabled=(true|false)', output)
     if system_controls:
@@ -306,10 +323,25 @@ def activity_top_summary(activity_dump):
             category = 'input-method'
         elif package == 'com.android.systemui':
             category = 'system-ui'
+        elif package in ('com.android.launcher3', 'com.google.android.apps.nexuslauncher'):
+            category = 'launcher'
         else:
             category = 'other'
         return 'activity-top=' + category
     return 'activity-top=unavailable'
+
+
+def activity_record_summary(activity_dump):
+    """Report only whether either of the two fixed test activities has a record."""
+    if not activity_dump.strip():
+        return 'activity-records=unavailable'
+    records = []
+    for name, activity in (('import', 'HistoricalImportActivity'),
+                           ('recovery', 'ReceiptRecoveryActivity')):
+        if any('* Hist #' in line and PACKAGE + '/com.markobl.calllogsync.slice.' + activity in line
+               for line in activity_dump.splitlines()):
+            records.append(name)
+    return 'activity-records=' + (','.join(records) or 'none')
 
 
 def runtime_failure_summary(logcat):
@@ -324,32 +356,41 @@ def runtime_failure_summary(logcat):
         categories.append('runtime-permission-denial=true')
     if 'grantpermissionsactivity' in lowered:
         categories.append('runtime-permission-controller=true')
+    if re.search(r'Background activity start \[callingPackage: '
+                 + re.escape(PACKAGE) + r'(?:;|\])', logcat):
+        categories.append('runtime-background-start-blocked=true')
     if re.search(r'Process:\s*' + re.escape(TEST_PACKAGE) + r'(?:\s|,)', logcat):
         categories.append('runtime-test-process-died=true')
     if re.search(r'Process:\s*' + re.escape(PACKAGE) + r'(?:\s|,)', logcat):
         categories.append('runtime-app-process-died=true')
-    exception = re.search(
-        r'\b((?:java|android|androidx)\.[A-Za-z0-9_.$]+(?:Exception|Error))\b',
-        logcat,
-    )
-    if exception:
-        categories.append('runtime-exception=' + exception.group(1))
     fatal = re.search(
-        r'FATAL EXCEPTION:[^\n]*\n(?P<body>.*?)(?:\n\s*\n|\Z)',
+        r'FATAL EXCEPTION(?P<system> IN SYSTEM PROCESS)?:[^\n]*\n(?P<body>.*?)(?:\n\s*\n|\Z)',
         logcat,
         re.DOTALL,
     )
+    exception = re.search(
+        r'\b((?:java|android|androidx)\.[A-Za-z0-9_.$]+(?:Exception|Error))\b',
+        fatal.group('body'),
+    ) if fatal else None
+    if exception:
+        categories.append('runtime-exception=' + exception.group(1))
     if fatal:
         body = fatal.group('body')
+        if fatal.group('system'):
+            categories.append('runtime-fatal-process=platform')
+        if 'UiAutomationConnection' in body and re.search(r'\bEPIPE\b|broken pipe', body, re.I):
+            categories.append('runtime-shell-pipe-failure=true')
         process = re.search(
-            r'^[^\n]*\bProcess:\s*([A-Za-z0-9_.]+)(?:,|\s|$)', body, re.MULTILINE
+            r'^[^\n]*\bProcess:\s*([A-Za-z0-9_.:]+)(?:,|\s|$)', body, re.MULTILINE
         )
-        if process:
+        if process and not fatal.group('system'):
             package = process.group(1)
             if package == TEST_PACKAGE:
                 categories.append('runtime-fatal-process=test')
             elif package == PACKAGE:
                 categories.append('runtime-fatal-process=app')
+            elif package == PACKAGE + ':recovery_driver':
+                categories.append('runtime-fatal-process=driver')
             elif package in ('com.android.permissioncontroller',
                              'com.google.android.permissioncontroller'):
                 categories.append('runtime-fatal-process=permission-controller')
@@ -358,6 +399,8 @@ def runtime_failure_summary(logcat):
                 categories.append('runtime-fatal-process=input-method')
             elif package.startswith(('android.', 'com.android.')):
                 categories.append('runtime-fatal-process=platform')
+            else:
+                categories.append('runtime-fatal-process=other')
         frame = re.search(r'^[^\n]*\bat\s+([A-Za-z0-9_.$]+)\(', body, re.MULTILINE)
         if frame:
             owner = frame.group(1)
@@ -365,6 +408,8 @@ def runtime_failure_summary(logcat):
                 categories.append('runtime-fatal-source=test')
             elif owner.startswith(PACKAGE + '.'):
                 categories.append('runtime-fatal-source=app')
+            elif owner.startswith('com.markobl.calllogsync.slice.'):
+                categories.append('runtime-fatal-source=project')
             elif owner.startswith(('com.android.permissioncontroller.',
                                    'com.google.android.permissioncontroller.')):
                 categories.append('runtime-fatal-source=permission-controller')
@@ -373,6 +418,12 @@ def runtime_failure_summary(logcat):
                 categories.append('runtime-fatal-source=input-method')
             elif owner.startswith(('android.', 'com.android.')):
                 categories.append('runtime-fatal-source=platform')
+        project_frame = re.search(
+            r'\bat\s+com\.markobl\.calllogsync\.slice\.'
+            r'((?:HistoricalImportActivity|ReceiptRecoveryActivity|ImportUiTest|RecoveryUiTest|'
+            r'RenderedUi)(?:\$[A-Za-z0-9_$]+)?\.[A-Za-z0-9_$]+)\(', body)
+        if project_frame:
+            categories.append('runtime-project-frame=' + project_frame.group(1))
     return ' '.join(categories)
 
 
@@ -381,6 +432,7 @@ def instrumentation_failure_summary(method, output, activity_dump='', logcat='',
     """Combine raw local output with only bounded platform diagnostics."""
     augmented = (output + '\n' + permission_activity_launcher_summary(activity_dump)
                  + '\n' + activity_top_summary(activity_dump)
+                 + '\n' + activity_record_summary(activity_dump)
                  + '\n' + runtime_failure_summary(logcat))
     return native_failure_summary(method, augmented, declared_permissions)
 
@@ -440,12 +492,29 @@ def qualify(serial, suite="settings", receipt_dir=None):
             raise RuntimeError('ADB command failed: ' + ' '.join(args))
         return result.stdout.strip()
 
-    def check(method, class_name=None):
+    def failure_summary(method, output):
+        try:
+            activity_dump = command('shell', 'dumpsys', 'activity', 'activities')
+        except Exception:
+            activity_dump = ''
+        try:
+            logcat = command('logcat', '-d', '-t', '800')
+        except Exception:
+            logcat = ''
+        try:
+            logcat += '\n' + command('logcat', '-d', '-s', 'ActivityTaskManager:I', 'AndroidRuntime:E')
+        except Exception:
+            pass
+        apk_permissions = apk_runtime_permission_summary(apks[0], apks[1], aapt)
+        return instrumentation_failure_summary(
+            method, output, activity_dump, logcat, apk_permissions)
+
+    def check(method, class_name=None, runner='androidx.test.runner.AndroidJUnitRunner'):
         selected_class = class_name or test_class
         instrument_args = (
             'shell', 'am', 'instrument', '-w', '-r', '-e', 'fixtureToken',
             receipt['fixture_token'], '-e', 'class', selected_class + '#' + method,
-            TEST_PACKAGE + '/androidx.test.runner.AndroidJUnitRunner',
+            TEST_PACKAGE + '/' + runner,
         )
         try:
             output = command(*instrument_args)
@@ -457,25 +526,11 @@ def qualify(serial, suite="settings", receipt_dir=None):
             # Nonzero instrumentation exits can still contain a useful JUnit
             # failure. Keep raw output in the ignored receipt; only emit the
             # same allowlisted summary used for normal assertion failures.
-            try:
-                activity_dump = command('shell', 'dumpsys', 'activity', 'activities')
-            except Exception:
-                activity_dump = ''
-            try:
-                logcat = command('logcat', '-d', '-t', '800')
-            except Exception:
-                logcat = ''
-            apk_permissions = apk_runtime_permission_summary(apks[0], apks[1], aapt)
-            raise RuntimeError(instrumentation_failure_summary(
-                method, step.get('output', ''), activity_dump, logcat, apk_permissions
-            )) from failure
+            raise RuntimeError(failure_summary(method, step.get('output', ''))) from failure
         if 'OK (1 test)' not in output or 'FAILURES' in output or 'INSTRUMENTATION_FAILED' in output:
             # The full output stays in the ignored receipt; public CI only gets
             # source locations, never rendered labels or fixture values.
-            apk_permissions = apk_runtime_permission_summary(
-                apks[0], apks[1], aapt)
-            raise RuntimeError(native_failure_summary(
-                method, output, declared_permissions=apk_permissions))
+            raise RuntimeError(failure_summary(method, output))
 
     def capture_ui():
         directory = evidence / ('ui-' + receipt['fixture_token'])
@@ -556,7 +611,10 @@ def qualify(serial, suite="settings", receipt_dir=None):
         elif suite == 'imports':
             check('prepareCalendarAndTaggedHistory')
             command('shell', 'pm', 'grant', PACKAGE, 'android.permission.READ_CALL_LOG')
+            check('latestCallUsesNewestDateAndHighestIdOnTies')
             ui_attempted = True
+            check('renderedDestinationAndFiltersSurviveProcessDeathWithoutPreview',
+                  runner='com.markobl.calllogsync.slice.ProcessRecoveryRunner')
             check('renderedDestinationAndFiltersSurviveRecreationBeforePreview')
             check('renderedRangePreviewCancelConfirmAndRepeat')
             check('preparePersistedPartialImport')
@@ -564,6 +622,8 @@ def qualify(serial, suite="settings", receipt_dir=None):
         else:
             check('preparePendingWithoutCallAccess')
             ui_attempted = True
+            check('renderedPendingRecoverySurvivesProcessDeathWithoutApproval',
+                  runner='com.markobl.calllogsync.slice.ProcessRecoveryRunner')
             check('renderedPendingRecoverySurvivesRecreationWithoutApproval')
             check('leavingAndReturningWithdrawsQueuedApproval')
             command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.WRITE_CALENDAR')

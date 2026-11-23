@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <instrumentation
+        android:name="androidx.test.runner.AndroidJUnitRunner"
+        android:targetPackage="org.calltrack.community.dev" />
+    <instrumentation
+        android:name="com.markobl.calllogsync.slice.ProcessRecoveryRunner"
+        android:targetPackage="org.calltrack.community.dev"
+        android:targetProcesses="org.calltrack.community.dev:recovery_driver" />
     <application>
         <activity
             android:name="androidx.activity.ComponentActivity"

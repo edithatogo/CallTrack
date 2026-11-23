@@ -114,6 +114,23 @@ public class RecoveryUiTest {
                 "Recovery state did not become " + expected);
     }
 
+    private void awaitPendingAction(RenderedUi ui, String stage) {
+        try {
+            ui.await(
+                    () -> ui.shown(context().getString(R.string.reapproval_open), false) != null,
+                    "Pending recovery action did not appear",
+                    90000);
+        } catch (AssertionError failure) {
+            try {
+                ui.capture("recovery-" + stage + "-failure");
+            } catch (Throwable capture) {
+                failure.addSuppressed(capture);
+            }
+            throw new AssertionError(
+                    "Pending recovery action did not appear; " + ui.dialogActionSummary(), failure);
+        }
+    }
+
     @Test
     public void preparePendingWithoutCallAccess() {
         assertTrue(state().edit().putLong("calendar", fixture.createCalendar()).commit());
@@ -131,6 +148,39 @@ public class RecoveryUiTest {
                     assertNotNull(ui.shown("recovery_retention_copy", true));
                     assertNotNull(ui.shown(context().getString(R.string.retention_policy), false));
                 });
+    }
+
+    @Test
+    public void renderedPendingRecoverySurvivesProcessDeathWithoutApproval() {
+        RenderedUi ui = new RenderedUi(InstrumentationRegistry.getInstrumentation());
+        ui.startActivity(ReceiptRecoveryActivity.class);
+        awaitPendingAction(ui, "initial");
+        tap(ui, R.string.reapproval_open);
+        try {
+            ui.await(() -> ui.find("button1", true) != null, "Reapproval dialog did not open");
+        } catch (AssertionError failure) {
+            try {
+                ui.capture("recovery-reapproval-dialog-failure");
+            } catch (Throwable capture) {
+                failure.addSuppressed(capture);
+            }
+            throw new AssertionError(
+                    "Reapproval dialog did not open; " + ui.dialogActionSummary(), failure);
+        }
+        assertEquals(DurableDelivery.State.READY, saved("pending").state);
+        assertEquals(0, fixture.events(calendar()));
+        ui.capture("recovery-before-process-death");
+
+        ui.killStoppedProcessAndReturn(ReceiptRecoveryActivity.class);
+        assertEquals(DurableDelivery.State.READY, saved("pending").state);
+        assertEquals(0, fixture.events(calendar()));
+        awaitPendingAction(ui, "after-process-death");
+        assertNull(
+                "Process restoration must not revive the approval dialog",
+                ui.find("button1", true));
+        assertEquals(DurableDelivery.State.READY, saved("pending").state);
+        assertEquals(0, fixture.events(calendar()));
+        ui.capture("recovery-after-process-death");
     }
 
     @Test
