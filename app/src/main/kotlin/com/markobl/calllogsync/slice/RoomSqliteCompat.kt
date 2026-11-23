@@ -8,19 +8,29 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteStatement
 
 /**
- * Temporary Android-specific SQL adapter for Room's official SupportSQLite bridge.
- * It does not open a second database; all operations use the Room-owned connection.
- * Remove alongside legacy imperative queries after suspending DAO parity is proven.
+ * Temporary Android-specific SQL adapter for Room's official SupportSQLite bridge. It does not open
+ * a second database; all operations use the Room-owned connection. Remove alongside legacy
+ * imperative queries after suspending DAO parity is proven.
  */
 class RoomSqliteCompat(private val database: SupportSQLiteDatabase) {
     fun inTransaction(): Boolean = database.inTransaction()
+
     fun beginTransaction() = database.beginTransaction()
+
     fun setTransactionSuccessful() = database.setTransactionSuccessful()
+
     fun endTransaction() = database.endTransaction()
+
     fun getVersion(): Int = database.version
-    fun setVersion(version: Int) { database.version = version }
+
+    fun setVersion(version: Int) {
+        database.version = version
+    }
+
     fun execSQL(sql: String) = database.execSQL(sql)
+
     fun execSQL(sql: String, bindArgs: Array<out Any>) = database.execSQL(sql, bindArgs)
+
     fun compileStatement(sql: String): SupportSQLiteStatement = database.compileStatement(sql)
 
     fun rawQuery(sql: String, selectionArgs: Array<out String?>?): Cursor =

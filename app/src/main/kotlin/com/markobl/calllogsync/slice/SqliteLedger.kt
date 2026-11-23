@@ -9,9 +9,7 @@ import java.util.function.LongSupplier
 
 /** Durable source/destination receipts; SQL transactions serialize concurrent instances. */
 class SqliteLedger(context: Context?, name: String?, private val clock: LongSupplier?) :
-    SliceEngine.Ledger,
-    AutomaticDelivery.Progress,
-    Closeable {
+    SliceEngine.Ledger, AutomaticDelivery.Progress, Closeable {
     constructor(context: Context?) : this(context, "calltrack-ledger.db")
 
     constructor(
@@ -21,8 +19,11 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
 
     private val room = RoomPersistence.ledger(requireNotNull(context), requireNotNull(name))
     private val adapter = RoomPersistence.adapter(room)
-    val writableDatabase: RoomSqliteCompat get() = adapter
-    val readableDatabase: RoomSqliteCompat get() = adapter
+    val writableDatabase: RoomSqliteCompat
+        get() = adapter
+
+    val readableDatabase: RoomSqliteCompat
+        get() = adapter
 
     override fun close() = room.close()
 
@@ -504,5 +505,4 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
             db.endTransaction()
         }
     }
-
 }

@@ -8,14 +8,16 @@ import org.json.JSONException
 import org.json.JSONObject
 
 /** Versioned import sessions; delivery authority remains in the existing receipt ledger. */
-class SqliteImportStore(context: Context?, name: String?) :
-    HistoricalImport.Store, Closeable {
+class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Store, Closeable {
     constructor(context: Context?) : this(context, "calltrack-imports.db")
 
     private val room = RoomPersistence.imports(requireNotNull(context), requireNotNull(name))
     private val adapter = RoomPersistence.adapter(room)
-    val writableDatabase: RoomSqliteCompat get() = adapter
-    val readableDatabase: RoomSqliteCompat get() = adapter
+    val writableDatabase: RoomSqliteCompat
+        get() = adapter
+
+    val readableDatabase: RoomSqliteCompat
+        get() = adapter
 
     override fun close() = room.close()
 

@@ -58,18 +58,14 @@ public class KotlinPackageUpdateTest {
         if (context().getDatabasePath("calltrack-ledger.db").exists()) {
             try (SqliteLedger ledger = new SqliteLedger(context())) {
                 for (String table : new String[] {"receipts", "outbox", "scan_cursors"}) {
-                    assertEquals(
-                            0,
-                            countRows(ledger.getReadableDatabase(), table));
+                    assertEquals(0, countRows(ledger.getReadableDatabase(), table));
                 }
             }
         }
         if (context().getDatabasePath("calltrack-imports.db").exists()) {
             try (SqliteImportStore imports = new SqliteImportStore(context())) {
                 for (String table : new String[] {"sessions", "candidates"}) {
-                    assertEquals(
-                            0,
-                            countRows(imports.getReadableDatabase(), table));
+                    assertEquals(0, countRows(imports.getReadableDatabase(), table));
                 }
             }
         }

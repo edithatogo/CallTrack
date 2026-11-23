@@ -16,7 +16,6 @@ import androidx.room3.support.getSupportWrapper
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.driver.AndroidSQLiteDriver
 import androidx.sqlite.execSQL
-import androidx.sqlite.db.SupportSQLiteDatabase
 
 // These entities describe the existing on-disk schema, not a new interchange format.
 // Retaining the original DB filenames is essential for preserving installed receipts.
@@ -77,13 +76,14 @@ internal data class ImportSessionRow(
 @Entity(
     tableName = "candidates",
     primaryKeys = ["session", "source_id"],
-    foreignKeys = [
-        ForeignKey(
-            entity = ImportSessionRow::class,
-            parentColumns = ["id"],
-            childColumns = ["session"],
-        ),
-    ],
+    foreignKeys =
+        [
+            ForeignKey(
+                entity = ImportSessionRow::class,
+                parentColumns = ["id"],
+                childColumns = ["session"],
+            ),
+        ],
 )
 internal data class ImportCandidateRow(
     val session: String,
@@ -95,14 +95,12 @@ internal data class ImportCandidateRow(
 
 @Dao
 internal interface RoomLedgerDao {
-    @Query("SELECT COUNT(*) FROM outbox")
-    suspend fun outboxCount(): Long
+    @Query("SELECT COUNT(*) FROM outbox") suspend fun outboxCount(): Long
 }
 
 @Dao
 internal interface RoomImportDao {
-    @Query("SELECT COUNT(*) FROM sessions")
-    suspend fun sessionCount(): Long
+    @Query("SELECT COUNT(*) FROM sessions") suspend fun sessionCount(): Long
 }
 
 @Database(
@@ -124,9 +122,9 @@ internal abstract class RoomImportDatabase : RoomDatabase() {
 }
 
 /**
- * One Room owner per physical database. Room's official SupportSQLite bridge is
- * temporary: it lets the pre-existing, qualified receipt state machine keep its
- * exact SQL and transaction boundaries until its queries become suspend DAOs.
+ * One Room owner per physical database. Room's official SupportSQLite bridge is temporary: it lets
+ * the pre-existing, qualified receipt state machine keep its exact SQL and transaction boundaries
+ * until its queries become suspend DAOs.
  */
 internal object RoomPersistence {
     private const val RECEIPT_TABLE =
@@ -139,7 +137,8 @@ internal object RoomPersistence {
     private val migration6To7 =
         object : Migration(6, 7) {
             override suspend fun migrate(connection: SQLiteConnection) {
-                // Room installs its schema identity; the legacy schema-6 tables stay byte-compatible.
+                // Room installs its schema identity; the legacy schema-6 tables stay
+                // byte-compatible.
             }
         }
 
@@ -164,7 +163,9 @@ internal object RoomPersistence {
                         connection.execSQL("ALTER TABLE outbox ADD COLUMN source_start INTEGER")
                         connection.execSQL("ALTER TABLE outbox ADD COLUMN source_seconds INTEGER")
                         connection.execSQL("ALTER TABLE outbox ADD COLUMN source_type INTEGER")
-                        connection.execSQL("ALTER TABLE outbox ADD COLUMN source_presentation INTEGER")
+                        connection.execSQL(
+                            "ALTER TABLE outbox ADD COLUMN source_presentation INTEGER",
+                        )
                         connection.execSQL(
                             "ALTER TABLE outbox ADD COLUMN source_presentation_supplied INTEGER",
                         )
@@ -177,7 +178,8 @@ internal object RoomPersistence {
                 val now = System.currentTimeMillis()
                 check(now >= 0) { "Invalid migration clock" }
                 connection.execSQL(
-                    "UPDATE outbox SET payload_saved_at=" + now +
+                    "UPDATE outbox SET payload_saved_at=" +
+                        now +
                         " WHERE payload_title IS NOT NULL",
                 )
             }
