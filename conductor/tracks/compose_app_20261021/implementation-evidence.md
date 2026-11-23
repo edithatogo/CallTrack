@@ -1076,3 +1076,168 @@ API26 ARM64 emulator the no-op control again failed with `focus-tree-moved=false
 and the restored Tab candidate passed with 12 screenshots. Both outcomes
 verified fixture cleanup, package removal and emulator restoration. Hosted
 qualification remains separate from this local evidence.
+
+## Latest-call and process-recovery continuation — 2026-11-23
+
+On a user-selected Android 17 phone and dedicated Google test calendar, the
+manual latest-call action saved an older call rather than the controlled call.
+The exact unintended event was removed from the phone; bounded Google Calendar
+readbacks found no matching remote event. This does not prove the event was never
+transiently uploaded. Call-log permission was revoked while the defect is fixed,
+and automatic logging was not enabled. The original ignored local journal was
+lost during worktree cleanup; a private replacement identifies itself as
+reconstructed from retained conversation tool results.
+
+The Android framework's synthesized multi-column sort can append the descending
+direction only after the final column. The observed old event matched the first
+row under that ordering on the phone. A synthetic real-provider regression failed
+against the earlier query; the candidate specifies descending date and ID
+explicitly. The phone test, current-source hosted matrix and process-recovery
+qualification remain pending. The process test returns to the retained task
+after killing the stopped app process, rather than starting a new activity.
+
+The first hosted matrix on this candidate, run `45080074184`, failed the
+new import process-restoration check on API26, API33 and API36; fixture cleanup
+and package removal passed. The initial driver could kill the cached process
+before Android had saved its activity state. The revised driver waits for the
+target activity to be stopped with saved state before killing it. The import
+journey also dismisses the keyboard after verifying cancellation so its next
+explicit preview control can be reached; the cancellation assertion remains.
+The separate first build run `45080052659` encountered HTTP 429 while fetching
+the pinned formatter. These failures remain part of the qualification history.
+
+On the dedicated API36 emulator, the revised source-bound build, unit tests and
+lint passed, as did the import, recovery and accessibility suites. Each suite
+verified fixture cleanup, package removal and emulator restoration. The 38
+focused host safety tests passed. The corrected candidate still needs its own
+hosted API26/API33/API36 matrix and controlled phone/Google Calendar retest.
+
+The next hosted matrix, run `45081560752` on `c7d66de`, passed all four
+suites on API36. API26 failed while waiting for the saved-state diagnostic;
+[Android 8's activity dump](https://android.googlesource.com/platform/frameworks/base/+/android-8.0.0_r1/services/core/java/com/android/server/am/ActivityRecord.java)
+uses `haveState` where the probe expected `mHaveState`. The probe now accepts
+either spelling while still requiring saved state and a stopped activity.
+API33 passed settings and imports, then failed waiting for the restored
+recovery action; the available hosted summary did not establish why. The
+recovery test now checks the pending ledger and event count immediately after
+restart and records an allowlisted window/control diagnostic if the action
+does not return. Cleanup and package removal passed for both failed jobs.
+
+The local API36 lifecycle qualification passed on `c7d66de`, including a
+process killed after provider insertion, reboot, offline delivery and Doze
+deferral, with fixture cleanup and environment restoration. Two clean
+same-host release builds on that revision produced identical unsigned APKs;
+they used a shared dependency cache and are not independent-host reproduction.
+The current test-only refinements and the controlled Google retest still need
+their own applicable qualification.
+
+Hosted run `45092254258` passed API36 and failed API26 and API33. API26
+progressed beyond the saved-state wait but the instrumentation terminated with
+an `IllegalStateException`; its cause was not available in the sanitized log.
+The same source passed both the import and recovery suites on a dedicated
+API26 ARM emulator, with cleanup and environment restoration verified. API33
+passed the immediate pending-record and zero-event checks, but its active
+window was not the app when the recovery action was sought.
+
+Android 13's [task-return implementation](https://android.googlesource.com/platform/frameworks/base/+/android-13.0.0_r1/services/core/java/com/android/server/wm/AppTaskImpl.java)
+can reject a background caller's `moveToFront`. The test driver now briefly
+adopts only the system permission for that task-return operation on API29+
+to emulate selecting the retained task from Recents, drops it immediately,
+and checks the original task ID. It does not grant an app permission or change
+the recovery assertions. The hosted API26 crash's cause and the effect of this
+task-return change still require verification; the physical user journey
+remains a separate gate. Sanitized failure diagnostics now also classify the
+driver and known project frames without emitting rendered or call data.
+
+On a later local API26 run the instrumentation again terminated without a
+result. Its retained emulator log showed Android 8's `UiAutomation` shell
+writer failing with `EPIPE`: the saved-state probe had closed the pipe as soon
+as it found the record. The probe now reads the complete dump before returning,
+while still requiring both stopped and saved state for the target activity.
+This establishes the local failure mechanism; the hosted run did not retain
+enough detail to prove its termination had the same cause. The candidate needs
+fresh local and hosted qualification.
+
+In hosted run `45094878459`, API33 subsequently failed before the first
+recovery screen appeared, with another application active; fixture cleanup
+passed but no screenshot was available, so the harness did not verify package
+removal before the disposable emulator was stopped. The process-death driver's
+initial screen launch is also a background task start. The same narrowly
+scoped system permission now surrounds that launch as well as returning the
+retained task. This is a test-driver change; it does not establish that the
+background-start restriction caused the hosted failure. Diagnostics classify
+that specific platform denial without retaining its account or call details.
+
+Hosted run `45096297934` on `b96018b` passed API26 and API36, but API33
+again failed before the initial recovery action appeared. Fixture cleanup
+passed; package removal was not verified because no screenshot had been
+captured. The cause remains unconfirmed. The test now captures the initial
+failure as well as a failed return, and the harness reports only fixed
+launcher/activity-record categories and bounded runtime diagnostics. It no
+longer labels unrelated nonfatal log entries as the failure's exception.
+These diagnostics retain the existing screen, cleanup and recovery gates.
+
+Hosted run `45098167798` on `a4a5a87` passed API26 and API36, but API33
+failed after process death: the pending record and zero-event checks passed,
+while the launcher remained active. The failure screenshot, fixture cleanup
+and package removal were verified. The same recovery suite passed on a local
+API33 ARM emulator. On that isolated emulator a physical touch on the centered
+Recents card returned the test app to the foreground. The API33 driver now
+waits for a focused app window and, when needed, uses that explicit system UI
+interaction with a unique centered, launcher-owned card. It still checks the
+original task ID and restored content. After correcting focus and transition
+races, the local API33 ARM import and recovery suites passed with fixture
+cleanup, package removal and emulator restoration verified. The hosted API33
+failure's underlying platform cause remains unconfirmed, and the candidate
+still requires the full hosted matrix.
+
+Hosted run `45101787725` passed settings, imports, recovery and accessibility
+on API26, API33 and API36 at `6a01121`. The recorded methods include latest-call
+ordering, both process-death journeys, the recovery approval check and keyboard
+focus. Every suite reported fixture cleanup, package removal and screenshot
+hashes. The two build qualifications and privacy check passed on that head.
+The local API33 ARM settings and accessibility suites also passed after the
+import and recovery runs. The Google Calendar phone retest, manual assistive
+technology checks and broader operational acceptance remain open.
+
+## Google sync precision and recovery follow-up — 2026-11-23
+
+A user-confirmed outgoing test call produced one event in the dedicated Google
+calendar. The phone provider and Google readback agreed on the event title,
+description, duration, private visibility and free availability. The synchronized
+provider record retained the app marker and the device timezone, but both event
+times were rounded down by 644 ms. The original fingerprint retained the precise
+call time, so the unchanged synced event would otherwise require review on retry.
+
+A focused regression reproduced that outcome. The candidate recovery change
+accepts only the exact whole-second representation derived from the stored source
+facts, then verifies the complete original fingerprint. Changed titles or times
+and older receipts without source facts still require review; no insertion path is
+added. The existing exact call-time tests remain in place. Physical recovery
+readback, identified-event cleanup and the affected hosted gates remain open until
+verified on the revised candidate. Private identifiers and call content remain in
+the local test journal, not this repository.
+
+The subsequent API 37 phone retest logged one user-confirmed outgoing call to
+that dedicated calendar. The latest-call candidate was source-equivalent to
+`b402aa8a92e3781ef312ad7a7a58c012c7043aa7` and had SHA-256
+`acfb084a0536dc2dfd7732b44a4560c4ef065336f2bd26d75e22e103ee54597e`.
+After sync, local and Google title, description, start/end and duration matched
+at the provider's whole-second resolution. Private visibility and free
+availability matched; the local app marker and device timezone remained present.
+
+A non-debuggable release test candidate built from
+`3129fd6fce0cfefbcfd0f5db02b3f8b461b13829` had SHA-256
+`4203d868e701c738107fa86364806100881e594e991eae391bc642517bcbddcf`.
+It used the same development signer and was installed as a preserving update.
+Its recovery screen identified the existing receipt and verified the existing
+effect without creating another event; both providers still showed exactly one
+matching event. The identified unedited test event was deleted once, and its
+absence was verified locally and on Google. The previous call-log permission
+state was restored. Private identifiers and call content remain in the local
+journal, not this repository.
+
+The local release build, lint and 119 release JVM tests passed without errors
+or skips, and the shared-core JVM suite passed. Hosted API 26/33/36 acceptance
+is recorded separately. This one controlled outgoing case does not close the
+broader physical-release, operational, accessibility or observation gates.

@@ -4,23 +4,44 @@ gradle.projectsEvaluated {
             def root = gradle.rootProject
             def app = root.project(':app')
             def configs = [root.buildscript.configurations.classpath]
+            def owners = new IdentityHashMap()
+            owners.put(root.buildscript.configurations.classpath, 'root buildscript')
             def names = ['releaseCompileClasspath','releaseRuntimeClasspath','debugCompileClasspath','debugRuntimeClasspath','debugAndroidTestRuntimeClasspath','releaseUnitTestRuntimeClasspath','lintClassPath']
+            def unavailable = []
             names.each { name ->
                 def config = app.configurations.findByName(name)
-                if (config != null && config.canBeResolved) configs.add(config)
+                if (config != null && config.canBeResolved) {
+                    configs.add(config)
+                    owners.put(config, app.path)
+                }
+                else unavailable.add([configuration:name, reason:config == null ? 'not present' : 'not resolvable'])
             }
             [root, app].each { project ->
                 project.configurations.findAll { it.canBeResolved && it.name.toLowerCase() =~ /(lint|compiler|aapt|desugar)/ }.each { config ->
-                    if (!configs.contains(config)) configs.add(config)
+                    if (!configs.contains(config)) {
+                        configs.add(config)
+                        owners.put(config, project.path)
+                    }
                 }
             }
             def rows = configs.collectMany { config ->
-                config.resolvedConfiguration.resolvedArtifacts.collect { a ->
-                    [configuration: config.name, coordinate:a.moduleVersion.id.toString(), name:a.file.name,
-                    sha256:java.security.MessageDigest.getInstance('SHA-256').digest(a.file.bytes).encodeHex().toString()]
+                // In-repository KMP projects have several Android artifact variants;
+                // inventory their source separately and resolve external modules only.
+                config.incoming.artifactView {
+                    componentFilter { id -> id instanceof org.gradle.api.artifacts.component.ModuleComponentIdentifier }
+                }.artifacts.artifacts.collect { artifact ->
+                    def component = artifact.id.componentIdentifier
+                    [configuration: config.name, owner:owners.get(config), coordinate:"${component.group}:${component.module}:${component.version}", name:artifact.file.name,
+                    sha256:java.security.MessageDigest.getInstance('SHA-256').digest(artifact.file.bytes).encodeHex().toString()]
                 }
             }
-            new File(System.getenv('CALLTRACK_TOOLTRUST_OUT')).text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson([configurations:configs.collect {it.name}, artifacts:rows]))+'\n'
+            def projects = configs.collectMany { config ->
+                config.incoming.resolutionResult.allComponents.findAll {
+                    it.id instanceof org.gradle.api.artifacts.component.ProjectComponentIdentifier
+                }.collect { [configuration:config.name, owner:owners.get(config), project:it.id.projectPath] }
+            }.unique()
+            def scopes = configs.collect { [configuration:it.name, owner:owners.get(it)] }
+            new File(System.getenv('CALLTRACK_TOOLTRUST_OUT')).text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson([configurations:configs.collect {it.name}, configurationScopes:scopes, unavailableConfigurations:unavailable, projectComponents:projects, artifacts:rows]))+'\n'
         }
     }
 }

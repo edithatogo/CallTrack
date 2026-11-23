@@ -1,0 +1,81 @@
+name: Security checks
+on:
+  pull_request:
+  push:
+    branches: [main]
+  merge_group:
+    types: [checks_requested]
+  schedule:
+    - cron: '17 3 * * 2'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  trufflehog-history:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install verified TruffleHog
+        run: |
+          curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
+            https://github.com/trufflesecurity/trufflehog/releases/download/v3.100.0/trufflehog_3.100.0_linux_amd64.tar.gz \
+            -o "$RUNNER_TEMP/trufflehog.tar.gz"
+          echo 'b2d85eba59865e98f45c9fc9f77d2c6d62df529fdd5755af121304ea5a7cecbb  '"$RUNNER_TEMP/trufflehog.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/trufflehog.tar.gz" -C "$RUNNER_TEMP" trufflehog
+      - name: Scan history without sending candidates to issuers
+        run: |
+          if "$RUNNER_TEMP/trufflehog" git "file://$GITHUB_WORKSPACE" \
+              --no-verification --no-update --no-ignore-tag --fail --fail-on-scan-errors \
+              --json --concurrency=4 --archive-max-depth=2 --archive-max-size=50MB \
+              > "$RUNNER_TEMP/trufflehog-results.jsonl" 2> "$RUNNER_TEMP/trufflehog.log"; then
+            echo 'History scan completed without candidates or scan errors.'
+          else
+            echo '::error::TruffleHog found a candidate or could not complete the scan. Reproduce locally to inspect the private results.'
+            exit 1
+          fi
+  workflow-lint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
+        with:
+          go-version: '1.27.4'
+          cache: false
+      - name: Build verified actionlint
+        env:
+          GOTOOLCHAIN: local
+          GOPROXY: https://proxy.golang.org
+          GOSUMDB: sum.golang.org
+          CGO_ENABLED: '0'
+        run: |
+          test "$(go env GOVERSION)" = 'go1.27.4'
+          git clone --depth 1 --single-branch --branch v1.7.12 \
+            https://github.com/rhysd/actionlint.git "$RUNNER_TEMP/actionlint-src"
+          test "$(git -C "$RUNNER_TEMP/actionlint-src" rev-parse HEAD)" = '914e7df21a07ef503a81201c76d2b11c789d3fca'
+          # Remove this pinned upstream backport once a qualified release supports cache-mode.
+          curl --fail --location --silent --show-error --proto '=https' --proto-redir '=https' --tlsv1.2 \
+            https://github.com/rhysd/actionlint/commit/5dc52e8daa4ef51bfd76a648128474bd41d65df0.patch \
+            -o "$RUNNER_TEMP/actionlint-cache-mode.patch"
+          echo 'ef967535729dcc82cc631863c0c1994be3f89e0193a17b581dcdc4b58910779c  '"$RUNNER_TEMP/actionlint-cache-mode.patch" | sha256sum --check
+          git -C "$RUNNER_TEMP/actionlint-src" apply --check "$RUNNER_TEMP/actionlint-cache-mode.patch"
+          git -C "$RUNNER_TEMP/actionlint-src" apply "$RUNNER_TEMP/actionlint-cache-mode.patch"
+          cd "$RUNNER_TEMP/actionlint-src"
+          # v0.47.0 fixes GO-2026-5024 and is the newest release compatible with the upstream core tests.
+          go get golang.org/x/sys@v0.47.0
+          echo 'd4e8a9fe668de60f78eb4824a90c2b698705cba6ebde1500a6589c57dfea26db  go.mod' | sha256sum --check
+          echo 'd78791d5c9bacaea46a88acf58cad778bd0ae020302fbf0a81a0793dd83441f8  go.sum' | sha256sum --check
+          GOFLAGS=-mod=readonly go mod download
+          go mod verify
+          GOFLAGS=-mod=readonly go test -count=1 . ./cmd/actionlint
+          GOFLAGS=-mod=readonly go build -trimpath -o "$RUNNER_TEMP/actionlint" ./cmd/actionlint
+      - name: Lint all GitHub Actions workflows
+        run: '"$RUNNER_TEMP/actionlint" -no-color'
+      - name: Lint the fuzz runner
+        run: shellcheck fuzz/run-jazzer.sh

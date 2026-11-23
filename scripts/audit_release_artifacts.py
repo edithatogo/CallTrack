@@ -13,16 +13,25 @@ import re
 from pathlib import Path
 import urllib.request
 from urllib.parse import urljoin, urlsplit
-import xml.etree.ElementTree as ET
 import zipfile
+from redirect_validation import ValidatingRedirectHandler
+from xml_safety import parse_xml
 
 LIMIT = 64 * 1024 * 1024
+
+
+def validate_publication_redirect(url):
+    if urlsplit(url).scheme != 'https':
+        raise ValueError('Insecure publication redirect')
+
+
+PUBLICATION_OPENER = urllib.request.build_opener(ValidatingRedirectHandler(validate_publication_redirect))
 
 
 def read_publication(url):
     if not url.startswith('https://'):
         raise ValueError('HTTPS publication required')
-    with urllib.request.urlopen(url, timeout=60) as response:
+    with PUBLICATION_OPENER.open(url, timeout=60) as response:
         if not getattr(response, 'url', url).startswith('https://'):
             raise ValueError('Insecure publication redirect')
         data = response.read(LIMIT + 1)
@@ -57,7 +66,7 @@ def module_artifact_url(row, metadata):
 
 
 def declarations(data):
-    root = ET.fromstring(data)
+    root = parse_xml(data)
     ns = {'m': 'http://maven.apache.org/POM/4.0.0'}
     return [{key: node.findtext('m:' + key, default='', namespaces=ns)
              for key in ('name', 'url', 'distribution')}
@@ -70,7 +79,7 @@ def inherited_licences(data, evidence, depth=0):
         return direct
     if depth >= 8:
         raise ValueError('POM parent chain exceeds audit limit')
-    root = ET.fromstring(data)
+    root = parse_xml(data)
     ns = {'m': 'http://maven.apache.org/POM/4.0.0'}
     parent = root.find('m:parent', ns)
     if parent is None:

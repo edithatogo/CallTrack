@@ -16,10 +16,10 @@ class AndroidCallLogSource(context: Context?) : SliceEngine.CallSource, PagedCal
     override fun latest(): CallRecord? {
         permission()
         val query = Bundle()
-        query.putStringArray(ContentResolver.QUERY_ARG_SORT_COLUMNS, arrayOf(Calls.DATE, Calls._ID))
-        query.putInt(
-            ContentResolver.QUERY_ARG_SORT_DIRECTION,
-            ContentResolver.QUERY_SORT_DIRECTION_DESCENDING,
+        // The platform's structured sort can apply DESC only to the last column.
+        query.putString(
+            ContentResolver.QUERY_ARG_SQL_SORT_ORDER,
+            "${Calls.DATE} DESC, ${Calls._ID} DESC",
         )
         query.putInt(ContentResolver.QUERY_ARG_LIMIT, 1)
         context.contentResolver

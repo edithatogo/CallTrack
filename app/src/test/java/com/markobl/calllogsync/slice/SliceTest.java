@@ -40,6 +40,21 @@ public class SliceTest {
                                 new CallRecord(
                                         "x", "1", Long.MAX_VALUE, 1, "Outgoing", null, null, true),
                                 "UTC"));
+        DurableDelivery.Intent invalidFacts =
+                new DurableDelivery.Intent(
+                        DurableDelivery.State.CONFIRMED,
+                        "x",
+                        7,
+                        "signature",
+                        "marker",
+                        "unmatched",
+                        1,
+                        null,
+                        null,
+                        new DurableDelivery.SourceFacts(Long.MAX_VALUE, 1, 1, null, false));
+        CallEvent normalized =
+                new CallEvent("title", "body", Long.MAX_VALUE - 807, 0, "UTC", "marker");
+        assertFalse(invalidFacts.matchesEvent(normalized));
     }
 
     @Test
