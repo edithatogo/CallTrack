@@ -6,7 +6,6 @@ provider fixtures. No production key, permanent identity or release approval.
 """
 import argparse
 import json
-import os
 from pathlib import Path
 import re
 import subprocess
@@ -14,13 +13,13 @@ import uuid
 import tempfile
 import zipfile
 
+from audit_release_toolchain import qualified_java_environment, qualified_local_jdk
 from parity_health import require_healthy_boot
 from parity_targets import is_dedicated_avd
 from qualify_kotlin_update import PACKAGE, TEST_PACKAGE, require_successful_receipt, sha
 from run_slice_build import inputs
 
 ROOT = Path(__file__).resolve().parents[1]
-JDK = Path(os.environ['JAVA_HOME']) if os.environ.get('JAVA_HOME') else None
 
 
 def require_rejection(result, reason):
@@ -99,8 +98,7 @@ def require_identical_payload(unsigned, signed):
 def qualify(serial, output, provider_schema=False, release_build_receipt=None):
     if not re.fullmatch(r'emulator-\d+', serial):
         raise RuntimeError('Release upgrade probe refuses physical-device serials')
-    if JDK is None:
-        raise RuntimeError('JAVA_HOME must select the qualified JDK 25')
+    jdk, jdk_evidence = qualified_local_jdk()
     if subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT).strip():
         raise RuntimeError('Commit source before release upgrade probe')
     key = Path.home() / '.android/debug.keystore'
@@ -120,11 +118,12 @@ def qualify(serial, output, provider_schema=False, release_build_receipt=None):
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     output.mkdir(parents=True, exist_ok=False)
     sdk = (ROOT / '.local/android-sdk').resolve()
-    env = dict(os.environ, JAVA_HOME=str(JDK), ANDROID_HOME=str(sdk),
-               CALLTRACK_RELEASE_QUALIFICATION=str(qualification))
+    env = qualified_java_environment(jdk)
+    env.update(ANDROID_HOME=str(sdk), CALLTRACK_RELEASE_QUALIFICATION=str(qualification))
     receipt = dict(scope='development-key-release-mode-version-increase-private-state-only',
                    revision=revision, inputs=current['inputs'], token=uuid.uuid4().hex,
                    production_signed=False, release_ready=False, result='failed', steps=[])
+    receipt['jdk'] = jdk_evidence
     receipt['qualification_inputs'] = fixture_inputs
     if provider_schema:
         receipt['scope'] = 'development-key-release-mode-historical-schema-provider-upgrade'
@@ -267,10 +266,11 @@ gradle.beforeProject { project ->
         native('verifyPersistedState')
         # A one-day disposable fixture certificate tests rejection, never production custody.
         with tempfile.TemporaryDirectory(prefix='calltrack-test-key-', dir=output) as temporary:
+            qualified_local_jdk()
             fixture_key = Path(temporary) / 'fixture.keystore'
             fixture_apk = Path(temporary) / 'wrong-certificate.apk'
             fixture_env = dict(env, CALLTRACK_FIXTURE_PASSWORD='disposable-fixture-only')
-            subprocess.run([str(JDK / 'bin/keytool'), '-genkeypair', '-alias', 'fixture',
+            subprocess.run([str(jdk / 'bin/keytool'), '-genkeypair', '-alias', 'fixture',
                             '-dname', 'CN=Disposable Calltrack Test Only', '-keyalg', 'RSA',
                             '-validity', '1', '-keystore', str(fixture_key),
                             '-storepass:env', 'CALLTRACK_FIXTURE_PASSWORD',

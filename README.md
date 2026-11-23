@@ -46,6 +46,13 @@ test "$(.venv/bin/python --version)" = "Python $python_version"
 .venv/bin/python scripts/verify_conductor.py
 ```
 
+The local release-upgrade emulator check uses the qualified macOS ARM64 JDK
+bundle at `.local/toolchain/temurin-jdk25` and its original publisher archive,
+`OpenJDK25U-jdk_aarch64_mac_hotspot_25.0.5.1_2.tar.gz`, in the same directory.
+These may be links to the verified toolchain storage. Before using the JDK, the
+check compares the archive to its pinned digest and every installed bundle file
+to that archive; other platforms are not yet qualified for this local check.
+
 The build runs JVM tests, builds app/test APKs and lints. Receipts and logs stay under
 excluded `.local/slice-evidence`. The app uses Compose controls and Kotlin shared
 call-selection rules. The [live plan](conductor/index.md#current-checkpoint) links

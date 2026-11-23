@@ -20,6 +20,8 @@ from redirect_validation import ValidatingRedirectHandler
 from xml_safety import parse_xml
 
 ROOT = Path(__file__).resolve().parents[1]
+TEMURIN25_ARCHIVE = 'OpenJDK25U-jdk_aarch64_mac_hotspot_25.0.5.1_2.tar.gz'
+TEMURIN25_SHA256 = '248353ea41be39d5d2c1c67c7ce0ae4d1668966aacd0c5308464bc1be42f677b'
 
 
 def validate_tool_redirect(url):
@@ -107,6 +109,29 @@ def temurin_comparison(archive, installed):
     return dict(files=rows, unexpected_files=sorted(str(p) for p in actual_paths - expected_paths),
                 all_jdk_files_match=bool(rows) and actual_paths == expected_paths and all(
                     r['archive_sha256'] == r['installed_sha256'] for r in rows))
+
+
+def qualified_local_jdk():
+    """Select only the repo-local macOS JDK whose full payload matches the publisher archive."""
+    toolchain = ROOT / '.local/toolchain'
+    archive = toolchain / TEMURIN25_ARCHIVE
+    bundle = toolchain / 'temurin-jdk25'
+    if not archive.is_file() or sha(archive) != TEMURIN25_SHA256:
+        raise RuntimeError('Publisher-pinned Temurin 25 archive required in .local/toolchain')
+    if not bundle.is_dir() or not temurin_comparison(archive, bundle.resolve())['all_jdk_files_match']:
+        raise RuntimeError('The local Temurin 25 bundle differs from the pinned archive')
+    return bundle / 'Contents/Home', {'archive_sha256': TEMURIN25_SHA256,
+                                      'bundle': str(bundle.resolve()),
+                                      'verification_script_sha256': sha(Path(__file__).resolve())}
+
+
+def qualified_java_environment(jdk):
+    env = dict(os.environ, JAVA_HOME=str(jdk))
+    for name in ('JAVA_TOOL_OPTIONS', 'JDK_JAVA_OPTIONS', '_JAVA_OPTIONS', 'CLASSPATH',
+                 'LD_PRELOAD', 'LD_LIBRARY_PATH', 'DYLD_INSERT_LIBRARIES',
+                 'DYLD_LIBRARY_PATH', 'DYLD_FRAMEWORK_PATH'):
+        env.pop(name, None)
+    return env
 
 
 def macho_payload(data):
@@ -252,20 +277,20 @@ def run(output, archives_from=None):
             licence = next((e for e in node if e.tag.endswith('uses-license')), None)
             row['licence_id'] = licence.get('ref') if licence is not None else None
             receipt['sdk'].append(row)
-        jdk_name = 'OpenJDK25U-jdk_aarch64_mac_hotspot_25.0.5.1_2.tar.gz'
+        jdk_name = TEMURIN25_ARCHIVE
         jdk_url = ('https://github.com/adoptium/temurin25-binaries/releases/download/'
                    'jdk-25.0.5.1%2B2/' + jdk_name)
         checksum_file = output / 'temurin25.sha256'
         fetch(jdk_url + '.sha256.txt', checksum_file)
         if checksum_file.read_text().strip().split() != [
-                '248353ea41be39d5d2c1c67c7ce0ae4d1668966aacd0c5308464bc1be42f677b', jdk_name]:
+                TEMURIN25_SHA256, jdk_name]:
             raise RuntimeError('Temurin publisher checksum differs from the pinned release')
         jdk_archive = output / jdk_name
         if archives_from is not None:
             jdk_archive.symlink_to((archives_from / jdk_name).resolve())
         else:
             fetch(jdk_url, jdk_archive)
-        if sha(jdk_archive) != '248353ea41be39d5d2c1c67c7ce0ae4d1668966aacd0c5308464bc1be42f677b':
+        if sha(jdk_archive) != TEMURIN25_SHA256:
             raise RuntimeError('Temurin archive checksum mismatch')
         if not os.environ.get('JAVA_HOME'):
             raise RuntimeError('JAVA_HOME must select the audited Temurin JDK')

@@ -1,5 +1,5 @@
 import json
-import io
+import os
 from pathlib import Path
 import sys
 import tarfile
@@ -14,6 +14,47 @@ import audit_release_artifacts as artifacts
 
 
 class ToolTrustTest(unittest.TestCase):
+    def test_local_jdk_selection_requires_original_archive_and_unchanged_bundle(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            toolchain = root / '.local/toolchain'
+            toolchain.mkdir(parents=True)
+            archive = toolchain / tools.TEMURIN25_ARCHIVE
+            with tarfile.open(archive, 'w:gz') as bundle:
+                for name in ('java', 'keytool'):
+                    data = ('publisher-' + name).encode()
+                    member = tarfile.TarInfo('jdk-25.0.5.1+2/Contents/Home/bin/' + name)
+                    member.size = len(data)
+                    bundle.addfile(member, io.BytesIO(data))
+            installed = root / 'publisher-jdk'
+            binaries = installed / 'Contents/Home/bin'
+            binaries.mkdir(parents=True)
+            for name in ('java', 'keytool'):
+                (binaries / name).write_bytes(('publisher-' + name).encode())
+            (toolchain / 'temurin-jdk25').symlink_to(installed, target_is_directory=True)
+            with patch.object(tools, 'ROOT', root), patch.object(tools, 'TEMURIN25_SHA256', tools.sha(archive)):
+                with patch.dict(os.environ, {'JAVA_HOME': '/tmp/untrusted-jdk'}):
+                    selected, evidence = tools.qualified_local_jdk()
+                self.assertEqual(toolchain / 'temurin-jdk25/Contents/Home', selected)
+                self.assertEqual(tools.sha(archive), evidence['archive_sha256'])
+                self.assertEqual(tools.sha(Path(tools.__file__).resolve()), evidence['verification_script_sha256'])
+                (binaries / 'keytool').write_bytes(b'tampered')
+                with self.assertRaisesRegex(RuntimeError, 'bundle differs'):
+                    tools.qualified_local_jdk()
+                (binaries / 'keytool').write_bytes(b'publisher-keytool')
+                archive.write_bytes(b'tampered archive')
+                with self.assertRaisesRegex(RuntimeError, 'Publisher-pinned'):
+                    tools.qualified_local_jdk()
+
+    def test_java_environment_drops_injected_runtime_options(self):
+        overrides = {'JAVA_HOME': '/tmp/untrusted-jdk', 'JAVA_TOOL_OPTIONS': '-agentlib:malicious',
+                     'JDK_JAVA_OPTIONS': '-javaagent:malicious', 'LD_PRELOAD': '/tmp/malicious'}
+        with patch.dict(os.environ, overrides):
+            env = tools.qualified_java_environment(Path('/verified/jdk'))
+        self.assertEqual('/verified/jdk', env['JAVA_HOME'])
+        for name in ('JAVA_TOOL_OPTIONS', 'JDK_JAVA_OPTIONS', 'LD_PRELOAD'):
+            self.assertNotIn(name, env)
+
     def test_temurin_archive_comparison_rejects_missing_changed_and_extra_files(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
