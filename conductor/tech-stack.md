@@ -1,5 +1,26 @@
 # Technology stack and decision status
 
+## Toolchain and Android dependencies — 2026-11-24
+
+The active app and cold Linux release gate select Temurin JDK 25.0.5.1+2,
+Gradle 9.7.0, AGP 9.3.1 and Kotlin/Compose compiler 2.4.21. AGP supplies the
+app's Kotlin plugin and the first-party Kotlin Multiplatform Android library
+plugin supplies the shared module. The upstream comparison fixtures retain
+their JDK 11 and JDK 17 runtimes.
+
+Compose BOM 2026.11.01 requires compile SDK 37.1. The app compiles to JVM 11
+bytecode, targets Android 16 and supports Android 8.0 onward. The hosted
+acceptance matrix still exercises API 26, 33 and 36. Android 17.2 is available
+locally for testing. The [runtime audit](tracks/release_20261020/canonical-runtime-audit-20261124.json)
+and [source inventory](../qualification/release/runtime-sources.json) bind
+91 runtime artifacts to their canonical publications.
+
+The published Kotlin compatibility range supports Gradle 9.7.0 and AGP
+9.3.1. The root buildscript resolves the Netty 4.1.141 BOM alone; a Netty 4.2
+change needs qualification when a consumer is selected. Current Android
+providers and WorkManager continue to serve Calendar, CallLog and durable
+scheduling, with SQLite retaining the verified receipt and recovery behavior.
+
 ## Dependency refresh — 2026-10-23
 
 Python3.15.1 passed all144 local helper tests and Conductor validation and

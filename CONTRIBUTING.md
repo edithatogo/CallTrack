@@ -6,11 +6,12 @@ The current package is disposable; there is no supported public release yet.
 
 ## Reproduce the development build
 
-Use a fresh checkout of the exact commit being reviewed. Install the qualified Temurin 25.0.5.1+2
-runtime, the Python version selected by `.python-version` and Android SDK platform 36/build-tools 36.0.0.
-The wrapper pins Gradle 9.7.0 and its distribution checksum; AGP is 9.3.1.
+Use a fresh checkout of the exact commit being reviewed. Install Temurin 25.0.5.1+2,
+the Python version in `.python-version`, Android SDK platforms 36 and 37.1, and
+Build Tools 36.0.0. The device and upgrade harnesses also use Build Tools 35.0.0.
+The wrapper pins Gradle 9.7.0 and its distribution checksum. The build uses AGP 9.3.1.
 The Kotlin implementation retains one Java nullable-label bridge and Java interop
-tests, pins Kotlin/KGP 2.4.21 and targets Java 8 bytecode.
+tests. The app uses Kotlin 2.4.21 and JVM 11 bytecode with minimum Android API 26.
 Read the selection with `python_version="$(cat .python-version)"`, install it
 with `uv python install "$python_version"`, then create `.venv` using
 `uv venv --python "$python_version" .venv`. Verify `.venv/bin/python -V` and run

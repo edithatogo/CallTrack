@@ -19,7 +19,7 @@ Contents:
 
 Build/modification:
 Read source/CONTRIBUTING.md, source/qualification/README.md and source/RELEASING.md.
-Use JDK 25, Gradle 9.7, AGP 9.3.1, Kotlin 2.4.21, Android SDK platforms 36 and
+Use JDK 25, Gradle 9.7.0, AGP 9.3.1, Kotlin 2.4.21, Android SDK platforms 36 and
 37.1, build-tools 36.0.0 and an Android SDK licensed separately by the builder.
 The wrapper downloads the SHA256-pinned Gradle distribution; normal Maven
 resolution must satisfy the committed dependency-verification policy.

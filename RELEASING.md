@@ -16,7 +16,8 @@ track's scope; use a separately authorised execution after these gates pass.
    disposable development identity. Do not overwrite the old CallTrack installation
    or claim its signing/branding rights. Audit inherited assets/translations.
 3. Freeze a clean Git commit. Build from a fresh checkout with JDK 25, Gradle 9.7.0,
-   AGP 9.3.1, Kotlin/KGP 2.4.21, compile/target 36 and build-tools 36.0.0, or explicitly qualify any
+   AGP 9.3.1, Kotlin/KGP 2.4.21, compile SDK 37.1, target SDK 36 and Build Tools
+   36.0.0, or explicitly qualify any
    changes. Follow CONTRIBUTING.md and preserve all test/build evidence. No private
    reference checkout or APK may be required for the root build.
 4. Capture the actual releaseRuntimeClasspath graph and all artifact licences and
@@ -87,7 +88,7 @@ full matrix below before supported release acceptance.
 
 ```sh
 .venv/bin/python scripts/audit_release_artifacts.py \
-  --inventory conductor/tracks/kotlin_20261020/runtime-artifacts-20261021.json \
+  --inventory .local/release-runtime.json \
   --output .local/release-evidence/UNIQUE-RUNTIME-AUDIT
 ```
 

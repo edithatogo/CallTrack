@@ -1,7 +1,7 @@
 # Dependency verification qualification
 
-The canonical policy is `gradle/verification-metadata.xml`; the prototype copy was
-retired after qualification. Gradle enforces artifact and repository-metadata
+The app policy is `gradle/verification-metadata.xml`. The independent shared UI
+and JVM benchmark builds pin their own resolved dependencies. Gradle enforces artifact and repository-metadata
 SHA256 checks in ordinary builds. The original736 entries were compared against fresh official
 repository bytes or the completed239-artifact canonical binary audit before
 promotion. Generation from a cache was only a candidate, never the trust decision.
