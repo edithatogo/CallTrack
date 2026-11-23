@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import io
 import json
+import os
 import re
 from pathlib import Path
 import urllib.request
@@ -119,6 +120,19 @@ def audit(inventory, output):
     rows = json.loads(source)['artifacts']
     unique = {(r['coordinate'], r['name'], r['sha256']): r for r in rows}
     output.mkdir(parents=True, exist_ok=False)
+    directory = os.open(output, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        return _audit_output(source, rows, unique, output, directory)
+    finally:
+        os.close(directory)
+
+
+def _audit_output(source, rows, unique, output, directory):
+    def write_new(name, data):
+        descriptor = os.open(name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
+                             0o666, dir_fd=directory)
+        with os.fdopen(descriptor, 'wb') as stream:
+            stream.write(data)
 
     def check(item):
         number, row = item
@@ -129,14 +143,14 @@ def audit(inventory, output):
             if not row['name'].startswith(module + '-' + version):
                 module_url = repository_url(row, pom=True)[:-4] + '.module'
                 metadata = read_publication(module_url)
-                (output / (str(number) + '-module')).write_bytes(metadata)
+                write_new(str(number) + '-module', metadata)
                 result['module_url'] = module_url
                 result['module_sha256'] = digest(metadata)
                 artifact_url = module_artifact_url(row, json.loads(metadata))
             for kind in ('artifact', 'pom'):
                 url = artifact_url if kind == 'artifact' else repository_url(row, pom=True)
                 data = read_publication(url)
-                (output / (str(number) + '-' + kind)).write_bytes(data)
+                write_new(str(number) + '-' + kind, data)
                 result[kind + '_url'] = url
                 result[kind + '_sha256'] = digest(data)
                 if kind == 'artifact':
@@ -156,7 +170,18 @@ def audit(inventory, output):
                    unique_artifacts=len(unique), artifacts=results,
                    all_repository_bytes_match=all(r.get('repository_bytes_match') is True and 'error' not in r for r in results),
                    licence_clearance=False, build_tool_trust=False, release_ready=False)
-    (output / 'receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
+    def require_same_directory():
+        try:
+            current = output.stat(follow_symlinks=False)
+        except OSError as error:
+            raise RuntimeError('Audit output directory changed during the run') from error
+        opened = os.fstat(directory)
+        if (current.st_dev, current.st_ino) != (opened.st_dev, opened.st_ino):
+            raise RuntimeError('Audit output directory changed during the run')
+
+    require_same_directory()
+    write_new('receipt.json', (json.dumps(receipt, indent=2) + '\n').encode())
+    require_same_directory()
     return receipt
 
 

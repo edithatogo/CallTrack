@@ -9,7 +9,9 @@ from parity_health import require_healthy_boot
 import argparse
 import hashlib
 import json
+import os
 import re
+import stat
 from parity_environment import EmulatorDisplayEnvironment as EmulatorEnvironment
 from pathlib import Path
 import subprocess
@@ -20,6 +22,39 @@ ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = 'org.calltrack.community.dev'
 TEST_PACKAGE = PACKAGE + '.test'
 TEST_CLASS = 'com.markobl.calllogsync.slice.PositiveUiTest'
+
+
+def write_receipt(directory, expected, filename, receipt, replace):
+    """Write only a regular receipt in the directory selected for this run."""
+    if not re.fullmatch(r'parity-ui(?:-(?:imports|recovery|accessibility))?-receipt\.json', filename):
+        raise ValueError('Unexpected receipt name')
+    directory_fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        def require_same_directory():
+            try:
+                current = directory.stat(follow_symlinks=False)
+            except OSError as error:
+                raise RuntimeError('Receipt directory changed during the run') from error
+            opened = os.fstat(directory_fd)
+            identity = (expected.st_dev, expected.st_ino)
+            if ((current.st_dev, current.st_ino) != identity or
+                    (opened.st_dev, opened.st_ino) != identity):
+                raise RuntimeError('Receipt directory changed during the run')
+
+        require_same_directory()
+        flags = os.O_WRONLY | os.O_CREAT | os.O_NOFOLLOW | os.O_NONBLOCK
+        if not replace:
+            flags |= os.O_EXCL
+        descriptor = os.open(filename, flags, 0o666, dir_fd=directory_fd)
+        with os.fdopen(descriptor, 'w') as stream:
+            info = os.fstat(stream.fileno())
+            if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+                raise RuntimeError('Unsafe receipt file')
+            stream.truncate(0)
+            stream.write(json.dumps(receipt, indent=2) + '\n')
+        require_same_directory()
+    finally:
+        os.close(directory_fd)
 
 
 def native_failure_summary(method, output, declared_permissions=None):
@@ -445,6 +480,7 @@ def qualify(serial, suite="settings", receipt_dir=None):
     if not re.fullmatch(r'emulator-\d+', serial):
         raise RuntimeError('Provider harness refuses a physical-device serial')
     evidence = ROOT / '.local/slice-evidence'
+    evidence_stat = evidence.stat()
     build = json.loads((evidence / 'build-receipt.json').read_text())
     if build['exit_code'] != 0 or not build['inputs_unchanged'] or build['inputs'] != inputs():
         raise RuntimeError('Successful build receipt does not match current source')
@@ -464,6 +500,16 @@ def qualify(serial, suite="settings", receipt_dir=None):
     if receipt_dir is not None:
         receipt_dir = Path(receipt_dir)
         receipt_dir.mkdir(parents=True, exist_ok=False)
+        initial_receipt_directory_stat = receipt_dir.stat(follow_symlinks=False)
+        if not stat.S_ISDIR(initial_receipt_directory_stat.st_mode):
+            raise RuntimeError('Receipt directory changed during the run')
+    else:
+        initial_receipt_directory_stat = evidence_stat
+    receipt_directory = (receipt_dir or evidence).resolve(strict=True)
+    receipt_directory_stat = receipt_directory.stat()
+    initial_identity = (initial_receipt_directory_stat.st_dev, initial_receipt_directory_stat.st_ino)
+    if initial_identity != (receipt_directory_stat.st_dev, receipt_directory_stat.st_ino):
+        raise RuntimeError('Receipt directory changed during the run')
     receipt = {'suite': suite, 'fixture_token': uuid.uuid4().hex, 'steps': [], 'artifacts': build['artifacts'], 'inputs': build['inputs']}
     installed = []
     fixture_possible = False
@@ -681,7 +727,8 @@ def qualify(serial, suite="settings", receipt_dir=None):
         if (not receipt['fixture_cleanup_verified'] or not receipt['packages_removed']
                 or not receipt.get('emulator_restored', {'verified': True})['verified']):
             receipt['result'] = 'failed'
-        ((receipt_dir or evidence) / ('parity-ui-receipt.json' if suite == 'settings' else 'parity-ui-' + suite + '-receipt.json')).write_text(json.dumps(receipt, indent=2) + '\n')
+        receipt_name = 'parity-ui-receipt.json' if suite == 'settings' else 'parity-ui-' + suite + '-receipt.json'
+        write_receipt(receipt_directory, receipt_directory_stat, receipt_name, receipt, receipt_dir is None)
     print(json.dumps({k: receipt.get(k) for k in ('result', 'fixture_cleanup_verified', 'packages_removed', 'error')}))
     return 0 if receipt.get('result') == 'passed' else 1
 
