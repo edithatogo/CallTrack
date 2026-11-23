@@ -2,8 +2,8 @@
 
 Prefer the newest qualified stable Python version for CallTrack tooling, in
 keeping with the general dependency/version policy in [workflow](workflow.md).
-The repository's `.python-version` is the single active selection; it currently
-selects Python3.15.1, which has passed local macOS/Linux and hosted qualification.
+The repository's `.python-version` is the single active selection; it selects the current patch from that file. Prior platform-specific runtime evidence
+is historical; do not copy its patch version into live documentation.
 This selection is a qualified default, not a mandatory minimum or a prohibition
 on other versions.
 
