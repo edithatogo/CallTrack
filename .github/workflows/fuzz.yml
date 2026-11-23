@@ -21,7 +21,13 @@ jobs:
       - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
           distribution: temurin
-          java-version: '17.0.21+100000002'
+          java-version: '25.0.5+100000002.0.LTS'
+      - name: Verify Java and install the app SDK
+        run: |
+          java -version 2>&1 | grep -F 'Temurin-25.0.5.1+2'
+          sdkmanager_path="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          test -n "$sdkmanager_path"
+          "$sdkmanager_path" "platforms;android-36" "platforms;android-37.1" "build-tools;36.0.0"
       - name: Install verified Jazzer
         run: |
           curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \

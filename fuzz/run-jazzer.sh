@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-: "${JAVA_HOME:?Set JAVA_HOME to the qualified JDK 17}"
+: "${JAVA_HOME:?Set JAVA_HOME to the qualified JDK 25}"
 : "${JAZZER_HOME:?Set JAZZER_HOME to the verified Jazzer distribution}"
 : "${FUZZ_OUTPUT_DIR:?Set FUZZ_OUTPUT_DIR to a private output directory}"
 : "${ANDROID_HOME:?Set ANDROID_HOME to the qualified Android SDK}"
@@ -21,7 +21,8 @@ mkdir -p "$FUZZ_OUTPUT_DIR"
 work_dir=$(mktemp -d "$FUZZ_OUTPUT_DIR/run.XXXXXXXX")
 mkdir "$work_dir/classes" "$work_dir/corpus"
 cp fuzz/corpus/seed "$work_dir/corpus/seed"
-app_classes="$repo_dir/app/build/tmp/kotlin-classes/debug"
+app_classes="$repo_dir/app/build/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes"
+test -f "$app_classes/com/markobl/calllogsync/slice/CallEvent.class"
 "$JAVA_HOME/bin/javac" -cp "$JAZZER_HOME/jazzer_standalone.jar:$app_classes:$stdlib" \
     -d "$work_dir/classes" fuzz/CallDataFuzzer.java
 "$JAZZER_HOME/jazzer" \

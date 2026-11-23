@@ -27,7 +27,7 @@ calendar account software controls remote sync.
 
 ## Build and verify
 
-Use Temurin JDK 25.0.5.1+2, Android SDK platform 36/build-tools 36.0.0, the
+Use Temurin JDK 25.0.5.1+2, Android SDK platforms 36 and 37.1, Build Tools 36.0.0, the
 included Gradle 9.7.0 wrapper and Kotlin/KGP 2.4.21. Set `JAVA_HOME` and
 `ANDROID_HOME` to those installed toolchains, then:
 
