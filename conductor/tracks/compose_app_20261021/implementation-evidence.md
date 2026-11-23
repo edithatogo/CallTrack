@@ -1167,3 +1167,12 @@ scoped system permission now surrounds that launch as well as returning the
 retained task. This is a test-driver change; it does not establish that the
 background-start restriction caused the hosted failure. Diagnostics classify
 that specific platform denial without retaining its account or call details.
+
+Hosted run `45096297934` on `b96018b` passed API26 and API36, but API33
+again failed before the initial recovery action appeared. Fixture cleanup
+passed; package removal was not verified because no screenshot had been
+captured. The cause remains unconfirmed. The test now captures the initial
+failure as well as a failed return, and the harness reports only fixed
+launcher/activity-record categories and bounded runtime diagnostics. It no
+longer labels unrelated nonfatal log entries as the failure's exception.
+These diagnostics retain the existing screen, cleanup and recovery gates.

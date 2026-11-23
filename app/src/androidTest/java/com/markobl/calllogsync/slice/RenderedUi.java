@@ -598,6 +598,8 @@ final class RenderedUi {
         if (context.getPackageName().contentEquals(owner)) return "app";
         if (permissionPackage(owner.toString())) return "permission";
         if ("com.android.systemui".contentEquals(owner)) return "system-ui";
+        if ("com.android.launcher3".contentEquals(owner)
+                || "com.google.android.apps.nexuslauncher".contentEquals(owner)) return "launcher";
         if (owner.toString().contains("inputmethod")) return "input-method";
         return "other";
     }

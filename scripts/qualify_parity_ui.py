@@ -158,11 +158,11 @@ def native_failure_summary(method, output, declared_permissions=None):
     if 'Refusing a control in an unexpected package:' in output:
         detail = (detail + '; ' if detail else '') + 'dialog-action-owned-by-unexpected-window'
     dialog_active = re.search(
-        r'dialog-active=(app|permission|system-ui|input-method|other|unavailable)', output)
+        r'dialog-active=(app|permission|system-ui|launcher|input-method|other|unavailable)', output)
     if dialog_active:
         detail = (detail + '; ' if detail else '') + 'dialog-active=' + dialog_active.group(1)
     dialog_windows = re.findall(
-        r'(app|permission|system-ui|input-method|other|unavailable):'
+        r'(app|permission|system-ui|launcher|input-method|other|unavailable):'
         r'(application|input-method|other):', output)
     if dialog_windows:
         detail = (detail + '; ' if detail else '') + 'dialog-windows=' + ','.join(
@@ -231,11 +231,15 @@ def native_failure_summary(method, output, declared_permissions=None):
         detail = (detail + '; ' if detail else '') + (
             'permission-launcher=' + permission_launcher.group(1))
     activity_top = re.search(
-        r'activity-top=(app|test|permission-controller|input-method|system-ui|other|unavailable)',
+        r'activity-top=(app|test|permission-controller|input-method|system-ui|launcher|other|unavailable)',
         output,
     )
     if activity_top:
         detail = (detail + '; ' if detail else '') + activity_top.group(0)
+    activity_records = re.search(
+        r'activity-records=(none|import|recovery|import,recovery)(?![a-z,-])', output)
+    if activity_records:
+        detail = (detail + '; ' if detail else '') + activity_records.group(0)
     system_controls = re.findall(
         r':id/([a-z0-9_]+):(android\.[A-Za-z0-9_.$]+):enabled=(true|false)', output)
     if system_controls:
@@ -319,10 +323,23 @@ def activity_top_summary(activity_dump):
             category = 'input-method'
         elif package == 'com.android.systemui':
             category = 'system-ui'
+        elif package in ('com.android.launcher3', 'com.google.android.apps.nexuslauncher'):
+            category = 'launcher'
         else:
             category = 'other'
         return 'activity-top=' + category
     return 'activity-top=unavailable'
+
+
+def activity_record_summary(activity_dump):
+    """Report only whether either of the two fixed test activities has a record."""
+    records = []
+    for name, activity in (('import', 'HistoricalImportActivity'),
+                           ('recovery', 'ReceiptRecoveryActivity')):
+        if any('* Hist #' in line and PACKAGE + '/com.markobl.calllogsync.slice.' + activity in line
+               for line in activity_dump.splitlines()):
+            records.append(name)
+    return 'activity-records=' + (','.join(records) or 'none')
 
 
 def runtime_failure_summary(logcat):
@@ -351,8 +368,8 @@ def runtime_failure_summary(logcat):
     )
     exception = re.search(
         r'\b((?:java|android|androidx)\.[A-Za-z0-9_.$]+(?:Exception|Error))\b',
-        fatal.group('body') if fatal else logcat,
-    )
+        fatal.group('body'),
+    ) if fatal else None
     if exception:
         categories.append('runtime-exception=' + exception.group(1))
     if fatal:
@@ -413,6 +430,7 @@ def instrumentation_failure_summary(method, output, activity_dump='', logcat='',
     """Combine raw local output with only bounded platform diagnostics."""
     augmented = (output + '\n' + permission_activity_launcher_summary(activity_dump)
                  + '\n' + activity_top_summary(activity_dump)
+                 + '\n' + activity_record_summary(activity_dump)
                  + '\n' + runtime_failure_summary(logcat))
     return native_failure_summary(method, augmented, declared_permissions)
 
@@ -481,6 +499,10 @@ def qualify(serial, suite="settings", receipt_dir=None):
             logcat = command('logcat', '-d', '-t', '800')
         except Exception:
             logcat = ''
+        try:
+            logcat += '\n' + command('logcat', '-d', '-s', 'ActivityTaskManager:I', 'AndroidRuntime:E')
+        except Exception:
+            pass
         apk_permissions = apk_runtime_permission_summary(apks[0], apks[1], aapt)
         return instrumentation_failure_summary(
             method, output, activity_dump, logcat, apk_permissions)

@@ -112,6 +112,30 @@ class UiSafety(unittest.TestCase):
         self.assertEqual(device.activity_top_summary(dump), 'activity-top=input-method')
         self.assertNotIn('com.example.private', device.activity_top_summary(dump))
 
+    def test_activity_diagnostics_classify_launcher_and_known_records_only(self):
+        dump = (
+            '* Hist #0: ActivityRecord{abc u0 org.calltrack.community.dev/'
+            'com.markobl.calllogsync.slice.ReceiptRecoveryActivity t42}\n'
+            'mResumedActivity: ActivityRecord{def u0 '
+            'com.google.android.apps.nexuslauncher/.Launcher t1}\n'
+            'private account and call details\n'
+        )
+        summary = device.instrumentation_failure_summary('restore', '', activity_dump=dump)
+        self.assertIn('activity-top=launcher', summary)
+        self.assertIn('activity-records=recovery', summary)
+        self.assertNotIn('private', summary)
+        windows = device.native_failure_summary(
+            'restore', 'dialog-active=launcher dialog-windows=[launcher:application:[]] private')
+        self.assertIn('dialog-active=launcher', windows)
+        self.assertIn('dialog-windows=launcher:application', windows)
+        self.assertNotIn('private', windows)
+
+    def test_unrelated_nonfatal_exception_is_not_reported(self):
+        summary = device.runtime_failure_summary(
+            'java.lang.ArrayIndexOutOfBoundsException: unrelated private detail\n')
+        self.assertNotIn('runtime-exception', summary)
+        self.assertNotIn('private', summary)
+
     def test_runtime_diagnostic_keeps_only_failure_categories_and_exception_class(self):
         logcat = (
             'E AndroidRuntime: FATAL EXCEPTION: main\n'
