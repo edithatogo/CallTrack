@@ -21,10 +21,10 @@ jobs:
           persist-credentials: false
       - name: Install verified TruffleHog
         run: |
-          curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
-            https://github.com/trufflesecurity/trufflehog/releases/download/v3.100.0/trufflehog_3.100.0_linux_amd64.tar.gz \
+          curl --fail --location --silent --show-error --proto '=https' --proto-redir '=https' --tlsv1.2 \
+            https://github.com/trufflesecurity/trufflehog/releases/download/v3.100.1/trufflehog_3.100.1_linux_amd64.tar.gz \
             -o "$RUNNER_TEMP/trufflehog.tar.gz"
-          echo 'b2d85eba59865e98f45c9fc9f77d2c6d62df529fdd5755af121304ea5a7cecbb  '"$RUNNER_TEMP/trufflehog.tar.gz" | sha256sum --check
+          echo 'b2460688116f29ce33f1afe16d14fef3fa3db928e74ba55a6c9fed392c60ad69  '"$RUNNER_TEMP/trufflehog.tar.gz" | sha256sum --check
           tar -xzf "$RUNNER_TEMP/trufflehog.tar.gz" -C "$RUNNER_TEMP" trufflehog
       - name: Scan history without sending candidates to issuers
         run: |
@@ -84,5 +84,7 @@ jobs:
           GOFLAGS=-mod=readonly go build -trimpath -o "$RUNNER_TEMP/actionlint" ./cmd/actionlint
       - name: Lint all GitHub Actions workflows
         run: '"$RUNNER_TEMP/actionlint" -no-color'
-      - name: Lint the fuzz runner
-        run: shellcheck fuzz/run-jazzer.sh
+      - name: Lint the security and fuzz runners
+        run: shellcheck scripts/run-opengrep.sh fuzz/run-jazzer.sh
+      - name: Scan application and tooling with OpenGrep
+        run: sh scripts/run-opengrep.sh

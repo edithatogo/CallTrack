@@ -1,0 +1,55 @@
+# SPDX-License-Identifier: Apache-2.0
+rules:
+  - id: calltrack-android-manifest-protection
+    languages: [generic]
+    severity: ERROR
+    message: Set both android:usesCleartextTraffic and android:allowBackup to false in the CallTrack manifest.
+    paths:
+      include: [app/src/main/AndroidManifest.xml]
+    pattern-regex: |-
+      (?x)<application\b(?:
+        (?![^>]*\bandroid:usesCleartextTraffic\s*=\s*["']false["'])
+        | (?![^>]*\bandroid:allowBackup\s*=\s*["']false["'])
+      )[^>]*>
+  - id: calltrack-android-internet-permission
+    languages: [generic]
+    severity: ERROR
+    message: Keep the production app on the Android providers without direct network permission.
+    paths:
+      include: [app/src/main/AndroidManifest.xml]
+    pattern-regex: 'android\s*:\s*name\s*=\s*["'']android\.permission\.INTERNET["'']'
+  - id: calltrack-java-log-data
+    languages: [java]
+    severity: ERROR
+    message: Keep call and calendar data out of application logs.
+    paths:
+      include: [app/src/main/java]
+    pattern-either:
+      - pattern: android.util.Log.$METHOD(...)
+      - pattern: System.out.$METHOD(...)
+      - pattern: System.err.$METHOD(...)
+  # Generic matching covers Kotlin syntax that OpenGrep 2.0 does not parse.
+  - id: calltrack-kotlin-log-data
+    languages: [generic]
+    severity: ERROR
+    message: Keep call and calendar data out of application logs. The scheduler uses one fixed diagnostic.
+    paths:
+      include: [app/src/main/kotlin]
+    patterns:
+      - pattern-either:
+          - pattern: Log.$METHOD(...)
+          - pattern: System.out.$METHOD(...)
+          - pattern: System.err.$METHOD(...)
+          - pattern: println(...)
+          - pattern: print(...)
+          - pattern: import android.util.Log as $ALIAS
+      - pattern-not: Log.w("CallTrackScheduling", "WAKE_ENQUEUE_UNCONFIRMED")
+  - id: calltrack-python-shell-execution
+    languages: [python]
+    severity: ERROR
+    message: Pass an argument list to subprocess and leave shell execution disabled.
+    paths:
+      include: [scripts]
+    pattern-either:
+      - pattern: subprocess.$METHOD(..., shell=True, ...)
+      - pattern: os.system(...)
