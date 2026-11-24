@@ -119,6 +119,9 @@ jobs:
             adb devices -l || true
             exit 1
           fi
+          # The import test opens the real IME while the emulator has a hardware keyboard.
+          adb -s emulator-5554 shell settings put secure show_ime_with_hard_keyboard 1
+          test "$(adb -s emulator-5554 shell settings get secure show_ime_with_hard_keyboard | tr -d '\r')" = 1
       - name: Run API ${{ matrix.api-level }} settings, import, recovery and accessibility journeys
         env:
           RUN_ATTEMPT: ${{ github.run_attempt }}

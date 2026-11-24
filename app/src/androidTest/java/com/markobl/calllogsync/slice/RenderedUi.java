@@ -812,30 +812,40 @@ final class RenderedUi {
         Rect bounds = new Rect();
         node.getBoundsInScreen(bounds);
         assertFalse(bounds.isEmpty());
+        MotionEvent.PointerProperties finger = new MotionEvent.PointerProperties();
+        finger.id = 0;
+        finger.toolType = MotionEvent.TOOL_TYPE_FINGER;
+        MotionEvent.PointerCoords point = new MotionEvent.PointerCoords();
+        point.x = bounds.centerX();
+        point.y = bounds.centerY();
+        point.size = 1;
+        MotionEvent.PointerProperties[] properties = {finger};
+        MotionEvent.PointerCoords[] coordinates = {point};
         long at = SystemClock.uptimeMillis();
-        MotionEvent down =
-                MotionEvent.obtain(
-                        at, at, MotionEvent.ACTION_DOWN, bounds.centerX(), bounds.centerY(), 0);
-        down.setSource(InputDevice.SOURCE_TOUCHSCREEN);
-        try {
-            assertTrue(automation.injectInputEvent(down, true));
-        } finally {
-            down.recycle();
-        }
-        SystemClock.sleep(40);
-        MotionEvent up =
-                MotionEvent.obtain(
-                        at,
-                        SystemClock.uptimeMillis(),
-                        MotionEvent.ACTION_UP,
-                        bounds.centerX(),
-                        bounds.centerY(),
-                        0);
-        up.setSource(InputDevice.SOURCE_TOUCHSCREEN);
-        try {
-            assertTrue(automation.injectInputEvent(up, true));
-        } finally {
-            up.recycle();
+        for (int action : new int[] {MotionEvent.ACTION_DOWN, MotionEvent.ACTION_UP}) {
+            point.pressure = action == MotionEvent.ACTION_DOWN ? 1 : 0;
+            MotionEvent event =
+                    MotionEvent.obtain(
+                            at,
+                            SystemClock.uptimeMillis(),
+                            action,
+                            1,
+                            properties,
+                            coordinates,
+                            0,
+                            0,
+                            1,
+                            1,
+                            0,
+                            0,
+                            InputDevice.SOURCE_TOUCHSCREEN,
+                            0);
+            try {
+                assertTrue(automation.injectInputEvent(event, true));
+            } finally {
+                event.recycle();
+            }
+            if (action == MotionEvent.ACTION_DOWN) SystemClock.sleep(40);
         }
         SystemClock.sleep(250);
     }
