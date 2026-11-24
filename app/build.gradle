@@ -20,7 +20,7 @@ android {
         manifestPlaceholders.calltrackAppLabel = "@string/app_name"
         minSdk 37
         targetSdk 37
-        versionCode 12
+        versionCode 13
         versionName "0.1.0-dev"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

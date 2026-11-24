@@ -156,9 +156,6 @@ class AutomaticSettingsActivity : ComponentActivity() {
                 onPause = { change { AutomaticScheduling.pause(applicationContext) } },
                 onRefresh = { load(false) },
             )
-            AutomaticStatusPanel(
-                AutomaticStatusUiState(stateText, countsText, feedbackText, lastText),
-            )
             AutomaticSettingsNavigationPanel(
                 importLabel = getString(R.string.import_open),
                 recoveryLabel = getString(R.string.recovery_open),
@@ -178,6 +175,9 @@ class AutomaticSettingsActivity : ComponentActivity() {
                         ),
                     )
                 },
+            )
+            AutomaticStatusPanel(
+                AutomaticStatusUiState(stateText, countsText, feedbackText, lastText),
             )
         }
         buttons()
