@@ -4,13 +4,10 @@ import android.Manifest
 import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.widget.*
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import com.markobl.calllogsync.R
 import java.time.Instant
@@ -33,7 +30,6 @@ class HistoricalImportActivity : ComponentActivity() {
     private var destinationState by mutableStateOf(CalendarDestinationUiState())
     private var filters by mutableStateOf(HistoricalImportFiltersUiState())
     private var actionState by mutableStateOf(HistoricalImportActionState())
-    private var summary: ComposeView? = null
     private var summaryText by mutableStateOf("")
     private var feedbackText by mutableStateOf("")
     private var historyState by mutableStateOf(HistoricalImportHistoryUiState())
@@ -64,188 +60,90 @@ class HistoricalImportActivity : ComponentActivity() {
                 outgoing = saved == null || saved.getBoolean("outgoing"),
                 missed = saved == null || saved.getBoolean("missed"),
             )
-        val layout = LinearLayout(this)
-        layout.orientation = LinearLayout.VERTICAL
-        val pad = (16 * resources.displayMetrics.density).toInt()
-        layout.setPadding(pad, pad, pad, pad)
-        val introPanel =
-            ComposeView(this).apply {
-                id = R.id.import_intro_panel
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent { HistoricalImportIntroPanel(getString(R.string.import_intro, zone)) }
-            }
-        layout.addView(introPanel)
-        val accessPanel =
-            ComposeView(this).apply {
-                id = R.id.import_access_panel
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    HistoricalImportAccessPanel(
-                        label = stringResource(R.string.auto_access),
-                        onRequestAccess = {
-                            requestPermissions(
-                                arrayOf(
-                                    Manifest.permission.READ_CALL_LOG,
-                                    Manifest.permission.READ_CALENDAR,
-                                    Manifest.permission.WRITE_CALENDAR,
-                                ),
-                                9,
-                            )
-                        },
-                    )
-                }
-            }
-        layout.addView(accessPanel)
-        val destinationPicker =
-            ComposeView(this).apply {
-                id = R.id.import_calendar_picker_panel
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    CalendarDestinationPicker(
-                        state = destinationState,
-                        tagPrefix = "import_calendar",
-                        optionsEnabled = true,
-                        chooseLabel = stringResource(R.string.slice_choose),
-                        unavailableLabel = stringResource(R.string.auto_destination_unavailable),
-                        onSelect = ::selectDestination,
-                    )
-                }
-            }
-        layout.addView(destinationPicker)
-        val filtersPanel =
-            ComposeView(this).apply {
-                id = R.id.import_filters
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    HistoricalImportFiltersPanel(
-                        state = filters,
-                        fromLabel = stringResource(R.string.import_from),
-                        toLabel = stringResource(R.string.import_to),
-                        incomingLabel = stringResource(R.string.auto_incoming),
-                        outgoingLabel = stringResource(R.string.auto_outgoing),
-                        missedLabel = stringResource(R.string.auto_missed),
-                        onStateChange = {
-                            filters = it
-                            buttons()
-                        },
-                    )
-                }
-            }
-        layout.addView(filtersPanel)
-        val createActions =
-            ComposeView(this).apply {
-                id = R.id.import_actions
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    HistoricalImportCreateActionPanel(
-                        state = actionState,
-                        label = stringResource(R.string.import_create),
-                        onCreate = ::startPreview,
-                    )
-                }
-            }
-        layout.addView(createActions)
         summaryText = getString(R.string.import_none)
-        summary =
-            ComposeView(this).apply {
-                id = R.id.import_summary
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent { HistoricalImportSummaryText(summaryText) }
-            }
-        layout.addView(summary)
-        val runActions =
-            ComposeView(this).apply {
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    HistoricalImportRunActionsPanel(
-                        state = actionState,
-                        continueLabel = stringResource(R.string.import_continue),
-                        confirmLabel = stringResource(R.string.import_confirm),
-                        stopLabel = stringResource(R.string.import_stop),
-                        cancelLabel = stringResource(R.string.import_cancel),
-                        onContinue = {
-                            running = true
-                            step()
-                        },
-                        onConfirm = ::confirmImport,
-                        onStop = {
-                            running = false
-                            setFeedback(R.string.import_stopping)
-                            buttons()
-                        },
-                        onCancel = ::cancelImport,
+        setCallTrackContent {
+            HistoricalImportIntroPanel(getString(R.string.import_intro, zone))
+            HistoricalImportAccessPanel(
+                label = stringResource(R.string.auto_access),
+                onRequestAccess = {
+                    requestPermissions(
+                        arrayOf(
+                            Manifest.permission.READ_CALL_LOG,
+                            Manifest.permission.READ_CALENDAR,
+                            Manifest.permission.WRITE_CALENDAR,
+                        ),
+                        9,
                     )
-                }
-            }
-        layout.addView(runActions)
-        val feedback =
-            ComposeView(this).apply {
-                id = R.id.import_feedback
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent { HistoricalImportFeedbackText(feedbackText) }
-            }
-        layout.addView(feedback)
-        val historyPanel =
-            ComposeView(this).apply {
-                id = R.id.import_history
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    HistoricalImportHistoryPanel(
-                        state = historyState,
-                        title = stringResource(R.string.import_history),
-                        emptyMessage = stringResource(R.string.import_empty_history),
-                        onOpen = ::openHistorySession,
-                    )
-                }
-            }
-        layout.addView(historyPanel)
-        val historyNavigation =
-            ComposeView(this).apply {
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    HistoricalImportPaginationPanel(
-                        state = actionState,
-                        newerLabel = stringResource(R.string.import_newer),
-                        olderLabel = stringResource(R.string.import_older),
-                        onNewer = {
-                            if (!busy && historyBack.isNotEmpty()) {
-                                loadHistory(historyBack.removeAt(historyBack.size - 1))
-                            }
-                        },
-                        onOlder = {
-                            if (!busy && nextHistoryCursor > 0) {
-                                historyBack.add(historyCursor)
-                                loadHistory(nextHistoryCursor)
-                            }
-                        },
-                    )
-                }
-            }
-        layout.addView(historyNavigation)
-        val scroll = ScrollView(this)
-        scroll.addView(layout)
-        ActivityInsets.apply(scroll)
-        setContentView(scroll)
+                },
+            )
+            CalendarDestinationPicker(
+                state = destinationState,
+                tagPrefix = "import_calendar",
+                optionsEnabled = true,
+                chooseLabel = stringResource(R.string.slice_choose),
+                unavailableLabel = stringResource(R.string.auto_destination_unavailable),
+                onSelect = ::selectDestination,
+            )
+            HistoricalImportFiltersPanel(
+                state = filters,
+                fromLabel = stringResource(R.string.import_from),
+                toLabel = stringResource(R.string.import_to),
+                incomingLabel = stringResource(R.string.auto_incoming),
+                outgoingLabel = stringResource(R.string.auto_outgoing),
+                missedLabel = stringResource(R.string.auto_missed),
+                onStateChange = {
+                    filters = it
+                    buttons()
+                },
+            )
+            HistoricalImportCreateActionPanel(
+                state = actionState,
+                label = stringResource(R.string.import_create),
+                onCreate = ::startPreview,
+            )
+            HistoricalImportSummaryText(summaryText)
+            HistoricalImportRunActionsPanel(
+                state = actionState,
+                continueLabel = stringResource(R.string.import_continue),
+                confirmLabel = stringResource(R.string.import_confirm),
+                stopLabel = stringResource(R.string.import_stop),
+                cancelLabel = stringResource(R.string.import_cancel),
+                onContinue = {
+                    running = true
+                    step()
+                },
+                onConfirm = ::confirmImport,
+                onStop = {
+                    running = false
+                    setFeedback(R.string.import_stopping)
+                    buttons()
+                },
+                onCancel = ::cancelImport,
+            )
+            HistoricalImportFeedbackText(feedbackText)
+            HistoricalImportHistoryPanel(
+                state = historyState,
+                title = stringResource(R.string.import_history),
+                emptyMessage = stringResource(R.string.import_empty_history),
+                onOpen = ::openHistorySession,
+            )
+            HistoricalImportPaginationPanel(
+                state = actionState,
+                newerLabel = stringResource(R.string.import_newer),
+                olderLabel = stringResource(R.string.import_older),
+                onNewer = {
+                    if (!busy && historyBack.isNotEmpty()) {
+                        loadHistory(historyBack.removeAt(historyBack.size - 1))
+                    }
+                },
+                onOlder = {
+                    if (!busy && nextHistoryCursor > 0) {
+                        historyBack.add(historyCursor)
+                        loadHistory(nextHistoryCursor)
+                    }
+                },
+            )
+        }
         buttons()
         loadCalendars(if (saved == null) -1 else saved.getLong("calendar", -1))
         loadHistory(-1)
@@ -478,7 +376,7 @@ class HistoricalImportActivity : ComponentActivity() {
                                     (result.phase == HistoricalImport.Phase.BUILDING ||
                                         result.phase == HistoricalImport.Phase.CONFIRMED)
                             )
-                                summary!!.post { step() }
+                                window.decorView.post { step() }
                             else {
                                 running = false
                                 buttons()

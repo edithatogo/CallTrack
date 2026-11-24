@@ -1,7 +1,6 @@
 package com.markobl.calllogsync.slice
 
 import android.content.Context
-import androidx.room3.withWriteTransaction
 import java.io.Closeable
 import java.util.Collections
 import java.util.function.LongSupplier
@@ -9,7 +8,7 @@ import kotlinx.coroutines.runBlocking
 
 /** Durable source/destination receipts; Room transactions serialize concurrent instances. */
 class SqliteLedger(context: Context?, name: String?, private val clock: LongSupplier?) :
-    SliceEngine.Ledger, AutomaticDelivery.Progress, Closeable {
+    AutomaticDelivery.Progress, Closeable {
     constructor(context: Context?) : this(context, "calltrack-ledger.db")
 
     constructor(
@@ -181,24 +180,8 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
         }
     }
 
-    override suspend fun transaction(work: SliceEngine.Work?): SliceEngine.Result? =
-        room.withWriteTransaction {
-            work!!.run()
-        }
-
     fun get(sourceKey: String?, calendar: Long): SliceEngine.Entry? = runBlocking {
-        getReceipt(sourceKey, calendar)
-    }
-
-    override suspend fun getReceipt(sourceKey: String?, calendar: Long): SliceEngine.Entry? =
         dao.receipt(sourceKey, calendar)?.let { SliceEngine.Entry(it.event, it.fingerprint) }
-
-    fun put(sourceKey: String?, calendar: Long, entry: SliceEngine.Entry?) = runBlocking {
-        putReceipt(sourceKey, calendar, entry)
-    }
-
-    override suspend fun putReceipt(sourceKey: String?, calendar: Long, entry: SliceEngine.Entry?) {
-        dao.insertReceipt(ReceiptRow(sourceKey!!, calendar, entry!!.id, entry.fingerprint!!))
     }
 
     fun outbox(): DurableDelivery.Store =

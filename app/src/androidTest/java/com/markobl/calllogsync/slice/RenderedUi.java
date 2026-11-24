@@ -17,7 +17,10 @@ import android.os.ParcelFileDescriptor;
 import android.os.SystemClock;
 import android.view.InputDevice;
 import android.view.MotionEvent;
+import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityNodeInfo;
+
+import androidx.compose.ui.platform.ComposeView;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -44,6 +47,16 @@ final class RenderedUi {
                 AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS
                         | AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS;
         automation.setServiceInfo(info);
+    }
+
+    static void assertComposeRoot(Instrumentation instrumentation, Activity activity) {
+        instrumentation.runOnMainSync(() -> {
+            ViewGroup content = activity.findViewById(android.R.id.content);
+            assertEquals("Activity must have one screen root", 1, content.getChildCount());
+            assertTrue(
+                    "Screen root must be a ComposeView",
+                    content.getChildAt(0) instanceof ComposeView);
+        });
     }
 
     void await(BooleanSupplier condition, String message) {
@@ -298,13 +311,24 @@ final class RenderedUi {
                 }) {
             for (int i = 0; i < 8; i++) {
                 AccessibilityNodeInfo node = find(value, id);
-                if (node != null) return node;
+                if (node != null && touchPointIsVisible(node)) return node;
                 AccessibilityNodeInfo scroll = scrollable(automation.getRootInActiveWindow());
                 if (scroll == null || !scroll.performAction(direction)) break;
                 SystemClock.sleep(150);
             }
         }
         return null;
+    }
+
+    private boolean touchPointIsVisible(AccessibilityNodeInfo node) {
+        if (!node.isClickable()) return true;
+        AccessibilityNodeInfo viewport = find("calltrack_screen", true);
+        if (viewport == null) return true;
+        Rect visible = new Rect();
+        Rect target = new Rect();
+        viewport.getBoundsInScreen(visible);
+        node.getBoundsInScreen(target);
+        return visible.contains(target.centerX(), target.centerY());
     }
 
     void setTextId(String id, String value) {
@@ -537,6 +561,7 @@ final class RenderedUi {
         else SystemClock.sleep(50); // A user can stop work while its progress keeps changing.
         found[0] = waitForIdle ? shown(value, id) : find(value, id);
         assertNotNull("Control disappeared before touch", found[0]);
+        assertTrue("Control became disabled before touch: " + value, found[0].isEnabled());
         touch(found[0], value);
         if (id && (value.equals("import_from") || value.equals("import_to")))
             dismissKeyboardContactsPromptIfVisible();

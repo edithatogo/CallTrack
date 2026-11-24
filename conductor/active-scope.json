@@ -17,7 +17,7 @@
   },
   "native_stack": [
     "Kotlin",
-    "Jetpack Compose",
+    "Jetpack Compose with Material 3",
     "Android CallLog",
     "Android CalendarContract",
     "WorkManager",

@@ -4,13 +4,10 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.widget.ScrollView
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import com.markobl.calllogsync.R
 import java.util.HashMap
 import java.util.TimeZone
@@ -31,39 +28,29 @@ class CalendarSliceActivity : ComponentActivity() {
 
     public override fun onCreate(state: Bundle?) {
         super.onCreate(state)
-        val screen =
-            ComposeView(this).apply {
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    ManualCalendarScreen(
-                        intro = getString(R.string.slice_intro),
-                        calendarState = destinationState,
-                        logState = panelState,
-                        chooseLabel = getString(R.string.slice_choose),
-                        accessLabel = getString(R.string.slice_calendar_access),
-                        unavailableLabel = getString(R.string.slice_no_calendars),
-                        automaticLabel = getString(R.string.auto_open),
-                        onRequestAccess = ::requestCalendarAccess,
-                        onSelect = ::selectDestination,
-                        onLogLatest = ::logLatest,
-                        onOpenAutomatic = {
-                            startActivity(
-                                Intent(
-                                    this@CalendarSliceActivity,
-                                    AutomaticSettingsActivity::class.java,
-                                ),
-                            )
-                        },
-                    )
-                }
-            }
         panelState = panelState.copy(logLabel = getString(R.string.slice_log_latest))
-        val scroll = ScrollView(this)
-        scroll.addView(screen)
-        ActivityInsets.apply(scroll)
-        setContentView(scroll)
+        setCallTrackContent {
+            ManualCalendarScreen(
+                intro = getString(R.string.slice_intro),
+                calendarState = destinationState,
+                logState = panelState,
+                chooseLabel = getString(R.string.slice_choose),
+                accessLabel = getString(R.string.slice_calendar_access),
+                unavailableLabel = getString(R.string.slice_no_calendars),
+                automaticLabel = getString(R.string.auto_open),
+                onRequestAccess = ::requestCalendarAccess,
+                onSelect = ::selectDestination,
+                onLogLatest = ::logLatest,
+                onOpenAutomatic = {
+                    startActivity(
+                        Intent(
+                            this@CalendarSliceActivity,
+                            AutomaticSettingsActivity::class.java,
+                        ),
+                    )
+                },
+            )
+        }
     }
 
     public override fun onResume() {

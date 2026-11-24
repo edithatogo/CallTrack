@@ -143,9 +143,9 @@ public class RecoveryUiTest {
         journey(
                 "recovery-copy",
                 ui -> {
-                    assertNotNull(ui.shown("recovery_intro_panel", true));
+                    assertNotNull(ui.shown("recovery_intro_text", true));
                     assertNotNull(ui.shown(context().getString(R.string.recovery_intro), false));
-                    assertNotNull(ui.shown("recovery_retention_copy", true));
+                    assertNotNull(ui.shown("recovery_retention_copy_text", true));
                     assertNotNull(ui.shown(context().getString(R.string.retention_policy), false));
                 });
     }
@@ -228,7 +228,7 @@ public class RecoveryUiTest {
         java.util.concurrent.CountDownLatch release = new java.util.concurrent.CountDownLatch(1);
         try {
             ui.await(
-                    () -> ui.find(context().getString(R.string.reapproval_open), false) != null,
+                    () -> ui.shown(context().getString(R.string.reapproval_open), false) != null,
                     "Pending reapproval control missing");
             java.util.concurrent.ExecutorService executor =
                     (java.util.concurrent.ExecutorService) field(activity, "executor");
@@ -334,7 +334,7 @@ public class RecoveryUiTest {
                     tap(ui, R.string.recovery_check);
                     ui.await(
                             () ->
-                                    ui.find(context().getString(R.string.recovery_verified), false)
+                                    ui.shown(context().getString(R.string.recovery_verified), false)
                                             != null,
                             "Read-only verification feedback missing");
                     assertEquals(DurableDelivery.State.CONFIRMED, saved("pending").state);
@@ -401,7 +401,7 @@ public class RecoveryUiTest {
                 ui -> {
                     ui.await(
                             () ->
-                                    ui.find(context().getString(R.string.reapproval_open), false)
+                                    ui.shown(context().getString(R.string.reapproval_open), false)
                                             != null,
                             "Fresh pending intent not visible before aging");
                     try (SqliteLedger ledger = new SqliteLedger(context())) {

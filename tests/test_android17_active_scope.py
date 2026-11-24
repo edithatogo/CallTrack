@@ -37,12 +37,31 @@ class Android17Scope(unittest.TestCase):
                 self.assertTrue((path / "deferral.md").is_file())
                 self.assertFalse(meta.get("production_adopted", True))
 
-    def test_only_supported_android_insets_path_remains(self):
-        """With minimum SDK 37, old WindowInsets and systemUiVisibility code is unreachable."""
-        source = (ROOT / "app/src/main/kotlin/com/markobl/calllogsync/slice/ActivityInsets.kt").read_text()
-        self.assertNotIn("Build.VERSION.SDK_INT", source)
-        self.assertNotIn("systemWindowInset", source)
-        self.assertNotIn("SYSTEM_UI_FLAG_LIGHT_STATUS_BAR", source)
+    def test_native_screens_use_one_compose_root_and_compose_insets(self):
+        screens = ROOT / "app/src/main/kotlin/com/markobl/calllogsync/slice"
+        root = (screens / "CallTrackScreen.kt").read_text()
+        self.assertEqual(1, root.count("ComposeView(this)"))
+        self.assertIn("DisposeOnViewTreeLifecycleDestroyed", root)
+        self.assertIn("safeDrawingPadding()", root)
+        self.assertIn("verticalScroll(", root)
+        self.assertFalse((screens / "ActivityInsets.kt").exists())
+        self.assertFalse((screens / "ComposeActionButton.kt").exists())
+        for name in ("CalendarSlice", "AutomaticSettings", "HistoricalImport", "ReceiptRecovery"):
+            with self.subTest(screen=name):
+                source = (screens / f"{name}Activity.kt").read_text()
+                self.assertEqual(1, source.count("setCallTrackContent {"))
+                self.assertNotIn("ScrollView", source)
+                self.assertNotIn("LinearLayout", source)
+                self.assertNotIn("setContentView", source)
+
+    def test_durable_delivery_is_the_single_calendar_insertion_path(self):
+        slice_source = ROOT / "app/src/main/kotlin/com/markobl/calllogsync/slice"
+        writers = sorted(path.name for path in slice_source.glob("*.kt")
+                         if "sink.insert(" in path.read_text())
+        self.assertEqual(["DurableDelivery.kt"], writers)
+        self.assertIn("resolver.insert(Events.CONTENT_URI", (slice_source / "AndroidCalendarSink.kt").read_text())
+        self.assertNotIn("fun run(", (slice_source / "SliceEngine.kt").read_text())
+        self.assertNotIn("insertReceipt(", (slice_source / "RoomQueries.kt").read_text())
 
     def test_active_ui_matrix_only_checks_android17(self):
         workflow = (ROOT / ".github/workflows/track14-hosted-ui.yml").read_text()

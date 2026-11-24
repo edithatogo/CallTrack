@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Rect;
 import android.os.SystemClock;
 import android.provider.CallLog.Calls;
 import android.view.InputDevice;
@@ -45,29 +46,6 @@ public class PositiveUiTest {
             if (match != null) return match;
         }
         return null;
-    }
-
-    private void assertComposeScreen(
-            Instrumentation instrumentation, Activity activity, int... ids) {
-        instrumentation.runOnMainSync(() -> {
-            for (int id : ids) {
-                assertTrue(
-                        "Missing Compose host " + context().getResources().getResourceEntryName(id),
-                        activity.findViewById(id)
-                                instanceof androidx.compose.ui.platform.ComposeView);
-            }
-            assertNoLegacyContent(activity.findViewById(android.R.id.content));
-        });
-    }
-
-    private static void assertNoLegacyContent(android.view.View view) {
-        if (view instanceof androidx.compose.ui.platform.ComposeView) return;
-        assertFalse("Legacy adapter widget remains", view instanceof android.widget.AdapterView);
-        assertTrue(
-                "Legacy content remains: " + view.getClass().getSimpleName(),
-                view instanceof android.view.ViewGroup);
-        android.view.ViewGroup group = (android.view.ViewGroup) view;
-        for (int i = 0; i < group.getChildCount(); i++) assertNoLegacyContent(group.getChildAt(i));
     }
 
     private boolean treeHasMovedFocus(AccessibilityNodeInfo node, AccessibilityNodeInfo initial) {
@@ -199,13 +177,7 @@ public class PositiveUiTest {
             ui.await(
                     () -> ui.find("open_automatic", true) != null,
                     "Manual Compose automatic-settings action is missing");
-            android.view.ViewGroup content = activity[0].findViewById(android.R.id.content);
-            assertTrue(content.getChildAt(0) instanceof android.widget.ScrollView);
-            android.widget.ScrollView viewport = (android.widget.ScrollView) content.getChildAt(0);
-            assertEquals("Manual screen has one Compose content root", 1, viewport.getChildCount());
-            assertTrue(
-                    "Manual screen presentation must use a Compose root",
-                    viewport.getChildAt(0) instanceof androidx.compose.ui.platform.ComposeView);
+            RenderedUi.assertComposeRoot(instrumentation, activity[0]);
             android.view.accessibility.AccessibilityNodeInfo before =
                     ui.find("slice_calendar_picker", true);
             assertNotNull(before);
@@ -342,10 +314,10 @@ public class PositiveUiTest {
             ReceiptRecoveryActivity.class
         };
         String[] ids = {
-            "auto_permissions",
+            "auto_access_action",
             "slice_calendar_picker",
             "import_calendar_picker",
-            "recovery_refresh"
+            "recovery_refresh_action"
         };
         String[] names = {"settings", "manual", "imports", "recovery"};
         for (int i = 0; i < activities.length; i++) {
@@ -357,33 +329,29 @@ public class PositiveUiTest {
             try {
                 ui.await(() -> ui.find(id, true) != null, "Screen missing: " + names[i]);
                 ui.capture("system-bars-" + names[i]);
-                int[] rootPosition = new int[2], contentTop = new int[1], requiredTop = new int[1];
+                RenderedUi.assertComposeRoot(instrumentation, activity);
+                AccessibilityNodeInfo viewport = ui.find("calltrack_screen", true);
+                assertNotNull("Visible Compose scroll viewport", viewport);
+                Rect actual = new Rect();
+                viewport.getBoundsInScreen(actual);
                 instrumentation.runOnMainSync(() -> {
-                    android.view.ViewGroup content = activity.findViewById(android.R.id.content);
-                    android.widget.ScrollView scroll =
-                            (android.widget.ScrollView) content.getChildAt(0);
-                    // Measure the viewport's visible content edge. Its child can be
-                    // scrolled above the viewport when Android auto-focuses a field.
-                    scroll.getLocationOnScreen(rootPosition);
-                    contentTop[0] = rootPosition[1] + scroll.getPaddingTop();
                     android.view.WindowInsets insets =
                             activity.getWindow().getDecorView().getRootWindowInsets();
-                    requiredTop[0] =
-                            android.os.Build.VERSION.SDK_INT >= 30
-                                    ? insets.getInsets(
-                                                    android.view.WindowInsets.Type.systemBars()
-                                                            | android.view.WindowInsets.Type
-                                                                    .displayCutout())
-                                            .top
-                                    : insets.getSystemWindowInsetTop();
+                    assertNotNull(insets);
+                    android.graphics.Insets bars =
+                            insets.getInsets(
+                                    android.view.WindowInsets.Type.systemBars()
+                                            | android.view.WindowInsets.Type.displayCutout());
+                    Rect safe = activity.getWindowManager().getCurrentWindowMetrics().getBounds();
+                    safe.set(
+                            safe.left + bars.left,
+                            safe.top + bars.top,
+                            safe.right - bars.right,
+                            safe.bottom - bars.bottom);
+                    assertTrue(
+                            "Compose scroll viewport " + actual + " overlaps system area " + safe,
+                            !actual.isEmpty() && safe.contains(actual));
                 });
-                assertTrue(
-                        names[i]
-                                + " visible content begins at "
-                                + contentTop[0]
-                                + " beneath system area "
-                                + requiredTop[0],
-                        contentTop[0] >= requiredTop[0]);
             } finally {
                 finish(instrumentation, activity);
             }
@@ -422,33 +390,7 @@ public class PositiveUiTest {
                             return windowFocused[0];
                         },
                         "Screen window did not receive keyboard input focus " + anchor);
-                if (activity instanceof HistoricalImportActivity) {
-                    assertComposeScreen(
-                            instrumentation,
-                            activity,
-                            R.id.import_intro_panel,
-                            R.id.import_access_panel,
-                            R.id.import_calendar_picker_panel,
-                            R.id.import_filters,
-                            R.id.import_actions,
-                            R.id.import_summary,
-                            R.id.import_feedback,
-                            R.id.import_history);
-                } else if (activity instanceof ReceiptRecoveryActivity) {
-                    assertComposeScreen(
-                            instrumentation,
-                            activity,
-                            R.id.recovery_intro_panel,
-                            R.id.recovery_access_panel,
-                            R.id.recovery_refresh,
-                            R.id.recovery_retention_copy,
-                            R.id.recovery_retention,
-                            R.id.recovery_feedback,
-                            R.id.recovery_empty,
-                            R.id.recovery_cards,
-                            R.id.recovery_navigation);
-                    assertNotNull(activity.findViewById(R.id.recovery_rows));
-                }
+                RenderedUi.assertComposeRoot(instrumentation, activity);
                 ui.capture("accessibility-before-" + i);
                 final int[] controls = {0};
                 assertRenderedAccessibilityControls(
@@ -604,11 +546,11 @@ public class PositiveUiTest {
         Activity activity = null;
         try {
             activity = open(instrumentation);
-            ui.await(() -> ui.find("auto_permissions", true) != null, "Settings not rendered");
+            ui.await(() -> ui.find("auto_access_action", true) != null, "Settings not rendered");
             ui.capture("settings-before-access");
             assertFalse(allGranted());
             assertNull(active());
-            ui.tapId("auto_permissions");
+            ui.tapId("auto_access_action");
             boolean requiresSettingsGrant = ui.permissionDialogs(true, this::allGranted);
             assertFalse(allGranted());
             assertNull(active());
@@ -628,7 +570,7 @@ public class PositiveUiTest {
                 }
                 instrumentation.runOnMainSync(activity::recreate);
             } else {
-                ui.tapId("auto_permissions");
+                ui.tapId("auto_access_action");
                 ui.permissionDialogs(false, this::allGranted);
             }
             ui.await(this::allGranted, "Permission grants did not persist after restoration");
@@ -722,7 +664,7 @@ public class PositiveUiTest {
             assertFalse(ui.find("auto_enable", true).isEnabled());
             assertFalse(active().enabled);
             ui.capture("settings-calendar-revoked");
-            ui.tapId("auto_permissions");
+            ui.tapId("auto_access_action");
             ui.permissionDialogs(false, this::allGranted);
             ui.await(this::allGranted, "Calendar access not restored through UI");
             assertFalse(active().enabled);

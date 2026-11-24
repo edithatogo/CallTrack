@@ -5,16 +5,13 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.widget.*
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.text.BasicText
+import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
@@ -35,7 +32,7 @@ internal data class AutomaticStatusUiState(
 internal fun AutomaticStatusLine(text: String, tag: String, announceChanges: Boolean = false) {
     var modifier = Modifier.testTag(tag)
     if (announceChanges) modifier = modifier.semantics { liveRegion = LiveRegionMode.Polite }
-    BasicText(text, modifier = modifier)
+    Text(text, modifier = modifier)
 }
 
 @androidx.compose.runtime.Composable
@@ -51,14 +48,10 @@ internal fun AutomaticStatusPanel(state: AutomaticStatusUiState) {
 /** Explicit activation controls; reopening can resume enabled policy but never enable it. */
 class AutomaticSettingsActivity : ComponentActivity() {
     private val executor = Executors.newSingleThreadExecutor()
-    private var statePanel: ComposeView? = null
-    private var countsPanel: ComposeView? = null
-    private var feedbackPanel: ComposeView? = null
-    private var lastPanel: ComposeView? = null
-    private var stateText = ""
-    private var countsText = ""
-    private var lastText = ""
-    private var feedbackText = ""
+    private var stateText by mutableStateOf("")
+    private var countsText by mutableStateOf("")
+    private var lastText by mutableStateOf("")
+    private var feedbackText by mutableStateOf("")
     private var choices: List<AndroidCalendarSink.Choice> = Collections.emptyList()
     private var selected = -1L
     private var busy = false
@@ -82,138 +75,72 @@ class AutomaticSettingsActivity : ComponentActivity() {
                 missed = saved?.getBoolean(STATE_MISSED, true) ?: true,
             )
         restoredCallTypes = saved != null
-        val layout = LinearLayout(this)
-        layout.orientation = LinearLayout.VERTICAL
-        val pad = (16 * resources.displayMetrics.density).toInt()
-        layout.setPadding(pad, pad, pad, pad)
-        val intro =
-            ComposeView(this).apply {
-                id = R.id.auto_intro_panel
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent { AutomaticSettingsIntroPanel(text = getString(R.string.auto_intro)) }
-            }
-        layout.addView(intro)
-        val access =
-            ComposeView(this).apply {
-                id = R.id.auto_permissions
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    AutomaticSettingsAccessPanel(
-                        label = getString(R.string.auto_access),
-                        onRequestAccess = {
-                            requestPermissions(
-                                arrayOf(
-                                    Manifest.permission.READ_CALENDAR,
-                                    Manifest.permission.WRITE_CALENDAR,
-                                    Manifest.permission.READ_CALL_LOG,
-                                    Manifest.permission.READ_PHONE_STATE,
-                                ),
-                                7,
-                            )
-                        },
+        setCallTrackContent {
+            AutomaticSettingsIntroPanel(text = getString(R.string.auto_intro))
+            AutomaticSettingsAccessPanel(
+                label = getString(R.string.auto_access),
+                onRequestAccess = {
+                    requestPermissions(
+                        arrayOf(
+                            Manifest.permission.READ_CALENDAR,
+                            Manifest.permission.WRITE_CALENDAR,
+                            Manifest.permission.READ_CALL_LOG,
+                            Manifest.permission.READ_PHONE_STATE,
+                        ),
+                        7,
                     )
-                }
-            }
-        layout.addView(access)
-        val destinationPanel =
-            ComposeView(this).apply {
-                id = R.id.auto_calendar_picker_panel
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    CalendarDestinationPicker(
-                        state = destinationUiState,
-                        tagPrefix = "auto_calendar",
-                        chooseLabel = getString(R.string.slice_choose),
-                        onSelect = ::selectDestination,
+                },
+            )
+            CalendarDestinationPicker(
+                state = destinationUiState,
+                tagPrefix = "auto_calendar",
+                chooseLabel = getString(R.string.slice_choose),
+                onSelect = ::selectDestination,
+            )
+            AutomaticCallTypesPanel(
+                state = callTypesState,
+                incomingLabel = getString(R.string.auto_incoming),
+                outgoingLabel = getString(R.string.auto_outgoing),
+                missedLabel = getString(R.string.auto_missed),
+                enabled = callTypesEnabled,
+                onStateChange = {
+                    callTypesState = it
+                    buttons()
+                },
+            )
+            AutomaticSettingsActionsPanel(
+                state = actionsUiState,
+                enableLabel = getString(R.string.auto_enable),
+                pauseLabel = getString(R.string.auto_pause),
+                refreshLabel = getString(R.string.auto_refresh),
+                onEnable = ::confirmEnable,
+                onPause = { change { AutomaticScheduling.pause(applicationContext) } },
+                onRefresh = { load(false) },
+            )
+            AutomaticStatusPanel(
+                AutomaticStatusUiState(stateText, countsText, feedbackText, lastText),
+            )
+            AutomaticSettingsNavigationPanel(
+                importLabel = getString(R.string.import_open),
+                recoveryLabel = getString(R.string.recovery_open),
+                onOpenImports = {
+                    startActivity(
+                        Intent(
+                            this@AutomaticSettingsActivity,
+                            HistoricalImportActivity::class.java,
+                        ),
                     )
-                }
-            }
-        layout.addView(destinationPanel)
-        val callTypes =
-            ComposeView(this).apply {
-                id = R.id.auto_call_types
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    AutomaticCallTypesPanel(
-                        state = callTypesState,
-                        incomingLabel = getString(R.string.auto_incoming),
-                        outgoingLabel = getString(R.string.auto_outgoing),
-                        missedLabel = getString(R.string.auto_missed),
-                        enabled = callTypesEnabled,
-                        onStateChange = {
-                            callTypesState = it
-                            buttons()
-                        },
+                },
+                onOpenRecovery = {
+                    startActivity(
+                        Intent(
+                            this@AutomaticSettingsActivity,
+                            ReceiptRecoveryActivity::class.java,
+                        ),
                     )
-                }
-            }
-        layout.addView(callTypes)
-        val actionsPanel =
-            ComposeView(this).apply {
-                id = R.id.auto_actions
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    AutomaticSettingsActionsPanel(
-                        state = actionsUiState,
-                        enableLabel = getString(R.string.auto_enable),
-                        pauseLabel = getString(R.string.auto_pause),
-                        refreshLabel = getString(R.string.auto_refresh),
-                        onEnable = ::confirmEnable,
-                        onPause = { change { AutomaticScheduling.pause(applicationContext) } },
-                        onRefresh = { load(false) },
-                    )
-                }
-            }
-        layout.addView(actionsPanel)
-        statePanel = statusView(layout, R.id.auto_state)
-        countsPanel = statusView(layout, R.id.auto_counts)
-        feedbackPanel = statusView(layout, R.id.auto_feedback)
-        lastPanel = statusView(layout, R.id.auto_last)
-        val navigation =
-            ComposeView(this).apply {
-                id = R.id.auto_navigation
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    AutomaticSettingsNavigationPanel(
-                        importLabel = getString(R.string.import_open),
-                        recoveryLabel = getString(R.string.recovery_open),
-                        onOpenImports = {
-                            startActivity(
-                                Intent(
-                                    this@AutomaticSettingsActivity,
-                                    HistoricalImportActivity::class.java,
-                                ),
-                            )
-                        },
-                        onOpenRecovery = {
-                            startActivity(
-                                Intent(
-                                    this@AutomaticSettingsActivity,
-                                    ReceiptRecoveryActivity::class.java,
-                                ),
-                            )
-                        },
-                    )
-                }
-            }
-        layout.addView(navigation)
-        val scroll = ScrollView(this)
-        scroll.addView(layout)
-        ActivityInsets.apply(scroll)
-        setContentView(scroll)
-        renderStatus()
+                },
+            )
+        }
         buttons()
     }
 
@@ -294,7 +221,6 @@ class AutomaticSettingsActivity : ComponentActivity() {
                 busy = false
                 feedbackText =
                     getString(if (done) R.string.auto_action_saved else R.string.auto_action_failed)
-                renderStatus()
                 buttons()
                 load(false)
             }
@@ -354,7 +280,6 @@ class AutomaticSettingsActivity : ComponentActivity() {
                         )
                     choices = loaded
                     destinationOptionTokens = loaded.map { java.util.UUID.randomUUID().toString() }
-                    renderStatus()
                     val preferred =
                         if (initialised) selected
                         else
@@ -395,7 +320,6 @@ class AutomaticSettingsActivity : ComponentActivity() {
                     if (isDestroyed) return@runOnUiThread
                     busy = false
                     stateText = getString(R.string.auto_action_failed)
-                    renderStatus()
                     buttons()
                     reloadIfRequested()
                 }
@@ -435,25 +359,11 @@ class AutomaticSettingsActivity : ComponentActivity() {
             else -> R.string.auto_unknown
         }
 
-    private fun statusView(parent: LinearLayout, id: Int): ComposeView =
-        ComposeView(this).apply {
-            this.id = id
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            parent.addView(this)
-        }
-
     public override fun onSaveInstanceState(outState: Bundle) {
         outState.putBoolean(STATE_INCOMING, callTypesState.incoming)
         outState.putBoolean(STATE_OUTGOING, callTypesState.outgoing)
         outState.putBoolean(STATE_MISSED, callTypesState.missed)
         super.onSaveInstanceState(outState)
-    }
-
-    private fun renderStatus() {
-        statePanel?.setContent { AutomaticStatusLine(stateText, "auto_state", true) }
-        countsPanel?.setContent { AutomaticStatusLine(countsText, "auto_counts") }
-        feedbackPanel?.setContent { AutomaticStatusLine(feedbackText, "auto_feedback") }
-        lastPanel?.setContent { AutomaticStatusLine(lastText, "auto_last") }
     }
 
     @Deprecated("Required to preserve the existing permission callback contract")

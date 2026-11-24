@@ -4,7 +4,7 @@
 
 - [~] **Track 6 — Kotlin native migration / retaining source contracts**: [Track](tracks/kotlin_20261020/index.md) — verify exact Android 17 source/release integration.
 - [~] **Track 5 — Android 17 release qualification**: [Track](tracks/release_20261020/index.md) — retain signing, physical call/account, preservation and distribution gates.
-- [~] **Track 14 — Native Jetpack Compose UI completion**: [Track](tracks/compose_app_20261021/index.md) — remove residual hybrid/custom controls only after Android 17 rendered parity; [issue #116](https://github.com/edithatogo/CallTrack/issues/116).
+- [~] **Track 14 — Native Jetpack Compose**. The four screen roots and single durable writer are qualified for Android 17 development. Production acceptance follows Tracks 5 and 6. [Track and evidence](tracks/compose_app_20261021/implementation-evidence.md#android-17-native-screen-roots-and-durable-delivery) · [issue #116](https://github.com/edithatogo/CallTrack/issues/116).
 - [x] **Track 22 — Room 3.0.3 preserving migration**. Suspend DAOs own both preserved databases. [Track and evidence](tracks/room3_android17_20261124/plan.md). [issue #115](https://github.com/edithatogo/CallTrack/issues/115).
 
 ## Deferred: no active implementation or automatic CI

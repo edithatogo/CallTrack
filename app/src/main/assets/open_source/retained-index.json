@@ -754,5 +754,41 @@
     "origin": "sources!/META-INF/androidx/window/window/LICENSE.txt",
     "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
     "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
+  },
+  {
+    "coordinate": "androidx.activity:activity-compose:1.13.0",
+    "origin": "META-INF/androidx/activity/activity-compose/LICENSE.txt",
+    "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+    "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
+  },
+  {
+    "coordinate": "androidx.compose.material3:material3-android:1.5.0",
+    "origin": "META-INF/androidx/compose/material3/material3/LICENSE.txt",
+    "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+    "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
+  },
+  {
+    "coordinate": "androidx.compose.material3:material3-ripple-android:1.5.0",
+    "origin": "META-INF/androidx/compose/material3/material3-ripple/LICENSE.txt",
+    "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+    "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
+  },
+  {
+    "coordinate": "androidx.compose.material:material-ripple-android:1.13.0",
+    "origin": "META-INF/androidx/compose/material/material-ripple/LICENSE.txt",
+    "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+    "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
+  },
+  {
+    "coordinate": "androidx.lifecycle:lifecycle-common-java8:2.11.1",
+    "origin": "META-INF/androidx/lifecycle/lifecycle-common-java8/LICENSE.txt",
+    "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+    "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
+  },
+  {
+    "coordinate": "androidx.navigationevent:navigationevent-compose-android:1.1.0",
+    "origin": "META-INF/androidx/navigationevent/navigationevent-compose/LICENSE.txt",
+    "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+    "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
   }
 ]

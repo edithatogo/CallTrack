@@ -79,8 +79,6 @@ internal interface RoomLedgerDao {
     @Query("SELECT * FROM receipts WHERE source = :key AND calendar = :calendar")
     suspend fun receipt(key: String?, calendar: Long): ReceiptRow?
 
-    @Insert suspend fun insertReceipt(row: ReceiptRow)
-
     @Query("SELECT * FROM outbox WHERE source = :key AND calendar = :calendar")
     suspend fun intent(key: String?, calendar: Long): OutboxRow?
 

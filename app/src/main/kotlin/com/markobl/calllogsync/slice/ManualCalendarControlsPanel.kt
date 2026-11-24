@@ -17,7 +17,7 @@ internal fun ManualCalendarControlsPanel(
     onSelect: (String) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        ComposeActionButton(
+        ActionButton(
             label = accessLabel,
             tag = "slice_calendar_access",
             enabled = true,

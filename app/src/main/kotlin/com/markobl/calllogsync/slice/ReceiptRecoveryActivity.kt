@@ -7,13 +7,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.CalendarContract
-import android.widget.*
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import com.markobl.calllogsync.R
 import java.text.DateFormat
@@ -39,174 +36,76 @@ class ReceiptRecoveryActivity : ComponentActivity() {
 
     public override fun onCreate(saved: Bundle?) {
         super.onCreate(saved)
-        val layout = LinearLayout(this)
-        layout.orientation = LinearLayout.VERTICAL
-        val pad = (16 * resources.displayMetrics.density).toInt()
-        layout.setPadding(pad, pad, pad, pad)
-        val intro =
-            ComposeView(this).apply {
-                id = R.id.recovery_intro_panel
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    RecoveryCopyPanel(
-                        text = stringResource(R.string.recovery_intro),
-                        tag = "recovery_intro_text",
-                    )
-                }
-            }
-        layout.addView(intro)
-        val access =
-            ComposeView(this).apply {
-                id = R.id.recovery_access_panel
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    RecoveryAccessPanel(
-                        label = stringResource(R.string.recovery_access),
-                        onRequestAccess = {
-                            requestPermissions(arrayOf(Manifest.permission.READ_CALENDAR), 11)
-                        },
-                    )
-                }
-            }
-        layout.addView(access)
-        val actions =
-            ComposeView(this).apply {
-                id = R.id.recovery_refresh
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    RecoveryRefreshPanel(
-                        busy = navigationState.busy,
-                        refreshLabel = stringResource(R.string.recovery_refresh),
-                        onRefresh = {
-                            if (!busy) {
-                                back.clear()
-                                load(null)
-                            }
-                        },
-                    )
-                }
-            }
-        layout.addView(actions)
-        val retentionCopy =
-            ComposeView(this).apply {
-                id = R.id.recovery_retention_copy
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    RecoveryCopyPanel(
-                        text = stringResource(R.string.retention_policy),
-                        tag = "recovery_retention_copy_text",
-                    )
-                }
-            }
-        layout.addView(retentionCopy)
-        val expire =
-            ComposeView(this).apply {
-                id = R.id.recovery_retention
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    RecoveryRetentionPanel(
-                        busy = navigationState.busy,
-                        label = stringResource(R.string.retention_run),
-                        onExpire = ::expireOldPayloads,
-                    )
-                }
-            }
-        layout.addView(expire)
-        val feedback =
-            ComposeView(this).apply {
-                id = R.id.recovery_feedback
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent { RecoveryStatusPanel(feedbackText) }
-            }
-        layout.addView(feedback)
-        val rows = LinearLayout(this)
-        rows.id = R.id.recovery_rows
-        rows.orientation = LinearLayout.VERTICAL
-        val emptyPanel =
-            ComposeView(this).apply {
-                id = R.id.recovery_empty
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    RecoveryEmptyPanel(
-                        visible = emptyState,
-                        message = stringResource(R.string.recovery_empty),
-                    )
-                }
-            }
-        rows.addView(emptyPanel)
-        val cardsPanel =
-            ComposeView(this).apply {
-                id = R.id.recovery_cards
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    RecoveryCardsPanel(
-                        cards = cards,
-                        busy = navigationState.busy,
-                        checkLabel = stringResource(R.string.recovery_check),
-                        suppressLabel = stringResource(R.string.recovery_suppress),
-                        reapproveLabel = stringResource(R.string.reapproval_open),
-                        openEventLabel = stringResource(R.string.recovery_open_event),
-                        onCheck = { token ->
-                            visibleRecords[token]?.let { action(it.first, false) }
-                        },
-                        onSuppress = { token ->
-                            visibleRecords[token]?.let { confirmSuppression(it.first) }
-                        },
-                        onReapprove = { token ->
-                            visibleRecords[token]?.let { confirmReapproval(it.first, it.second) }
-                        },
-                        onOpenEvent = { token ->
-                            visibleRecords[token]?.let { openEvent(it.first) }
-                        },
-                    )
-                }
-            }
-        rows.addView(cardsPanel)
-        layout.addView(rows)
-        val navigation =
-            ComposeView(this).apply {
-                id = R.id.recovery_navigation
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-                )
-                setContent {
-                    RecoveryNavigationPanel(
-                        state = navigationState,
-                        previousLabel = stringResource(R.string.recovery_previous),
-                        moreLabel = stringResource(R.string.recovery_more),
-                        onPrevious = {
-                            if (!busy && back.isNotEmpty()) load(back.removeAt(back.size - 1))
-                        },
-                        onMore = {
-                            if (!busy && next != null) {
-                                back.add(current)
-                                load(next)
-                            }
-                        },
-                    )
-                }
-            }
-        layout.addView(navigation)
-        val scroll = ScrollView(this)
-        scroll.addView(layout)
-        ActivityInsets.apply(scroll)
-        setContentView(scroll)
+        setCallTrackContent {
+            RecoveryCopyPanel(
+                text = stringResource(R.string.recovery_intro),
+                tag = "recovery_intro_text",
+            )
+            RecoveryAccessPanel(
+                label = stringResource(R.string.recovery_access),
+                onRequestAccess = {
+                    requestPermissions(arrayOf(Manifest.permission.READ_CALENDAR), 11)
+                },
+            )
+            RecoveryRefreshPanel(
+                busy = navigationState.busy,
+                refreshLabel = stringResource(R.string.recovery_refresh),
+                onRefresh = {
+                    if (!busy) {
+                        back.clear()
+                        load(null)
+                    }
+                },
+            )
+            RecoveryCopyPanel(
+                text = stringResource(R.string.retention_policy),
+                tag = "recovery_retention_copy_text",
+            )
+            RecoveryRetentionPanel(
+                busy = navigationState.busy,
+                label = stringResource(R.string.retention_run),
+                onExpire = ::expireOldPayloads,
+            )
+            RecoveryStatusPanel(feedbackText)
+            RecoveryEmptyPanel(
+                visible = emptyState,
+                message = stringResource(R.string.recovery_empty),
+            )
+            RecoveryCardsPanel(
+                cards = cards,
+                busy = navigationState.busy,
+                checkLabel = stringResource(R.string.recovery_check),
+                suppressLabel = stringResource(R.string.recovery_suppress),
+                reapproveLabel = stringResource(R.string.reapproval_open),
+                openEventLabel = stringResource(R.string.recovery_open_event),
+                onCheck = { token ->
+                    visibleRecords[token]?.let { action(it.first, false) }
+                },
+                onSuppress = { token ->
+                    visibleRecords[token]?.let { confirmSuppression(it.first) }
+                },
+                onReapprove = { token ->
+                    visibleRecords[token]?.let { confirmReapproval(it.first, it.second) }
+                },
+                onOpenEvent = { token ->
+                    visibleRecords[token]?.let { openEvent(it.first) }
+                },
+            )
+            RecoveryNavigationPanel(
+                state = navigationState,
+                previousLabel = stringResource(R.string.recovery_previous),
+                moreLabel = stringResource(R.string.recovery_more),
+                onPrevious = {
+                    if (!busy && back.isNotEmpty()) load(back.removeAt(back.size - 1))
+                },
+                onMore = {
+                    if (!busy && next != null) {
+                        back.add(current)
+                        load(next)
+                    }
+                },
+            )
+        }
         load(null)
     }
 

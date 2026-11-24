@@ -2,14 +2,12 @@ package com.markobl.calllogsync.slice
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.BasicText
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.compose.ui.unit.dp
 
 /** Presentation for manual logging. Provider, permission and delivery effects stay in Activity. */
 @Composable
@@ -28,12 +26,12 @@ internal fun ManualCalendarScreen(
 ) {
     Column(
         modifier =
-            Modifier.fillMaxWidth().padding(16.dp).semantics {
+            Modifier.fillMaxWidth().semantics {
                 testTagsAsResourceId = true
                 testTag = "slice_screen"
             },
     ) {
-        BasicText(
+        Text(
             intro,
             modifier =
                 Modifier.fillMaxWidth().semantics {
@@ -64,7 +62,7 @@ internal fun ManualCalendarScreen(
         ) {
             ManualLogPanel(state = logState, onLogLatest = onLogLatest)
         }
-        ComposeActionButton(
+        ActionButton(
             label = automaticLabel,
             tag = "open_automatic",
             enabled = true,

@@ -1,6 +1,5 @@
 package com.markobl.calllogsync.slice
 
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsOff
@@ -10,9 +9,11 @@ import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
+import androidx.test.platform.app.InstrumentationRegistry
 import com.markobl.calllogsync.R
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -23,18 +24,20 @@ class HistoricalImportActivityComposeTest {
 
     @Test
     fun filtersRenderAcceptInputAndSurviveActivityRecreationWithoutCreatingASession() {
-        compose.onNodeWithTag("import_create").assertIsDisplayed().assertIsNotEnabled()
+        compose
+            .onNodeWithTag("import_create")
+            .performScrollTo()
+            .assertIsDisplayed()
+            .assertIsNotEnabled()
         compose.onNodeWithTag("import_confirm").assertIsNotEnabled()
         compose.onNodeWithTag("import_continue").assertIsNotEnabled()
-        compose.onNodeWithText(compose.activity.getString(R.string.import_none)).assertIsDisplayed()
-        assertTrue(compose.activity.findViewById<ComposeView>(R.id.import_filters) != null)
-        assertTrue(
-            compose.activity.findViewById<ComposeView>(R.id.import_calendar_picker_panel) != null,
-        )
-        assertTrue(compose.activity.findViewById<ComposeView>(R.id.import_intro_panel) != null)
-        assertTrue(compose.activity.findViewById<ComposeView>(R.id.import_access_panel) != null)
-        compose.onNodeWithTag("import_access_action").assertIsDisplayed()
-        compose.onNodeWithTag("import_intro_text").assertIsDisplayed()
+        compose
+            .onNodeWithText(compose.activity.getString(R.string.import_none))
+            .performScrollTo()
+            .assertIsDisplayed()
+        RenderedUi.assertComposeRoot(InstrumentationRegistry.getInstrumentation(), compose.activity)
+        compose.onNodeWithTag("import_access_action").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithTag("import_intro_text").performScrollTo().assertIsDisplayed()
         compose
             .onNodeWithText(
                 compose.activity.getString(
@@ -42,17 +45,22 @@ class HistoricalImportActivityComposeTest {
                     java.time.ZoneId.systemDefault().id,
                 ),
             )
+            .performScrollTo()
             .assertIsDisplayed()
         compose.onNodeWithTag("import_calendar_picker").assertIsNotEnabled()
         compose.onNodeWithTag("import_incoming").assertIsOn()
         compose.onNodeWithTag("import_outgoing").assertIsOn()
         compose.onNodeWithTag("import_missed").assertIsOn()
 
-        compose.onNodeWithTag("import_from").performTextClearance()
+        compose.onNodeWithTag("import_from").performScrollTo().performTextClearance()
         compose.onNodeWithTag("import_from").performTextInput("2026-10-21")
-        compose.onNodeWithTag("import_to").performTextClearance()
+        compose.onNodeWithTag("import_to").performScrollTo().performTextClearance()
         compose.onNodeWithTag("import_to").performTextInput("2026-10-24")
-        compose.onNodeWithTag("import_outgoing").performTouchInput { click() }.assertIsOff()
+        compose
+            .onNodeWithTag("import_outgoing")
+            .performScrollTo()
+            .performTouchInput { click() }
+            .assertIsOff()
         compose.activityRule.scenario.recreate()
 
         compose.onNodeWithTag("import_from").assertTextEquals("2026-10-21")

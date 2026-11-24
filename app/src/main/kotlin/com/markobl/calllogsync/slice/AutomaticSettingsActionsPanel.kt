@@ -29,19 +29,19 @@ internal fun AutomaticSettingsActionsPanel(
         modifier = Modifier.fillMaxWidth().semantics { testTagsAsResourceId = true },
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        ComposeActionButton(
+        ActionButton(
             label = enableLabel,
             tag = "auto_enable",
             enabled = state.enableEnabled,
             onClick = onEnable,
         )
-        ComposeActionButton(
+        ActionButton(
             label = pauseLabel,
             tag = "auto_pause",
             enabled = state.pauseEnabled,
             onClick = onPause,
         )
-        ComposeActionButton(
+        ActionButton(
             label = refreshLabel,
             tag = "auto_refresh",
             enabled = state.refreshEnabled,

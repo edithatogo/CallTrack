@@ -2,9 +2,6 @@ package com.markobl.calllogsync.slice;
 
 import static org.junit.Assert.*;
 
-import kotlin.Unit;
-import kotlin.coroutines.Continuation;
-
 import org.junit.Test;
 
 import java.util.*;
@@ -96,72 +93,62 @@ public class SliceTest {
         }
     }
 
-    static class Ledger implements SliceEngine.Ledger {
-        Map<String, SliceEngine.Entry> rows = new HashMap<>();
-        boolean fail;
-
-        public synchronized Object transaction(
-                SliceEngine.Work work, Continuation<? super SliceEngine.Result> completion) {
-            return work.run(completion);
-        }
-
-        public Object getReceipt(
-                String key, long calendar, Continuation<? super SliceEngine.Entry> completion) {
-            return rows.get(key + ":" + calendar);
-        }
-
-        public Object putReceipt(
-                String key,
-                long calendar,
-                SliceEngine.Entry entry,
-                Continuation<? super Unit> completion) {
-            if (fail) throw new IllegalStateException("crash gap");
-            rows.put(key + ":" + calendar, entry);
-            return Unit.INSTANCE;
-        }
+    private ManualDelivery manual(
+            SliceEngine.CallSource source, Sink sink, DurableDelivery.Store store) {
+        return new ManualDelivery(source, new DurableDelivery(store, sink), "UTC");
     }
 
     @Test
     public void savedThenRetryCreatesOnlyOneEvent() {
         Sink sink = new Sink();
-        Ledger ledger = new Ledger();
-        SliceEngine engine = new SliceEngine(this::call, sink, ledger, "UTC");
-        assertEquals(SliceEngine.Result.SAVED, engine.run(7));
-        assertEquals(SliceEngine.Result.ALREADY_LOGGED, engine.run(7));
+        DurableDeliveryTest.Store store = new DurableDeliveryTest.Store();
+        ManualDelivery delivery = manual(this::call, sink, store);
+        assertEquals(SliceEngine.Result.SAVED, delivery.run(7));
+        assertEquals(SliceEngine.Result.ALREADY_LOGGED, delivery.run(7));
         assertEquals(1, sink.inserts);
     }
 
     @Test
     public void crashAfterInsertRecoversFromMarker() {
         Sink sink = new Sink();
-        Ledger ledger = new Ledger();
-        ledger.fail = true;
-        SliceEngine engine = new SliceEngine(this::call, sink, ledger, "UTC");
-        assertEquals(SliceEngine.Result.FAILED, engine.run(7));
-        ledger.fail = false;
-        assertEquals(SliceEngine.Result.RECOVERED, engine.run(7));
+        DurableDeliveryTest.Store store =
+                new DurableDeliveryTest.Store() {
+                    private boolean fail = true;
+
+                    @Override
+                    public void put(DurableDelivery.Intent intent) {
+                        if (fail && intent.state == DurableDelivery.State.ATTEMPTED) {
+                            fail = false;
+                            throw new IllegalStateException("interruption before ID publication");
+                        }
+                        super.put(intent);
+                    }
+                };
+        ManualDelivery delivery = manual(this::call, sink, store);
+        assertEquals(SliceEngine.Result.FAILED, delivery.run(7));
+        assertEquals(DurableDelivery.State.IN_FLIGHT, store.get(call().key(), 7).state);
+        assertEquals(SliceEngine.Result.RECOVERED, delivery.run(7));
         assertEquals(1, sink.inserts);
     }
 
     @Test
     public void missingEventIsPreservedForReview() {
         Sink sink = new Sink();
-        Ledger ledger = new Ledger();
-        SliceEngine engine = new SliceEngine(this::call, sink, ledger, "UTC");
-        engine.run(7);
+        DurableDeliveryTest.Store store = new DurableDeliveryTest.Store();
+        ManualDelivery delivery = manual(this::call, sink, store);
+        assertEquals(SliceEngine.Result.SAVED, delivery.run(7));
         sink.rows.clear();
-        assertEquals(SliceEngine.Result.REVIEW_REQUIRED, engine.run(7));
+        assertEquals(SliceEngine.Result.REVIEW_REQUIRED, delivery.run(7));
         assertEquals(1, sink.inserts);
     }
 
     @Test
     public void editedEventIsNotOverwritten() {
         Sink sink = new Sink();
-        Ledger ledger = new Ledger();
-        SliceEngine engine = new SliceEngine(this::call, sink, ledger, "UTC");
-        engine.run(7);
-        sink.rows.put(
-                1L,
+        DurableDeliveryTest.Store store = new DurableDeliveryTest.Store();
+        ManualDelivery delivery = manual(this::call, sink, store);
+        assertEquals(SliceEngine.Result.SAVED, delivery.run(7));
+        CallEvent edited =
                 CallEvent.from(
                         new CallRecord(
                                 "fixture",
@@ -172,8 +159,10 @@ public class SliceTest {
                                 "Edited",
                                 "123",
                                 true),
-                        "UTC"));
-        assertEquals(SliceEngine.Result.REVIEW_REQUIRED, engine.run(7));
+                        "UTC");
+        sink.rows.put(1L, edited);
+        assertEquals(SliceEngine.Result.REVIEW_REQUIRED, delivery.run(7));
+        assertSame(edited, sink.rows.get(1L));
         assertEquals(1, sink.inserts);
     }
 
@@ -181,38 +170,40 @@ public class SliceTest {
     public void invalidDestinationDoesNotReadCallSource() {
         Sink sink = new Sink();
         sink.writable = false;
-        assertEquals(
-                SliceEngine.Result.DESTINATION_UNAVAILABLE,
-                new SliceEngine(
-                                () -> {
-                                    throw new AssertionError("personal source read");
-                                },
-                                sink,
-                                new Ledger(),
-                                "UTC")
-                        .run(7));
+        DurableDeliveryTest.Store store = new DurableDeliveryTest.Store();
+        ManualDelivery delivery =
+                manual(
+                        () -> {
+                            throw new AssertionError("Call source must not be read");
+                        },
+                        sink,
+                        store);
+        assertEquals(SliceEngine.Result.DESTINATION_UNAVAILABLE, delivery.run(7));
+        assertTrue(store.rows.isEmpty());
     }
 
     @Test
     public void permissionDenialIsRecoverable() {
+        Sink sink = new Sink();
+        DurableDeliveryTest.Store store = new DurableDeliveryTest.Store();
         assertEquals(
                 SliceEngine.Result.PERMISSION_REQUIRED,
-                new SliceEngine(
+                manual(
                                 () -> {
                                     throw new SecurityException();
                                 },
-                                new Sink(),
-                                new Ledger(),
-                                "UTC")
+                                sink,
+                                store)
                         .run(7));
+        assertTrue(store.rows.isEmpty());
     }
 
     @Test
     public void emptySourceDoesNotWrite() {
         Sink sink = new Sink();
-        assertEquals(
-                SliceEngine.Result.NO_CALL,
-                new SliceEngine(() -> null, sink, new Ledger(), "UTC").run(7));
+        DurableDeliveryTest.Store store = new DurableDeliveryTest.Store();
+        assertEquals(SliceEngine.Result.NO_CALL, manual(() -> null, sink, store).run(7));
+        assertTrue(store.rows.isEmpty());
         assertEquals(0, sink.inserts);
     }
 
@@ -225,43 +216,49 @@ public class SliceTest {
                         return null;
                     }
                 };
-        Ledger ledger = new Ledger();
-        assertEquals(
-                SliceEngine.Result.REVIEW_REQUIRED,
-                new SliceEngine(this::call, sink, ledger, "UTC").run(7));
-        assertEquals(1, ledger.rows.size());
+        DurableDeliveryTest.Store store = new DurableDeliveryTest.Store();
+        assertEquals(SliceEngine.Result.REVIEW_REQUIRED, manual(this::call, sink, store).run(7));
+        assertEquals(1, store.get(call().key(), 7).eventId);
+        assertEquals(DurableDelivery.State.REVIEW, store.get(call().key(), 7).state);
     }
 
     @Test
     public void ambiguousRecoveryDoesNotInsert() {
+        CallRecord call = call();
+        CallEvent event = CallEvent.from(call, "UTC");
         Sink sink =
                 new Sink() {
                     @Override
                     public List<SliceEngine.StoredEvent> find(long calendar, String marker) {
-                        return Arrays.asList(
-                                new SliceEngine.StoredEvent(
-                                        1, calendar, CallEvent.from(call(), "UTC")),
-                                new SliceEngine.StoredEvent(
-                                        2, calendar, CallEvent.from(call(), "UTC")));
+                        assertEquals(event.marker, marker);
+                        return List.of(
+                                new SliceEngine.StoredEvent(1, calendar, event),
+                                new SliceEngine.StoredEvent(2, calendar, event));
                     }
                 };
-        assertEquals(
-                SliceEngine.Result.REVIEW_REQUIRED,
-                new SliceEngine(this::call, sink, new Ledger(), "UTC").run(7));
+        DurableDeliveryTest.Store store = new DurableDeliveryTest.Store();
+        store.put(
+                new DurableDelivery.Intent(
+                        DurableDelivery.State.IN_FLIGHT,
+                        call.key(),
+                        7,
+                        CallIdentity.signature(call),
+                        event.marker,
+                        event.fingerprint(),
+                        -1,
+                        event));
+        assertEquals(SliceEngine.Result.REVIEW_REQUIRED, manual(() -> call, sink, store).run(7));
         assertEquals(0, sink.inserts);
     }
 
     @Test
     public void changedSourceRequiresReview() {
         Sink sink = new Sink();
-        Ledger ledger = new Ledger();
-        assertEquals(
-                SliceEngine.Result.SAVED, new SliceEngine(this::call, sink, ledger, "UTC").run(7));
+        DurableDeliveryTest.Store store = new DurableDeliveryTest.Store();
+        assertEquals(SliceEngine.Result.SAVED, manual(this::call, sink, store).run(7));
         CallRecord changed =
                 new CallRecord("fixture", "1", 1700000000123L, 99, "Incoming", "Ada", "123", true);
-        assertEquals(
-                SliceEngine.Result.REVIEW_REQUIRED,
-                new SliceEngine(() -> changed, sink, ledger, "UTC").run(7));
+        assertEquals(SliceEngine.Result.REVIEW_REQUIRED, manual(() -> changed, sink, store).run(7));
         assertEquals(1, sink.inserts);
     }
 
@@ -279,10 +276,10 @@ public class SliceTest {
                         return Collections.emptyList();
                     }
                 };
-        Ledger ledger = new Ledger();
-        SliceEngine engine = new SliceEngine(this::call, sink, ledger, "UTC");
-        assertEquals(SliceEngine.Result.REVIEW_REQUIRED, engine.run(7));
-        assertEquals(SliceEngine.Result.REVIEW_REQUIRED, engine.run(7));
+        DurableDeliveryTest.Store store = new DurableDeliveryTest.Store();
+        ManualDelivery delivery = manual(this::call, sink, store);
+        assertEquals(SliceEngine.Result.REVIEW_REQUIRED, delivery.run(7));
+        assertEquals(SliceEngine.Result.REVIEW_REQUIRED, delivery.run(7));
         assertEquals(1, sink.inserts);
     }
 
@@ -295,11 +292,12 @@ public class SliceTest {
                         throw new IllegalStateException("provider unavailable");
                     }
                 };
-        Ledger ledger = new Ledger();
-        SliceEngine engine = new SliceEngine(this::call, sink, ledger, "UTC");
-        assertEquals(SliceEngine.Result.FAILED, engine.run(7));
-        assertEquals(SliceEngine.Result.FAILED, engine.run(7));
-        assertEquals(1, ledger.rows.size());
+        DurableDeliveryTest.Store store = new DurableDeliveryTest.Store();
+        ManualDelivery delivery = manual(this::call, sink, store);
+        assertEquals(SliceEngine.Result.FAILED, delivery.run(7));
+        assertEquals(SliceEngine.Result.FAILED, delivery.run(7));
+        assertEquals(DurableDelivery.State.ATTEMPTED, store.get(call().key(), 7).state);
+        assertEquals(1, store.get(call().key(), 7).eventId);
         assertEquals(1, sink.inserts);
     }
 

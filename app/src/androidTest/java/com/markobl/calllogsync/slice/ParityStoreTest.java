@@ -220,7 +220,11 @@ public class ParityStoreTest {
             try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
                 assertEquals(
                         SliceEngine.Result.ALREADY_LOGGED,
-                        new SliceEngine(() -> call, sink, ledger, "UTC").run(7));
+                        new ManualDelivery(
+                                        () -> call,
+                                        new DurableDelivery(ledger.outbox(), sink),
+                                        "UTC")
+                                .run(7));
                 assertEquals(javaFingerprint, ledger.get(call.key(), 7).fingerprint);
             }
             observed[0] =
@@ -234,7 +238,11 @@ public class ParityStoreTest {
             try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
                 assertEquals(
                         SliceEngine.Result.REVIEW_REQUIRED,
-                        new SliceEngine(() -> call, sink, ledger, "UTC").run(7));
+                        new ManualDelivery(
+                                        () -> call,
+                                        new DurableDelivery(ledger.outbox(), sink),
+                                        "UTC")
+                                .run(7));
                 assertEquals(javaFingerprint, ledger.get(call.key(), 7).fingerprint);
                 assertEquals(7, RoomFixtures.version(ledger));
             }
@@ -646,7 +654,7 @@ public class ParityStoreTest {
             assertEquals(1, counts.verified);
             assertEquals(3, counts.review);
             assertEquals(1, counts.suppressed);
-            ledger.put("late-manual", 7, new SliceEngine.Entry(123, "fingerprint"));
+            RoomFixtures.seedLegacyReceipt(ledger, "late-manual", 7, 123, "fingerprint");
             assertEquals(4, ledger.counts().review);
             assertEquals(DurableDelivery.State.LEGACY, ledger.outbox().get("late-manual", 7).state);
             ledger.outbox()
@@ -692,7 +700,7 @@ public class ParityStoreTest {
                                                 Integer.valueOf(1),
                                                 true)));
             for (int i = 0; i < 3; i++)
-                ledger.put("legacy-" + i, 7, new SliceEngine.Entry(100 + i, "f"));
+                RoomFixtures.seedLegacyReceipt(ledger, "legacy-" + i, 7, 100 + i, "f");
             java.util.Set<String> seen = new java.util.HashSet<>();
             SqliteLedger.RecoveryCursor after = null;
             ReceiptRecovery recovery =
@@ -922,7 +930,7 @@ public class ParityStoreTest {
                                         event,
                                         operation,
                                         DurableDelivery.SourceFacts.from(call)));
-                ledger.put("legacy", 7, new SliceEngine.Entry(99, "old-fingerprint"));
+                RoomFixtures.seedLegacyReceipt(ledger, "legacy", 7, 99, "old-fingerprint");
                 ledger.checkpoint(
                         operation, new PagedCalls.Checkpoint("fixture", 2, "upper", 1, "last"));
             }

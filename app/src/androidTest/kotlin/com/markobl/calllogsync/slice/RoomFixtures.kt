@@ -5,6 +5,7 @@ import android.database.MatrixCursor
 import androidx.room3.RoomDatabase
 import androidx.room3.useReaderConnection
 import androidx.room3.useWriterConnection
+import androidx.room3.withWriteTransaction
 import androidx.sqlite.SQLITE_DATA_INTEGER
 import androidx.sqlite.SQLITE_DATA_NULL
 import androidx.sqlite.SQLITE_DATA_TEXT
@@ -41,11 +42,26 @@ object RoomFixtures {
     @JvmStatic
     fun writeIntentInReceiptTransaction(ledger: SqliteLedger, intent: DurableDelivery.Intent) {
         runBlocking {
-            ledger.transaction {
-                ledger.writeIntent(intent)
-                SliceEngine.Result.NO_CALL
-            }
+            ledger.room.withWriteTransaction { ledger.writeIntent(intent) }
         }
+    }
+
+    @JvmStatic
+    fun seedLegacyReceipt(
+        ledger: SqliteLedger,
+        key: String,
+        calendar: Long,
+        eventId: Long,
+        fingerprint: String,
+    ) {
+        execute(
+            ledger,
+            "INSERT INTO receipts (source, calendar, event, fingerprint) VALUES (?, ?, ?, ?)",
+            key,
+            calendar,
+            eventId,
+            fingerprint,
+        )
     }
 
     private fun version(room: RoomDatabase): Int =
