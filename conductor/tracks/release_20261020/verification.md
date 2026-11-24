@@ -11,9 +11,11 @@ physical-call, account-calendar and seven-day observation protocols. Review the
 remaining privacy, platform support and accessibility criteria before closing the
 track.
 
-## Android 17 unsigned baseline
+## Android 17 unsigned baselines
 
-Two clean macOS builds and a cache-disabled Linux build produced byte-identical unsigned APKs for `f85b2f15d7a3caaa9a3941b6e91e74c085a84eaf`. Repeat the independent build check when freezing the next release candidate. [Baseline commit and receipts](https://github.com/edithatogo/CallTrack/pull/114) · [cold Linux reproduction](https://github.com/edithatogo/CallTrack/actions/runs/45245637176)
+Two clean macOS builds and a cache-disabled Linux build produced identical unsigned development APKs for `5bcb512a30af1263c6eea389f8a7e18501807b37`. Each local build passed 119 release JVM tests and lint with zero errors. Source and notices readback covered 77 runtime dependency records. Repeat these checks for the production identity. [Cold Linux reproduction](https://github.com/edithatogo/CallTrack/actions/runs/45394800204)
+
+The earlier Android 17 unsigned baseline was `f85b2f15d7a3caaa9a3941b6e91e74c085a84eaf`. [Baseline commit and receipts](https://github.com/edithatogo/CallTrack/pull/114) · [cold Linux reproduction](https://github.com/edithatogo/CallTrack/actions/runs/45245637176)
 
 A controlled outgoing call previously synced once to the dedicated Google calendar and passed independent readback and cleanup. Carry that baseline into candidate-bound physical-call and account-route acceptance, then start the seven-day observation after the prerequisites in the [release plan](plan.md) are met.
 

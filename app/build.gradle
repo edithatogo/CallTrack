@@ -4,6 +4,8 @@ plugins {
     id 'com.google.devtools.ksp' version '2.3.14'
 }
 
+def developmentRelease = providers.gradleProperty('calltrackDevelopmentRelease').orElse('false').get() == 'true'
+
 android {
     namespace 'com.markobl.calllogsync'
     compileSdk {
@@ -15,6 +17,7 @@ android {
 
     defaultConfig {
         applicationId "org.calltrack.community.dev"
+        manifestPlaceholders.calltrackAppLabel = "@string/app_name"
         minSdk 37
         targetSdk 37
         versionCode 10
@@ -25,6 +28,9 @@ android {
 
     buildTypes {
         release {
+            if (!developmentRelease) {
+                manifestPlaceholders.calltrackAppLabel = "@string/release_app_name"
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -32,6 +38,18 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
+    }
+}
+
+androidComponents {
+    if (!developmentRelease) {
+        onVariants(selector().withBuildType('release')) { variant ->
+            variant.applicationId.set('io.github.edithatogo.calltrack')
+            variant.outputs.each { output ->
+                output.versionCode.set(1)
+                output.versionName.set('0.1.0')
+            }
+        }
     }
 }
 

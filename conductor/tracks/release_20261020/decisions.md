@@ -162,3 +162,16 @@ Separate host/JVM, actual provider/UI, remote and operational evidence. Refuse
 focused guest ANRs and reused per-run receipt paths. Retain failed probes and
 scoped cleanup readback. App changes require a new release freeze/reproduction;
 local emulator completion cannot close original M4 or physical/cloud/signing gates.
+
+## RD07 — First release identity, signing and distribution (2026-11-24)
+
+The owner selected CallTrack Community 0.1.0, application ID
+`io.github.edithatogo.calltrack` and version code 1. Distribute the owner-signed
+APK and its corresponding source through GitHub Releases after acceptance.
+Keep signing and recovery material under the owner's custody and build unsigned
+in CI. Retain the development package for debug and synthetic upgrade evidence.
+
+Use a fresh installation on the selected Android 17 phone and the dedicated
+Google Calendar. Limit the seven-day observation to controlled sessions. Pause
+logging outside those sessions. Retain the original installation, recovery,
+accessibility, physical-call and remote-calendar gates.

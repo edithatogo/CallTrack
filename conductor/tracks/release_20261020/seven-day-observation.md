@@ -1,16 +1,13 @@
 # Seven-day operational observation
 
-Date:2026-10-22. Status: awaiting prerequisites; zero days/hours claimed.
-The user authorised real observation and subsequent review/fixes. This document
-prepares execution; it is not an executed seven-day report.
+Updated 2026-11-24. The owner selected controlled sessions on the dedicated
+Google Calendar. The window starts after the signed candidate passes physical
+and calendar qualification and the participant is ready.
 
 ## Starting state and prerequisites
 
-Only emulators are currently visible. Physical-call and remote-route qualification
-are not yet complete. Resolve the [physical acceptance procedure](physical-calendar-qualification.md)
-for the selected phone and claimed route(s), and confirm the user's observation
-scope before starting. A connector default account, elapsed chat time, scheduled
-run or emulator test cannot substitute for those prerequisites.
+Complete the [physical acceptance procedure](physical-calendar-qualification.md)
+for the selected phone and Google Calendar before starting.
 
 The existing app filters directions, not individual phone numbers. During normal
 use, calls in enabled directions may disclose number/name/time/duration to the
@@ -21,12 +18,9 @@ results must retain that scope; they do not establish all-day normal-use accepta
 
 Bind the cohort to the observed signed APK/certificate and source, selected device/
 OS, destination account/calendar alias, sync adapter/version where observable,
-logging settings/generation and usage scope. The prepared artifact is the15998ba
-candidate with unsigned SHA256
-89a548489035a6df8c464cc621e49dfbb0c9d6d16619bbe54f27f78e612d5f86;
-verify actual installation identity and the development-signed copy before use.
-Production identity/signing remains separate. Do not replace an existing working
-installation or select an account implicitly.
+logging settings/generation and usage scope. Verify that the installed APK is the
+signed distribution candidate. Preserve the existing development installation and
+use the selected calendar.
 
 The app has one active destination per installation. Bind each operational cohort
 to one selected route/calendar. Qualifying Google and Outlook for seven days each

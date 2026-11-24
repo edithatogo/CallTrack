@@ -1,20 +1,16 @@
 # First-release installation and upgrade baseline
 
-Status: development candidate policy,2026-10-22. Public release remains gated.
+Current policy updated 2026-11-24. Public release remains gated.
 
 ## Installation identity and supported starting point
 
-The first public release starts from a fresh installation under one deliberately
-selected permanent application ID and app-signing certificate. Those choices and
-the key custodian/recovery procedure are pending. This does not reserve a name,
-generate a production key or authorise publication.
+The first public release starts from a fresh installation of CallTrack Community
+0.1.0, application ID `io.github.edithatogo.calltrack`, version code 1, on
+Android 17. Use the owner-custodied signing certificate and record the full Git
+revision, both APK hashes, certificate and corresponding-source bundle hash.
 
-Until then retain org.calltrack.community.dev, versionCode10,0.1.0-dev,
-minSdk26/target36, ledger6/import2. It is a development qualification identity;
-unsigned artifacts cannot be installed directly and development-signed test copies
-must not be distributed as production. The final local candidate is identified by
-its full Git revision, unsigned APK SHA256 and corresponding-source bundle hash,
-not by the reused development version label alone.
+Debug and synthetic upgrade fixtures use the separately installed development
+package `org.calltrack.community.dev`, version code 10, name `0.1.0-dev`.
 
 A fresh installation must have no selected calendar, activation policy, receipts
 or import sessions. Call-log/phone/calendar access starts denied, automatic logging
@@ -54,15 +50,15 @@ Channel/key rotation needs its own proved compatibility plan.
 
 Freeze clean source before building. Two Mac unsigned builds must match; reproduce
 that exact hash in the separate Linux environment and refresh source/notices.
-The dedicated emulator probe may sign a copy of the exact unsigned payload with
-the existing development key. Verify every original ZIP entry is unchanged and the
-certificate matches the existing test lineage. Test fresh state before/after actual
-launcher opening, then seed synthetic private/provider historical state and prove
-10→11 preservation and controlled install rejections. The11 overlay is a future
-compatibility fixture, not the frozen10 candidate. Record each artifact separately.
+Run the dedicated emulator probe against the development identity and test key.
+Check fresh state before and after opening the launcher and prove synthetic 10→11
+preservation and controlled install rejections with the historical provider and
+database fixtures. If an exact unsigned development fixture is provided, check
+that signing preserves every original ZIP entry. Record the signed distribution
+candidate's independent fresh-install and launcher evidence.
 
-API26/API33 coverage and affected API36 regression evidence are qualified development
-scope. Final signed package identity/certificate, representative physical/OEM and
+Android 17 is the current platform qualification scope. Final signed package
+identity/certificate, representative physical/OEM and
 manual accessibility checks, actual account/remote calendar delivery where claimed,
 seven actual observation days, security/support/source delivery and authorised
 publication remain separate gates. If permanent identity or release configuration

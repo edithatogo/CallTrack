@@ -1,15 +1,13 @@
 # Physical-call and account-calendar qualification
 
-Date:2026-10-22. Status: prepared; device/participant and account selection pending.
-Track5 remains active. The user requested physical-call and claimed Google/Outlook
-route qualification. Earlier emulator-only preference is superseded for this work;
-actual participation and exact device/calendar selection remain necessary.
+Updated 2026-11-24. The first release qualification uses a selected physical
+Android 17 phone and the owner's dedicated Google Calendar. Phone participation
+and the selected calendar's visibility on that phone are required.
 
-## Verified starting point
+## Historical development preparation
 
-ADB currently exposes only the two retained emulators. No physical phone is visible.
-No physical installation, permission grant, call, account query or calendar write
-has occurred in this continuation. The exact15998ba unsigned release hash remains
+On 2026-10-22 ADB exposed only the two retained emulators. The exact
+`15998ba` unsigned release hash was
 89a548489035a6df8c464cc621e49dfbb0c9d6d16619bbe54f27f78e612d5f86.
 Its existing development-signed release copy was signature-verified and every
 original APK entry compared against that frozen unsigned artifact. This prepares
@@ -52,8 +50,7 @@ These references were refreshed2026-10-22 and are prerequisites, not runtime pro
    uninstall, downgrade, mismatched-key replacement or changing an existing working
    logger's destination. An existing development installation requires a preservation
    plan before replacement. Emulator harnesses continue to refuse physical devices.
-2. Use the exact candidate release test copy with its observed development certificate,
-   not a rebuilt HEAD APK, version11 fixture or schema/provider instrumentation APK.
+2. Use the exact production-signed APK and verify its source, hash and certificate.
    Fresh installation is appropriate only if that package is absent on the selected
    phone. User grants sensitive permissions through the normal app/Android UI.
    Do not use root, permission allow-list overrides, call-log injection or phone-test
@@ -136,5 +133,5 @@ Retain case IDs and recovery tools if cleanup is uncertain; do not delete an acc
 turn off account-wide export, clear data or uninstall to conceal residue. Restore
 agreed app/device settings with readback and retain the installed app unless its
 removal is explicitly requested. Review actual outcomes and fixes before accepting
-physical or remote routes. If production code changes, refreeze/reproduce the
-candidate and repeat affected acceptance; new host-only documents do not relabel15998ba.
+physical or remote routes. If production code changes, freeze and reproduce the
+new candidate and repeat affected acceptance. Retain the earlier candidate record.

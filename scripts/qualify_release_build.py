@@ -36,12 +36,13 @@ def verify_unsigned(apk, sdk, env):
     return dict(exit_code=result.returncode, output=output, unsigned_verified=True)
 
 
-def run(output, jdk, sdk):
+def run(output, jdk, sdk, development_fixture=False):
     if subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT).strip():
         raise ValueError('Commit source changes before qualification')
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     output.mkdir(parents=True, exist_ok=False)
-    receipt = {'revision': revision, 'scope': 'unsigned-same-host-development-identity',
+    receipt = {'revision': revision, 'scope': 'unsigned-same-host-release',
+               'development_fixture': development_fixture,
                'independent_environment_reproduction': False, 'shared_dependency_cache': True,
                'signed': False, 'release_ready': False, 'builds': [], 'success': False}
     env = dict(os.environ, JAVA_HOME=str(jdk), ANDROID_HOME=str(sdk))
@@ -58,9 +59,11 @@ def run(output, jdk, sdk):
                             str(ROOT), str(checkout)], check=True)
             subprocess.run(['git', 'checkout', '--quiet', '--detach', revision],
                            cwd=checkout, check=True)
-            command = ['sh', 'gradlew', '--no-daemon', '--console=plain',
-                       ':app:assembleRelease', ':app:testReleaseUnitTest', ':app:lintRelease',
-                       ':app:dependencies', '--configuration', 'releaseRuntimeClasspath']
+            command = ['sh', 'gradlew', '--no-daemon', '--console=plain']
+            if development_fixture:
+                command.append('-PcalltrackDevelopmentRelease=true')
+            command.extend([':app:assembleRelease', ':app:testReleaseUnitTest', ':app:lintRelease',
+                            ':app:dependencies', '--configuration', 'releaseRuntimeClasspath'])
             log = output / f'build-{number}.log'
             with log.open('w') as stream:
                 result = subprocess.run(command, cwd=checkout, env=env, stdout=stream,
@@ -99,5 +102,8 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--jdk', type=Path, required=True)
     parser.add_argument('--sdk', type=Path, required=True)
+    parser.add_argument('--development-fixture', action='store_true',
+                        help='Build the disposable package for the same-key development upgrade probe')
     args = parser.parse_args()
-    print(json.dumps(run(args.output.resolve(), args.jdk.resolve(), args.sdk.resolve()), indent=2))
+    print(json.dumps(run(args.output.resolve(), args.jdk.resolve(), args.sdk.resolve(),
+                         args.development_fixture), indent=2))
