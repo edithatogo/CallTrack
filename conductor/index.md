@@ -40,7 +40,7 @@ Use the [Android 17 scope](active-scope.json) and [track registry](tracks.md) to
 
 | Track | Remaining work |
 |---|---|
-| 14 · Android Compose | Finish the native screen roots, retire superseded UI and prove the sole durable write path. [Track 14](tracks/compose_app_20261021/plan.md) · [#116](https://github.com/edithatogo/CallTrack/issues/116) |
+| 14 · Android Compose | Carry the qualified screen roots and durable writer into the production acceptance for Tracks 5 and 6. [Track 14 evidence](tracks/compose_app_20261021/implementation-evidence.md#android-17-native-screen-roots-and-durable-delivery) |
 | 5 · Release | Freeze the exact Android 17 candidate. Complete signing and distribution, physical-call and selected calendar readbacks, and seven days of observation. [Release gates](tracks/release_20261020/verification.md#active-release-gates) |
 | 6 · Kotlin | Close K07 against the same supported upgrade, recovery and operational evidence as Track 5. [Track 6](tracks/kotlin_20261020/plan.md) |
 

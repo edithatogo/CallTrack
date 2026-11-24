@@ -4,7 +4,7 @@
   "status": "in_progress",
   "milestone": "M6",
   "created_at": "2026-10-21",
-  "updated_at": "2026-11-22",
+  "updated_at": "2026-11-24",
   "depends_on": [
     "kotlin_20261020",
     "release_20261020"
@@ -13,6 +13,6 @@
   "track_number": 14,
   "execution_stage": 3,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
-  "implementation_status": "Historical-import and recovery visible content is implemented in the existing lifecycle-disposed Compose hosts. Source-bound local API36 import, recovery and accessibility journeys pass, including destination/filter and pending-recovery recreation; hosted API26/API33/API36 qualification is tracked separately. Broader process, assistive-technology, provider and operational acceptance remains open. See implementation-evidence.md.",
+  "implementation_status": "Android 17 native Compose roots, Material 3 controls, and the sole durable writer qualified for development. Production acceptance follows the scoped Track 5 and Track 6 prerequisites. See implementation-evidence.md.",
   "production_adopted": false
 }

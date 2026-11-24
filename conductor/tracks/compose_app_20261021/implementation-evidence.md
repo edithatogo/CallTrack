@@ -1,5 +1,71 @@
 # Track 14 implementation checkpoint — 2026-10-23
 
+## Android 17 native screen roots and durable delivery
+
+The manual launcher, automatic settings, historical imports, and recovery each
+use one lifecycle-bound Compose root with shared safe drawing insets and
+scrolling. Material 3 supplies buttons, checkboxes, and date fields. The
+Activities own permission prompts, destination selection, confirmation, and
+delivery effects. Enabled and disabled controls keep their accessible roles
+and labels. The rendered harness checks each button's touch point against
+the visible scroll viewport before tapping it.
+
+The four rendered suites passed with the replacement roots before the legacy
+View libraries and writer were removed. Their app APK SHA-256 was
+`bf0d3ac234457c8a84e34d78cb3faa980f6a9ffc36320351ecf0be8b16bc5eac`.
+After retirement, the same suites passed against
+[source 76cc0c4](https://github.com/edithatogo/CallTrack/commit/76cc0c4d380bc5478187fe637eb839d7629cd816)
+on Android 17 API 37 arm64, build CP41.260831.015, with 16 KiB pages. The
+final debug APK SHA-256 is
+`4e19b6d797f217cc6c09bb538261c56a8c9e8366c14b5cb35274f0f6faba9f67`.
+
+- `qualify_parity_ui.py` passed settings (18), historical imports (11),
+  recovery (9), and accessibility (2). The suites checked accessible roles
+  and labels, keyboard focus, large text and RTL, permission revocation,
+  destination removal, import cancellation, and process death back into the
+  same task. The checks verified cleanup and package removal. A first
+  final-build run timed out during Activity teardown while a second
+  emulator was booting. The complete rerun used one emulator.
+- On the same APK, TalkBack touch exploration and Switch Access hardware
+  scanning each highlighted and opened Automatic logging settings, Historical
+  imports, and Delivery review and recovery. The synthetic guest's service
+  settings were restored and the app was removed.
+- `qualify_slice_device.py` (5), the Room store suite (39),
+  `qualify_parity_provider.py` (9), and
+  `qualify_parity_lifecycle.py` (11) passed. These checks exercised the actual
+  durable writer, existing receipts, uncertain writes, concurrent delivery,
+  permission revocation, edits and deletions, offline and Doze operation,
+  and guest reboot. The provider fixtures and test packages were removed.
+- The development-key package upgrade passed 15 instrumentation checks with
+  synthetic historical schemas, including rollback, retry, newer-schema
+  preservation, recovery, and rejection of wrong-signer and downgrade
+  attempts. The `qualify_release_upgrade.py --provider-schema` receipt
+  SHA-256 is `a5ae725eb8dabadea97db10f3d01e30212d83c87b13449f92d49087fc9e8aec1`.
+  Production signing, account-calendar readback, and observation follow
+  [Track 5](../release_20261020/verification.md#active-release-gates),
+  [Track 6](../kotlin_20261020/plan.md) and the [prerequisite deferral](prerequisite-deferral.md).
+
+`DurableDelivery` is the sole production path to creating a calendar event.
+Manual logging, automatic logging, and approved imports share its outbox.
+The old `SliceEngine.run/save` algorithm and receipt writer were retired
+after the replacement was qualified. The existing contract types and
+legacy receipt reads remain in use. The moved regression verifies that
+manual delivery rejects an unavailable calendar before reading the call log.
+It failed before the destination guard was restored and passed afterward.
+
+The Ponytail review reused Material 3 1.5.0 from the existing Compose BOM.
+The resolved runtime graph shrank from 94 to 77 artifacts with the removal
+of AppCompat, Fragments, Material Views, and their unused dependencies.
+The diff removes a net 515 production Kotlin lines. Lifecycle and tracing
+retain their qualified versions through constraints. All 15 added
+verification checksums matched canonical Google Maven bytes, and the
+runtime notices follow the resolved graph. Strict Gradle verification,
+119 JVM tests, APK assembly, Android lint, and the 256 host regressions
+passed.
+
+[GitHub issue #116](https://github.com/edithatogo/CallTrack/issues/116) ·
+[Hosted Android 17 acceptance](https://github.com/edithatogo/CallTrack/actions/workflows/track14-hosted-ui.yml)
+
 ## Historical import date and call-type filters — 2026-10-24
 
 Historical import's date range and incoming/outgoing/missed controls now render
