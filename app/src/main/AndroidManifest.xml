@@ -7,6 +7,18 @@
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
 
+    <queries>
+        <intent>
+            <action android:name="android.telecom.action.CALL_BACK" />
+        </intent>
+        <package android:name="com.microsoft.teams" />
+        <package android:name="com.whatsapp" />
+        <package android:name="com.whatsapp.w4b" />
+        <package android:name="org.thoughtcrime.securesms" />
+        <package android:name="org.telegram.messenger" />
+        <package android:name="org.telegram.messenger.web" />
+    </queries>
+
     <application
         android:allowBackup="false"
         android:fullBackupContent="@xml/slice_backup_rules"

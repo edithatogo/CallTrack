@@ -15,6 +15,7 @@ private constructor(
     @JvmField val phoneAccountId: String?,
     @JvmField val numberPresentation: Int?,
     @JvmField val presentationSupplied: Boolean,
+    @JvmField val source: String?,
 ) {
     @JvmField val namespace: String
     @JvmField val id: String
@@ -51,6 +52,7 @@ private constructor(
         null,
         null,
         false,
+        PHONE,
     )
 
     constructor(
@@ -76,8 +78,10 @@ private constructor(
         phoneAccountId,
         null,
         false,
+        PHONE,
     )
 
+    @JvmOverloads
     constructor(
         namespace: String?,
         id: String?,
@@ -88,6 +92,7 @@ private constructor(
         number: String?,
         presentation: Int?,
         phoneAccountId: String?,
+        source: String? = PHONE,
     ) : this(
         namespace,
         id,
@@ -101,11 +106,14 @@ private constructor(
         phoneAccountId,
         presentation,
         true,
+        source,
     )
 
     fun key(): String = "${namespace.length}:$namespace${id.length}:$id"
 
     companion object {
+        const val PHONE = "phone"
+
         private fun typeOf(direction: String?): Int =
             when (direction) {
                 "Incoming" -> 1

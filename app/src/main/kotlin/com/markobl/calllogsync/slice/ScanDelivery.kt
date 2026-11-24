@@ -14,11 +14,14 @@ class ScanDelivery(
         fun put(operation: DurableDelivery.Operation?, checkpoint: PagedCalls.Checkpoint?)
     }
 
-    class Policy(
+    class Policy
+    @JvmOverloads
+    constructor(
         @JvmField val activationStart: Long,
         @JvmField val incoming: Boolean,
         @JvmField val outgoing: Boolean,
         @JvmField val missed: Boolean,
+        private val sources: Set<String> = setOf(CallRecord.PHONE),
     ) {
         init {
             require(activationStart >= 0) { "Invalid activation boundary" }
@@ -26,6 +29,7 @@ class ScanDelivery(
 
         fun includes(call: CallRecord?): Boolean =
             call!!.start >= activationStart &&
+                call.source in sources &&
                 (call.type == 1 && incoming ||
                     call.type == 2 && outgoing ||
                     call.type == 3 && missed)

@@ -18,9 +18,35 @@ internal class AutomaticScheduleControl(
         outgoing: Boolean,
         missed: Boolean,
     ): ActivationControl.Settings =
+        activate(
+            mapOf(calendar to setOf(CallRecord.PHONE)),
+            timezone,
+            now,
+            incoming,
+            outgoing,
+            missed,
+        )
+
+    fun activate(
+        destinations: Map<Long, Set<String>>,
+        timezone: String?,
+        now: Long,
+        incoming: Boolean,
+        outgoing: Boolean,
+        missed: Boolean,
+        calendarBindings: Map<Long, String> = emptyMap(),
+    ): ActivationControl.Settings =
         synchronized(DurableDelivery.DELIVERY_LOCK) {
             val settings =
-                activation!!.activate(calendar, timezone, now, incoming, outgoing, missed)
+                activation!!.activate(
+                    destinations,
+                    timezone,
+                    now,
+                    incoming,
+                    outgoing,
+                    missed,
+                    calendarBindings,
+                )
             schedule!!.apply(settings)
             settings
         }

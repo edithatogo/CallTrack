@@ -18,16 +18,46 @@ class AutomaticScheduling private constructor() {
             incoming: Boolean,
             outgoing: Boolean,
             missed: Boolean,
-        ): ActivationControl.Settings =
-            control(context)
+        ): ActivationControl.Settings {
+            val binding =
+                checkNotNull(AndroidCalendarSink(context).writableBinding(calendar)) {
+                    "Destination unavailable"
+                }
+            return activate(
+                context,
+                mapOf(calendar to setOf(CallRecord.PHONE)),
+                timezone,
+                incoming,
+                outgoing,
+                missed,
+                mapOf(calendar to binding),
+            )
+        }
+
+        @JvmStatic
+        fun activate(
+            context: Context?,
+            destinations: Map<Long, Set<String>>,
+            timezone: String?,
+            incoming: Boolean,
+            outgoing: Boolean,
+            missed: Boolean,
+            calendarBindings: Map<Long, String>,
+        ): ActivationControl.Settings {
+            require(calendarBindings.keys == destinations.keys) { "Calendar bindings required" }
+            val sink = AndroidCalendarSink(context, calendarBindings)
+            check(destinations.keys.all(sink::writable)) { "Destination changed or unavailable" }
+            return control(context)
                 .activate(
-                    calendar,
+                    destinations,
                     timezone,
                     System.currentTimeMillis(),
                     incoming,
                     outgoing,
                     missed,
+                    calendarBindings,
                 )
+        }
 
         @JvmStatic
         fun pause(context: Context?) {

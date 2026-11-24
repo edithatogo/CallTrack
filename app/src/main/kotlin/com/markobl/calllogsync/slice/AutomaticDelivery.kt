@@ -32,13 +32,21 @@ class AutomaticDelivery(
         worker: ActivationControl.Settings?,
         limit: Int,
         running: BooleanSupplier?,
+    ): ScanDelivery.Batch = runForCalendar(worker, worker?.calendar ?: -1, limit, running)
+
+    fun runForCalendar(
+        worker: ActivationControl.Settings?,
+        calendar: Long,
+        limit: Int,
+        running: BooleanSupplier?,
     ): ScanDelivery.Batch {
         require(limit in 1..500) { "Invalid page limit" }
         return synchronized(DurableDelivery.DELIVERY_LOCK) {
             try {
                 if (!permitted(worker, running)) return stopped(DurableDelivery.Result.PAUSED)
                 val settings = worker!!
-                val pending = progress!!.pending(settings.operation(), settings.calendar, limit)
+                val operation = settings.operation(calendar)
+                val pending = progress!!.pending(operation, calendar, limit)
                 check(
                     pending != null &&
                         pending.size <= limit &&
@@ -53,7 +61,7 @@ class AutomaticDelivery(
                     for (key in pending) {
                         check(!key.isNullOrEmpty()) { "Invalid pending key" }
                         val result =
-                            delivery!!.resume(key, settings.calendar, settings.operation()) {
+                            delivery!!.resume(key, calendar, operation) {
                                 permitted(worker, running)
                             }
                         when (result) {
@@ -77,16 +85,16 @@ class AutomaticDelivery(
                     // Recovery and source scanning remain separate invocations.
                     return ScanDelivery.Batch(handled, delivered, 0, review, false, null)
                 }
-                val checkpoint = progress.get(settings.operation())
+                val checkpoint = progress.get(operation)
                 if (checkpoint != null && checkpoint.lastId == checkpoint.upperId) {
                     val next = PagedCalls.extend(source, checkpoint)
                     if (!permitted(worker, running)) return stopped(DurableDelivery.Result.PAUSED)
-                    progress.rollover(settings.operation(), checkpoint, next)
+                    progress.rollover(operation, checkpoint, next)
                 }
                 scan.run(
-                    settings.operation(),
-                    settings.policy(),
-                    settings.calendar,
+                    operation,
+                    settings.policy(calendar),
+                    calendar,
                     settings.timezone,
                     limit,
                 ) {

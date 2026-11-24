@@ -43,6 +43,7 @@ Use the [Android 17 scope](active-scope.json) and [track registry](tracks.md) to
 | 14 · Android Compose | Carry the qualified screen roots and durable writer into the production acceptance for Tracks 5 and 6. [Track 14 evidence](tracks/compose_app_20261021/implementation-evidence.md#android-17-native-screen-roots-and-durable-delivery) |
 | 5 · Release | Freeze the exact Android 17 candidate. Complete signing and distribution, physical-call and selected calendar readbacks, and seven days of observation. [Release gates](tracks/release_20261020/verification.md#active-release-gates) |
 | 6 · Kotlin | Close K07 against the same supported upgrade, recovery and operational evidence as Track 5. [Track 6](tracks/kotlin_20261020/plan.md) |
+| 23 · Call routing | Qualify Android 17 app call attribution, opt-in calendar routes and the preserving dev upgrade. [Track 23](tracks/android17_call_routing_20261125/index.md) |
 
 The dedicated Mac AVD and hosted Android 17 qualification have passed. The protected-main Mac dispatch and local hook evidence are tracked in [#117](https://github.com/edithatogo/CallTrack/issues/117). The [Renovate dashboard](https://github.com/edithatogo/CallTrack/issues/91) governs the Ubuntu approval and scheduled toolchain updates. The [offline scanner PR](https://github.com/edithatogo/CallTrack/pull/89) depends on upstream image and model qualification and a trusted isolated Linux x64 runner for CallTrack.
 

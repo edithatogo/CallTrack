@@ -684,6 +684,10 @@ def qualify(serial, suite="settings", receipt_dir=None):
                               'preservesV4FactsAndCreatesEmptyCheckpointStore',
                               'preservesV5PendingPayloadAndCheckpointWithExplicitMigrationGrace'):
                 check(migration, 'com.markobl.calllogsync.slice.ParityStoreTest')
+            for permission in ('READ_CALENDAR', 'WRITE_CALENDAR', 'READ_CALL_LOG'):
+                command('shell', 'pm', 'grant', PACKAGE, 'android.permission.' + permission)
+            check('nativeSharedHistoryRoutesIndependentlyAndRetriesWithoutDuplicates',
+                  'com.markobl.calllogsync.slice.CallRoutingProviderTest')
         elif suite == 'imports':
             check('runActionsRequireEnabledStateAndExplicitTaps',
                   'com.markobl.calllogsync.slice.HistoricalImportActionsPanelTest')
