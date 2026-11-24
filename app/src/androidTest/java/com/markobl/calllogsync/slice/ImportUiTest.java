@@ -250,6 +250,8 @@ public class ImportUiTest {
             assertEquals(calendar(), latest().calendar);
             assertEquals(2, latest().count);
             assertEquals(0, fixture.events(calendar()));
+            ui.dismissKeyboard();
+            ui.revealId("import_cancel");
             ui.tapId("import_cancel");
             ui.tapDialogPositive();
             ui.await(
@@ -288,9 +290,11 @@ public class ImportUiTest {
                     () -> {
                         android.view.accessibility.AccessibilityNodeInfo field =
                                 ui.find("import_from", true);
-                        return field != null && field.isFocused() && ui.keyboardVisible();
+                        return field != null && field.isFocused();
                     },
-                    "Start date did not receive focus with a visible keyboard for cancellation");
+                    "Start date did not receive input focus for cancellation");
+            ui.await(
+                    ui::keyboardVisible, "Date keyboard not visibly present for cancellation test");
             ui.capture("import-keyboard-visible-before-cancel");
             ui.tapAboveKeyboard("import_cancel");
             ui.tapDialogPositive();
