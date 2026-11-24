@@ -18,6 +18,31 @@ any release artifact that shipped the issue, update the supported-version table
 when one exists, and document an upgrade that preserves the ledger and user edits.
 Do not instruct users to erase app data to resolve a synchronization failure.
 
+## Repository security checks
+
+| Required GitHub check | Coverage |
+| --- | --- |
+| `workflow-lint` | OpenGrep for the Android app and Python tooling, actionlint for GitHub Actions, and ShellCheck for the security and fuzz runners. |
+| `jazzer-call-data` | Coverage-guided fuzzing of call-to-event conversion, restricted identities and historical import dates with synthetic input. |
+| `privacy-and-secrets` | Gitleaks and Presidio through the pinned shared action. Pull requests scan introduced commits for secrets and changed tracked text for supported personal identifiers. Scheduled scans audit reachable secret history and current tracked text. |
+| `trufflehog-history` | TruffleHog scans fetched Git history. Credential verification is disabled to keep potential secrets local. Findings and scan errors fail the check. |
+| `CodeQL` and language analyses | Static analysis across the enabled languages, including Java and Kotlin. |
+
+Run OpenGrep on Apple Silicon or Linux x64 with `sh scripts/run-opengrep.sh`.
+The runner needs `curl`, `jq` and a SHA-256 utility. It verifies the pinned
+release checksum on every run and caches the executable under `.local`.
+The rules check Android manifest protections, direct network permission, app
+logging and Python shell execution. Kotlin logging uses OpenGrep's text
+matching because its Kotlin parser rejects some valid syntax in the app.
+Strict mode and finding failures are enabled. The runner prints rule IDs,
+paths and line numbers while keeping raw scanner output out of CI logs.
+[OpenGrep 2.0.0](https://github.com/opengrep/opengrep/releases/tag/v2.0.0)
+
+The local fuzz runner and shared privacy documentation provide setup commands
+and describe the Gitleaks and Presidio scan scopes. The shared action runs
+the pinned Presidio 2.2.366 compatibility build on isolated Python 3.15.2.
+[Jazzer runner](fuzz/README.md) · [Shared privacy checks](https://github.com/edithatogo/repository-standards/blob/192dfdef72954f13420b01b3229ce8424ec9c365/docs/privacy-secrets-standard.md)
+
 ## Optional staged private-key check
 
 With `pre-commit` 4.7.0 installed in the repository's `.venv`, run the SHA-pinned
