@@ -397,7 +397,7 @@ final class RenderedUi {
                     Rect keyboard = keyboardBounds();
                     if (keyboard == null) return false;
                     AccessibilityNodeInfo node = find(id, true);
-                    if (node != null && node.isEnabled()) {
+                    if (node != null && node.isEnabled() && touchPointIsVisible(node)) {
                         Rect control = new Rect();
                         node.getBoundsInScreen(control);
                         if (!control.isEmpty() && !Rect.intersects(control, keyboard)) {
@@ -406,8 +406,10 @@ final class RenderedUi {
                         }
                     }
                     AccessibilityNodeInfo scroll = scrollable(automation.getRootInActiveWindow());
-                    if (scroll != null)
-                        scroll.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
+                    if (scroll != null
+                            && scroll.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD)) {
+                        settle();
+                    }
                     return false;
                 },
                 "Control not reachable above the visible keyboard: " + id);
