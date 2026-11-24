@@ -816,16 +816,25 @@ final class RenderedUi {
         MotionEvent down =
                 MotionEvent.obtain(
                         at, at, MotionEvent.ACTION_DOWN, bounds.centerX(), bounds.centerY(), 0);
-        MotionEvent up =
-                MotionEvent.obtain(
-                        at, at + 40, MotionEvent.ACTION_UP, bounds.centerX(), bounds.centerY(), 0);
         down.setSource(InputDevice.SOURCE_TOUCHSCREEN);
-        up.setSource(InputDevice.SOURCE_TOUCHSCREEN);
         try {
             assertTrue(automation.injectInputEvent(down, true));
-            assertTrue(automation.injectInputEvent(up, true));
         } finally {
             down.recycle();
+        }
+        SystemClock.sleep(40);
+        MotionEvent up =
+                MotionEvent.obtain(
+                        at,
+                        SystemClock.uptimeMillis(),
+                        MotionEvent.ACTION_UP,
+                        bounds.centerX(),
+                        bounds.centerY(),
+                        0);
+        up.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+        try {
+            assertTrue(automation.injectInputEvent(up, true));
+        } finally {
             up.recycle();
         }
         SystemClock.sleep(250);

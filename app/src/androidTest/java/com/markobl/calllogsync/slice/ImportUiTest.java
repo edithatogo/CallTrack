@@ -282,9 +282,15 @@ public class ImportUiTest {
             ui.tapId("button2");
             assertEquals(HistoricalImport.Phase.PREVIEW, latest().phase);
             assertEquals(0, fixture.events(calendar()));
-            ui.tapId("import_to");
+            // The end field can retain focus when the confirmation dismisses its keyboard.
+            ui.tapId("import_from");
             ui.await(
-                    ui::keyboardVisible, "Date keyboard not visibly present for cancellation test");
+                    () -> {
+                        android.view.accessibility.AccessibilityNodeInfo field =
+                                ui.find("import_from", true);
+                        return field != null && field.isFocused() && ui.keyboardVisible();
+                    },
+                    "Start date did not receive focus with a visible keyboard for cancellation");
             ui.capture("import-keyboard-visible-before-cancel");
             ui.tapAboveKeyboard("import_cancel");
             ui.tapDialogPositive();

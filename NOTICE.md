@@ -25,13 +25,13 @@ They are not public releases or replacements for the original developer's app.
 Runtime dependency declarations and retained licence text are inventoried in
 [third-party notices](THIRD_PARTY_NOTICES.md); build-only tool evidence remains
 separate. The inherited launcher/store artwork and unused endpoint translations have been
-removed. Replacement development artwork is original geometric vector source
-under GPLv3. This does not select a permanent production trademark or release name.
-Publication, signing and channel acceptance remain pending.
+removed. The replacement artwork is original geometric vector source under
+GPLv3. See the [release runbook](RELEASING.md) for the selected distribution
+identity and acceptance gates.
 
 The checked-in Gradle wrapper bootstrap is a build tool under Apache-2.0; its
-JAR matches the published Gradle 9.7.0 wrapper checksum and contains its licence.
-Conservative 9.7.0 distribution licence and notice copies are retained in
+JAR contains its licence. The current distribution and its checksum are pinned in
+`gradle/wrapper/gradle-wrapper.properties`. Earlier distribution licence and notice copies remain in
 `qualification/release/licences/Gradle-9.7.0-LICENSE.txt` and
 `qualification/release/licences/Gradle-9.7.0-NOTICE.txt`. The older
 `Gradle-wrapper-*` files remain as Gradle 7.0.2 reference evidence. The wrapper

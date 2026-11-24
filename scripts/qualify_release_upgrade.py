@@ -131,6 +131,10 @@ def qualify(serial, output, provider_schema=False, release_build_receipt=None):
     provider_attempted = False
     if release_build_receipt is not None:
         unsigned = frozen_release_apk(release_build_receipt, revision, sdk, env)
+        badge = subprocess.check_output([str(sdk / 'build-tools/35.0.0/aapt'), 'dump', 'badging',
+                                         str(unsigned)], text=True)
+        if "package: name='" + PACKAGE + "' versionCode='10'" not in badge:
+            raise RuntimeError('Build the frozen upgrade input with --development-fixture')
         original = output / 'exact-release-development-signed.apk'
         signing_env = dict(env, CALLTRACK_DEBUG_PASSWORD='android')
         subprocess.run([str(sdk / 'build-tools/35.0.0/apksigner'), 'sign',
@@ -201,7 +205,8 @@ gradle.beforeProject { project ->
 """)
         receipt['overlay_sha256'] = sha(overlay)
         with (output / 'build.log').open('w') as log:
-            subprocess.run(['sh', 'gradlew', '--no-daemon', '--console=plain', '-I', str(overlay),
+            subprocess.run(['sh', 'gradlew', '--no-daemon', '--console=plain',
+                            '-PcalltrackDevelopmentRelease=true', '-I', str(overlay),
                             *([':app:assembleRelease', ':app:assembleDebugAndroidTest'] if provider_schema else [':app:assembleRelease'])], cwd=checkout, env=env, stdout=log,
                            stderr=subprocess.STDOUT, check=True)
         if subprocess.check_output(['git', 'status', '--porcelain'], cwd=checkout).strip():
@@ -236,14 +241,15 @@ gradle.beforeProject { project ->
             attempted.append(package)
             if 'Success' not in adb('install', str(apk)):
                 raise RuntimeError('Install unconfirmed')
+        native('freshInstallIsUnconfiguredAndDenied')
+        launch = adb('shell', 'am', 'start', '-W', '-n',
+                     PACKAGE + '/com.markobl.calllogsync.slice.CalendarSliceActivity')
+        if 'Status: ok' not in launch:
+            raise RuntimeError('Fresh candidate launcher failed')
+        adb('shell', 'am', 'force-stop', PACKAGE)
+        native('freshInstallIsUnconfiguredAndDenied')
+        receipt['development_fresh_install_qualified'] = True
         if release_build_receipt is not None:
-            native('freshInstallIsUnconfiguredAndDenied')
-            launch = adb('shell', 'am', 'start', '-W', '-n',
-                         PACKAGE + '/com.markobl.calllogsync.slice.CalendarSliceActivity')
-            if 'Status: ok' not in launch:
-                raise RuntimeError('Fresh candidate launcher failed')
-            adb('shell', 'am', 'force-stop', PACKAGE)
-            native('freshInstallIsUnconfiguredAndDenied')
             receipt['exact_release_fresh_install_qualified'] = True
         native('seedJavaEraState')
         if provider_schema:
@@ -334,6 +340,7 @@ if __name__ == '__main__':
     parser.add_argument('--serial', required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--provider-schema', action='store_true', help='Use synthetic source-pinned schemas and LOCAL provider fixtures')
-    parser.add_argument('--release-build-receipt', type=Path, help='Qualify an exact unsigned release payload using the existing development key only')
+    parser.add_argument('--release-build-receipt', type=Path,
+                        help='Use a frozen --development-fixture payload with the existing development key')
     args = parser.parse_args()
     print(json.dumps(qualify(args.serial, args.output.resolve(), args.provider_schema, args.release_build_receipt), indent=2))

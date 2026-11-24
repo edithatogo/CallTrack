@@ -2,16 +2,16 @@
 
 This is a development fork with manual/automatic logging, historical import and
 recovery controls. Native acceptance is scoped to recorded emulator evidence. Check [Conductor](conductor/index.md) before proposing changes.
-The current package is disposable; there is no supported public release yet.
+Debug builds use the disposable development package. See the [release gates](RELEASING.md)
+for the distribution variant.
 
 ## Reproduce the development build
 
-Use a fresh checkout of the exact commit being reviewed. Install Temurin 25.0.5.1+2,
-the Python version in `.python-version`, Android SDK platforms 36 and 37.1, and
-Build Tools 36.0.0. The device and upgrade harnesses also use Build Tools 35.0.0.
-The wrapper pins Gradle 9.7.0 and its distribution checksum. The build uses AGP 9.3.1.
+Use a fresh checkout of the exact commit being reviewed and the versions in the
+[build guide](README.md#build-and-qualification). Install Build Tools 36.0.0 and
+35.0.0 for native qualification. Use the checked-in Gradle wrapper.
 The Kotlin implementation retains one Java nullable-label bridge and Java interop
-tests. The app uses Kotlin 2.4.21 and JVM 11 bytecode with minimum Android API 26.
+tests. The app uses JVM 11 bytecode with minimum Android API 37.
 Read the selection with `python_version="$(cat .python-version)"`, install it
 with `uv python install "$python_version"`, then create `.venv` using
 `uv venv --python "$python_version" .venv`. Verify `.venv/bin/python -V` and run
