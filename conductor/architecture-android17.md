@@ -70,8 +70,6 @@ Strict branch protection requires native build qualification, hosted Android 17 
 
 Build qualification runs on pull requests, pushes to main, tag pushes, and
 manual dispatch. A feature-branch push leaves qualification to its pull
-request. The hosted UI runner boots its fresh emulator while Gradle builds
-the source-bound APKs. It verifies Android and AVD identity before running
-the complete rendered suites and fixture cleanup.
+request.
 
 The [CodeQL ruleset](https://github.com/edithatogo/CallTrack/rules/27936995) requires scan results and blocks new alerts at every severity.
