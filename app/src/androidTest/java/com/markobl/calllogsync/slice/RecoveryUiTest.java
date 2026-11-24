@@ -219,6 +219,12 @@ public class RecoveryUiTest {
         }
     }
 
+    private boolean isBusy(Instrumentation instrumentation, Activity activity) {
+        boolean[] busy = new boolean[1];
+        instrumentation.runOnMainSync(() -> busy[0] = (Boolean) field(activity, "busy"));
+        return busy[0];
+    }
+
     @Test
     public void leavingAndReturningWithdrawsQueuedApproval() throws Exception {
         Instrumentation i = InstrumentationRegistry.getInstrumentation();
@@ -244,7 +250,7 @@ public class RecoveryUiTest {
             assertTrue(entered.await(10, java.util.concurrent.TimeUnit.SECONDS));
             tap(ui, R.string.reapproval_open);
             ui.tapId("button1");
-            assertTrue((Boolean) field(activity, "busy"));
+            ui.await(() -> isBusy(i, activity), "Rendered approval did not queue");
             assertTrue(
                     ui.automation.performGlobalAction(
                             android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME));
@@ -261,7 +267,7 @@ public class RecoveryUiTest {
                     () -> (Boolean) field(activity, "resumed"),
                     "Returning did not resume same activity");
             release.countDown();
-            ui.await(() -> !(Boolean) field(activity, "busy"), "Queued action did not settle");
+            ui.await(() -> !isBusy(i, activity), "Queued action did not settle");
             assertEquals(
                     "Leaving must permanently withdraw the earlier queued approval",
                     DurableDelivery.State.READY,

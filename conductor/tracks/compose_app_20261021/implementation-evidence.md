@@ -77,6 +77,13 @@ the receipt state, event content, user deletion, and explicit suppression.
 All nine recovery checks and fixture cleanup passed locally on the same
 Android 17 arm64 app APK. [First main run](https://github.com/edithatogo/CallTrack/actions/runs/45354909299/attempts/1).
 
+A separate hosted run reached the queued approval check before Android's
+dialog callback published the Activity state. The test now waits for that
+state on the UI thread while the executor remains held. The same journey
+then backgrounds and resumes the Activity, releases the executor, and
+checks that the receipt is still pending and no event was created.
+[Queued approval failure](https://github.com/edithatogo/CallTrack/actions/runs/45360102878/attempts/2).
+
 ## Historical import date and call-type filters — 2026-10-24
 
 Historical import's date range and incoming/outgoing/missed controls now render

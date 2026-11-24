@@ -1,6 +1,8 @@
 name: Build qualification
 on:
   push:
+    branches: [main]
+    tags: ['**']
   pull_request:
   workflow_dispatch:
 permissions:
@@ -26,7 +28,6 @@ jobs:
           fi
       - name: Native Android host policy, regressions and Conductor
         run: |
-          python -m venv .venv
           test "$(.venv/bin/python --version)" = "Python $(cat .python-version)"
           .venv/bin/python -m unittest discover -s tests -v
           .venv/bin/python scripts/verify_conductor.py

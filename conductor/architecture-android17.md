@@ -68,4 +68,8 @@ Android API 26/33/36 and all other OS/runtime targets, macOS, iOS, desktop and c
 
 Strict branch protection requires native build qualification, hosted Android 17 UI acceptance, workflow lint, secret history scanning, privacy and secrets, call-data fuzzing, and both the CodeQL summary and each configured analysis. The hosted API 37 workflow runs on every pull request and verifies settings, imports, full process recovery, accessibility, and fixture cleanup.
 
+Build qualification runs on pull requests, pushes to main, tag pushes, and
+manual dispatch. A feature-branch push leaves qualification to its pull
+request.
+
 The [CodeQL ruleset](https://github.com/edithatogo/CallTrack/rules/27936995) requires scan results and blocks new alerts at every severity.
