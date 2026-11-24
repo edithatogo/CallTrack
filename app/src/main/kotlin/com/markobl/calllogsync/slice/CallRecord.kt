@@ -18,7 +18,9 @@ private constructor(
     @JvmField val source: String?,
 ) {
     @JvmField val namespace: String
+
     @JvmField val id: String
+
     @JvmField val direction: String
 
     init {
@@ -113,20 +115,23 @@ private constructor(
 
     companion object {
         const val PHONE = "phone"
+        internal const val INCOMING = 1
+        internal const val OUTGOING = 2
+        internal const val MISSED = 3
 
         private fun typeOf(direction: String?): Int =
             when (direction) {
-                "Incoming" -> 1
-                "Outgoing" -> 2
-                "Missed" -> 3
+                "Incoming" -> INCOMING
+                "Outgoing" -> OUTGOING
+                "Missed" -> MISSED
                 else -> 0
             }
 
         private fun directionOf(type: Int): String =
             when (type) {
-                1 -> "Incoming"
-                2 -> "Outgoing"
-                3 -> "Missed"
+                INCOMING -> "Incoming"
+                OUTGOING -> "Outgoing"
+                MISSED -> "Missed"
                 else -> "Unknown"
             }
     }

@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.provider.CallLog.Calls;
+import android.view.accessibility.AccessibilityNodeInfo;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -183,7 +184,9 @@ public class ImportUiTest {
                 () -> {
                     android.view.accessibility.AccessibilityNodeInfo node =
                             ui.shown("import_outgoing", true);
-                    return node != null && node.isCheckable() && !node.isChecked();
+                    return node != null
+                            && node.isCheckable()
+                            && node.getChecked() == AccessibilityNodeInfo.CHECKED_STATE_FALSE;
                 },
                 "Outgoing filter did not switch off");
         ui.dismissKeyboard();
@@ -202,7 +205,9 @@ public class ImportUiTest {
                 "Selected destination did not return after process death");
         assertEquals(from, ui.shown("import_from", true).getText().toString());
         assertEquals(to, ui.shown("import_to", true).getText().toString());
-        assertFalse(ui.shown("import_outgoing", true).isChecked());
+        assertEquals(
+                AccessibilityNodeInfo.CHECKED_STATE_FALSE,
+                ui.shown("import_outgoing", true).getChecked());
         assertNull("Process restoration must not create a preview", latest());
         assertEquals(0, fixture.events(calendar()));
         ui.capture("import-after-process-death");
@@ -224,7 +229,9 @@ public class ImportUiTest {
                     () -> {
                         android.view.accessibility.AccessibilityNodeInfo node =
                                 ui.shown("import_outgoing", true);
-                        return node != null && node.isCheckable() && !node.isChecked();
+                        return node != null
+                                && node.isCheckable()
+                                && node.getChecked() == AccessibilityNodeInfo.CHECKED_STATE_FALSE;
                     },
                     "Outgoing filter did not switch off");
             ui.dismissKeyboard();
@@ -239,7 +246,9 @@ public class ImportUiTest {
                     "Selected destination did not return after recreation");
             assertEquals(from, ui.shown("import_from", true).getText().toString());
             assertEquals(to, ui.shown("import_to", true).getText().toString());
-            assertFalse(ui.shown("import_outgoing", true).isChecked());
+            assertEquals(
+                    AccessibilityNodeInfo.CHECKED_STATE_FALSE,
+                    ui.shown("import_outgoing", true).getChecked());
             assertNull("Recreation must not create a preview", latest());
             assertEquals(0, fixture.events(calendar()));
             ui.capture("import-after-recreation");

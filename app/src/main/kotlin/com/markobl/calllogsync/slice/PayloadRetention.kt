@@ -15,9 +15,11 @@ class PayloadRetention private constructor() {
         fun clear(intent: DurableDelivery.Intent?): DurableDelivery.Intent {
             val current = intent!!
             val state =
-                if (current.state == DurableDelivery.State.READY && current.eventId < 0)
+                if (current.state == DurableDelivery.State.READY && current.eventId < 0) {
                     DurableDelivery.State.EXPIRED_READY
-                else current.state
+                } else {
+                    current.state
+                }
             return DurableDelivery.Intent(
                 state,
                 current.key,

@@ -8,9 +8,9 @@ class CallSelection(
 ) {
     fun accepts(call: CallRecord?): Boolean =
         when (call!!.type) {
-            1 -> incoming
-            2 -> outgoing
-            3 -> missed
+            CallRecord.INCOMING -> incoming
+            CallRecord.OUTGOING -> outgoing
+            CallRecord.MISSED -> missed
             else -> false
         }
 

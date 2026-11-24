@@ -1,8 +1,24 @@
 package com.markobl.calllogsync.slice
 
 import android.content.Context
-import androidx.work.*
-import java.util.concurrent.*
+import androidx.work.BackoffPolicy
+import androidx.work.Data
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
+import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.Callable
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.Future
+import java.util.concurrent.ThreadFactory
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
+
+private const val RETRY_BACKOFF_SECONDS = 10L
+private const val RECOVERY_INTERVAL_MINUTES = 15L
 
 /** Best-effort prompt work plus persistent periodic recovery; no fixed deadline promise. */
 class AutomaticScheduling private constructor() {
@@ -128,10 +144,12 @@ class AutomaticScheduling private constructor() {
         @Throws(ExecutionException::class, InterruptedException::class, TimeoutException::class)
         fun awaitCommitted(operations: Array<out Future<*>?>?, deadlineNanos: Long) {
             remainingBudget(deadlineNanos)
-            for (operation in operations!!) operation!!.get(
-                remainingBudget(deadlineNanos),
-                TimeUnit.NANOSECONDS,
-            )
+            for (operation in operations!!) {
+                operation!!.get(
+                    remainingBudget(deadlineNanos),
+                    TimeUnit.NANOSECONDS,
+                )
+            }
         }
 
         private fun input(settings: ActivationControl.Settings?): Data =
@@ -143,15 +161,19 @@ class AutomaticScheduling private constructor() {
                 .setInputData(input(settings))
                 .addTag(TAG)
                 .setInitialDelay(2, TimeUnit.SECONDS)
-                .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.SECONDS)
+                .setBackoffCriteria(BackoffPolicy.LINEAR, RETRY_BACKOFF_SECONDS, TimeUnit.SECONDS)
                 .build()
 
         @JvmStatic
         fun periodic(settings: ActivationControl.Settings?): PeriodicWorkRequest =
-            PeriodicWorkRequest.Builder(AutomaticLogWorker::class.java, 15, TimeUnit.MINUTES)
+            PeriodicWorkRequest.Builder(
+                    AutomaticLogWorker::class.java,
+                    RECOVERY_INTERVAL_MINUTES,
+                    TimeUnit.MINUTES,
+                )
                 .setInputData(input(settings))
                 .addTag(TAG)
-                .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.SECONDS)
+                .setBackoffCriteria(BackoffPolicy.LINEAR, RETRY_BACKOFF_SECONDS, TimeUnit.SECONDS)
                 .build()
 
         private fun schedule(

@@ -160,7 +160,7 @@ final class RenderedUi {
                 "The driver must run in a separate process", android.os.Process.myPid(), pid);
         ActivityManager.AppTask savedTask = activityTask(activity);
         assertNotNull("The original activity task was not retained", savedTask);
-        int taskId = savedTask.getTaskInfo().id;
+        int taskId = savedTask.getTaskInfo().taskId;
         assertTrue(
                 automation.performGlobalAction(
                         android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME));
@@ -184,7 +184,8 @@ final class RenderedUi {
         await(
                 () -> mainProcess() != null && mainProcess().pid != pid,
                 "App did not restart in a new process");
-        assertEquals("Returning must keep the original task", taskId, savedTask.getTaskInfo().id);
+        assertEquals(
+                "Returning must keep the original task", taskId, savedTask.getTaskInfo().taskId);
     }
 
     private void returnFromRecents() {
@@ -1054,7 +1055,7 @@ final class RenderedUi {
                 .append(" focused=")
                 .append(node.isFocused())
                 .append(" checked=")
-                .append(node.isChecked())
+                .append(node.getChecked() == AccessibilityNodeInfo.CHECKED_STATE_TRUE)
                 .append(' ')
                 .append(bounds)
                 .append(' ')

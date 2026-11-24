@@ -28,15 +28,16 @@ class WorkStatus(
             fun parse(value: String?): Code =
                 try {
                     valueOf(value!!)
-                } catch (invalid: IllegalArgumentException) {
+                } catch (ignored: IllegalArgumentException) {
                     UNKNOWN
-                } catch (invalid: NullPointerException) {
+                } catch (ignored: NullPointerException) {
                     UNKNOWN
                 }
         }
     }
 
     @JvmField val token: String
+
     @JvmField val code: Code
 
     init {
@@ -67,14 +68,12 @@ class WorkStatus(
             review: Int,
         ): WorkStatus {
             if (prior != null && prior.generation > generation) return prior
-            var failures =
-                if (prior != null && prior.generation == generation) prior.failures else 0L
-            if (
-                code == Code.FAILED &&
-                    (prior == null || prior.generation != generation || prior.token != token) &&
-                    failures < Long.MAX_VALUE
-            )
+            val currentGeneration = prior?.takeIf { it.generation == generation }
+            var failures = currentGeneration?.failures ?: 0L
+            val newFailure = currentGeneration == null || currentGeneration.token != token
+            if (code == Code.FAILED && newFailure && failures < Long.MAX_VALUE) {
                 failures++
+            }
             return WorkStatus(generation, at, token, code, delivered, review, failures)
         }
     }

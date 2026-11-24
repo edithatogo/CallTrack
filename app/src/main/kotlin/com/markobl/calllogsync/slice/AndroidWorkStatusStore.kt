@@ -13,8 +13,9 @@ class AndroidWorkStatusStore(private val preferences: SharedPreferences?) {
 
     fun read(generation: Long): WorkStatus? =
         synchronized(DurableDelivery.DELIVERY_LOCK) {
-            if (uncertain.contains(preferences))
+            if (uncertain.contains(preferences)) {
                 throw IllegalStateException("Execution status commit uncertain")
+            }
             val stored = stored()
             if (stored != null && stored.generation == generation) stored else null
         }

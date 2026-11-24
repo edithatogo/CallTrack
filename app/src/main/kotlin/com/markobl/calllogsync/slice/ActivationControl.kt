@@ -23,8 +23,11 @@ class ActivationControl(store: Store?) {
         bindings: Map<Long, String> = emptyMap(),
     ) {
         @JvmField val timezone: String
+
         @JvmField val destinations: Map<Long, Set<String>>
+
         @JvmField val calendarBindings: Map<Long, String>
+
         @JvmField val calendar: Long
 
         constructor(
@@ -114,7 +117,7 @@ class ActivationControl(store: Store?) {
         }
     }
 
-    private val store: Store = store ?: throw NullPointerException()
+    private val store: Store = store ?: throw NullPointerException("Activation store required")
 
     fun current(): Settings? = synchronized(DurableDelivery.DELIVERY_LOCK) { store.get() }
 

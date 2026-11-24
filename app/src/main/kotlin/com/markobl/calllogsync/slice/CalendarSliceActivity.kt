@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -26,8 +27,17 @@ class CalendarSliceActivity : ComponentActivity() {
     private var refreshing = false
     private var refreshGeneration = 0
 
-    public override fun onCreate(state: Bundle?) {
-        super.onCreate(state)
+    private val calendarPermissions =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            if (calendarAccess()) refresh() else setStatus(R.string.slice_permission_needed)
+        }
+    private val callPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            setStatus(R.string.slice_tap_again)
+        }
+
+    public override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         panelState = panelState.copy(logLabel = getString(R.string.slice_log_latest))
         setCallTrackContent {
             ManualCalendarScreen(
@@ -58,17 +68,20 @@ class CalendarSliceActivity : ComponentActivity() {
         executor.execute {
             try {
                 AutomaticScheduling.reconcile(applicationContext)
-            } catch (unavailable: RuntimeException) {
+            } catch (ignored: RuntimeException) {
                 /* Settings exposes unavailable policy. */
             }
             try {
-                SqliteLedger(applicationContext).use { it.expirePayloads(50) }
-            } catch (unavailable: RuntimeException) {
+                SqliteLedger(applicationContext).use {
+                    it.expirePayloads(RECEIPT_RETENTION_BATCH_SIZE)
+                }
+            } catch (ignored: RuntimeException) {
                 /* Recovery exposes storage errors. */
             }
         }
-        if (calendarAccess()) refresh()
-        else {
+        if (calendarAccess()) {
+            refresh()
+        } else {
             selected = -1
             destinationState = destinationState.copy(selectedToken = null, enabled = false)
             setStatus(R.string.slice_permission_needed)
@@ -83,12 +96,13 @@ class CalendarSliceActivity : ComponentActivity() {
                 PackageManager.PERMISSION_GRANTED
 
     private fun requestCalendarAccess() {
-        if (calendarAccess()) refresh()
-        else
-            requestPermissions(
+        if (calendarAccess()) {
+            refresh()
+        } else {
+            calendarPermissions.launch(
                 arrayOf(Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR),
-                1,
             )
+        }
     }
 
     private fun selectDestination(token: String) {
@@ -121,7 +135,7 @@ class CalendarSliceActivity : ComponentActivity() {
             checkSelfPermission(Manifest.permission.READ_CALL_LOG) !=
                 PackageManager.PERMISSION_GRANTED
         ) {
-            requestPermissions(arrayOf(Manifest.permission.READ_CALL_LOG), 2)
+            callPermission.launch(Manifest.permission.READ_CALL_LOG)
             return
         }
         val destination = selected
@@ -142,7 +156,7 @@ class CalendarSliceActivity : ComponentActivity() {
                             )
                             .run(destination)
                     }
-                } catch (failed: RuntimeException) {
+                } catch (ignored: RuntimeException) {
                     SliceEngine.Result.FAILED
                 }
             runOnUiThread {
@@ -198,7 +212,7 @@ class CalendarSliceActivity : ComponentActivity() {
                     )
                     updateButton()
                 }
-            } catch (unavailable: RuntimeException) {
+            } catch (ignored: RuntimeException) {
                 runOnUiThread {
                     if (!isDestroyed && generation == refreshGeneration) {
                         refreshing = false
@@ -211,17 +225,6 @@ class CalendarSliceActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    public override fun onRequestPermissionsResult(
-        code: Int,
-        permissions: Array<String>,
-        grants: IntArray,
-    ) {
-        super.onRequestPermissionsResult(code, permissions, grants)
-        if (code == 1 && calendarAccess()) refresh()
-        else if (code == 2) setStatus(R.string.slice_tap_again)
-        else setStatus(R.string.slice_permission_needed)
     }
 
     private fun message(result: SliceEngine.Result): Int =

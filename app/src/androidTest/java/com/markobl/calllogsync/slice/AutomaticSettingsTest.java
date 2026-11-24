@@ -54,9 +54,15 @@ public class AutomaticSettingsTest {
             assertEquals(
                     context.getString(R.string.slice_choose), String.valueOf(picker.getText()));
             assertFalse(picker.isEnabled());
-            assertTrue(rendered.shown("auto_incoming", true).isChecked());
-            assertTrue(rendered.shown("auto_outgoing", true).isChecked());
-            assertTrue(rendered.shown("auto_missed", true).isChecked());
+            assertEquals(
+                    AccessibilityNodeInfo.CHECKED_STATE_TRUE,
+                    rendered.shown("auto_incoming", true).getChecked());
+            assertEquals(
+                    AccessibilityNodeInfo.CHECKED_STATE_TRUE,
+                    rendered.shown("auto_outgoing", true).getChecked());
+            assertEquals(
+                    AccessibilityNodeInfo.CHECKED_STATE_TRUE,
+                    rendered.shown("auto_missed", true).getChecked());
             assertFalse(
                     context.getSharedPreferences("slice", Context.MODE_PRIVATE)
                             .contains("automaticActivation"));
