@@ -66,6 +66,17 @@ passed.
 [GitHub issue #116](https://github.com/edithatogo/CallTrack/issues/116) ·
 [Hosted Android 17 acceptance](https://github.com/edithatogo/CallTrack/actions/workflows/track14-hosted-ui.yml)
 
+### Hosted recovery follow-up
+
+The first main run timed out waiting for the recovery receipt to become
+confirmed after the fixture restored an edited event title. The tap helper
+could start a new scroll after its final idle wait. It now settles after
+revealing a control, then resolves its enabled, reachable node without
+scrolling before sending one physical tap. The existing test still checks
+the receipt state, event content, user deletion, and explicit suppression.
+All nine recovery checks and fixture cleanup passed locally on the same
+Android 17 arm64 app APK. [First main run](https://github.com/edithatogo/CallTrack/actions/runs/45354909299/attempts/1).
+
 ## Historical import date and call-type filters — 2026-10-24
 
 Historical import's date range and incoming/outgoing/missed controls now render

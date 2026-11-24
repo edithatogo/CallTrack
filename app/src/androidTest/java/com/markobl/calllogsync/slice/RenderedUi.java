@@ -549,19 +549,23 @@ final class RenderedUi {
         try {
             await(
                     () -> {
-                        found[0] = waitForIdle ? shown(value, id) : find(value, id);
-                        return found[0] != null && found[0].isEnabled();
+                        AccessibilityNodeInfo candidate =
+                                waitForIdle ? shown(value, id) : find(value, id);
+                        if (candidate == null || !candidate.isEnabled()) return false;
+                        // Revealing can start a scroll animation. Resolve the touch after it
+                        // settles.
+                        if (waitForIdle) settle();
+                        else SystemClock.sleep(50);
+                        found[0] = find(value, id);
+                        return found[0] != null
+                                && found[0].isEnabled()
+                                && (!waitForIdle || touchPointIsVisible(found[0]));
                     },
                     "Visible enabled control missing: " + value);
         } catch (AssertionError missing) {
             if (!value.startsWith("permission_")) throw missing;
             throw new AssertionError(missing.getMessage() + "; " + permissionControlSummary());
         }
-        if (waitForIdle) settle();
-        else SystemClock.sleep(50); // A user can stop work while its progress keeps changing.
-        found[0] = waitForIdle ? shown(value, id) : find(value, id);
-        assertNotNull("Control disappeared before touch", found[0]);
-        assertTrue("Control became disabled before touch: " + value, found[0].isEnabled());
         touch(found[0], value);
         if (id && (value.equals("import_from") || value.equals("import_to")))
             dismissKeyboardContactsPromptIfVisible();
