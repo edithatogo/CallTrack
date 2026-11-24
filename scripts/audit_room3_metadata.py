@@ -41,27 +41,31 @@ def canonical_sha256(url):
 
 
 def pending(prior_bytes, candidate_bytes):
-    old = {(r["coordinate"], r["name"]): set(r["sha256"]) for r in rows(prior_bytes)}
-    current = {(r["coordinate"], r["name"]): set(r["sha256"]) for r in rows(candidate_bytes)}
+    prior_rows = rows(prior_bytes)
+    candidate_rows = rows(candidate_bytes)
+    old = {(r["coordinate"], r["name"]): set(r["sha256"]) for r in prior_rows}
+    current = {(r["coordinate"], r["name"]): set(r["sha256"]) for r in candidate_rows}
+    if len(old) != len(prior_rows) or len(current) != len(candidate_rows):
+        raise ValueError("Duplicate artifact identity in verification policy")
     for key, approved in old.items():
         if key not in current or not approved <= current[key]:
             raise ValueError("Existing trust entries may not be removed or changed: " + repr(key))
         if current[key] != approved:
             raise ValueError("Conflicting hashes for previously approved artifact: " + repr(key))
-    return [
-        dict(coordinate=key[0], name=key[1], sha256=next(iter(hashes)))
-        for key, hashes in sorted(current.items())
-        if key not in old and len(hashes) == 1
-    ], current
+    additions = []
+    for key in sorted(current.keys() - old):
+        hashes = current[key]
+        if len(hashes) != 1:
+            raise ValueError("New artifact must have exactly one SHA256: " + repr(key))
+        additions.append(dict(coordinate=key[0], name=key[1], sha256=next(iter(hashes))))
+    return additions, current
 
 
 def verify_one(entry, approved):
     candidate = dict(entry)
     primary = repository_url(candidate)
-    attempts = []
     try:
         actual = canonical_sha256(primary)
-        attempts.append(dict(url=primary, sha256=actual))
         if actual == entry["sha256"]:
             return dict(entry, canonical_url=primary, sha256_verified=True)
         raise ValueError("Canonical hash mismatch: " + primary)

@@ -44,6 +44,18 @@ class CandidateTrust(unittest.TestCase):
             verified = audit.verify_one(records[0], names)
         self.assertTrue(verified["sha256_verified"])
 
+    def test_rejects_ambiguous_new_artifact(self):
+        original = ("example", "core", "1.0", "core-1.0.jar", "a" * 64)
+        new = ("example", "new", "2.0", "new-2.0.jar", "b" * 64)
+        prior = policy([original])
+        with self.assertRaisesRegex(ValueError, "Duplicate artifact identity"):
+            audit.pending(prior, policy([original, new, new]))
+        first = b'<sha256 value="' + b"b" * 64 + b'"/>'
+        second = b'<sha256 value="' + b"c" * 64 + b'"/>'
+        ambiguous = policy([original, new]).replace(first, first + second)
+        with self.assertRaisesRegex(ValueError, "exactly one SHA256"):
+            audit.pending(prior, ambiguous)
+
     def test_rejects_incorrect_bytes(self):
         entry = dict(coordinate="example:new:2.0", name="new-2.0.jar", sha256="0" * 64)
         with patch.object(audit, "canonical_sha256", return_value=hashlib.sha256(b"not trusted").hexdigest()):
