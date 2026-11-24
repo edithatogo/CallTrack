@@ -21,7 +21,7 @@
     "Android CallLog",
     "Android CalendarContract",
     "WorkManager",
-    "Room 3.0.3 (preserving migration in progress)"
+    "Room 3.0.3 (preserving migration with SQLite compatibility bridge)"
   ],
   "local_primary_avd": "calltrack-android17-local",
   "active_tracks": [

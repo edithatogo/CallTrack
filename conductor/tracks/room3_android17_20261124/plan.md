@@ -1,15 +1,20 @@
-# Room 3 migration — executable work plan
+# Room 3 migration
 
-- [x] Verify latest stable Room 3.0.3 and its KSP/coroutine/SQLiteDriver boundary against official AndroidX documentation.
-- [x] Record the migration constraints and acceptance criteria in [spec](spec.md).
-- [x] Add source-bound synthetic schema-6/schema-2 Room readback/reopen regression and rewire Android 17 settings acceptance to v1–v5 historical ledger and import-v1 fixtures. Native execution remains pending; the new tests have not been marked as passed.
-- [x] Add KSP 2.3.14 / Room 3.0.3 / SQLite driver 2.7.1 and independently verify 154 new dependency artifact hashes against canonical repository bytes; bot admitted exact metadata and Room schema JSON in commit 2d56f2c. Isolated compile, JVM and unsigned release build passed; strict ordinary CI on the accepted tree remains pending.
-- [ ] Implement Room entities and suspend DAOs for import-session store using its original DB filename and a preserving schema strategy. No second writer, no data clears, no parallel legacy helper.
-- [ ] Test Room versus pre-change implementation on synthetic fixture database snapshots, transactions, concurrent workers, cancellation and process termination. Remove superseded import-store helpers only after equivalence.
-- [ ] Repeat the above for ledger v1–v6, with source namespace, durable intent-before-calendar-insert and unknown-write recovery.
-- [ ] Run all app unit/lint/release tests and local Android 17 native provider/UI tests, including a real reinstall/upgrade with retained private DB files.
-- [ ] Record exact PR commit, ABI/API37, SHA256, test receipts and migration decision in one track checkpoint and close the old implementation.
-- [ ] If KSP/AGP or Room 3 incompatibility blocks build, retain working legacy stores and report the compatibility evidence instead of merging unverified persistence changes.
+[Specification](spec.md) · [GitHub issue #115](https://github.com/edithatogo/CallTrack/issues/115)
+
+## Preserving migration
+
+- [x] Use Room 3 and AndroidSQLiteDriver for both existing database files. Ledger schema 7 and import schema 3 preserve legacy ledger v1–v6 and import v1–v2.
+- [x] Export both Room schemas and independently match 154 added dependency checksums against canonical bytes. Keep strict Gradle verification.
+- [x] Add historical schema, injected-clock, rollback and retry, newer schema preservation, and uncertain-write coverage. The release-mode development-key upgrade uses synthetic data and a dedicated Android 17 emulator.
+
+The compatibility bridge retains the proven synchronous SQL transactions during the migration. Use [PR #121](https://github.com/edithatogo/CallTrack/pull/121) for the exact build, native tests and dependency evidence.
+
+## Remaining DAO work
+
+- [ ] Move the import and ledger queries to suspend DAOs while retaining transaction boundaries, namespace and cancellation behavior.
+- [ ] Repeat historical-file upgrade, concurrent delivery, process death, permission revocation, unknown-write recovery, and edit/deletion protection against the DAO implementation.
+- [ ] Remove the compatibility bridge after parity. Close Track 22 with the exact source and test receipts.
 
 ## Preserving migration corrections (2026-11-24)
 

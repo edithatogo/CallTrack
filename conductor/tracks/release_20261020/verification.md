@@ -11,7 +11,13 @@ physical-call, account-calendar and seven-day observation protocols. Review the
 remaining privacy, platform support and accessibility criteria before closing the
 track.
 
-## Latest recorded unsigned candidate — 2026-10-24
+## Android 17 unsigned baseline
+
+Two clean macOS builds and a cache-disabled Linux build produced byte-identical unsigned APKs for `f85b2f15d7a3caaa9a3941b6e91e74c085a84eaf`. Repeat the independent build check when freezing the next release candidate. [Baseline commit and receipts](https://github.com/edithatogo/CallTrack/pull/114) · [cold Linux reproduction](https://github.com/edithatogo/CallTrack/actions/runs/45245637176)
+
+A controlled outgoing call previously synced once to the dedicated Google calendar and passed independent readback and cleanup. Carry that baseline into candidate-bound physical-call and account-route acceptance, then start the seven-day observation after the prerequisites in the [release plan](plan.md) are met.
+
+## Historical unsigned candidate — 2026-10-24
 
 See [candidate qualification](current-candidate-qualification-20261024.md),
 [candidate evidence](candidate-build-evidence-20261024.json),

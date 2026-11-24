@@ -19,7 +19,7 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
 
     private val room =
         RoomPersistence.ledger(requireNotNull(context), requireNotNull(name), requireNotNull(clock))
-    private val adapter = RoomPersistence.adapter(room)
+    private val adapter by lazy { RoomPersistence.adapter(room) }
     val writableDatabase: RoomSqliteCompat
         get() = adapter
 

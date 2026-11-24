@@ -12,7 +12,7 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
     constructor(context: Context?) : this(context, "calltrack-imports.db")
 
     private val room = RoomPersistence.imports(requireNotNull(context), requireNotNull(name))
-    private val adapter = RoomPersistence.adapter(room)
+    private val adapter by lazy { RoomPersistence.adapter(room) }
     val writableDatabase: RoomSqliteCompat
         get() = adapter
 

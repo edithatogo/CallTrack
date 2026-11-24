@@ -220,5 +220,6 @@ internal object RoomPersistence {
             .build()
 
     fun adapter(database: RoomDatabase): RoomSqliteCompat =
-        RoomSqliteCompat(database.getSupportWrapper())
+        // Opening the database must surface migration failures before a caller can use it.
+        RoomSqliteCompat(database.getSupportWrapper()).also { it.getVersion() }
 }

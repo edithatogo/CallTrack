@@ -5,7 +5,7 @@
 - [~] **Track 6 — Kotlin native migration / retaining source contracts**: [Track](tracks/kotlin_20261020/index.md) — verify exact Android 17 source/release integration.
 - [~] **Track 5 — Android 17 release qualification**: [Track](tracks/release_20261020/index.md) — retain signing, physical call/account, preservation and distribution gates.
 - [~] **Track 14 — Native Jetpack Compose UI completion**: [Track](tracks/compose_app_20261021/index.md) — remove residual hybrid/custom controls only after Android 17 rendered parity; [issue #116](https://github.com/edithatogo/CallTrack/issues/116).
-- [~] **Track 22 — Room 3.0.3 preserving migration**: [Track](tracks/room3_android17_20261124/index.md) — migration not yet applied; old stores authoritative; [issue #115](https://github.com/edithatogo/CallTrack/issues/115).
+- [~] **Track 22 — Room 3.0.3 preserving migration**: [Track](tracks/room3_android17_20261124/index.md) — Room owns both preserved databases. Complete suspend DAO parity and remove the bridge. [issue #115](https://github.com/edithatogo/CallTrack/issues/115).
 
 ## Deferred: no active implementation or automatic CI
 

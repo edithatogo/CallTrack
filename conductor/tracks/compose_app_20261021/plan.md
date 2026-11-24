@@ -1,5 +1,11 @@
 # Plan: Jetpack Compose Android implementation
 
+## Current Android 17 work
+
+PR #118 removed the pre-API-30 insets fallback. The API 37 settings, imports, process recovery, accessibility and cleanup gates passed. [PR #118](https://github.com/edithatogo/CallTrack/pull/118) · [hosted evidence](https://github.com/edithatogo/CallTrack/actions/runs/45302537925)
+
+Use [issue #116](https://github.com/edithatogo/CallTrack/issues/116) for the remaining native Compose roots, standard controls, and removal of redundant UI and write paths. Prove rendered accessibility, process recovery, permission revocation and cleanup after each replacement. Audit the Gradle graph before retiring any dependency.
+
 ## Phase 1: Refresh mapping and requirements
 
 - [x] Task: Read prerequisite evidence and archived research; map behaviour, native APIs, dependencies and code ownership.

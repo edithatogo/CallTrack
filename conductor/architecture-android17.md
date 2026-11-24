@@ -20,13 +20,13 @@ flowchart TD
   UI --> W
 ```
 
-The diagram's Room node is the **selected migration target**, not a claim that the existing two SQLiteOpenHelper databases have been converted. Until migration passes, those original databases remain authoritative and must not be concurrently opened by a new Room writer. The approved replacement must use the current schema identities, names, source namespaces, receipt state and atomic ordering. **Never** invoke `fallbackToDestructiveMigration`, clear app data to retry, or replay an unknown calendar insertion.
+Room owns both existing database files. The preserving migrations retain their filenames, historical rows, source namespaces and atomic receipt ordering. **Never** invoke `fallbackToDestructiveMigration`, clear app data to retry, or replay an unknown calendar insertion.
 
 ## Runtime and dependency choices
 
 - Android `CallLog.Calls` and `CalendarContract` are the correct API boundary. No direct cloud connector unless a proved native-provider gap exists. The app does not need `INTERNET` permission for the first release.
 - WorkManager is the single durable scheduler. Keep generation checks, cancellation and explicit user activation.
-- **Room 3.0.3 stable** (`androidx.room3`, not the Room 2.x package) is selected for persistent application data. This requires the official **KSP** compiler and coroutine APIs. Start with the import-session store; migrate the receipt ledger only after v1–v6 and import v1–v2 fixture replay, uncertain-write, edit/delete, retention and shutdown/cancellation checks succeed. Preserve exact SQL and receipt semantics before deleting either old helper. KSP 2.3.12 and the existing Kotlin 2.4.21/AGP 9.3.1 stack are candidates until an exact graph/build qualification passes. Record verified versions in Gradle, not repeatedly in documents.
+- **Room 3.0.3** uses KSP, AndroidSQLiteDriver and the official SupportSQLite bridge. The bridge keeps the existing receipt and import transactions during the migration. [Track 22](tracks/room3_android17_20261124/plan.md) owns the move to suspend DAOs and bridge retirement.
 - Use standard Material 3 controls when they replace custom UI *and* preserve stable test/accessibility labels. The existing Compose app remains native; do not rewrite it into Views.
 - No Rust, Kotlin Multiplatform production module, cross-platform UI, Swift app or second writer in active builds.
 

@@ -281,10 +281,10 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
                     "CREATE TRIGGER release_migration_fault BEFORE UPDATE ON outbox "
                             + "BEGIN SELECT RAISE(ABORT,'synthetic migration fault'); END");
         }
-        try (SQLiteDatabase db = context().openOrCreateDatabase(database(7), 0, null)) {
+        try (SQLiteDatabase db = context().openOrCreateDatabase(database(8), 0, null)) {
             db.execSQL("CREATE TABLE sentinel (value TEXT)");
             db.execSQL("INSERT INTO sentinel VALUES ('must survive unsupported downgrade')");
-            db.setVersion(7);
+            db.setVersion(8);
         }
         seedHistoricalImport();
         assertEquals(14, events(destination));
@@ -359,6 +359,7 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
                 ledger.getWritableDatabase();
                 fail("Fault must abort migration");
             } catch (SQLiteException expected) {
+                assertTrue(expected.getMessage().contains("synthetic migration fault"));
             }
         }
         try (SQLiteDatabase db = context().openOrCreateDatabase(name, 0, null)) {
@@ -377,16 +378,17 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
 
     @Test
     public void unsupportedNewerSchemaIsPreserved() {
-        try (SqliteLedger ledger = new SqliteLedger(context(), database(7))) {
+        try (SqliteLedger ledger = new SqliteLedger(context(), database(8))) {
             try {
                 ledger.getWritableDatabase();
                 fail("No blind schema downgrade");
-            } catch (SQLiteException expected) {
+            } catch (IllegalStateException expected) {
+                assertTrue(expected.getMessage().contains("A migration from 8 to 7 was required"));
             }
         }
-        try (SQLiteDatabase db = context().openOrCreateDatabase(database(7), 0, null);
+        try (SQLiteDatabase db = context().openOrCreateDatabase(database(8), 0, null);
                 Cursor row = db.rawQuery("SELECT value FROM sentinel", null)) {
-            assertEquals(7, db.getVersion());
+            assertEquals(8, db.getVersion());
             assertTrue(row.moveToFirst());
             assertEquals("must survive unsupported downgrade", row.getString(0));
         }
