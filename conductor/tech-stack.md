@@ -5,7 +5,7 @@
 ## Toolchain and Android dependencies — 2026-11-24
 
 The active app and cold Linux release gate select Temurin JDK 25.0.5.1+2,
-Gradle 9.7.0, AGP 9.3.1 and Kotlin/Compose compiler 2.4.21. AGP supplies the
+Gradle 9.9.2, AGP 9.3.1 and Kotlin/Compose compiler 2.4.21. AGP supplies the
 app's Kotlin plugin and the first-party Kotlin Multiplatform Android library
 plugin was used by a historical shared module (no longer in the active app). The upstream comparison fixtures retain
 their JDK 11 and JDK 17 runtimes.
@@ -16,22 +16,31 @@ UI acceptance is API37. Prior API26/33/36 evidence is archival; the Android 17.2
 16 KB emulator is the current native acceptance target. The
 [runtime audit](tracks/release_20261020/canonical-runtime-audit-20261124.json)
 and [source inventory](../qualification/release/runtime-sources.json) bind
-91 runtime artifacts to their canonical publications.
+77 runtime artifacts to their canonical publications.
 
-Renovate proposes AGP 9.5.2 and Gradle 9.9.2, above the fully supported
-range for Kotlin 2.4.21. The Android and multiplatform plugins use AGP
-9.3.1 with Gradle 9.7.0. The Actions proposal covers the pinned Ubuntu
-runner images and the historical JDK 17 comparison fixture. The app and
-release gate use JDK 25. The pinned actionlint rejects the explicit
-Ubuntu 26.04 runner label. [Renovate dashboard](https://github.com/edithatogo/CallTrack/issues/91),
-[Kotlin compatibility range](https://kotlinlang.org/docs/gradle-configure-project.html),
-[actionlint runner-label support](https://github.com/rhysd/actionlint/pull/683).
+The dependency dashboard update selects Gradle 9.9.2 for its security fixes.
+That release exceeds Kotlin 2.4.21's fully supported Gradle range. With AGP
+9.3.1, it passed strict debug assembly, instrumentation assembly, unit tests,
+Android lint, and the retained Compose and JVM prototype checks. The Lifecycle
+lint detector also rejected a deliberately invalid fixture.
 
-Strict dependency resolution found the Netty 4.1.141 BOM as the only Netty
-entry in the root buildscript and release runtime graphs. The proposed 4.2
-BOM offers no runtime update for this graph. CallTrack uses the Android
-Calendar and CallLog providers, WorkManager for scheduling, and SQLite
-for durable receipts and recovery.
+AGP 9.5.2 requires Lint 9.5.2 or newer and rejected the qualified Lint 9.3.3
+pin during plugin application. The earlier Lint 9.5.2 qualification skipped the
+Lifecycle registry, so the app and both Android prototype plugins use AGP
+9.3.1 until a newer combination preserves those checks. The explicit GitHub
+runner image is Ubuntu 26.04 with a checksum-pinned actionlint runner-label
+backport. [Renovate dashboard](https://github.com/edithatogo/CallTrack/issues/91) ·
+[Kotlin compatibility](https://kotlinlang.org/docs/gradle-configure-project.html) ·
+[Lint qualification](tracks/release_20261020/build-security-20261123.md) ·
+[GitHub runner release](https://github.blog/changelog/2026-09-17-ubuntu-26-generally-available-and-latest-migration/)
+
+AndroidX Tracing 2.0.5 retains the existing app constraint. The release audit
+matched the selected 77 runtime artifacts to their published bytes, and the
+source inventory covers those exact artifacts. The root buildscript Netty BOM
+was removed after strict resolution confirmed that no buildscript or release
+runtime library selected Netty. CallTrack uses Android Calendar and CallLog
+providers, WorkManager for scheduling, and SQLite for durable receipts and
+recovery.
 
 ## Dependency refresh — 2026-10-23
 

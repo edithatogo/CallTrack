@@ -9,7 +9,7 @@ CallTrack is a GPL-3.0 development fork of AndroidCallLogSync. Its active produc
 
 ## Build and qualification
 
-Use the versions in `app/build.gradle`, `gradle/wrapper/gradle-wrapper.properties` and `.python-version` as the authoritative selections. At this checkpoint the application expects Temurin JDK 25, Android SDK platform 37.1, Gradle 9.7.0 and Kotlin 2.4.21.
+Use the versions in `app/build.gradle`, `gradle/wrapper/gradle-wrapper.properties` and `.python-version` as the authoritative selections. At this checkpoint the application expects Temurin JDK 25, Android SDK platform 37.1, Gradle 9.9.2 and Kotlin 2.4.21.
 
 ```sh
 uv venv --python "$(cat .python-version)" .venv

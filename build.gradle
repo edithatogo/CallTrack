@@ -6,7 +6,6 @@ buildscript {
     }
     dependencies {
         // Minimum patched versions for build-time transitives; newer selections remain allowed.
-        classpath platform('io.netty:netty-bom:4.1.141.Final')
         constraints {
             classpath('com.google.guava:guava:33.8.0-jre')
             classpath('org.apache.commons:commons-compress:1.28.0')
