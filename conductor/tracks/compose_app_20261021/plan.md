@@ -6,6 +6,8 @@ PR #118 removed the pre-API-30 insets fallback. The API 37 settings, imports, pr
 
 Use [issue #116](https://github.com/edithatogo/CallTrack/issues/116) for the remaining native Compose roots, standard controls, and removal of redundant UI and write paths. Prove rendered accessibility, process recovery, permission revocation and cleanup after each replacement. Audit the Gradle graph before retiring any dependency.
 
+The current implementation uses the existing Compose BOM's Material 3 controls and one lifecycle-bound Compose root per Activity. Keep the Activity-owned effects and use the existing rendered suites to qualify the replacements. Compare the resolved runtime graph before and after removing View libraries, and preserve legacy receipts through the durable delivery tests.
+
 ## Phase 1: Refresh mapping and requirements
 
 - [x] Task: Read prerequisite evidence and archived research; map behaviour, native APIs, dependencies and code ownership.

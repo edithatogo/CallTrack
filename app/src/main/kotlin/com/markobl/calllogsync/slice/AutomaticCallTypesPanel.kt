@@ -1,19 +1,17 @@
 package com.markobl.calllogsync.slice
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.foundation.text.BasicText
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -23,11 +21,7 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.markobl.calllogsync.R
 
 internal data class AutomaticCallTypesUiState(
     val incoming: Boolean = true,
@@ -61,11 +55,11 @@ internal fun AutomaticCallTypesPanel(
 }
 
 @Composable
-private fun CallTypeOption(
+internal fun CallTypeOption(
     tag: String,
     label: String,
     checked: Boolean,
-    enabled: Boolean,
+    enabled: Boolean = true,
     onCheckedChange: (Boolean) -> Unit,
 ) {
     Row(
@@ -81,22 +75,15 @@ private fun CallTypeOption(
                 .clearAndSetSemantics {
                     testTagsAsResourceId = true
                     testTag = tag
-                    contentDescription = label
                     role = Role.Checkbox
                     toggleableState = if (checked) ToggleableState.On else ToggleableState.Off
+                    contentDescription = label
                 }
                 .padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        androidx.compose.foundation.layout.Box(
-            modifier = Modifier.size(24.dp).border(1.dp, colorResource(R.color.purple_500)),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (checked) {
-                BasicText("✓", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold))
-            }
-        }
-        BasicText(label)
+        Checkbox(checked = checked, onCheckedChange = null, enabled = enabled)
+        Text(label)
     }
 }

@@ -5,18 +5,13 @@ import static org.junit.Assert.*;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.SystemClock;
 import android.view.accessibility.AccessibilityNodeInfo;
-import android.widget.*;
 
-import androidx.compose.ui.platform.ComposeView;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.markobl.calllogsync.R;
 
 import org.junit.Test;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Activity state contracts only; no permission dialog, provider data or automatic activation. */
 public class AutomaticSettingsTest {
@@ -32,25 +27,11 @@ public class AutomaticSettingsTest {
                         new Intent(context, AutomaticSettingsActivity.class)
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         try {
-            AtomicBoolean ready = new AtomicBoolean();
-            long deadline = SystemClock.elapsedRealtime() + 10000;
-            do {
-                instrumentation.runOnMainSync(() ->
-                        ready.set(
-                                activity.findViewById(R.id.auto_state)
-                                        instanceof androidx.compose.ui.platform.ComposeView));
-                if (ready.get()) break;
-                SystemClock.sleep(50);
-            } while (SystemClock.elapsedRealtime() < deadline);
-            assertTrue("Compose settings status host did not initialize", ready.get());
-            assertTrue(activity.findViewById(R.id.auto_intro_panel) instanceof ComposeView);
-            assertTrue(activity.findViewById(R.id.auto_permissions) instanceof ComposeView);
-            assertTrue(
-                    activity.findViewById(R.id.auto_calendar_picker_panel) instanceof ComposeView);
-            assertTrue(activity.findViewById(R.id.auto_actions) instanceof ComposeView);
-            assertTrue(activity.findViewById(R.id.auto_navigation) instanceof ComposeView);
-            assertTrue(activity.findViewById(R.id.auto_call_types) instanceof ComposeView);
+            RenderedUi.assertComposeRoot(instrumentation, activity);
             RenderedUi rendered = new RenderedUi(instrumentation);
+            rendered.await(
+                    () -> rendered.shown("auto_state", true) != null,
+                    "Automatic settings status did not render");
             assertNotNull(rendered.shown("auto_intro_text", true));
             assertNotNull(rendered.shown(context.getString(R.string.auto_intro), false));
             assertNotNull(rendered.shown("auto_access_action", true));
@@ -97,18 +78,11 @@ public class AutomaticSettingsTest {
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         try {
             RenderedUi rendered = new RenderedUi(instrumentation);
-            assertTrue(
-                    activity.findViewById(R.id.import_summary)
-                            instanceof androidx.compose.ui.platform.ComposeView);
-            assertTrue(
-                    activity.findViewById(R.id.import_actions)
-                            instanceof androidx.compose.ui.platform.ComposeView);
-            assertTrue(
-                    activity.findViewById(R.id.import_filters)
-                            instanceof androidx.compose.ui.platform.ComposeView);
-            assertTrue(
-                    activity.findViewById(R.id.import_history)
-                            instanceof androidx.compose.ui.platform.ComposeView);
+            RenderedUi.assertComposeRoot(instrumentation, activity);
+            assertNotNull(rendered.shown("import_summary_text", true));
+            assertFalse(rendered.shown("import_create", true).isEnabled());
+            assertNotNull(rendered.shown("import_from", true));
+            assertNotNull(rendered.shown("import_to", true));
             rendered.revealId("import_history_empty");
             assertNotNull(rendered.find(context.getString(R.string.import_empty_history), false));
             try (SqliteImportStore store = new SqliteImportStore(context)) {
@@ -135,8 +109,7 @@ public class AutomaticSettingsTest {
             ui.await(
                     () -> ui.shown("recovery_empty_message", true) != null,
                     "Recovery empty state did not render after the query");
-            assertTrue(activity.findViewById(R.id.recovery_empty) instanceof ComposeView);
-            assertTrue(activity.findViewById(R.id.recovery_access_panel) instanceof ComposeView);
+            RenderedUi.assertComposeRoot(instrumentation, activity);
             ui.await(
                     () -> ui.shown("recovery_access_action", true) != null,
                     "Recovery access action did not render");

@@ -1,7 +1,7 @@
 package com.markobl.calllogsync.slice
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.text.BasicText
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -12,7 +12,7 @@ import androidx.compose.ui.semantics.semantics
 @Composable
 internal fun RecoveryStatusPanel(feedback: String) {
     if (feedback.isNotEmpty()) {
-        BasicText(
+        Text(
             text = feedback,
             modifier =
                 Modifier.fillMaxWidth()

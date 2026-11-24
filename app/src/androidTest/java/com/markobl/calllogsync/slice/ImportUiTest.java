@@ -100,7 +100,7 @@ public class ImportUiTest {
         ui.tapId("import_create");
         ui.await(() -> phase(HistoricalImport.Phase.PREVIEW), "Read-only preview did not complete");
         assertEquals(3, latest().count);
-        ui.revealId("import_summary");
+        ui.revealId("import_summary_text");
     }
 
     private void confirm(RenderedUi ui) {
@@ -115,7 +115,7 @@ public class ImportUiTest {
                 latest().calendar);
         assertEquals(3, latest().saved);
         assertEquals(0, latest().review);
-        ui.revealId("import_summary");
+        ui.revealId("import_summary_text");
     }
 
     @Test
@@ -290,7 +290,7 @@ public class ImportUiTest {
             ui.tapDialogPositive();
             ui.await(() -> phase(HistoricalImport.Phase.CANCELLED), "Cancel not persisted");
             assertEquals(0, fixture.events(calendar()));
-            ui.revealId("import_summary");
+            ui.revealId("import_summary_text");
             ui.capture("import-cancelled");
             ui.dismissKeyboard();
             ui.revealId("import_create");
@@ -366,7 +366,7 @@ public class ImportUiTest {
             assertEquals(HistoricalImport.Phase.CONFIRMED, latest().phase);
             assertEquals(1, latest().saved);
             assertEquals(4, fixture.events(calendar()));
-            ui.revealId("import_summary");
+            ui.revealId("import_summary_text");
             ui.capture("import-persisted-partial");
             ui.revealId("import_stop");
             ui.tapId("import_continue");
@@ -382,7 +382,7 @@ public class ImportUiTest {
             assertEquals(HistoricalImport.Phase.CONFIRMED, stopped.phase);
             assertTrue(stopped.saved >= 2 && stopped.saved < PARTIAL_COUNT);
             assertEquals(3 + stopped.saved, fixture.events(calendar()));
-            ui.revealId("import_summary");
+            ui.revealId("import_summary_text");
             ui.capture("import-user-stopped-partial");
             close(instrumentation, activity);
             activity = open(instrumentation);
@@ -404,7 +404,7 @@ public class ImportUiTest {
             assertTrue(
                     "Only the interrupted boundary may need conservative review", done.review <= 1);
             assertEquals(3 + done.saved, fixture.events(calendar()));
-            ui.revealId("import_summary");
+            ui.revealId("import_summary_text");
             ui.capture("import-resumed-complete");
             ui.await(
                     () ->
@@ -476,7 +476,7 @@ public class ImportUiTest {
             assertEquals(0, latest().saved);
             assertEquals(0, fixture.events(removed));
             assertEquals(remainingEvents, fixture.events(calendar()));
-            ui.revealId("import_summary");
+            ui.revealId("import_summary_text");
             ui.capture("import-destination-removed");
         }
     }

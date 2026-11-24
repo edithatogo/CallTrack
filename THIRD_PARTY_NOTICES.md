@@ -22,22 +22,23 @@ JDK or Gradle distributions with an app/source release by default.
 
 | Runtime coordinate | Licence declaration |
 |---|---|
+| androidx.activity:activity-compose:1.13.0 | Apache-2.0 |
 | androidx.activity:activity-ktx:1.13.0 | Apache-2.0 |
 | androidx.activity:activity:1.13.0 | Apache-2.0 |
 | androidx.annotation:annotation-experimental:1.4.1 | Apache-2.0 |
 | androidx.annotation:annotation-jvm:1.10.0 | Apache-2.0 |
-| androidx.appcompat:appcompat-resources:1.8.0 | Apache-2.0 |
-| androidx.appcompat:appcompat:1.8.0 | Apache-2.0 |
 | androidx.arch.core:core-common:2.2.0 | Apache-2.0 |
 | androidx.arch.core:core-runtime:2.2.0 | Apache-2.0 |
 | androidx.autofill:autofill:1.0.0 | Apache-2.0 |
-| androidx.cardview:cardview:1.0.0 | Apache-2.0 |
 | androidx.collection:collection-jvm:1.6.0 | Apache-2.0 |
 | androidx.collection:collection-ktx:1.6.0 | Apache-2.0 |
 | androidx.compose.animation:animation-android:1.13.0 | Apache-2.0 |
 | androidx.compose.animation:animation-core-android:1.13.0 | Apache-2.0 |
 | androidx.compose.foundation:foundation-android:1.13.0 | Apache-2.0 |
 | androidx.compose.foundation:foundation-layout-android:1.13.0 | Apache-2.0 |
+| androidx.compose.material3:material3-android:1.5.0 | Apache-2.0 |
+| androidx.compose.material3:material3-ripple-android:1.5.0 | Apache-2.0 |
+| androidx.compose.material:material-ripple-android:1.13.0 | Apache-2.0 |
 | androidx.compose.runtime:runtime-android:1.13.0 | Apache-2.0 |
 | androidx.compose.runtime:runtime-annotation-android:1.13.0 | Apache-2.0 |
 | androidx.compose.runtime:runtime-retain-android:1.13.0 | Apache-2.0 |
@@ -50,23 +51,15 @@ JDK or Gradle distributions with an app/source release by default.
 | androidx.compose.ui:ui-util-android:1.13.0 | Apache-2.0 |
 | androidx.concurrent:concurrent-futures-ktx:1.1.0 | Apache-2.0 |
 | androidx.concurrent:concurrent-futures:1.1.0 | Apache-2.0 |
-| androidx.constraintlayout:constraintlayout-core:1.1.2 | Apache-2.0 |
-| androidx.constraintlayout:constraintlayout:2.2.2 | Apache-2.0 |
-| androidx.coordinatorlayout:coordinatorlayout:1.1.0 | Apache-2.0 |
 | androidx.core:core-ktx:1.19.0 | Apache-2.0 |
 | androidx.core:core-viewtree:1.0.0 | Apache-2.0 |
 | androidx.core:core:1.19.0 | Apache-2.0 |
-| androidx.cursoradapter:cursoradapter:1.0.0 | Apache-2.0 |
 | androidx.customview:customview-poolingcontainer:1.0.0 | Apache-2.0 |
-| androidx.customview:customview:1.2.0 | Apache-2.0 |
-| androidx.drawerlayout:drawerlayout:1.1.1 | Apache-2.0 |
-| androidx.dynamicanimation:dynamicanimation:1.1.0 | Apache-2.0 |
-| androidx.emoji2:emoji2-views-helper:1.7.0 | Apache-2.0 |
 | androidx.emoji2:emoji2:1.7.0 | Apache-2.0 |
-| androidx.fragment:fragment:1.9.1 | Apache-2.0 |
 | androidx.graphics:graphics-path:1.1.0 | Apache-2.0 |
 | androidx.graphics:graphics-shapes-android:1.0.1 | Apache-2.0 |
 | androidx.interpolator:interpolator:1.0.0 | Apache-2.0 |
+| androidx.lifecycle:lifecycle-common-java8:2.11.1 | Apache-2.0 |
 | androidx.lifecycle:lifecycle-common-jvm:2.11.1 | Apache-2.0 |
 | androidx.lifecycle:lifecycle-livedata-core-ktx:2.11.1 | Apache-2.0 |
 | androidx.lifecycle:lifecycle-livedata-core:2.11.1 | Apache-2.0 |
@@ -79,12 +72,9 @@ JDK or Gradle distributions with an app/source release by default.
 | androidx.lifecycle:lifecycle-viewmodel-android:2.11.1 | Apache-2.0 |
 | androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.1 | Apache-2.0 |
 | androidx.lifecycle:lifecycle-viewmodel-savedstate-android:2.11.1 | Apache-2.0 |
-| androidx.lifecycle:lifecycle-viewmodel:2.11.1 | Apache-2.0 |
-| androidx.loader:loader:1.0.0 | Apache-2.0 |
 | androidx.navigationevent:navigationevent-android:1.1.0 | Apache-2.0 |
+| androidx.navigationevent:navigationevent-compose-android:1.1.0 | Apache-2.0 |
 | androidx.profileinstaller:profileinstaller:1.4.0 | Apache-2.0 |
-| androidx.recyclerview:recyclerview:1.4.0 | Apache-2.0 |
-| androidx.resourceinspection:resourceinspection-annotation:1.0.1 | Apache-2.0 |
 | androidx.room:room-common-jvm:2.7.0 | Apache-2.0 |
 | androidx.room:room-runtime-android:2.7.0 | Apache-2.0 |
 | androidx.savedstate:savedstate-android:1.5.0 | Apache-2.0 |
@@ -95,17 +85,10 @@ JDK or Gradle distributions with an app/source release by default.
 | androidx.startup:startup-runtime:1.1.1 | Apache-2.0 |
 | androidx.tracing:tracing-android:2.0.0 | Apache-2.0 |
 | androidx.tracing:tracing-ktx:2.0.0 | Apache-2.0 |
-| androidx.transition:transition:1.7.2 | Apache-2.0 |
-| androidx.vectordrawable:vectordrawable-animated:1.1.0 | Apache-2.0 |
-| androidx.vectordrawable:vectordrawable:1.1.0 | Apache-2.0 |
 | androidx.versionedparcelable:versionedparcelable:1.1.1 | Apache-2.0 |
-| androidx.viewpager2:viewpager2:1.1.0-beta02 | Apache-2.0 |
-| androidx.viewpager:viewpager:1.0.0 | Apache-2.0 |
 | androidx.window:window-core-android:1.5.0 | Apache-2.0 |
 | androidx.window:window:1.5.0 | Apache-2.0 |
 | androidx.work:work-runtime:2.12.0 | Apache-2.0 |
-| com.google.android.material:material:1.14.0 | Apache-2.0 |
-| com.google.errorprone:error_prone_annotations:2.15.0 | Apache-2.0 |
 | com.google.guava:listenablefuture:1.0 | Apache-2.0 (parent POM and source header) |
 | org.jetbrains.kotlin:kotlin-stdlib:2.4.21 | Apache-2.0 |
 | org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0 | Apache-2.0 |

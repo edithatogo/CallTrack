@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.BasicText
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -32,13 +32,13 @@ internal fun ManualLogPanel(state: ManualLogUiState, onLogLatest: () -> Unit) {
             },
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        ComposeActionButton(
+        ActionButton(
             label = state.logLabel,
             tag = "slice_log_latest",
             enabled = state.actionEnabled,
             onClick = onLogLatest,
         )
-        BasicText(
+        Text(
             text = state.status,
             modifier =
                 Modifier.fillMaxWidth()

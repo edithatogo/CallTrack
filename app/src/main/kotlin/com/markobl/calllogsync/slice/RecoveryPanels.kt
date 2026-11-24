@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.BasicText
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -17,19 +17,19 @@ import androidx.compose.ui.unit.dp
 @Composable
 internal fun RecoveryEmptyPanel(visible: Boolean, message: String) {
     Column(modifier = Modifier.fillMaxWidth().semantics { testTagsAsResourceId = true }) {
-        if (visible) BasicText(message, modifier = Modifier.testTag("recovery_empty_message"))
+        if (visible) Text(message, modifier = Modifier.testTag("recovery_empty_message"))
     }
 }
 
 @Composable
 internal fun RecoveryCopyPanel(text: String, tag: String) {
-    BasicText(text = text, modifier = Modifier.fillMaxWidth().testTag(tag))
+    Text(text = text, modifier = Modifier.fillMaxWidth().testTag(tag))
 }
 
 @Composable
 internal fun RecoveryAccessPanel(label: String, onRequestAccess: () -> Unit) {
     Column(Modifier.fillMaxWidth().semantics { testTagsAsResourceId = true }) {
-        ComposeActionButton(
+        ActionButton(
             label = label,
             tag = "recovery_access_action",
             enabled = true,
@@ -56,7 +56,7 @@ internal data class RecoveryNavigationUiState(
 @Composable
 internal fun RecoveryRefreshPanel(busy: Boolean, refreshLabel: String, onRefresh: () -> Unit) {
     Column(Modifier.fillMaxWidth().semantics { testTagsAsResourceId = true }) {
-        ComposeActionButton(
+        ActionButton(
             label = refreshLabel,
             tag = "recovery_refresh_action",
             enabled = !busy,
@@ -68,7 +68,7 @@ internal fun RecoveryRefreshPanel(busy: Boolean, refreshLabel: String, onRefresh
 @Composable
 internal fun RecoveryRetentionPanel(busy: Boolean, label: String, onExpire: () -> Unit) {
     Column(Modifier.fillMaxWidth().semantics { testTagsAsResourceId = true }) {
-        ComposeActionButton(
+        ActionButton(
             label = label,
             tag = "recovery_retention_action",
             enabled = !busy,
@@ -99,27 +99,27 @@ internal fun RecoveryCardsPanel(
                 modifier = Modifier.fillMaxWidth().testTag("recovery_card_${card.token}"),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                BasicText(
+                Text(
                     text = card.detail,
                     modifier =
                         Modifier.fillMaxWidth()
                             .padding(vertical = 8.dp)
                             .testTag("recovery_detail_${card.token}"),
                 )
-                ComposeActionButton(
+                ActionButton(
                     label = checkLabel,
                     tag = "recovery_check_${card.token}",
                     enabled = !busy && card.checkEnabled,
                     onClick = { onCheck(card.token) },
                 )
-                ComposeActionButton(
+                ActionButton(
                     label = suppressLabel,
                     tag = "recovery_suppress_${card.token}",
                     enabled = !busy && card.suppressEnabled,
                     onClick = { onSuppress(card.token) },
                 )
                 if (card.reapproveVisible) {
-                    ComposeActionButton(
+                    ActionButton(
                         label = reapproveLabel,
                         tag = "recovery_reapprove_${card.token}",
                         enabled = !busy,
@@ -127,7 +127,7 @@ internal fun RecoveryCardsPanel(
                     )
                 }
                 if (card.openEventVisible) {
-                    ComposeActionButton(
+                    ActionButton(
                         label = openEventLabel,
                         tag = "recovery_open_event_${card.token}",
                         enabled = true,
@@ -155,7 +155,7 @@ internal fun RecoveryNavigationPanel(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Box(Modifier.weight(1f)) {
-            ComposeActionButton(
+            ActionButton(
                 previousLabel,
                 "recovery_previous_action",
                 enabled = !state.busy && state.previousEnabled,
@@ -163,7 +163,7 @@ internal fun RecoveryNavigationPanel(
             )
         }
         Box(Modifier.weight(1f)) {
-            ComposeActionButton(
+            ActionButton(
                 moreLabel,
                 "recovery_more_action",
                 enabled = !state.busy && state.moreEnabled,

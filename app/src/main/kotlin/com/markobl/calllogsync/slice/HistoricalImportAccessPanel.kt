@@ -10,7 +10,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 @Composable
 internal fun HistoricalImportAccessPanel(label: String, onRequestAccess: () -> Unit) {
     Column(Modifier.fillMaxWidth().semantics { testTagsAsResourceId = true }) {
-        ComposeActionButton(
+        ActionButton(
             label = label,
             tag = "import_access_action",
             enabled = true,

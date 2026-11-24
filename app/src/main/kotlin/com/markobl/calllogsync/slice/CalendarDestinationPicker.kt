@@ -3,7 +3,7 @@ package com.markobl.calllogsync.slice
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.text.BasicText
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,7 +39,7 @@ internal fun CalendarDestinationPicker(
         modifier = Modifier.fillMaxWidth().semantics { testTagsAsResourceId = true },
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        ComposeActionButton(
+        ActionButton(
             label = label,
             tag = "${tagPrefix}_picker",
             enabled = state.enabled && state.options.isNotEmpty(),
@@ -51,7 +51,7 @@ internal fun CalendarDestinationPicker(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 state.options.forEachIndexed { index, option ->
-                    ComposeActionButton(
+                    ActionButton(
                         label = option.label,
                         tag = "${tagPrefix}_option_$index",
                         enabled = optionsEnabled,
@@ -64,7 +64,7 @@ internal fun CalendarDestinationPicker(
             }
         }
         if (state.options.isEmpty() && unavailableLabel != null) {
-            BasicText(unavailableLabel, modifier = Modifier.testTag("${tagPrefix}_unavailable"))
+            Text(unavailableLabel, modifier = Modifier.testTag("${tagPrefix}_unavailable"))
         }
     }
 }

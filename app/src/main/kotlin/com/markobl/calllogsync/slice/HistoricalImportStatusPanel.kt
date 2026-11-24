@@ -3,7 +3,7 @@ package com.markobl.calllogsync.slice
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.text.BasicText
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -24,7 +24,7 @@ internal fun HistoricalImportStatusPanel(state: HistoricalImportStatusUiState) {
 
 @Composable
 internal fun HistoricalImportSummaryText(text: String) {
-    BasicText(
+    Text(
         text = text,
         modifier =
             Modifier.fillMaxWidth()
@@ -36,7 +36,7 @@ internal fun HistoricalImportSummaryText(text: String) {
 @Composable
 internal fun HistoricalImportFeedbackText(text: String) {
     if (text.isNotEmpty()) {
-        BasicText(
+        Text(
             text = text,
             modifier =
                 Modifier.fillMaxWidth()

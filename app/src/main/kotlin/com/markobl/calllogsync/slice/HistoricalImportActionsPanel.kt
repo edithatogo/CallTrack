@@ -28,7 +28,7 @@ internal fun HistoricalImportCreateActionPanel(
     onCreate: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth().semantics { testTagsAsResourceId = true }) {
-        ComposeActionButton(
+        ActionButton(
             label = label,
             tag = "import_create",
             enabled = state.createEnabled,
@@ -56,10 +56,10 @@ internal fun HistoricalImportRunActionsPanel(
             },
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        ComposeActionButton(continueLabel, "import_continue", state.continueEnabled, onContinue)
-        ComposeActionButton(confirmLabel, "import_confirm", state.confirmEnabled, onConfirm)
-        ComposeActionButton(stopLabel, "import_stop", state.stopEnabled, onStop)
-        ComposeActionButton(cancelLabel, "import_cancel", state.cancelEnabled, onCancel)
+        ActionButton(continueLabel, "import_continue", state.continueEnabled, onContinue)
+        ActionButton(confirmLabel, "import_confirm", state.confirmEnabled, onConfirm)
+        ActionButton(stopLabel, "import_stop", state.stopEnabled, onStop)
+        ActionButton(cancelLabel, "import_cancel", state.cancelEnabled, onCancel)
     }
 }
 
@@ -79,10 +79,10 @@ internal fun HistoricalImportPaginationPanel(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         androidx.compose.foundation.layout.Box(Modifier.weight(1f)) {
-            ComposeActionButton(newerLabel, "import_newer", state.newerEnabled, onNewer)
+            ActionButton(newerLabel, "import_newer", state.newerEnabled, onNewer)
         }
         androidx.compose.foundation.layout.Box(Modifier.weight(1f)) {
-            ComposeActionButton(olderLabel, "import_older", state.olderEnabled, onOlder)
+            ActionButton(olderLabel, "import_older", state.olderEnabled, onOlder)
         }
     }
 }

@@ -7,7 +7,6 @@ import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
 
-import androidx.compose.ui.platform.ComposeView;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.markobl.calllogsync.R;
@@ -56,9 +55,7 @@ public class HistoricalImportHistoryActivityTest {
                     instrumentation.startActivitySync(
                             new Intent(context, HistoricalImportActivity.class)
                                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-            assertTrue(
-                    "Historical session host must be a ComposeView",
-                    activity.findViewById(R.id.import_history) instanceof ComposeView);
+            RenderedUi.assertComposeRoot(instrumentation, activity);
             String range = fromDate + " → " + toDate + " (UTC)";
             String row =
                     context.getString(

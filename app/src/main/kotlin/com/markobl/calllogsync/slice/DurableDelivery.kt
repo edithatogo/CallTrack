@@ -195,6 +195,9 @@ class DurableDelivery(private val store: Store?, private val sink: SliceEngine.C
             )
     }
 
+    internal fun writableDestination(calendar: Long): Boolean =
+        calendar >= 0 && sink!!.writable(calendar)
+
     fun previouslyConfirmed(key: String?, calendar: Long): Boolean =
         synchronized(DELIVERY_LOCK) {
             val prior = store!!.get(key, calendar)
@@ -218,8 +221,7 @@ class DurableDelivery(private val store: Store?, private val sink: SliceEngine.C
         synchronized(DELIVERY_LOCK) {
             try {
                 if (!allowed!!.asBoolean) return Result.PAUSED
-                if (calendar < 0 || !sink!!.writable(calendar))
-                    return Result.DESTINATION_UNAVAILABLE
+                if (!writableDestination(calendar)) return Result.DESTINATION_UNAVAILABLE
                 val signature = CallIdentity.signature(call)
                 val source = call!!
                 var intent = store!!.get(source.key(), calendar)
@@ -276,8 +278,7 @@ class DurableDelivery(private val store: Store?, private val sink: SliceEngine.C
         synchronized(DELIVERY_LOCK) {
             try {
                 if (!allowed!!.asBoolean) return Result.PAUSED
-                if (calendar < 0 || !sink!!.writable(calendar))
-                    return Result.DESTINATION_UNAVAILABLE
+                if (!writableDestination(calendar)) return Result.DESTINATION_UNAVAILABLE
                 val intent = store!!.get(key, calendar) ?: return Result.NOTHING_PENDING
                 if (!sameOperation(intent.operation, operation)) return Result.PAUSED
                 attempt(intent, allowed)
