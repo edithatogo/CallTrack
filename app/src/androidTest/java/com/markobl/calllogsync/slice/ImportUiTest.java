@@ -291,9 +291,14 @@ public class ImportUiTest {
             ui.tapId("import_confirm");
             ui.capture("import-confirmation-preview");
             ui.tapId("button2");
+            ui.await(
+                    () -> ui.find("calltrack_screen", true) != null,
+                    "Import screen did not regain its active window after confirmation");
             assertEquals(HistoricalImport.Phase.PREVIEW, latest().phase);
             assertEquals(0, fixture.events(calendar()));
-            // The end field can retain focus when the confirmation dismisses its keyboard.
+            // Dismissing the dialog can restore the end field and its keyboard.
+            ui.dismissKeyboard();
+            ui.revealId("import_from");
             ui.tapId("import_from");
             ui.await(
                     () -> {
