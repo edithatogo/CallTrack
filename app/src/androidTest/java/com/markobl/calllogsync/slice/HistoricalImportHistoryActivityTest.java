@@ -83,7 +83,7 @@ public class HistoricalImportHistoryActivityTest {
                 instrumentation.runOnMainSync(launched::finish);
             }
             try (SqliteImportStore store = new SqliteImportStore(context)) {
-                store.getWritableDatabase().delete("sessions", "id=?", new String[] {id});
+                RoomFixtures.execute(store, "DELETE FROM sessions WHERE id=?", id);
                 assertNull(store.get(id));
             }
         }

@@ -2,17 +2,14 @@ package com.markobl.calllogsync.slice
 
 import android.content.Context
 import androidx.room3.ColumnInfo
-import androidx.room3.Dao
 import androidx.room3.Database
 import androidx.room3.Entity
 import androidx.room3.ForeignKey
 import androidx.room3.Index
 import androidx.room3.PrimaryKey
-import androidx.room3.Query
 import androidx.room3.Room
 import androidx.room3.RoomDatabase
 import androidx.room3.migration.Migration
-import androidx.room3.support.getSupportWrapper
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.driver.AndroidSQLiteDriver
 import androidx.sqlite.execSQL
@@ -94,16 +91,6 @@ internal data class ImportCandidateRow(
     val outcome: String?,
 )
 
-@Dao
-internal interface RoomLedgerDao {
-    @Query("SELECT COUNT(*) FROM outbox") suspend fun outboxCount(): Long
-}
-
-@Dao
-internal interface RoomImportDao {
-    @Query("SELECT COUNT(*) FROM sessions") suspend fun sessionCount(): Long
-}
-
 @Database(
     entities = [ReceiptRow::class, OutboxRow::class, ScanCursorRow::class],
     version = 7,
@@ -122,11 +109,7 @@ internal abstract class RoomImportDatabase : RoomDatabase() {
     abstract fun importDao(): RoomImportDao
 }
 
-/**
- * One Room owner per physical database. Room's official SupportSQLite bridge is temporary: it lets
- * the pre-existing, qualified receipt state machine keep its exact SQL and transaction boundaries
- * until its queries become suspend DAOs.
- */
+/** One Room owner per physical database, including its installed schema migrations. */
 internal object RoomPersistence {
     private const val RECEIPT_TABLE =
         "CREATE TABLE receipts (source TEXT NOT NULL, calendar INTEGER NOT NULL, event INTEGER NOT NULL, fingerprint TEXT NOT NULL, PRIMARY KEY(source,calendar))"
@@ -218,8 +201,4 @@ internal object RoomPersistence {
             .setDriver(AndroidSQLiteDriver())
             .addMigrations(migration2To3, migration1To3)
             .build()
-
-    fun adapter(database: RoomDatabase): RoomSqliteCompat =
-        // Opening the database must surface migration failures before a caller can use it.
-        RoomSqliteCompat(database.getSupportWrapper()).also { it.getVersion() }
 }

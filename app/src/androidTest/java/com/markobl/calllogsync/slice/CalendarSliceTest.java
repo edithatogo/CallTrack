@@ -12,6 +12,9 @@ import android.provider.CalendarContract.Calendars;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import kotlin.Unit;
+import kotlin.coroutines.Continuation;
+
 import org.junit.Test;
 
 /** Synthetic source only. Never queries or changes the device's call history. */
@@ -258,15 +261,24 @@ public class CalendarSliceTest {
                             true);
             SliceEngine.Ledger crashLedger =
                     new SliceEngine.Ledger() {
-                        public SliceEngine.Result transaction(SliceEngine.Work w) {
-                            return w.run();
+                        public Object transaction(
+                                SliceEngine.Work w,
+                                Continuation<? super SliceEngine.Result> completion) {
+                            return w.run(completion);
                         }
 
-                        public SliceEngine.Entry get(String key, long destination) {
+                        public Object getReceipt(
+                                String key,
+                                long destination,
+                                Continuation<? super SliceEngine.Entry> completion) {
                             return null;
                         }
 
-                        public void put(String key, long destination, SliceEngine.Entry entry) {
+                        public Object putReceipt(
+                                String key,
+                                long destination,
+                                SliceEngine.Entry entry,
+                                Continuation<? super Unit> completion) {
                             throw new IllegalStateException("simulated interruption");
                         }
                     };
@@ -429,15 +441,21 @@ public class CalendarSliceTest {
     }
 
     private static class MemoryLedger implements SliceEngine.Ledger {
-        public SliceEngine.Result transaction(SliceEngine.Work w) {
-            return w.run();
+        public Object transaction(
+                SliceEngine.Work w, Continuation<? super SliceEngine.Result> completion) {
+            return w.run(completion);
         }
 
-        public SliceEngine.Entry get(String key, long calendar) {
+        public Object getReceipt(
+                String key, long calendar, Continuation<? super SliceEngine.Entry> completion) {
             return null;
         }
 
-        public void put(String key, long calendar, SliceEngine.Entry e) {
+        public Object putReceipt(
+                String key,
+                long calendar,
+                SliceEngine.Entry e,
+                Continuation<? super Unit> completion) {
             throw new AssertionError("No writes expected");
         }
     }

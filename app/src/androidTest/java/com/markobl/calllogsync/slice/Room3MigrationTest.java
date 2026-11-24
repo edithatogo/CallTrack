@@ -74,7 +74,7 @@ public class Room3MigrationTest {
             }
             for (int iteration = 0; iteration < 2; iteration++) {
                 try (SqliteLedger ledger = new SqliteLedger(context, ledgerFile)) {
-                    assertEquals(7, ledger.getReadableDatabase().getVersion());
+                    assertEquals(7, RoomFixtures.version(ledger));
                     assertEquals(42L, ledger.get("legacy", 7).id);
                     DurableDelivery.Intent attempted = ledger.outbox().get("uncertain", 7);
                     assertNotNull(attempted);
@@ -82,22 +82,21 @@ public class Room3MigrationTest {
                     assertEquals(-1L, attempted.eventId);
                 }
                 try (SqliteImportStore imports = new SqliteImportStore(context, importFile)) {
-                    assertEquals(3, imports.getReadableDatabase().getVersion());
+                    assertEquals(3, RoomFixtures.version(imports));
                     try (Cursor cursor =
-                            imports.getReadableDatabase()
-                                    .rawQuery(
-                                            "SELECT revision,body FROM sessions WHERE id='session'",
-                                            null)) {
+                            RoomFixtures.query(
+                                    imports,
+                                    "SELECT revision,body FROM sessions WHERE id='session'",
+                                    null)) {
                         assertTrue(cursor.moveToFirst());
                         assertEquals(3L, cursor.getLong(0));
                         assertEquals("synthetic-record", cursor.getString(1));
                     }
                     try (Cursor cursor =
-                            imports.getReadableDatabase()
-                                    .rawQuery(
-                                            "SELECT outcome FROM candidates WHERE"
-                                                    + " session='session'",
-                                            null)) {
+                            RoomFixtures.query(
+                                    imports,
+                                    "SELECT outcome FROM candidates WHERE" + " session='session'",
+                                    null)) {
                         assertTrue(cursor.moveToFirst());
                         assertEquals("SAVED", cursor.getString(0));
                     }

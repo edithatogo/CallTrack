@@ -1,13 +1,13 @@
 package com.markobl.calllogsync.slice
 
-import android.content.ContentValues
 import android.content.Context
-import android.database.sqlite.SQLiteDatabase
+import androidx.room3.withWriteTransaction
 import java.io.Closeable
 import java.util.Collections
 import java.util.function.LongSupplier
+import kotlinx.coroutines.runBlocking
 
-/** Durable source/destination receipts; SQL transactions serialize concurrent instances. */
+/** Durable source/destination receipts; Room transactions serialize concurrent instances. */
 class SqliteLedger(context: Context?, name: String?, private val clock: LongSupplier?) :
     SliceEngine.Ledger, AutomaticDelivery.Progress, Closeable {
     constructor(context: Context?) : this(context, "calltrack-ledger.db")
@@ -17,14 +17,9 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
         name: String?,
     ) : this(context, name, LongSupplier { System.currentTimeMillis() })
 
-    private val room =
+    internal val room =
         RoomPersistence.ledger(requireNotNull(context), requireNotNull(name), requireNotNull(clock))
-    private val adapter by lazy { RoomPersistence.adapter(room) }
-    val writableDatabase: RoomSqliteCompat
-        get() = adapter
-
-    val readableDatabase: RoomSqliteCompat
-        get() = adapter
+    private val dao = room.ledgerDao()
 
     override fun close() = room.close()
 
@@ -52,41 +47,13 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
 
     fun recoveryPage(after: RecoveryCursor?, limit: Int): List<RecoveryItem> {
         require(limit in 1..50) { "Invalid receipt page" }
-        val rows =
-            "SELECT source,calendar,COALESCE(source_start,-1) AS started FROM outbox UNION ALL SELECT r.source,r.calendar,-1 AS started FROM receipts r WHERE NOT EXISTS (SELECT 1 FROM outbox o WHERE o.source=r.source AND o.calendar=r.calendar)"
-        val predicate =
-            if (after == null) ""
-            else
-                " WHERE started<CAST(? AS INTEGER) OR (started=CAST(? AS INTEGER) AND (source>? OR (source=? AND calendar>CAST(? AS INTEGER))))"
-        val args =
-            if (after == null) arrayOf(limit.toString())
-            else
-                arrayOf(
-                    after.started.toString(),
-                    after.started.toString(),
-                    after.key,
-                    after.key,
-                    after.calendar.toString(),
-                    limit.toString(),
-                )
-        val items = ArrayList<RecoveryItem>()
-        readableDatabase
-            .rawQuery(
-                "SELECT source,calendar,started FROM (" +
-                    rows +
-                    ")" +
-                    predicate +
-                    " ORDER BY started DESC,source ASC,calendar ASC LIMIT ?",
-                args,
-            )
-            .use { cursor ->
-                while (cursor.moveToNext()) {
-                    val point =
-                        RecoveryCursor(cursor.getLong(2), cursor.getString(0), cursor.getLong(1))
-                    val intent = readIntent(point.key, point.calendar)
-                    if (intent != null) items.add(RecoveryItem(point, intent))
-                }
-            }
+        val rows = runBlocking {
+            dao.recoveryPage(after?.started, after?.key, after?.calendar, limit)
+        }
+        val items = rows.mapNotNull { row ->
+            val point = RecoveryCursor(row.started, row.source, row.calendar)
+            readIntent(point.key, point.calendar)?.let { RecoveryItem(point, it) }
+        }
         return Collections.unmodifiableList(items)
     }
 
@@ -95,27 +62,19 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
         var verified = 0L
         var review = 0L
         var suppressed = 0L
-        readableDatabase
-            .rawQuery(
-                "SELECT state,COUNT(*) FROM (SELECT state FROM outbox UNION ALL SELECT 'LEGACY' AS state FROM receipts r WHERE NOT EXISTS (SELECT 1 FROM outbox o WHERE o.source=r.source AND o.calendar=r.calendar)) GROUP BY state",
-                null,
-            )
-            .use { cursor ->
-                while (cursor.moveToNext()) {
-                    val count = cursor.getLong(1)
-                    when (DurableDelivery.State.valueOf(cursor.getString(0))) {
-                        DurableDelivery.State.READY,
-                        DurableDelivery.State.IN_FLIGHT,
-                        DurableDelivery.State.ATTEMPTED -> pending = Math.addExact(pending, count)
-                        DurableDelivery.State.CONFIRMED -> verified = Math.addExact(verified, count)
-                        DurableDelivery.State.REVIEW,
-                        DurableDelivery.State.LEGACY,
-                        DurableDelivery.State.EXPIRED_READY -> review = Math.addExact(review, count)
-                        DurableDelivery.State.SUPPRESSED ->
-                            suppressed = Math.addExact(suppressed, count)
-                    }
-                }
+        for (row in runBlocking { dao.counts() }) {
+            when (DurableDelivery.State.valueOf(row.state)) {
+                DurableDelivery.State.READY,
+                DurableDelivery.State.IN_FLIGHT,
+                DurableDelivery.State.ATTEMPTED -> pending = Math.addExact(pending, row.total)
+                DurableDelivery.State.CONFIRMED -> verified = Math.addExact(verified, row.total)
+                DurableDelivery.State.REVIEW,
+                DurableDelivery.State.LEGACY,
+                DurableDelivery.State.EXPIRED_READY -> review = Math.addExact(review, row.total)
+                DurableDelivery.State.SUPPRESSED ->
+                    suppressed = Math.addExact(suppressed, row.total)
             }
+        }
         return DeliveryCounts(pending, verified, review, suppressed)
     }
 
@@ -125,27 +84,9 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
         limit: Int,
     ): List<String> {
         require(operation != null && calendar >= 0 && limit in 1..500) { "Invalid pending query" }
-        val keys = ArrayList<String>()
-        readableDatabase
-            .query(
-                "outbox",
-                arrayOf("source"),
-                "calendar=? AND operation_owner=? AND operation_generation=? AND state IN (?,?,?)",
-                arrayOf(
-                    calendar.toString(),
-                    operation.owner,
-                    operation.generation.toString(),
-                    "READY",
-                    "IN_FLIGHT",
-                    "ATTEMPTED",
-                ),
-                null,
-                null,
-                "source ASC",
-                limit.toString(),
-            )
-            .use { cursor -> while (cursor.moveToNext()) keys.add(cursor.getString(0)) }
-        return Collections.unmodifiableList(keys)
+        return Collections.unmodifiableList(
+            runBlocking { dao.pending(operation.owner, operation.generation, calendar, limit) },
+        )
     }
 
     override fun get(operation: DurableDelivery.Operation?): PagedCalls.Checkpoint? =
@@ -157,67 +98,49 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
 
     fun checkpoint(operation: DurableDelivery.Operation?): PagedCalls.Checkpoint? {
         require(operation != null) { "Operation required" }
-        readableDatabase
-            .query(
-                "scan_cursors",
-                arrayOf("namespace", "upper_id", "upper_binding", "last_id", "last_binding"),
-                "owner=? AND generation=?",
-                arrayOf(operation.owner, operation.generation.toString()),
-                null,
-                null,
-                null,
-            )
-            .use { cursor ->
-                return if (!cursor.moveToFirst()) null
-                else
-                    PagedCalls.Checkpoint(
-                        cursor.getString(0),
-                        cursor.getLong(1),
-                        cursor.getString(2),
-                        cursor.getLong(3),
-                        cursor.getString(4),
-                    )
-            }
+        return runBlocking { readCheckpoint(operation) }
     }
+
+    private suspend fun readCheckpoint(
+        operation: DurableDelivery.Operation,
+    ): PagedCalls.Checkpoint? =
+        dao.checkpoint(operation.owner, operation.generation)?.let {
+            PagedCalls.Checkpoint(
+                it.namespace,
+                it.upperId,
+                it.upperBinding,
+                it.lastId,
+                it.lastBinding,
+            )
+        }
 
     fun checkpoint(operation: DurableDelivery.Operation?, next: PagedCalls.Checkpoint?) {
         require(operation != null && next != null) { "Checkpoint required" }
-        val db = writableDatabase
-        check(!db.inTransaction()) { "Checkpoint must commit independently" }
-        db.beginTransaction()
-        try {
-            val prior = checkpoint(operation)
-            check(
-                prior == null ||
-                    prior.namespace == next.namespace &&
-                        prior.upperId == next.upperId &&
-                        prior.upperBinding == next.upperBinding &&
-                        next.lastId >= prior.lastId &&
-                        (next.lastId != prior.lastId || prior.lastBinding == next.lastBinding),
-            ) {
-                "Frozen checkpoint cannot be reset or rebound"
+        runBlocking {
+            room.commitIndependently("Checkpoint must commit independently") {
+                val prior = readCheckpoint(operation)
+                check(
+                    prior == null ||
+                        prior.namespace == next.namespace &&
+                            prior.upperId == next.upperId &&
+                            prior.upperBinding == next.upperBinding &&
+                            next.lastId >= prior.lastId &&
+                            (next.lastId != prior.lastId || prior.lastBinding == next.lastBinding),
+                ) {
+                    "Frozen checkpoint cannot be reset or rebound"
+                }
+                val row =
+                    ScanCursorRow(
+                        operation.owner,
+                        operation.generation,
+                        next.namespace,
+                        next.upperId,
+                        next.upperBinding,
+                        next.lastId,
+                        next.lastBinding,
+                    )
+                check(dao.storeCheckpoint(row) >= 0) { "Checkpoint not stored" }
             }
-            val values = ContentValues()
-            values.put("owner", operation.owner)
-            values.put("generation", operation.generation)
-            values.put("namespace", next.namespace)
-            values.put("upper_id", next.upperId)
-            values.put("upper_binding", next.upperBinding)
-            values.put("last_id", next.lastId)
-            values.put("last_binding", next.lastBinding)
-            check(
-                db.insertWithOnConflict(
-                    "scan_cursors",
-                    null,
-                    values,
-                    SQLiteDatabase.CONFLICT_REPLACE,
-                ) >= 0,
-            ) {
-                "Checkpoint not stored"
-            }
-            db.setTransactionSuccessful()
-        } finally {
-            db.endTransaction()
         }
     }
 
@@ -239,69 +162,43 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
         ) {
             "Invalid scan rollover"
         }
-        val db = writableDatabase
-        check(!db.inTransaction()) { "Rollover must commit independently" }
-        db.beginTransaction()
-        try {
-            check(PagedCalls.equal(checkpoint(operation), expected)) {
-                "Scan changed before rollover"
+        runBlocking {
+            room.commitIndependently("Rollover must commit independently") {
+                check(PagedCalls.equal(readCheckpoint(operation), expected)) {
+                    "Scan changed before rollover"
+                }
+                check(
+                    dao.rollover(
+                        operation.owner,
+                        operation.generation,
+                        next.upperId,
+                        next.upperBinding,
+                    ) == 1,
+                ) {
+                    "Rollover not stored"
+                }
             }
-            val values = ContentValues()
-            values.put("upper_id", next.upperId)
-            values.put("upper_binding", next.upperBinding)
-            check(
-                db.update(
-                    "scan_cursors",
-                    values,
-                    "owner=? AND generation=?",
-                    arrayOf(operation.owner, operation.generation.toString()),
-                ) == 1,
-            ) {
-                "Rollover not stored"
-            }
-            db.setTransactionSuccessful()
-        } finally {
-            db.endTransaction()
         }
     }
 
-    override fun transaction(work: SliceEngine.Work?): SliceEngine.Result? {
-        val db = writableDatabase
-        db.beginTransaction()
-        try {
-            val result = work!!.run()
-            db.setTransactionSuccessful()
-            return result
-        } finally {
-            db.endTransaction()
+    override suspend fun transaction(work: SliceEngine.Work?): SliceEngine.Result? =
+        room.withWriteTransaction {
+            work!!.run()
         }
+
+    fun get(sourceKey: String?, calendar: Long): SliceEngine.Entry? = runBlocking {
+        getReceipt(sourceKey, calendar)
     }
 
-    override fun get(sourceKey: String?, calendar: Long): SliceEngine.Entry? {
-        readableDatabase
-            .query(
-                "receipts",
-                arrayOf("event", "fingerprint"),
-                "source=? AND calendar=?",
-                arrayOf(sourceKey, calendar.toString()),
-                null,
-                null,
-                null,
-            )
-            .use { cursor ->
-                return if (cursor.moveToFirst())
-                    SliceEngine.Entry(cursor.getLong(0), cursor.getString(1))
-                else null
-            }
+    override suspend fun getReceipt(sourceKey: String?, calendar: Long): SliceEngine.Entry? =
+        dao.receipt(sourceKey, calendar)?.let { SliceEngine.Entry(it.event, it.fingerprint) }
+
+    fun put(sourceKey: String?, calendar: Long, entry: SliceEngine.Entry?) = runBlocking {
+        putReceipt(sourceKey, calendar, entry)
     }
 
-    override fun put(sourceKey: String?, calendar: Long, entry: SliceEngine.Entry?) {
-        val values = ContentValues()
-        values.put("source", sourceKey)
-        values.put("calendar", calendar)
-        values.put("event", entry!!.id)
-        values.put("fingerprint", entry.fingerprint)
-        writableDatabase.insertOrThrow("receipts", null, values)
+    override suspend fun putReceipt(sourceKey: String?, calendar: Long, entry: SliceEngine.Entry?) {
+        dao.insertReceipt(ReceiptRow(sourceKey!!, calendar, entry!!.id, entry.fingerprint!!))
     }
 
     fun outbox(): DurableDelivery.Store =
@@ -310,7 +207,7 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
                 readIntent(key, calendar)
 
             override fun put(intent: DurableDelivery.Intent?) {
-                writeIntent(intent)
+                runBlocking { writeIntent(intent) }
             }
         }
 
@@ -319,191 +216,102 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
         return synchronized(DurableDelivery.DELIVERY_LOCK) {
             val time = now()
             if (time < PayloadRetention.WINDOW_MILLIS) return 0
-            writableDatabase
-                .compileStatement(
-                    "UPDATE outbox SET state=CASE WHEN state='READY' AND event<0 THEN 'EXPIRED_READY' ELSE state END, payload_title=NULL,payload_description=NULL,payload_start=NULL,payload_end=NULL,payload_timezone=NULL,payload_saved_at=NULL WHERE rowid IN (SELECT rowid FROM outbox WHERE payload_title IS NOT NULL AND payload_saved_at<=? ORDER BY payload_saved_at ASC,source ASC,calendar ASC LIMIT ?)",
-                )
-                .use { statement ->
-                    statement.bindLong(1, time - PayloadRetention.WINDOW_MILLIS)
-                    statement.bindLong(2, limit.toLong())
-                    statement.executeUpdateDelete()
-                }
+            runBlocking { dao.expirePayloads(time - PayloadRetention.WINDOW_MILLIS, limit) }
         }
     }
 
     private fun readIntent(key: String?, calendar: Long): DurableDelivery.Intent? =
-        synchronized(DurableDelivery.DELIVERY_LOCK) { readIntentLocked(key, calendar) }
-
-    private fun readIntentLocked(key: String?, calendar: Long): DurableDelivery.Intent? {
-        var found: DurableDelivery.Intent? = null
-        var savedAt: Long? = null
-        readableDatabase
-            .query(
-                "outbox",
-                arrayOf(
-                    "state",
-                    "event",
-                    "signature",
-                    "marker",
-                    "fingerprint",
-                    "payload_title",
-                    "payload_description",
-                    "payload_start",
-                    "payload_end",
-                    "payload_timezone",
-                    "operation_owner",
-                    "operation_generation",
-                    "source_start",
-                    "source_seconds",
-                    "source_type",
-                    "source_presentation",
-                    "source_presentation_supplied",
-                    "payload_saved_at",
-                ),
-                "source=? AND calendar=?",
-                arrayOf(key, calendar.toString()),
-                null,
-                null,
-                null,
-            )
-            .use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val payload =
-                        if (cursor.isNull(5)) null
-                        else
-                            CallEvent(
-                                cursor.getString(5),
-                                cursor.getString(6),
-                                cursor.getLong(7),
-                                cursor.getLong(8),
-                                cursor.getString(9),
-                                cursor.getString(3),
-                            )
-                    found =
-                        DurableDelivery.Intent(
-                            DurableDelivery.State.valueOf(cursor.getString(0)),
-                            key,
-                            calendar,
-                            cursor.getString(2),
-                            cursor.getString(3),
-                            cursor.getString(4),
-                            cursor.getLong(1),
-                            payload,
-                            if (cursor.isNull(10)) null
-                            else
-                                DurableDelivery.Operation(cursor.getString(10), cursor.getLong(11)),
-                            if (cursor.isNull(12)) null
-                            else
-                                DurableDelivery.SourceFacts(
-                                    cursor.getLong(12),
-                                    cursor.getLong(13),
-                                    cursor.getInt(14),
-                                    if (cursor.isNull(15)) null else cursor.getInt(15),
-                                    cursor.getInt(16) != 0,
-                                ),
-                        )
-                    savedAt = if (cursor.isNull(17)) null else cursor.getLong(17)
+        synchronized(DurableDelivery.DELIVERY_LOCK) {
+            runBlocking {
+                val row = dao.intent(key, calendar)
+                if (row == null) {
+                    val prior = dao.receipt(key, calendar) ?: return@runBlocking null
+                    return@runBlocking DurableDelivery.Intent(
+                        DurableDelivery.State.LEGACY,
+                        prior.source,
+                        prior.calendar,
+                        null,
+                        null,
+                        prior.fingerprint,
+                        prior.event,
+                        null,
+                    )
                 }
-            }
-        val current = found
-        if (current != null) {
-            if (current.payload != null && PayloadRetention.expired(savedAt, now())) {
-                return synchronized(DurableDelivery.DELIVERY_LOCK) {
+                val current = row.toIntent()
+                if (
+                    current.payload != null && PayloadRetention.expired(row.payloadSavedAt, now())
+                ) {
                     val cleared = PayloadRetention.clear(current)
                     writeIntent(cleared)
                     cleared
-                }
+                } else current
             }
-            return current
         }
-        val prior = get(key, calendar) ?: return null
-        return DurableDelivery.Intent(
-            DurableDelivery.State.LEGACY,
-            key,
-            calendar,
-            null,
-            null,
-            prior.fingerprint,
-            prior.id,
-            null,
-        )
-    }
 
-    private fun writeIntent(intent: DurableDelivery.Intent?) {
-        val db = writableDatabase
-        check(!db.inTransaction()) { "Outbox intent must commit before provider access" }
-        db.beginTransaction()
-        try {
+    private fun OutboxRow.toIntent(): DurableDelivery.Intent =
+        DurableDelivery.Intent(
+            DurableDelivery.State.valueOf(state),
+            source,
+            calendar,
+            signature,
+            marker,
+            fingerprint,
+            event,
+            payloadTitle?.let {
+                CallEvent(
+                    it,
+                    payloadDescription,
+                    payloadStart ?: 0L,
+                    payloadEnd ?: 0L,
+                    payloadTimezone,
+                    marker,
+                )
+            },
+            operationOwner?.let { DurableDelivery.Operation(it, operationGeneration) },
+            sourceStart?.let {
+                DurableDelivery.SourceFacts(
+                    it,
+                    sourceSeconds ?: 0L,
+                    sourceType ?: 0,
+                    sourcePresentation,
+                    (sourcePresentationSupplied ?: 0) != 0,
+                )
+            },
+        )
+
+    internal suspend fun writeIntent(intent: DurableDelivery.Intent?) {
+        room.commitIndependently("Outbox intent must commit before provider access") {
             val current = intent!!
-            var savedAt: Long? = null
-            if (current.payload != null) {
-                db.query(
-                        "outbox",
-                        arrayOf("payload_title", "payload_saved_at"),
-                        "source=? AND calendar=?",
-                        arrayOf(current.key, current.calendar.toString()),
-                        null,
-                        null,
-                        null,
-                    )
-                    .use { prior ->
-                        if (prior.moveToFirst() && !prior.isNull(0) && !prior.isNull(1))
-                            savedAt = prior.getLong(1)
-                    }
-                if (savedAt == null) savedAt = now()
-            }
-            val values = ContentValues()
-            values.put("payload_saved_at", savedAt)
-            values.put("source", current.key)
-            values.put("calendar", current.calendar)
-            values.put("state", current.state.name)
-            values.put("event", current.eventId)
-            values.put("signature", current.sourceSignature)
-            values.put("marker", current.marker)
-            values.put("fingerprint", current.fingerprint)
-            values.put("operation_owner", current.operation?.owner)
-            values.put("operation_generation", current.operation?.generation ?: 0L)
-            val facts = current.facts
-            if (facts != null) {
-                values.put("source_start", facts.start)
-                values.put("source_seconds", facts.seconds)
-                values.put("source_type", facts.type)
-                values.put("source_presentation", facts.presentation)
-                values.put("source_presentation_supplied", if (facts.presentationSupplied) 1 else 0)
-            } else
-                for (column in
-                    arrayOf(
-                        "source_start",
-                        "source_seconds",
-                        "source_type",
-                        "source_presentation",
-                        "source_presentation_supplied",
-                    )) values.putNull(column)
             val payload = current.payload
-            if (payload != null) {
-                values.put("payload_title", payload.title)
-                values.put("payload_description", payload.description)
-                values.put("payload_start", payload.start)
-                values.put("payload_end", payload.end)
-                values.put("payload_timezone", payload.timezone)
-            } else
-                for (column in
-                    arrayOf(
-                        "payload_title",
-                        "payload_description",
-                        "payload_start",
-                        "payload_end",
-                        "payload_timezone",
-                    )) values.putNull(column)
-            check(
-                db.insertWithOnConflict("outbox", null, values, SQLiteDatabase.CONFLICT_REPLACE) >=
-                    0,
-            ) {
-                "Outbox write was not committed"
+            val facts = current.facts
+            val savedAt = payload?.let {
+                dao.payloadSavedAt(current.key, current.calendar) ?: now()
             }
-            db.setTransactionSuccessful()
-        } finally {
-            db.endTransaction()
+            val row =
+                OutboxRow(
+                    source = current.key,
+                    calendar = current.calendar,
+                    state = current.state.name,
+                    event = current.eventId,
+                    signature = current.sourceSignature,
+                    marker = current.marker,
+                    fingerprint = current.fingerprint,
+                    payloadTitle = payload?.title,
+                    payloadDescription = payload?.description,
+                    payloadStart = payload?.start,
+                    payloadEnd = payload?.end,
+                    payloadTimezone = payload?.timezone,
+                    operationOwner = current.operation?.owner,
+                    operationGeneration = current.operation?.generation ?: 0L,
+                    sourceStart = facts?.start,
+                    sourceSeconds = facts?.seconds,
+                    sourceType = facts?.type,
+                    sourcePresentation = facts?.presentation,
+                    sourcePresentationSupplied =
+                        facts?.let { if (it.presentationSupplied) 1 else 0 },
+                    payloadSavedAt = savedAt,
+                )
+            check(dao.storeIntent(row) >= 0) { "Outbox write was not committed" }
         }
     }
 }

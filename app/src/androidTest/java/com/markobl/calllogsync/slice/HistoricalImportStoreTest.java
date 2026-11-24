@@ -3,6 +3,7 @@ package com.markobl.calllogsync.slice;
 import static org.junit.Assert.*;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 
@@ -150,10 +151,10 @@ public class HistoricalImportStoreTest {
         try (SqliteImportStore imports = new SqliteImportStore(context(), name)) {
             HistoricalImport importer = new HistoricalImport(imports, source, null, null);
             HistoricalImport.Session initial = importer.start(7, "UTC", 0, 2000, true, true, true);
-            imports.getWritableDatabase()
-                    .execSQL(
-                            "CREATE TRIGGER fail_fixture BEFORE INSERT ON candidates WHEN"
-                                    + " NEW.source_id=1 BEGIN SELECT RAISE(ABORT,'fixture'); END");
+            RoomFixtures.execute(
+                    imports,
+                    "CREATE TRIGGER fail_fixture BEFORE INSERT ON candidates WHEN"
+                            + " NEW.source_id=1 BEGIN SELECT RAISE(ABORT,'fixture'); END");
             try {
                 importer.preview(initial.id, 3);
                 fail("Append must fail");
@@ -161,7 +162,7 @@ public class HistoricalImportStoreTest {
             }
             assertEquals(0, imports.get(initial.id).revision);
             assertEquals(0, imports.candidates(initial.id, -1, 3).size());
-            imports.getWritableDatabase().execSQL("DROP TRIGGER fail_fixture");
+            RoomFixtures.execute(imports, "DROP TRIGGER fail_fixture");
             importer.preview(initial.id, 3);
             assertEquals(3, imports.get(initial.id).count);
             try {
@@ -209,8 +210,13 @@ public class HistoricalImportStoreTest {
                 importer.deliver(id, 1);
                 assertEquals(
                         DurableDelivery.Result.SAVED, imports.candidates(id, -1, 4).get(0).outcome);
-                // Reconstruct the historical table using SQL supported by the minimum SDK.
-                RoomSqliteCompat db = imports.getWritableDatabase();
+            }
+            // Reconstruct the historical table using SQL supported by the minimum SDK.
+            try (SQLiteDatabase db =
+                    SQLiteDatabase.openDatabase(
+                            context().getDatabasePath(name).getPath(),
+                            null,
+                            SQLiteDatabase.OPEN_READWRITE)) {
                 db.beginTransaction();
                 try {
                     db.execSQL("ALTER TABLE candidates RENAME TO candidates_v2");
@@ -226,11 +232,11 @@ public class HistoricalImportStoreTest {
                 } finally {
                     db.endTransaction();
                 }
-                imports.getWritableDatabase().setVersion(1);
+                db.setVersion(1);
             }
             try (SqliteImportStore imports = new SqliteImportStore(context(), name);
                     SqliteLedger ledger = new SqliteLedger(context(), ledgerName)) {
-                assertEquals(3, imports.getReadableDatabase().getVersion());
+                assertEquals(3, RoomFixtures.version(imports));
                 assertEquals(1, imports.get(id).saved);
                 assertNull(imports.candidates(id, -1, 4).get(0).outcome);
                 assertNull(imports.candidates(id, -1, 4).get(1).outcome);
@@ -276,10 +282,10 @@ public class HistoricalImportStoreTest {
                             0,
                             null);
             HistoricalImport.Candidate candidate = imports.candidates(id, -1, 1).get(0);
-            imports.getWritableDatabase()
-                    .execSQL(
-                            "CREATE TRIGGER fail_outcome_fixture BEFORE UPDATE ON sessions BEGIN"
-                                    + " SELECT RAISE(ABORT,'fixture'); END");
+            RoomFixtures.execute(
+                    imports,
+                    "CREATE TRIGGER fail_outcome_fixture BEFORE UPDATE ON sessions BEGIN"
+                            + " SELECT RAISE(ABORT,'fixture'); END");
             try {
                 imports.finish(before, next, candidate, DurableDelivery.Result.SAVED);
                 fail("Progress must fail");
@@ -288,7 +294,7 @@ public class HistoricalImportStoreTest {
             assertNull(imports.candidates(id, -1, 1).get(0).outcome);
             assertEquals(-1, imports.get(id).processedId);
             assertEquals(before.revision, imports.get(id).revision);
-            imports.getWritableDatabase().execSQL("DROP TRIGGER fail_outcome_fixture");
+            RoomFixtures.execute(imports, "DROP TRIGGER fail_outcome_fixture");
             imports.finish(before, next, candidate, DurableDelivery.Result.SAVED);
             assertEquals(1, imports.get(id).saved);
             assertEquals(

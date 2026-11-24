@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.SystemClock;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.*;
 
 import androidx.compose.ui.platform.ComposeView;
@@ -67,9 +68,11 @@ public class AutomaticSettingsTest {
             assertFalse(rendered.shown("auto_enable", true).isEnabled());
             assertTrue(rendered.shown("auto_pause", true).isEnabled());
             assertTrue(rendered.shown("auto_refresh", true).isEnabled());
+            AccessibilityNodeInfo picker = rendered.shown("auto_calendar_picker", true);
+            assertNotNull(picker);
             assertEquals(
-                    context.getString(R.string.slice_choose),
-                    rendered.shown("auto_calendar_picker", true).getContentDescription());
+                    context.getString(R.string.slice_choose), String.valueOf(picker.getText()));
+            assertFalse(picker.isEnabled());
             assertTrue(rendered.shown("auto_incoming", true).isChecked());
             assertTrue(rendered.shown("auto_outgoing", true).isChecked());
             assertTrue(rendered.shown("auto_missed", true).isChecked());

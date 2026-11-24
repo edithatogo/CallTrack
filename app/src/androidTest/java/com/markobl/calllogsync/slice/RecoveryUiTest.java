@@ -405,15 +405,13 @@ public class RecoveryUiTest {
                                             != null,
                             "Fresh pending intent not visible before aging");
                     try (SqliteLedger ledger = new SqliteLedger(context())) {
-                        ledger.getWritableDatabase()
-                                .execSQL(
-                                        "UPDATE outbox SET payload_saved_at=? WHERE source=? AND"
-                                                + " calendar=?",
-                                        new Object[] {
-                                            System.currentTimeMillis() - 8L * 24 * 60 * 60 * 1000,
-                                            call("expired").key(),
-                                            fixtureCalendar
-                                        });
+                        RoomFixtures.execute(
+                                ledger,
+                                "UPDATE outbox SET payload_saved_at=? WHERE source=? AND"
+                                        + " calendar=?",
+                                System.currentTimeMillis() - 8L * 24 * 60 * 60 * 1000,
+                                call("expired").key(),
+                                fixtureCalendar);
                     }
                     tap(ui, R.string.retention_run);
                     ui.await(

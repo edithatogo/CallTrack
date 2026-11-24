@@ -2,6 +2,9 @@ package com.markobl.calllogsync.slice;
 
 import static org.junit.Assert.*;
 
+import kotlin.Unit;
+import kotlin.coroutines.Continuation;
+
 import org.junit.Test;
 
 import java.util.*;
@@ -97,17 +100,24 @@ public class SliceTest {
         Map<String, SliceEngine.Entry> rows = new HashMap<>();
         boolean fail;
 
-        public synchronized SliceEngine.Result transaction(SliceEngine.Work work) {
-            return work.run();
+        public synchronized Object transaction(
+                SliceEngine.Work work, Continuation<? super SliceEngine.Result> completion) {
+            return work.run(completion);
         }
 
-        public SliceEngine.Entry get(String key, long calendar) {
+        public Object getReceipt(
+                String key, long calendar, Continuation<? super SliceEngine.Entry> completion) {
             return rows.get(key + ":" + calendar);
         }
 
-        public void put(String key, long calendar, SliceEngine.Entry entry) {
+        public Object putReceipt(
+                String key,
+                long calendar,
+                SliceEngine.Entry entry,
+                Continuation<? super Unit> completion) {
             if (fail) throw new IllegalStateException("crash gap");
             rows.put(key + ":" + calendar, entry);
+            return Unit.INSTANCE;
         }
     }
 
