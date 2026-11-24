@@ -50,7 +50,7 @@ dependencies {
         implementation('androidx.lifecycle:lifecycle-runtime:2.11.1') {
             because 'Keep the qualified Lifecycle family selected for Activity, Compose and WorkManager'
         }
-        implementation('androidx.tracing:tracing:2.0.0') {
+        implementation('androidx.tracing:tracing:2.0.5') {
             because 'Keep the qualified Tracing version selected for Activity and WorkManager'
         }
     }

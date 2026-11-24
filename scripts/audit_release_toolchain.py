@@ -269,25 +269,32 @@ def run(output, archives_from=None):
         gradle_home = selected_toolchain_path('GRADLE_USER_HOME', '.local/toolchain/gradle-home')
         sdk = selected_toolchain_path('ANDROID_HOME', '.local/android-sdk')
         jdk_home = selected_toolchain_path('JAVA_HOME', '.local/toolchain/temurin-jdk25/Contents/Home')
-        wrapper_url = 'https://services.gradle.org/distributions/gradle-9.7.0-wrapper.jar.sha256'
+        properties = (ROOT / 'gradle/wrapper/gradle-wrapper.properties').read_text().splitlines()
+        urls = [line.partition('=')[2].replace(r'\:', ':')
+                for line in properties if line.startswith('distributionUrl=')]
+        match = re.fullmatch(r'https://services[.]gradle[.]org/distributions/gradle-([0-9]+[.][0-9]+[.][0-9]+)-bin[.]zip',
+                             urls[0]) if len(urls) == 1 else None
+        if match is None:
+            raise ValueError('Expected one canonical stable Gradle binary distribution URL')
+        version = match.group(1)
+        wrapper_url = f'https://services.gradle.org/distributions/gradle-{version}-wrapper.jar.sha256'
         wrapper_expected = published_checksum(wrapper_url, output / 'wrapper.sha256')
         wrapper_actual = sha(ROOT / 'gradle/wrapper/gradle-wrapper.jar')
-        receipt['wrapper'] = dict(official_matching_hash_reference='9.7.0', url=wrapper_url,
+        receipt['wrapper'] = dict(official_matching_hash_reference=version, url=wrapper_url,
                                    expected=wrapper_expected, actual=wrapper_actual, matches=wrapper_actual == wrapper_expected,
-                                   execution_distribution='9.7.0')
-        distribution_url = 'https://services.gradle.org/distributions/gradle-9.7.0-bin.zip.sha256'
+                                   execution_distribution=version)
+        distribution_url = urls[0] + '.sha256'
         expected = published_checksum(distribution_url, output / 'gradle.sha256')
-        properties = (ROOT / 'gradle/wrapper/gradle-wrapper.properties').read_text()
-        receipt['distribution_pin'] = dict(url=distribution_url, sha256=expected,
-                                           pin_matches=('distributionSha256Sum=' + expected) in properties)
-        distribution = output / 'gradle-9.7.0-bin.zip'
+        pins = [line.partition('=')[2] for line in properties if line.startswith('distributionSha256Sum=')]
+        receipt['distribution_pin'] = dict(url=distribution_url, sha256=expected, pin_matches=pins == [expected])
+        distribution = output / f'gradle-{version}-bin.zip'
         if archives_from is not None:
             distribution.symlink_to((archives_from / distribution.name).resolve())
         else:
-            fetch('https://services.gradle.org/distributions/gradle-9.7.0-bin.zip', distribution)
+            fetch(urls[0], distribution)
         if sha(distribution) != expected:
             raise RuntimeError('Gradle distribution checksum mismatch')
-        caches = list((gradle_home / 'wrapper/dists/gradle-9.7.0-bin').glob('*/gradle-9.7.0'))
+        caches = list((gradle_home / f'wrapper/dists/gradle-{version}-bin').glob(f'*/gradle-{version}'))
         if len(caches) != 1:
             raise RuntimeError('Exact installed Gradle distribution required')
         receipt['gradle_distribution'] = zip_comparison(distribution, caches[0])

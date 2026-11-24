@@ -25,7 +25,7 @@ JDK or Gradle distributions with an app/source release by default.
 | androidx.activity:activity-compose:1.13.0 | Apache-2.0 |
 | androidx.activity:activity-ktx:1.13.0 | Apache-2.0 |
 | androidx.activity:activity:1.13.0 | Apache-2.0 |
-| androidx.annotation:annotation-experimental:1.4.1 | Apache-2.0 |
+| androidx.annotation:annotation-experimental:1.5.0 | Apache-2.0 |
 | androidx.annotation:annotation-jvm:1.10.0 | Apache-2.0 |
 | androidx.arch.core:core-common:2.2.0 | Apache-2.0 |
 | androidx.arch.core:core-runtime:2.2.0 | Apache-2.0 |
@@ -75,16 +75,19 @@ JDK or Gradle distributions with an app/source release by default.
 | androidx.navigationevent:navigationevent-android:1.1.0 | Apache-2.0 |
 | androidx.navigationevent:navigationevent-compose-android:1.1.0 | Apache-2.0 |
 | androidx.profileinstaller:profileinstaller:1.4.0 | Apache-2.0 |
+| androidx.room3:room3-common-jvm:3.0.3 | Apache-2.0 |
+| androidx.room3:room3-runtime-android:3.0.3 | Apache-2.0 |
 | androidx.room:room-common-jvm:2.7.0 | Apache-2.0 |
 | androidx.room:room-runtime-android:2.7.0 | Apache-2.0 |
 | androidx.savedstate:savedstate-android:1.5.0 | Apache-2.0 |
 | androidx.savedstate:savedstate-compose-android:1.5.0 | Apache-2.0 |
 | androidx.savedstate:savedstate-ktx:1.5.0 | Apache-2.0 |
-| androidx.sqlite:sqlite-android:2.5.0 | Apache-2.0 |
-| androidx.sqlite:sqlite-framework-android:2.5.0 | Apache-2.0 |
+| androidx.sqlite:sqlite-android:2.7.1 | Apache-2.0 |
+| androidx.sqlite:sqlite-async-android:2.7.1 | Apache-2.0 |
+| androidx.sqlite:sqlite-framework-android:2.7.1 | Apache-2.0 |
 | androidx.startup:startup-runtime:1.1.1 | Apache-2.0 |
-| androidx.tracing:tracing-android:2.0.0 | Apache-2.0 |
-| androidx.tracing:tracing-ktx:2.0.0 | Apache-2.0 |
+| androidx.tracing:tracing-android:2.0.5 | Apache-2.0 |
+| androidx.tracing:tracing-ktx:2.0.5 | Apache-2.0 |
 | androidx.versionedparcelable:versionedparcelable:1.1.1 | Apache-2.0 |
 | androidx.window:window-core-android:1.5.0 | Apache-2.0 |
 | androidx.window:window:1.5.0 | Apache-2.0 |
@@ -101,9 +104,9 @@ JDK or Gradle distributions with an app/source release by default.
 
 The fork and original replacement vector artwork use GPLv3; upstream attribution
 is retained in NOTICE.md. See [asset provenance](ASSET_PROVENANCE.md) and
-[modification notices](MODIFICATIONS.md). The 91 runtime dependency source
+[modification notices](MODIFICATIONS.md). The 77 runtime dependency source
 coordinates and hashes are in
-[the source inventory](qualification/release/runtime-sources.json). Eight published
+[the source inventory](qualification/release/runtime-sources.json). 9 published
 source archives contain metadata and licence text only; their runtime artifacts
 contain no JVM class entries. Retained notice entries include earlier audited
 origins as well as the current runtime graph.

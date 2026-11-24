@@ -199,7 +199,9 @@ class ToolTrustTest(unittest.TestCase):
                 gradle_home = root / '.local/toolchain/gradle-home'
                 (gradle_home / 'wrapper/dists/gradle-9.7.0-bin/test/gradle-9.7.0').mkdir(parents=True)
                 (root / 'gradle/wrapper').mkdir(parents=True)
-                (root / 'gradle/wrapper/gradle-wrapper.properties').write_text('distributionSha256Sum=' + '0' * 64)
+                (root / 'gradle/wrapper/gradle-wrapper.properties').write_text(
+                    'distributionUrl=https://services.gradle.org/distributions/gradle-9.7.0-bin.zip\n'
+                    'distributionSha256Sum=' + '0' * 64)
                 def fetch(_url, destination):
                     destination.write_bytes(xml)
                 selected = {'GRADLE_USER_HOME': str(gradle_home),
@@ -226,7 +228,9 @@ class ToolTrustTest(unittest.TestCase):
             gradle_home = root / '.local/toolchain/gradle-home'
             (gradle_home / 'wrapper/dists/gradle-9.7.0-bin/test/gradle-9.7.0').mkdir(parents=True)
             (root / 'gradle/wrapper').mkdir(parents=True)
-            (root / 'gradle/wrapper/gradle-wrapper.properties').write_text('distributionSha256Sum=' + '0' * 64)
+            (root / 'gradle/wrapper/gradle-wrapper.properties').write_text(
+                    'distributionUrl=https://services.gradle.org/distributions/gradle-9.7.0-bin.zip\n'
+                    'distributionSha256Sum=' + '0' * 64)
             selected = {'GRADLE_USER_HOME': str(gradle_home),
                         'ANDROID_HOME': str(root / '.local/android-sdk'),
                         'JAVA_HOME': str(root / '.local/toolchain/temurin-jdk25/Contents/Home')}

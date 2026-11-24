@@ -12,7 +12,7 @@ permissions:
   contents: read
 jobs:
   trufflehog-history:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -38,7 +38,7 @@ jobs:
             exit 1
           fi
   workflow-lint:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -66,6 +66,13 @@ jobs:
           echo 'ef967535729dcc82cc631863c0c1994be3f89e0193a17b581dcdc4b58910779c  '"$RUNNER_TEMP/actionlint-cache-mode.patch" | sha256sum --check
           git -C "$RUNNER_TEMP/actionlint-src" apply --check "$RUNNER_TEMP/actionlint-cache-mode.patch"
           git -C "$RUNNER_TEMP/actionlint-src" apply "$RUNNER_TEMP/actionlint-cache-mode.patch"
+          # Remove this backport once actionlint releases support for GitHub's Ubuntu 26.04 image.
+          curl --fail --location --silent --show-error --proto '=https' --proto-redir '=https' --tlsv1.2 \
+            https://github.com/rhysd/actionlint/commit/60be20184d723e812b8454fe72e1ef3740ce050e.patch \
+            -o "$RUNNER_TEMP/actionlint-ubuntu26.patch"
+          echo '802ea10154343aaf499213590c2b3008eb9a6fefe71eff24a0fa7b2d0b67a7f9  '"$RUNNER_TEMP/actionlint-ubuntu26.patch" | sha256sum --check
+          git -C "$RUNNER_TEMP/actionlint-src" apply --check "$RUNNER_TEMP/actionlint-ubuntu26.patch"
+          git -C "$RUNNER_TEMP/actionlint-src" apply "$RUNNER_TEMP/actionlint-ubuntu26.patch"
           cd "$RUNNER_TEMP/actionlint-src"
           # v0.47.0 fixes GO-2026-5024 and is the newest release compatible with the upstream core tests.
           go get golang.org/x/sys@v0.47.0
