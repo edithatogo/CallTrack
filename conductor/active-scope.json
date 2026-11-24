@@ -27,7 +27,8 @@
   "active_tracks": [
     "kotlin_20261020",
     "release_20261020",
-    "compose_app_20261021"
+    "compose_app_20261021",
+    "android17_call_routing_20261125"
   ],
   "deferred_tracks": [
     "shared_core_20261021",

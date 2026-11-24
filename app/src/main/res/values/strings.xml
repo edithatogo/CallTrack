@@ -22,16 +22,23 @@
     <string name="slice_failed" translatable="false">The operation could not be verified. Retry can reconcile an existing event; check the calendar before further action.</string>
 
     <string name="auto_open">Automatic logging settings</string>
-    <string name="auto_intro">Choose a calendar and call types, then enable logging from now. Draft changes do not alter an active policy until applied. Calls during a pause require a historical import. Calendar providers may sync events to their accounts. Phone-state access supports prompt call-end wakeups; periodic recovery still works without it.</string>
+    <string name="auto_intro">Choose calendars for each call source and select the call types to log. Apply to start a new logging period. Calendar providers may sync events to their accounts. Phone-state access helps Android check after phone calls. Shared app calls use periodic checks.</string>
     <string name="auto_access">Grant call/calendar access</string>
     <string name="auto_incoming">Incoming calls</string>
     <string name="auto_outgoing">Outgoing calls</string>
     <string name="auto_missed">Missed calls</string>
     <string name="auto_enable">Enable / apply from now</string>
     <string name="auto_pause">Pause automatic logging</string>
-    <string name="auto_confirm">Start a new logging period from now with the selected calendar and call types? Existing calendar events remain unchanged. Earlier calls and paused work are not imported by enabling. Android can delay background work; reopen this screen to request recovery.</string>
+    <string name="auto_confirm">Start logging new calls to the calendars below? The selected call types apply to every route. Reopen this screen to request a background check.</string>
     <string name="auto_refresh">Refresh logging status</string>
     <string name="auto_enabled">Automatic logging enabled. Active destination: %1$s</string>
+    <string name="auto_enabled_routes">Automatic logging enabled\n%1$s</string>
+    <string name="auto_source_phone">Phone calls</string>
+    <string name="auto_source_observed">%1$s — shared calls seen</string>
+    <string name="auto_source_unverified">%1$s — no shared calls seen</string>
+    <string name="auto_system_history">Android call history settings</string>
+    <string name="auto_system_history_unavailable">Android call history settings are unavailable on this device.</string>
+    <string name="auto_route_row">%1$s ← %2$s</string>
     <string name="auto_disabled">Automatic logging paused or not enabled.</string>
     <string name="auto_destination_unavailable">Previously selected calendar unavailable</string>
     <string name="auto_count_text">Across all destinations — pending: %1$d; previously verified: %2$d; review: %3$d; suppressed: %4$d. Previously verified events may have since changed or been deleted.</string>

@@ -26,35 +26,42 @@ class AutomaticLogWorker(context: Context, parameters: WorkerParameters) :
                 return report(generation, "PAUSED", 0, 0, false)
             var delivered = 0
             var review = 0
+            var stopped: DurableDelivery.Result? = null
+            var retry = false
+            var backlog = false
             SqliteLedger(applicationContext).use { ledger ->
                 ledger.expirePayloads(50)
-                val runner =
-                    AutomaticDelivery(
-                        control,
-                        AndroidCallLogSource(applicationContext),
-                        ledger,
-                        DurableDelivery(ledger.outbox(), AndroidCalendarSink(applicationContext)),
+                val delivery =
+                    DurableDelivery(
+                        ledger.outbox(),
+                        AndroidCalendarSink(applicationContext, settings.calendarBindings),
                     )
-                for (page in 0 until 8) {
-                    val batch = runner.run(settings, 50) { !isStopped }
-                    delivered += batch.delivered
-                    review += batch.review
-                    when (AutomaticWorkPolicy.decide(batch, runAttemptCount)) {
-                        AutomaticWorkPolicy.Action.RETRY ->
-                            return report(generation, "FAILED", delivered, review, true)
-                        AutomaticWorkPolicy.Action.STOP ->
-                            return report(
-                                generation,
-                                batch.stopped?.name ?: "COMPLETE",
-                                delivered,
-                                review,
-                                false,
-                            )
-                        else -> Unit
+                for ((calendar, sources) in settings.destinations) {
+                    val source =
+                        AndroidCallLogSource(
+                            applicationContext,
+                            sources.any { it != CallRecord.PHONE },
+                        )
+                    val runner = AutomaticDelivery(control, source, ledger, delivery)
+                    var settled = false
+                    repeat(8) {
+                        if (!settled) {
+                            val batch = runner.runForCalendar(settings, calendar, 50) { !isStopped }
+                            delivered += batch.delivered
+                            review += batch.review
+                            val action = AutomaticWorkPolicy.decide(batch, runAttemptCount)
+                            settled = action != AutomaticWorkPolicy.Action.CONTINUE
+                            retry = retry || action == AutomaticWorkPolicy.Action.RETRY
+                            if (stopped == null || batch.stopped == DurableDelivery.Result.FAILED) {
+                                stopped = batch.stopped
+                            }
+                        }
                     }
+                    backlog = backlog || !settled
                 }
             }
-            return report(generation, "BACKLOG", delivered, review, true)
+            val status = stopped?.name ?: if (backlog) "BACKLOG" else "COMPLETE"
+            return report(generation, status, delivered, review, retry || backlog)
         } catch (unavailable: RuntimeException) {
             return report(generation, "FAILED", 0, 0, runAttemptCount < 5)
         }

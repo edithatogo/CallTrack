@@ -4,6 +4,9 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import java.util.Map;
+import java.util.Set;
+
 public class AutomaticDeliveryTest {
     static class Progress extends ScanDeliveryTest.Progress implements AutomaticDelivery.Progress {
         public java.util.List<String> pending(
@@ -18,6 +21,57 @@ public class AutomaticDeliveryTest {
             if (!PagedCalls.equal(value, expected)) throw new IllegalStateException();
             value = next;
         }
+    }
+
+    @Test
+    public void oneUnavailableRouteDoesNotClaimOrBlockTheOtherCalendar() {
+        String app = "org.example.calling";
+        ActivationControl control = new ActivationControl(new ActivationControlTest.Store());
+        ActivationControl.Settings settings =
+                control.activate(
+                        Map.of(7L, Set.of(CallRecord.PHONE, app), 9L, Set.of(app)),
+                        "UTC",
+                        1000,
+                        true,
+                        true,
+                        true);
+        CallRecord shared = new CallRecord("fixture", "1", 1001, 1, 1, null, "123", 1, null, app);
+        CallRecord unknown = new CallRecord("fixture", "2", 1002, 1, 1, null, "123", 1, null, null);
+        assertTrue(settings.policy(7).includes(shared));
+        assertTrue(settings.policy(9).includes(shared));
+        assertFalse(settings.policy(9).includes(PagedCallsTest.row(1, 1)));
+        assertFalse(settings.policy(7).includes(unknown));
+        assertNotEquals(settings.operation(7).owner, settings.operation(9).owner);
+
+        PagedCallsTest.Source source = new PagedCallsTest.Source();
+        source.rows.put(1L, shared);
+        source.rows.put(2L, unknown);
+        DurableDeliveryTest.Store receipts = new DurableDeliveryTest.Store();
+        SliceTest.Sink sink =
+                new SliceTest.Sink() {
+                    @Override
+                    public boolean writable(long id) {
+                        return id == 7;
+                    }
+                };
+        DurableDelivery delivery = new DurableDelivery(receipts, sink);
+        Progress unavailable = new Progress();
+        Progress available = new Progress();
+        assertEquals(
+                DurableDelivery.Result.DESTINATION_UNAVAILABLE,
+                new AutomaticDelivery(control, source, unavailable, delivery)
+                        .runForCalendar(settings, 9, 4, () -> true)
+                        .stopped);
+        AutomaticDelivery runner = new AutomaticDelivery(control, source, available, delivery);
+        ScanDelivery.Batch saved = runner.runForCalendar(settings, 7, 4, () -> true);
+        assertTrue(saved.complete);
+        assertEquals(1, saved.delivered);
+        assertEquals(1, saved.excluded);
+        assertEquals(DurableDelivery.State.CONFIRMED, receipts.get(shared.key(), 7).state);
+        assertEquals(-1L, unavailable.value.lastId);
+        assertEquals(2L, available.value.lastId);
+        assertEquals(0, runner.runForCalendar(settings, 7, 4, () -> true).delivered);
+        assertEquals(1, sink.inserts);
     }
 
     @Test

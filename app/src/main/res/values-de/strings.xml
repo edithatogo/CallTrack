@@ -2,14 +2,21 @@
     <string name="app_name">CallTrack Community (dev)</string>
 
     <string name="auto_open">Einstellungen zur automatischen Protokollierung</string>
-    <string name="auto_intro">Wähle einen Kalender und die Anrufarten aus und aktiviere die Protokollierung ab jetzt. Änderungen am Entwurf ändern eine aktive Konfiguration erst nach dem Anwenden. Anrufe während einer Pause müssen über einen historischen Import übernommen werden. Kalenderanbieter können Termine mit ihren Konten synchronisieren. Der Zugriff auf den Telefonstatus ermöglicht zeitnahe Ausführungen nach Gesprächsende; die regelmäßige Wiederherstellung funktioniert auch ohne diesen Zugriff.</string>
+    <string name="auto_intro">Wähle Kalender für jede Anrufquelle und die gewünschten Anrufarten. Anwenden startet einen neuen Protokollierungszeitraum. Kalenderanbieter können Termine mit ihren Konten synchronisieren. Der Zugriff auf den Telefonstatus ermöglicht Prüfungen nach Telefonanrufen. Geteilte App-Anrufe werden regelmäßig geprüft.</string>
     <string name="auto_access">Zugriff auf Anrufe und Kalender erlauben</string>
     <string name="auto_incoming">Eingehende Anrufe</string>
     <string name="auto_outgoing">Ausgehende Anrufe</string>
     <string name="auto_missed">Verpasste Anrufe</string>
     <string name="auto_enable">Ab jetzt aktivieren / anwenden</string>
     <string name="auto_pause">Automatische Protokollierung pausieren</string>
-    <string name="auto_confirm">Soll ab jetzt ein neuer Protokollierungszeitraum mit dem ausgewählten Kalender und den ausgewählten Anrufarten beginnen? Bestehende Termine bleiben unverändert. Frühere Anrufe und pausierte Vorgänge werden durch das Aktivieren nicht importiert. Android kann die Hintergrundausführung verzögern. Öffne diese Ansicht erneut, um eine Wiederherstellung anzufordern.</string>
+    <string name="auto_confirm">Neue Anrufe in den unten aufgeführten Kalendern protokollieren? Die gewählten Anrufarten gelten für alle Kalender. Öffne diese Ansicht erneut, um eine Hintergrundprüfung anzufordern.</string>
+    <string name="auto_enabled_routes">Automatische Protokollierung ist aktiv\n%1$s</string>
+    <string name="auto_source_phone">Telefonanrufe</string>
+    <string name="auto_source_observed">%1$s — geteilte Anrufe gefunden</string>
+    <string name="auto_source_unverified">%1$s — keine geteilten Anrufe gefunden</string>
+    <string name="auto_system_history">Android-Einstellungen für die Anrufliste</string>
+    <string name="auto_system_history_unavailable">Die Android-Einstellungen für die Anrufliste sind auf diesem Gerät nicht verfügbar.</string>
+    <string name="auto_route_row">%1$s ← %2$s</string>
     <string name="auto_refresh">Protokollierungsstatus aktualisieren</string>
     <string name="auto_enabled">Automatische Protokollierung aktiviert. Aktiver Zielkalender: %1$s</string>
     <string name="auto_disabled">Automatische Protokollierung pausiert oder nicht aktiviert.</string>

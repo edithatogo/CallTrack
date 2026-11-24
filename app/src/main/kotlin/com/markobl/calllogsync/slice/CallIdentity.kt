@@ -14,7 +14,9 @@ class CallIdentity private constructor() {
             val number = source.number?.let { "${it.length}:$it" } ?: "-1:"
             val material =
                 "source-v1|${source.key()}|${source.start}|${source.seconds}|${source.type}|" +
-                    "${source.direction.length}:${source.direction}|${source.identityAllowed}|$number"
+                    "${source.direction.length}:${source.direction}|${source.identityAllowed}|$number" +
+                    (if (source.source == CallRecord.PHONE) ""
+                    else "|app:${source.source.orEmpty()}")
             try {
                 val bytes =
                     MessageDigest.getInstance("SHA-256")

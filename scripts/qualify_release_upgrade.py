@@ -27,6 +27,15 @@ def require_rejection(result, reason):
         raise RuntimeError('Expected controlled rejection: ' + reason)
 
 
+def apk_version(apk, package, sdk):
+    badge = subprocess.check_output(
+        [str(sdk / 'build-tools/35.0.0/aapt'), 'dump', 'badging', str(apk)], text=True)
+    match = re.match(r"package: name='" + re.escape(package) + r"' versionCode='([0-9]*)'", badge)
+    if match is None or (not match[1] and package != TEST_PACKAGE):
+        raise RuntimeError('Unexpected package or missing APK version')
+    return int(match[1]) if match[1] else None
+
+
 def cleanup_owned_packages(adb, attempted, provider_cleanup_verified=True):
     if not provider_cleanup_verified:
         return ["Provider cleanup unverified; owned packages retained for recovery"]
@@ -118,6 +127,10 @@ def qualify(serial, output, provider_schema=False, release_build_receipt=None):
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     output.mkdir(parents=True, exist_ok=False)
     sdk = (ROOT / '.local/android-sdk').resolve()
+    baseline_version = apk_version(original, PACKAGE, sdk)
+    if not 0 < baseline_version < 2_147_483_647:
+        raise RuntimeError('Baseline APK version does not permit a version increase')
+    next_version = baseline_version + 1
     env = qualified_java_environment(jdk)
     env.update(ANDROID_HOME=str(sdk), CALLTRACK_RELEASE_QUALIFICATION=str(qualification))
     receipt = dict(scope='development-key-release-mode-version-increase-private-state-only',
@@ -131,9 +144,7 @@ def qualify(serial, output, provider_schema=False, release_build_receipt=None):
     provider_attempted = False
     if release_build_receipt is not None:
         unsigned = frozen_release_apk(release_build_receipt, revision, sdk, env)
-        badge = subprocess.check_output([str(sdk / 'build-tools/35.0.0/aapt'), 'dump', 'badging',
-                                         str(unsigned)], text=True)
-        if "package: name='" + PACKAGE + "' versionCode='10'" not in badge:
+        if apk_version(unsigned, PACKAGE, sdk) != baseline_version:
             raise RuntimeError('Build the frozen upgrade input with --development-fixture')
         original = output / 'exact-release-development-signed.apk'
         signing_env = dict(env, CALLTRACK_DEBUG_PASSWORD='android')
@@ -185,12 +196,12 @@ def qualify(serial, output, provider_schema=False, release_build_receipt=None):
         overlay.write_text("""gradle.beforeProject { project ->
     project.plugins.withId('com.android.application') {
         project.androidComponents.finalizeDsl { android ->
-            android.defaultConfig.versionCode = 11
+            android.defaultConfig.versionCode = CALLTRACK_NEXT_VERSION
             android.buildTypes.release.signingConfig = android.signingConfigs.debug
         }
     }
 }
-""")
+""".replace('CALLTRACK_NEXT_VERSION', str(next_version)))
         if provider_schema:
             overlay.write_text(overlay.read_text() + """
 gradle.beforeProject { project ->
@@ -217,9 +228,10 @@ gradle.beforeProject { project ->
             tests = checkout / 'app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk'
         candidate = checkout / 'app/build/outputs/apk/release/app-release.apk'
         certs = []
-        for apk, package, version in ((original, PACKAGE, 10), (candidate, PACKAGE, 11), (tests, TEST_PACKAGE, None)):
-            badge = subprocess.check_output([str(sdk / 'build-tools/35.0.0/aapt'), 'dump', 'badging', str(apk)], text=True)
-            if "package: name='" + package + "'" not in badge or (version and "versionCode='" + str(version) + "'" not in badge):
+        for apk, package, version in ((original, PACKAGE, baseline_version),
+                                      (candidate, PACKAGE, next_version), (tests, TEST_PACKAGE, None)):
+            actual_version = apk_version(apk, package, sdk)
+            if version is not None and actual_version != version:
                 raise RuntimeError('Unexpected package/version')
             signature = subprocess.check_output([str(sdk / 'build-tools/35.0.0/apksigner'), 'verify', '--print-certs', str(apk)], env=env, text=True)
             found = re.findall(r'Signer #\d+ certificate SHA-256 digest: ([a-f0-9]{64})', signature)
@@ -229,7 +241,8 @@ gradle.beforeProject { project ->
         if len(set(certs)) != 1:
             raise RuntimeError('Development/instrumentation certificate mismatch')
         receipt.update(artifacts={str(p): sha(p) for p in (original, candidate, tests)},
-                       signer_sha256=certs[0], versions=[10, 11], build_log_sha256=sha(output / 'build.log'))
+                       signer_sha256=certs[0], versions=[baseline_version, next_version],
+                       build_log_sha256=sha(output / 'build.log'))
         # Building can take minutes: recheck ownership and guest health before mutation.
         if adb('shell', 'getprop', 'ro.kernel.qemu') != '1' or not is_dedicated_avd(adb('emu', 'avd', 'name')):
             raise RuntimeError('Dedicated emulator changed during build')
@@ -260,7 +273,7 @@ gradle.beforeProject { project ->
         adb('shell', 'am', 'force-stop', PACKAGE)
         if 'Success' not in adb('install', '-r', str(candidate)):
             raise RuntimeError('Upgrade unconfirmed')
-        if not re.search(r'\bversionCode=11\b', adb('shell', 'dumpsys', 'package', PACKAGE)):
+        if not re.search(rf'\bversionCode={next_version}\b', adb('shell', 'dumpsys', 'package', PACKAGE)):
             raise RuntimeError('Installed increasing version unverified')
         native('verifyPersistedState')
         if provider_schema:

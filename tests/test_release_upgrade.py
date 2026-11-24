@@ -38,6 +38,15 @@ class UpgradeSafetyTest(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             upgrade.require_rejection(result, 'INSTALL_FAILED_VERSION_DOWNGRADE')
 
+    def test_version_comes_from_exact_apk_identity(self):
+        for package, version in ((upgrade.PACKAGE, 11), (upgrade.TEST_PACKAGE, None)):
+            code = version if version is not None else ''
+            badge = f"package: name='{package}' versionCode='{code}' versionName='fixture'\n"
+            with patch.object(upgrade.subprocess, 'check_output', return_value=badge):
+                self.assertEqual(version, upgrade.apk_version(Path('fixture.apk'), package, Path('/sdk')))
+                with self.assertRaisesRegex(RuntimeError, 'Unexpected package'):
+                    upgrade.apk_version(Path('fixture.apk'), 'different.package', Path('/sdk'))
+
     def test_cleanup_does_not_touch_unowned_packages(self):
         command = unittest.mock.Mock()
         self.assertEqual([], upgrade.cleanup_owned_packages(command, []))

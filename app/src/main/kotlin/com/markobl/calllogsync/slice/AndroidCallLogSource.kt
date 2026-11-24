@@ -1,6 +1,7 @@
 package com.markobl.calllogsync.slice
 
 import android.Manifest
+import android.content.ComponentName
 import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
@@ -10,8 +11,15 @@ import android.provider.CallLog.Calls
 import java.util.UUID
 
 /** Call-only adapter; queries occur only on explicit coordinator requests. */
-class AndroidCallLogSource(context: Context?) : SliceEngine.CallSource, PagedCalls.Source {
+class AndroidCallLogSource
+@JvmOverloads
+constructor(context: Context?, includeAppCalls: Boolean = false) :
+    SliceEngine.CallSource, PagedCalls.Source {
     private val context = context!!.applicationContext
+    private val uri = if (includeAppCalls) Calls.CONTENT_URI_WITH_VOIP_CALLS else Calls.CONTENT_URI
+    private val projection =
+        if (includeAppCalls) PROJECTION + arrayOf(Calls.UUID, Calls.PHONE_ACCOUNT_COMPONENT_NAME)
+        else PROJECTION
 
     override fun latest(): CallRecord? {
         permission()
@@ -24,10 +32,8 @@ class AndroidCallLogSource(context: Context?) : SliceEngine.CallSource, PagedCal
         query.putInt(ContentResolver.QUERY_ARG_LIMIT, 1)
         context.contentResolver
             .query(
-                Calls.CONTENT_URI.buildUpon()
-                    .appendQueryParameter(Calls.LIMIT_PARAM_KEY, "1")
-                    .build(),
-                PROJECTION,
+                uri.buildUpon().appendQueryParameter(Calls.LIMIT_PARAM_KEY, "1").build(),
+                projection,
                 query,
                 null,
             )
@@ -38,6 +44,26 @@ class AndroidCallLogSource(context: Context?) : SliceEngine.CallSource, PagedCal
     }
 
     override fun namespace(): String = namespace(context)
+
+    internal fun observedAppPackages(): Set<String> {
+        permission()
+        val query = pageQuery("${Calls.UUID} IS NOT NULL", null, false, 500)
+        return context.contentResolver
+            .query(
+                Calls.CONTENT_URI_WITH_VOIP_CALLS.buildUpon()
+                    .appendQueryParameter(Calls.LIMIT_PARAM_KEY, "500")
+                    .build(),
+                arrayOf(Calls.PHONE_ACCOUNT_COMPONENT_NAME),
+                query,
+                null,
+            )
+            .use { cursor ->
+                checkNotNull(cursor) { "Call provider unavailable" }
+                buildSet {
+                    while (cursor.moveToNext()) appPackage(cursor.getString(0))?.let(::add)
+                }
+            }
+    }
 
     override fun upper(): CallRecord? = bounded(null, null, false, 1).firstOrNull()
 
@@ -80,10 +106,10 @@ class AndroidCallLogSource(context: Context?) : SliceEngine.CallSource, PagedCal
         permission()
         context.contentResolver
             .query(
-                Calls.CONTENT_URI.buildUpon()
+                uri.buildUpon()
                     .appendQueryParameter(Calls.LIMIT_PARAM_KEY, limit.toString())
                     .build(),
-                PROJECTION,
+                projection,
                 pageQuery(selection, args, ascending, limit),
                 null,
             )
@@ -164,8 +190,17 @@ class AndroidCallLogSource(context: Context?) : SliceEngine.CallSource, PagedCal
         fun first(cursor: Cursor?, namespace: String?): CallRecord? =
             if (!cursor!!.moveToFirst()) null else current(cursor, namespace)
 
-        private fun current(cursor: Cursor, namespace: String?): CallRecord =
-            CallRecord(
+        private fun current(cursor: Cursor, namespace: String?): CallRecord {
+            val appMarker = cursor.getColumnIndex(Calls.UUID)
+            val source =
+                if (appMarker < 0 || cursor.isNull(appMarker)) CallRecord.PHONE
+                else
+                    appPackage(
+                        cursor.getString(
+                            cursor.getColumnIndexOrThrow(Calls.PHONE_ACCOUNT_COMPONENT_NAME),
+                        ),
+                    )
+            return CallRecord(
                 namespace,
                 cursor.getString(0),
                 cursor.getLong(3),
@@ -175,6 +210,13 @@ class AndroidCallLogSource(context: Context?) : SliceEngine.CallSource, PagedCal
                 cursor.getString(1),
                 if (cursor.isNull(6)) null else cursor.getInt(6),
                 cursor.getString(7),
+                source,
             )
+        }
+
+        internal fun appPackage(component: String?): String? =
+            component?.let(ComponentName::unflattenFromString)?.packageName?.takeIf {
+                it.isNotBlank()
+            }
     }
 }

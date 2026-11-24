@@ -49,6 +49,9 @@ class CallEvent(
                     (if (source.identityAllowed && present(source.number)) source.number
                     else "Unavailable") +
                     "\nActual duration: ${source.seconds} seconds"
+            if (source.source != null && source.source != CallRecord.PHONE) {
+                description += "\nCalling app: ${source.source}"
+            }
             if (source.seconds == 0L) {
                 description += "\nOne-minute visual marker; actual call duration is zero."
             }
