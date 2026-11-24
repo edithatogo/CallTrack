@@ -13,16 +13,23 @@ jobs:
       github.event.pull_request.head.ref != 'main'
     runs-on: ubuntu-latest
     steps:
-      - name: Remove only the merged repository branch
+      - name: Remove only the merged branch tip
         env:
           GH_TOKEN: ${{ github.token }}
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
-          ref="repos/$GITHUB_REPOSITORY/git/refs/heads/$HEAD_REF"
-          if gh api --silent "$ref" >/dev/null 2>&1; then
-            gh api --method DELETE "$ref"
-            echo "Pruned merged branch"
-          else
-            echo "Branch already absent; nothing to prune"
+          ref="refs/heads/$HEAD_REF"
+          git check-ref-format "$ref"
+          [[ "$HEAD_SHA" =~ ^[0-9a-f]{40}$ ]]
+          repo="$RUNNER_TEMP/merged-branch.git"
+          remote="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git"
+          git init --quiet --bare "$repo"
+          git -C "$repo" config "credential.$GITHUB_SERVER_URL.helper" '!gh auth git-credential'
+          tip="$(git -C "$repo" ls-remote --refs "$remote" "$ref" | cut -f1)"
+          if [[ "$tip" != "$HEAD_SHA" ]]; then
+            echo "The merged branch is absent or has advanced"
+            exit 0
           fi
+          git -C "$repo" push --force-with-lease="$ref:$HEAD_SHA" "$remote" ":$ref"
