@@ -1,5 +1,7 @@
 package com.markobl.calllogsync.slice
 
+import kotlinx.coroutines.runBlocking
+
 /** Manual single-call orchestration with explicit insertion/receipt recovery. */
 class SliceEngine(
     private val source: CallSource?,
@@ -34,15 +36,15 @@ class SliceEngine(
     }
 
     fun interface Work {
-        fun run(): Result?
+        suspend fun run(): Result?
     }
 
     interface Ledger {
-        fun transaction(work: Work?): Result?
+        suspend fun transaction(work: Work?): Result?
 
-        fun get(sourceKey: String?, calendar: Long): Entry?
+        suspend fun getReceipt(sourceKey: String?, calendar: Long): Entry?
 
-        fun put(sourceKey: String?, calendar: Long, entry: Entry?)
+        suspend fun putReceipt(sourceKey: String?, calendar: Long, entry: Entry?)
     }
 
     class Entry(@JvmField val id: Long, @JvmField val fingerprint: String?)
@@ -61,7 +63,7 @@ class SliceEngine(
                 if (call == null) Result.NO_CALL
                 else {
                     val event = CallEvent.from(call, timezone)
-                    ledger!!.transaction { save(call.key(), calendar, event) }
+                    runBlocking { ledger!!.transaction { save(call.key(), calendar, event) } }
                 }
             }
         } catch (denied: SecurityException) {
@@ -79,9 +81,9 @@ class SliceEngine(
             stored.calendar == calendar &&
             event.fingerprint() == stored.event!!.fingerprint()
 
-    private fun save(key: String, calendar: Long, event: CallEvent): Result {
+    private suspend fun save(key: String, calendar: Long, event: CallEvent): Result {
         if (!sink!!.writable(calendar)) return Result.DESTINATION_UNAVAILABLE
-        val prior = ledger!!.get(key, calendar)
+        val prior = ledger!!.getReceipt(key, calendar)
         if (prior != null) {
             if (
                 !prior.fingerprint!!.equals(event.fingerprint()) ||
@@ -95,7 +97,7 @@ class SliceEngine(
         val recovered = found.isNotEmpty()
         if (recovered && !matches(found[0], calendar, event)) return Result.REVIEW_REQUIRED
         val id = if (recovered) found[0]!!.id else sink.insert(calendar, event)
-        ledger.put(key, calendar, Entry(id, event.fingerprint()))
+        ledger.putReceipt(key, calendar, Entry(id, event.fingerprint()))
         return try {
             if (!matches(sink.read(id), calendar, event)) Result.REVIEW_REQUIRED
             else if (recovered) Result.RECOVERED else Result.SAVED

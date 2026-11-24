@@ -17,6 +17,14 @@ import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.Test;
 
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 /** Actual LOCAL calendar and SQLite, synthetic source only; no device-call access. */
 public class ParityProviderTest {
     Context context() {
@@ -152,12 +160,12 @@ public class ParityProviderTest {
 
     private void failState(SqliteLedger ledger, String state) {
         // State comes only from the test's fixed enum names, never application/provider data.
-        ledger.getWritableDatabase()
-                .execSQL(
-                        "CREATE TRIGGER fail_fixture BEFORE INSERT ON outbox "
-                                + "WHEN NEW.state='"
-                                + state
-                                + "' BEGIN SELECT RAISE(ABORT,'fixture'); END");
+        RoomFixtures.execute(
+                ledger,
+                "CREATE TRIGGER fail_fixture BEFORE INSERT ON outbox "
+                        + "WHEN NEW.state='"
+                        + state
+                        + "' BEGIN SELECT RAISE(ABORT,'fixture'); END");
     }
 
     long events(long calendar) {
@@ -202,7 +210,7 @@ public class ParityProviderTest {
                                 .deliver(first, calendar, "UTC", () -> true));
                 assertNull(ledger.outbox().get(first.key(), calendar));
                 assertEquals(0, events(calendar));
-                ledger.getWritableDatabase().execSQL("DROP TRIGGER fail_fixture");
+                RoomFixtures.execute(ledger, "DROP TRIGGER fail_fixture");
                 failState(ledger, "ATTEMPTED");
                 SliceEngine.CalendarSink boundary =
                         new SliceEngine.CalendarSink() {
@@ -240,7 +248,7 @@ public class ParityProviderTest {
                         DurableDelivery.State.IN_FLIGHT,
                         ledger.outbox().get(first.key(), calendar).state);
                 assertEquals(1, events(calendar));
-                ledger.getWritableDatabase().execSQL("DROP TRIGGER fail_fixture");
+                RoomFixtures.execute(ledger, "DROP TRIGGER fail_fixture");
             }
             try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
                 DurableDelivery delivery = new DurableDelivery(ledger.outbox(), sink);
@@ -258,7 +266,7 @@ public class ParityProviderTest {
                 assertTrue(known.eventId >= 0);
                 assertNotNull(sink.read(known.eventId));
                 assertEquals(2, events(calendar));
-                ledger.getWritableDatabase().execSQL("DROP TRIGGER fail_fixture");
+                RoomFixtures.execute(ledger, "DROP TRIGGER fail_fixture");
             }
             try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
                 assertEquals(
@@ -273,6 +281,97 @@ public class ParityProviderTest {
         } finally {
             cleanupFixture();
             assertTrue(context().deleteDatabase(name));
+        }
+    }
+
+    @Test
+    public void overlappingDeliveryPathsCommitOneCalendarEvent() throws Exception {
+        long calendar = createCalendar();
+        String ledgerName = account() + "-overlap-ledger.db";
+        String importName = account() + "-overlap-import.db";
+        CallRecord call = call(1);
+        AndroidCalendarSink sink = new AndroidCalendarSink(context());
+        HistoricalImportStoreTest.Source source =
+                new HistoricalImportStoreTest.Source() {
+                    @Override
+                    public String namespace() {
+                        return account();
+                    }
+                };
+        source.rows.put(1L, call);
+        ExecutorService pool = Executors.newFixedThreadPool(3);
+        try (SqliteLedger manual = new SqliteLedger(context(), ledgerName);
+                SqliteLedger automatic = new SqliteLedger(context(), ledgerName);
+                SqliteLedger history = new SqliteLedger(context(), ledgerName);
+                SqliteImportStore imports = new SqliteImportStore(context(), importName)) {
+            HistoricalImport importer =
+                    new HistoricalImport(
+                            imports,
+                            source,
+                            history.outbox(),
+                            new DurableDelivery(history.outbox(), sink));
+            String session =
+                    importer.start(calendar, "UTC", call.start, call.start + 1, true, true, true)
+                            .id;
+            importer.preview(session, 1);
+            importer.confirm(session);
+            assertEquals(0, events(calendar));
+
+            DurableDelivery.Operation operation = new DurableDelivery.Operation("automatic", 1);
+            CyclicBarrier start = new CyclicBarrier(3);
+            List<Callable<Void>> deliveries =
+                    List.of(
+                            () -> {
+                                start.await(10, TimeUnit.SECONDS);
+                                DurableDelivery.Result result =
+                                        new DurableDelivery(manual.outbox(), sink)
+                                                .deliver(call, calendar, "UTC", () -> true);
+                                assertTrue(
+                                        result == DurableDelivery.Result.SAVED
+                                                || result == DurableDelivery.Result.ALREADY_LOGGED);
+                                return null;
+                            },
+                            () -> {
+                                start.await(10, TimeUnit.SECONDS);
+                                ScanDelivery.Batch result =
+                                        new ScanDelivery(
+                                                        source,
+                                                        automatic,
+                                                        new DurableDelivery(
+                                                                automatic.outbox(), sink))
+                                                .run(
+                                                        operation,
+                                                        new ScanDelivery.Policy(
+                                                                0, true, true, true),
+                                                        calendar,
+                                                        "UTC",
+                                                        1,
+                                                        () -> true);
+                                assertTrue(result.complete);
+                                assertEquals(0, result.review);
+                                return null;
+                            },
+                            () -> {
+                                start.await(10, TimeUnit.SECONDS);
+                                assertEquals(
+                                        HistoricalImport.Phase.COMPLETE,
+                                        importer.deliver(session, 1).phase);
+                                return null;
+                            });
+            for (Future<Void> delivery : pool.invokeAll(deliveries, 30, TimeUnit.SECONDS)) {
+                delivery.get();
+            }
+            assertEquals(1, imports.get(session).saved);
+            assertEquals(1, automatic.checkpoint(operation).lastId);
+            assertEquals(
+                    DurableDelivery.State.CONFIRMED,
+                    history.outbox().get(call.key(), calendar).state);
+            assertEquals(1, events(calendar));
+        } finally {
+            pool.shutdownNow();
+            cleanupFixture();
+            assertTrue(context().deleteDatabase(ledgerName));
+            assertTrue(context().deleteDatabase(importName));
         }
     }
 
@@ -488,7 +587,7 @@ public class ParityProviderTest {
                     DurableDelivery.State.IN_FLIGHT,
                     ledger.outbox().get(call(1).key(), calendar).state);
             assertEquals(1, events(calendar));
-            ledger.getWritableDatabase().execSQL("DROP TRIGGER fail_fixture");
+            RoomFixtures.execute(ledger, "DROP TRIGGER fail_fixture");
         }
         // Deliberately remains for the next instrumentation process after write revocation.
         // The harness restores write access and verifies scoped cleanup even on failure.

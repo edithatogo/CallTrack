@@ -1,9 +1,9 @@
 package com.markobl.calllogsync.slice
 
-import android.content.ContentValues
 import android.content.Context
 import java.io.Closeable
 import java.util.Collections
+import kotlinx.coroutines.runBlocking
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -11,13 +11,8 @@ import org.json.JSONObject
 class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Store, Closeable {
     constructor(context: Context?) : this(context, "calltrack-imports.db")
 
-    private val room = RoomPersistence.imports(requireNotNull(context), requireNotNull(name))
-    private val adapter by lazy { RoomPersistence.adapter(room) }
-    val writableDatabase: RoomSqliteCompat
-        get() = adapter
-
-    val readableDatabase: RoomSqliteCompat
-        get() = adapter
+    internal val room = RoomPersistence.imports(requireNotNull(context), requireNotNull(name))
+    private val dao = room.importDao()
 
     override fun close() = room.close()
 
@@ -30,24 +25,11 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
         require((beforeExclusive == -1L || beforeExclusive >= 1) && limit in 1..50) {
             "Invalid session page"
         }
-        val rows = ArrayList<ListedSession>()
-        readableDatabase
-            .query(
-                "sessions",
-                arrayOf("rowid", "body"),
-                if (beforeExclusive == -1L) null else "rowid<?",
-                if (beforeExclusive == -1L) null else arrayOf(beforeExclusive.toString()),
-                null,
-                null,
-                "rowid DESC",
-                limit.toString(),
-            )
-            .use { cursor ->
-                while (cursor.moveToNext()) rows.add(
-                    ListedSession(cursor.getLong(0), decode(cursor.getString(1))),
-                )
-            }
-        return Collections.unmodifiableList(rows)
+        val rows = runBlocking {
+            if (beforeExclusive == -1L) dao.sessions(limit)
+            else dao.sessionsBefore(beforeExclusive, limit)
+        }
+        return Collections.unmodifiableList(rows.map { ListedSession(it.cursor, decode(it.body)) })
     }
 
     override fun create(session: HistoricalImport.Session?) {
@@ -63,22 +45,17 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
         ) {
             "Invalid initial import"
         }
-        val values = ContentValues()
-        values.put("id", current.id)
-        values.put("revision", 0)
-        values.put("body", encode(current))
-        val db = writableDatabase
-        check(!db.inTransaction()) { "Import creation must commit independently" }
-        db.insertOrThrow("sessions", null, values)
+        runBlocking {
+            room.commitIndependently("Import creation must commit independently") {
+                dao.insertSession(ImportSessionRow(current.id, 0, encode(current)))
+            }
+        }
     }
 
-    override fun get(id: String?): HistoricalImport.Session? {
-        readableDatabase
-            .query("sessions", arrayOf("body"), "id=?", arrayOf(id), null, null, null)
-            .use { cursor ->
-                return if (cursor.moveToFirst()) decode(cursor.getString(0)) else null
-            }
-    }
+    override fun get(id: String?): HistoricalImport.Session? = runBlocking { readSession(id) }
+
+    private suspend fun readSession(id: String?): HistoricalImport.Session? =
+        dao.sessionBody(id)?.let(::decode)
 
     override fun save(
         expected: HistoricalImport.Session?,
@@ -117,83 +94,70 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
         require(handled != null || updated.processedId == prior.processedId) {
             "Candidate outcome required for progress"
         }
-        val db = writableDatabase
-        check(!db.inTransaction()) { "Import progress must commit independently" }
-        db.beginTransaction()
-        try {
-            val stored = get(prior.id)
-            check(stored != null && encode(stored) == encode(prior)) {
-                "Import changed before publication"
-            }
-            for (candidate in added!!) {
-                val row = ContentValues()
-                row.put("session", updated.id)
-                row.put("source_id", candidate!!.sourceId)
-                row.put("source_key", candidate.key)
-                row.put("binding", candidate.binding)
-                db.insertOrThrow("candidates", null, row)
-            }
-            if (handled != null) {
-                val pending = candidates(prior.id, prior.processedId, 1)
+        runBlocking {
+            room.commitIndependently("Import progress must commit independently") {
+                val stored = readSession(prior.id)
+                check(stored != null && encode(stored) == encode(prior)) {
+                    "Import changed before publication"
+                }
+                dao.insertCandidates(
+                    added!!.map { candidate ->
+                        ImportCandidateRow(
+                            updated.id,
+                            candidate!!.sourceId,
+                            candidate.key,
+                            candidate.binding,
+                            null,
+                        )
+                    },
+                )
+                if (handled != null) {
+                    val pending = readCandidates(prior.id, prior.processedId, 1)
+                    check(
+                        pending.isNotEmpty() &&
+                            pending[0].sourceId == handled.sourceId &&
+                            pending[0].key == handled.key &&
+                            pending[0].binding == handled.binding,
+                    ) {
+                        "Candidate changed before result"
+                    }
+                    val terminal =
+                        outcome == DurableDelivery.Result.SAVED ||
+                            outcome == DurableDelivery.Result.RECOVERED ||
+                            outcome == DurableDelivery.Result.ALREADY_LOGGED ||
+                            outcome == DurableDelivery.Result.REVIEW_REQUIRED ||
+                            outcome == DurableDelivery.Result.SOURCE_CHANGED
+                    require(
+                        if (terminal) updated.processedId == handled.sourceId
+                        else updated.processedId == prior.processedId,
+                    ) {
+                        "Outcome disagrees with progress"
+                    }
+                    val verified =
+                        outcome == DurableDelivery.Result.SAVED ||
+                            outcome == DurableDelivery.Result.RECOVERED ||
+                            outcome == DurableDelivery.Result.ALREADY_LOGGED
+                    require(
+                        updated.saved == prior.saved + (if (verified) 1 else 0) &&
+                            updated.review == prior.review + (if (terminal && !verified) 1 else 0),
+                    ) {
+                        "Outcome disagrees with counts"
+                    }
+                    check(dao.storeOutcome(prior.id, handled.sourceId, outcome!!.name) == 1) {
+                        "Candidate outcome not stored"
+                    }
+                }
                 check(
-                    pending.isNotEmpty() &&
-                        pending[0].sourceId == handled.sourceId &&
-                        pending[0].key == handled.key &&
-                        pending[0].binding == handled.binding,
-                ) {
-                    "Candidate changed before result"
-                }
-                val terminal =
-                    outcome == DurableDelivery.Result.SAVED ||
-                        outcome == DurableDelivery.Result.RECOVERED ||
-                        outcome == DurableDelivery.Result.ALREADY_LOGGED ||
-                        outcome == DurableDelivery.Result.REVIEW_REQUIRED ||
-                        outcome == DurableDelivery.Result.SOURCE_CHANGED
-                require(
-                    if (terminal) updated.processedId == handled.sourceId
-                    else updated.processedId == prior.processedId,
-                ) {
-                    "Outcome disagrees with progress"
-                }
-                val verified =
-                    outcome == DurableDelivery.Result.SAVED ||
-                        outcome == DurableDelivery.Result.RECOVERED ||
-                        outcome == DurableDelivery.Result.ALREADY_LOGGED
-                require(
-                    updated.saved == prior.saved + (if (verified) 1 else 0) &&
-                        updated.review == prior.review + (if (terminal && !verified) 1 else 0),
-                ) {
-                    "Outcome disagrees with counts"
-                }
-                val result = ContentValues()
-                result.put("outcome", outcome!!.name)
-                check(
-                    db.update(
-                        "candidates",
-                        result,
-                        "session=? AND source_id=?",
-                        arrayOf(prior.id, handled.sourceId.toString()),
+                    dao.storeProgress(
+                        prior.id,
+                        prior.revision,
+                        updated.revision,
+                        encode(updated),
                     ) == 1,
                 ) {
-                    "Candidate outcome not stored"
+                    "Import progress not stored"
                 }
             }
-            val values = ContentValues()
-            values.put("revision", updated.revision)
-            values.put("body", encode(updated))
-            check(
-                db.update(
-                    "sessions",
-                    values,
-                    "id=? AND revision=?",
-                    arrayOf(prior.id, prior.revision.toString()),
-                ) == 1,
-            ) {
-                "Import progress not stored"
-            }
-            db.setTransactionSuccessful()
-        } finally {
-            db.endTransaction()
         }
     }
 
@@ -203,31 +167,24 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
         limit: Int,
     ): List<HistoricalImport.Candidate> {
         require(afterExclusive >= -1 && limit in 1..500) { "Invalid candidate page" }
-        val rows = ArrayList<HistoricalImport.Candidate>()
-        readableDatabase
-            .query(
-                "candidates",
-                arrayOf("source_id", "source_key", "binding", "outcome"),
-                "session=? AND source_id>?",
-                arrayOf(id, afterExclusive.toString()),
-                null,
-                null,
-                "source_id ASC",
-                limit.toString(),
-            )
-            .use { cursor ->
-                while (cursor.moveToNext()) rows.add(
-                    HistoricalImport.Candidate(
-                        cursor.getLong(0),
-                        cursor.getString(1),
-                        cursor.getString(2),
-                        if (cursor.isNull(3)) null
-                        else DurableDelivery.Result.valueOf(cursor.getString(3)),
-                    ),
-                )
-            }
-        return Collections.unmodifiableList(rows)
+        return Collections.unmodifiableList(
+            runBlocking { readCandidates(id, afterExclusive, limit) },
+        )
     }
+
+    private suspend fun readCandidates(
+        id: String?,
+        afterExclusive: Long,
+        limit: Int,
+    ): List<HistoricalImport.Candidate> =
+        dao.candidates(id, afterExclusive, limit).map {
+            HistoricalImport.Candidate(
+                it.sourceId,
+                it.sourceKey,
+                it.binding,
+                it.outcome?.let(DurableDelivery.Result::valueOf),
+            )
+        }
 
     companion object {
         private fun validate(

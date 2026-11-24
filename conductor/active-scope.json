@@ -21,14 +21,13 @@
     "Android CallLog",
     "Android CalendarContract",
     "WorkManager",
-    "Room 3.0.3 (preserving migration with SQLite compatibility bridge)"
+    "Room 3.0.3 (preserving migrations and suspend DAOs)"
   ],
   "local_primary_avd": "calltrack-android17-local",
   "active_tracks": [
     "kotlin_20261020",
     "release_20261020",
-    "compose_app_20261021",
-    "room3_android17_20261124"
+    "compose_app_20261021"
   ],
   "deferred_tracks": [
     "shared_core_20261021",

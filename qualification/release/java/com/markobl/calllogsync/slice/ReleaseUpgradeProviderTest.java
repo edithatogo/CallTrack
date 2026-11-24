@@ -180,7 +180,7 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
     public void importMigrationPreservesProgressAndCancelledSession() {
         try (SqliteImportStore imports =
                 new SqliteImportStore(context(), account() + "-imports.db")) {
-            assertEquals(3, imports.getReadableDatabase().getVersion());
+            assertEquals(3, RoomFixtures.version(imports));
             for (String phase : new String[] {"CONFIRMED", "CANCELLED"}) {
                 String id = importId(phase);
                 HistoricalImport.Session saved = imports.get(id);
@@ -297,7 +297,7 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
         assertEquals(14, events(destination));
         for (int version = 1; version <= 5; version++) {
             try (SqliteLedger ledger = new SqliteLedger(context(), database(version))) {
-                assertEquals(7, ledger.getWritableDatabase().getVersion());
+                assertEquals(7, RoomFixtures.version(ledger));
                 ReceiptRecovery recovery = recovery(ledger, sink);
                 for (int id = 0; id < 3; id++) {
                     long eventId = preferences().getLong(version + "/" + id, -1);
@@ -356,7 +356,7 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
         String name = database(2) + "-fault";
         try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
             try {
-                ledger.getWritableDatabase();
+                RoomFixtures.version(ledger);
                 fail("Fault must abort migration");
             } catch (SQLiteException expected) {
                 assertTrue(expected.getMessage().contains("synthetic migration fault"));
@@ -371,7 +371,7 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
             db.execSQL("DROP TRIGGER release_migration_fault");
         }
         try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
-            assertEquals(7, ledger.getWritableDatabase().getVersion());
+            assertEquals(7, RoomFixtures.version(ledger));
             assertNotNull(ledger.outbox().get(record(2, 4).key(), calendar()).payload);
         }
     }
@@ -380,7 +380,7 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
     public void unsupportedNewerSchemaIsPreserved() {
         try (SqliteLedger ledger = new SqliteLedger(context(), database(8))) {
             try {
-                ledger.getWritableDatabase();
+                RoomFixtures.version(ledger);
                 fail("No blind schema downgrade");
             } catch (IllegalStateException expected) {
                 assertTrue(expected.getMessage().contains("A migration from 8 to 7 was required"));

@@ -20,9 +20,20 @@ class Room3ProductionContract(unittest.TestCase):
         imports = (SOURCE / "SqliteImportStore.kt").read_text()
         self.assertIn("calltrack-ledger.db", ledger)
         self.assertIn("calltrack-imports.db", imports)
-        self.assertIn("room3-sqlite-wrapper", build)
-        for file in ("SqliteLedger.kt", "SqliteImportStore.kt"):
-            self.assertNotIn("SQLiteOpenHelper(", (SOURCE / file).read_text())
+        self.assertNotIn("room3-sqlite-wrapper", build)
+        self.assertFalse((SOURCE / "RoomSqliteCompat.kt").exists())
+        self.assertNotIn("getSupportWrapper", room)
+        for store in (ledger, imports):
+            self.assertNotIn("SQLiteOpenHelper(", store)
+            self.assertNotIn("rawQuery(", store)
+
+    def test_ledger_and_import_writes_use_suspend_daos(self):
+        queries = (SOURCE / "RoomQueries.kt").read_text()
+        for operation in (
+            "storeIntent", "expirePayloads", "storeCheckpoint", "rollover",
+            "insertCandidates", "storeOutcome", "storeProgress",
+        ):
+            self.assertRegex(queries, rf"\bsuspend fun {operation}\(")
 
     def test_preserving_migration_and_single_writer_are_nonnegotiable(self):
         room = (SOURCE / "RoomPersistence.kt").read_text()
