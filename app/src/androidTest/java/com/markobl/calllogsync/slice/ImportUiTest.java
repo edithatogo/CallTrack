@@ -195,10 +195,7 @@ public class ImportUiTest {
         ui.capture("import-before-process-death");
 
         ui.killStoppedProcessAndReturn(HistoricalImportActivity.class);
-        ui.await(
-                () -> ui.find("import_calendar_picker", true) != null,
-                "Import did not restore",
-                90000);
+        ui.await(() -> ui.find("calltrack_screen", true) != null, "Import did not restore", 90000);
         ui.revealId("import_calendar_picker");
         ui.await(
                 () -> ui.find(fixture.calendarDisplayName(), false) != null,
