@@ -14,7 +14,7 @@ zero-row permission tests. See the build track's findings and decisions through 
 | Modern upstream comparison fixture | 17 | 8.13 | 8.13.2 | 36/36 | 35.0.0 |
 
 These rows describe the upstream comparison fixtures, not the current root app.
-For the root app's JDK 25, Gradle 9.9.2, AGP 9.3.1 and SDK 37.1 setup,
+For the root app's JDK 25, Gradle 9.9.2, AGP 9.5.2 and SDK 37.1 setup,
 see [contributor instructions](../CONTRIBUTING.md). SDK command-line tools 19.0
 were used with JDK 17 to install the fixture packages. Set
 `ANDROID_HOME` to an SDK you maintain, and `JAVA_HOME` to the required JDK. The
