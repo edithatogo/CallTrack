@@ -1,5 +1,10 @@
 // Use a newer D8/R8 where the documented Kotlin 2.4 minimum and bundled version differ.
 pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
     buildscript {
         repositories {
             google()

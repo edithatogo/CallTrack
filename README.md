@@ -2,6 +2,7 @@
 
 CallTrack is a GPL-3.0 development fork of AndroidCallLogSync. Its active product scope is **Android 17 (API 37) only**. Kotlin, native Jetpack Compose, Android `CallLog` and `CalendarContract`, and WorkManager are retained. **Room 3.0.3 is selected but the preserving database migration has not yet replaced the existing SQLite stores.** The app is not a signed, supported public release.
 
+- [Implemented and planned features](FEATURES.md)
 - [Current architecture and rationale](conductor/architecture-android17.md) · [machine-readable scope](conductor/active-scope.json) · [Conductor tracks](conductor/tracks.md)
 - [Ponytail scope PR #114](https://github.com/edithatogo/CallTrack/pull/114) · [Room migration #115](https://github.com/edithatogo/CallTrack/issues/115) · [UI simplification #116](https://github.com/edithatogo/CallTrack/issues/116) · [local runner #117](https://github.com/edithatogo/CallTrack/issues/117)
 - [Release gates](RELEASING.md) · [privacy](PRIVACY.md) · [security](SECURITY.md) · [source provenance](NOTICE.md)

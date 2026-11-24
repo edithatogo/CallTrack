@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.plugin.compose'
+    id 'com.google.devtools.ksp' version '2.3.14'
 }
 
 android {
@@ -35,6 +36,12 @@ android {
 }
 
 dependencies {
+    // Room 3 owns both existing on-disk databases. The SQLite wrapper is a
+    // temporary, official migration bridge for the proven receipt state machine.
+    implementation 'androidx.room3:room3-runtime:3.0.3'
+    implementation 'androidx.room3:room3-sqlite-wrapper:3.0.3'
+    implementation 'androidx.sqlite:sqlite-framework:2.7.1'
+    ksp 'androidx.room3:room3-compiler:3.0.3'
     implementation platform('androidx.compose:compose-bom:2026.11.01')
     implementation 'androidx.activity:activity:1.13.0'
     implementation 'androidx.compose.ui:ui'
@@ -69,4 +76,9 @@ kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
     }
+}
+
+// Room schema JSON is an auditable, versioned migration contract.
+ksp {
+    arg('room.schemaLocation', "$projectDir/schemas")
 }

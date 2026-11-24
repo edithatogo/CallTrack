@@ -2,36 +2,24 @@ package com.markobl.calllogsync.slice
 
 import android.content.ContentValues
 import android.content.Context
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
 import java.io.Closeable
 import java.util.Collections
 import org.json.JSONException
 import org.json.JSONObject
 
 /** Versioned import sessions; delivery authority remains in the existing receipt ledger. */
-// SQLiteOpenHelper did not implement AutoCloseable on API26. Keep Kotlin use safe there.
-class SqliteImportStore(context: Context?, name: String?) :
-    SQLiteOpenHelper(context, name, null, 2), HistoricalImport.Store, Closeable {
+class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Store, Closeable {
     constructor(context: Context?) : this(context, "calltrack-imports.db")
 
-    override fun onConfigure(db: SQLiteDatabase) {
-        db.setForeignKeyConstraintsEnabled(true)
-    }
+    private val room = RoomPersistence.imports(requireNotNull(context), requireNotNull(name))
+    private val adapter by lazy { RoomPersistence.adapter(room) }
+    val writableDatabase: RoomSqliteCompat
+        get() = adapter
 
-    override fun onCreate(db: SQLiteDatabase) {
-        db.execSQL(
-            "CREATE TABLE sessions (id TEXT PRIMARY KEY NOT NULL, revision INTEGER NOT NULL, body TEXT NOT NULL)",
-        )
-        db.execSQL(
-            "CREATE TABLE candidates (session TEXT NOT NULL REFERENCES sessions(id), source_id INTEGER NOT NULL, source_key TEXT NOT NULL, binding TEXT NOT NULL, outcome TEXT, PRIMARY KEY(session,source_id))",
-        )
-    }
+    val readableDatabase: RoomSqliteCompat
+        get() = adapter
 
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        check(oldVersion == 1 && newVersion == 2) { "Preserving import migration required" }
-        db.execSQL("ALTER TABLE candidates ADD COLUMN outcome TEXT")
-    }
+    override fun close() = room.close()
 
     class ListedSession(
         @JvmField val cursor: Long,

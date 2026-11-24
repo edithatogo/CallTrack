@@ -58,22 +58,23 @@ public class KotlinPackageUpdateTest {
         if (context().getDatabasePath("calltrack-ledger.db").exists()) {
             try (SqliteLedger ledger = new SqliteLedger(context())) {
                 for (String table : new String[] {"receipts", "outbox", "scan_cursors"}) {
-                    assertEquals(
-                            0,
-                            android.database.DatabaseUtils.queryNumEntries(
-                                    ledger.getReadableDatabase(), table));
+                    assertEquals(0, countRows(ledger.getReadableDatabase(), table));
                 }
             }
         }
         if (context().getDatabasePath("calltrack-imports.db").exists()) {
             try (SqliteImportStore imports = new SqliteImportStore(context())) {
                 for (String table : new String[] {"sessions", "candidates"}) {
-                    assertEquals(
-                            0,
-                            android.database.DatabaseUtils.queryNumEntries(
-                                    imports.getReadableDatabase(), table));
+                    assertEquals(0, countRows(imports.getReadableDatabase(), table));
                 }
             }
+        }
+    }
+
+    private static long countRows(RoomSqliteCompat db, String table) {
+        try (android.database.Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + table, null)) {
+            assertTrue(cursor.moveToFirst());
+            return cursor.getLong(0);
         }
     }
 
@@ -132,7 +133,7 @@ public class KotlinPackageUpdateTest {
         assertFalse(settings.outgoing);
         assertTrue(settings.missed);
         try (SqliteLedger ledger = new SqliteLedger(context())) {
-            assertEquals(6, ledger.getReadableDatabase().getVersion());
+            assertEquals(7, ledger.getReadableDatabase().getVersion());
             for (int id = 0; id < 4; id++) {
                 CallRecord call = call(id);
                 DurableDelivery.Intent saved = ledger.outbox().get(call.key(), 7);
