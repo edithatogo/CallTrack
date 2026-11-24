@@ -241,14 +241,15 @@ gradle.beforeProject { project ->
             attempted.append(package)
             if 'Success' not in adb('install', str(apk)):
                 raise RuntimeError('Install unconfirmed')
+        native('freshInstallIsUnconfiguredAndDenied')
+        launch = adb('shell', 'am', 'start', '-W', '-n',
+                     PACKAGE + '/com.markobl.calllogsync.slice.CalendarSliceActivity')
+        if 'Status: ok' not in launch:
+            raise RuntimeError('Fresh candidate launcher failed')
+        adb('shell', 'am', 'force-stop', PACKAGE)
+        native('freshInstallIsUnconfiguredAndDenied')
+        receipt['development_fresh_install_qualified'] = True
         if release_build_receipt is not None:
-            native('freshInstallIsUnconfiguredAndDenied')
-            launch = adb('shell', 'am', 'start', '-W', '-n',
-                         PACKAGE + '/com.markobl.calllogsync.slice.CalendarSliceActivity')
-            if 'Status: ok' not in launch:
-                raise RuntimeError('Fresh candidate launcher failed')
-            adb('shell', 'am', 'force-stop', PACKAGE)
-            native('freshInstallIsUnconfiguredAndDenied')
             receipt['exact_release_fresh_install_qualified'] = True
         native('seedJavaEraState')
         if provider_schema:
