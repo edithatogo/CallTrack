@@ -114,6 +114,13 @@ public class RecoveryUiTest {
                 "Recovery state did not become " + expected);
     }
 
+    private void awaitRecoveryFeedback(RenderedUi ui, int message) {
+        String expected = context().getString(message);
+        ui.await(
+                () -> ui.shown(expected, false) != null,
+                "The recovery screen did not render the completed check");
+    }
+
     private void awaitPendingAction(RenderedUi ui, String stage) {
         try {
             ui.await(
@@ -365,6 +372,7 @@ public class RecoveryUiTest {
                 ui -> {
                     tap(ui, R.string.recovery_check);
                     awaitState(ui, DurableDelivery.State.REVIEW);
+                    awaitRecoveryFeedback(ui, R.string.recovery_review_result);
                     assertEquals(
                             "Human edited synthetic event",
                             new AndroidCalendarSink(context())
@@ -378,11 +386,20 @@ public class RecoveryUiTest {
                     assertEquals(
                             1,
                             context().getContentResolver().update(event(), original, null, null));
+                    DurableDelivery.Intent restored = saved("pending");
+                    SliceEngine.StoredEvent stored =
+                            new AndroidCalendarSink(context()).read(restored.eventId);
+                    assertNotNull("The restored fixture event must exist", stored);
+                    assertTrue(
+                            "The restored fixture must match its durable receipt",
+                            restored.matchesEvent(stored.event));
                     tap(ui, R.string.recovery_check);
                     awaitState(ui, DurableDelivery.State.CONFIRMED);
+                    awaitRecoveryFeedback(ui, R.string.recovery_verified);
                     assertEquals(1, context().getContentResolver().delete(event(), null, null));
                     tap(ui, R.string.recovery_check);
                     awaitState(ui, DurableDelivery.State.REVIEW);
+                    awaitRecoveryFeedback(ui, R.string.recovery_review_result);
                     assertEquals(0, fixture.events(calendar()));
                     ui.capture("recovery-does-not-recreate-deleted-event");
                     tap(ui, R.string.recovery_suppress);
