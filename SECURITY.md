@@ -41,7 +41,7 @@ paths and line numbers while keeping raw scanner output out of CI logs.
 The local fuzz runner and shared privacy documentation provide setup commands
 and describe the Gitleaks and Presidio scan scopes. The shared action runs
 the pinned Presidio 2.2.366 compatibility build on isolated Python 3.15.2.
-[Jazzer runner](fuzz/README.md) · [Shared privacy checks](https://github.com/edithatogo/repository-standards/blob/192dfdef72954f13420b01b3229ce8424ec9c365/docs/privacy-secrets-standard.md)
+[Jazzer runner](fuzz/README.md) · [Shared privacy checks](https://github.com/edithatogo/repository-standards/blob/23fe1fb4f99021b1a721f63dea09a2369ba8845d/docs/privacy-secrets-standard.md)
 
 ## Optional staged private-key check
 
