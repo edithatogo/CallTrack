@@ -26,7 +26,7 @@ Room owns both existing database files. The preserving migrations retain their f
 
 - Android `CallLog.Calls` and `CalendarContract` are the correct API boundary. No direct cloud connector unless a proved native-provider gap exists. The app does not need `INTERNET` permission for the first release.
 - WorkManager is the single durable scheduler. Keep generation checks, cancellation and explicit user activation.
-- **Room 3.0.3** uses KSP, AndroidSQLiteDriver and the official SupportSQLite bridge. The bridge keeps the existing receipt and import transactions during the migration. [Track 22](tracks/room3_android17_20261124/plan.md) owns the move to suspend DAOs and bridge retirement.
+- **Room 3.0.3** uses KSP, AndroidSQLiteDriver and suspend DAOs. Receipt, checkpoint and import transactions use Room’s native writer connection. Recovery persists intent before touching the calendar. [Track 22](tracks/room3_android17_20261124/plan.md).
 - Use standard Material 3 controls when they replace custom UI *and* preserve stable test/accessibility labels. The existing Compose app remains native; do not rewrite it into Views.
 - No Rust, Kotlin Multiplatform production module, cross-platform UI, Swift app or second writer in active builds.
 

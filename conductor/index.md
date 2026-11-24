@@ -41,7 +41,6 @@ Use the [Android 17 scope](active-scope.json) and [track registry](tracks.md) to
 | Track | Remaining work |
 |---|---|
 | 14 · Android Compose | Finish the native screen roots, retire superseded UI and prove the sole durable write path. [Track 14](tracks/compose_app_20261021/plan.md) · [#116](https://github.com/edithatogo/CallTrack/issues/116) |
-| 22 · Room | Replace the Room compatibility bridge with suspend DAOs after preserving transaction and recovery parity. [Track 22](tracks/room3_android17_20261124/plan.md) · [#115](https://github.com/edithatogo/CallTrack/issues/115) |
 | 5 · Release | Freeze the exact Android 17 candidate. Complete signing and distribution, physical-call and selected calendar readbacks, and seven days of observation. [Release gates](tracks/release_20261020/verification.md#active-release-gates) |
 | 6 · Kotlin | Close K07 against the same supported upgrade, recovery and operational evidence as Track 5. [Track 6](tracks/kotlin_20261020/plan.md) |
 

@@ -1,4 +1,4 @@
-> **Active stack (2026-11-24):** Android 17 API37-only Kotlin/Compose; native CallLog/CalendarContract + WorkManager. Room 3.0.3 is selected but its preserving migration has **not** replaced SQLite. `app/build.gradle` is authoritative for SDK/versions; the rest of this file includes prior checkpoints. [Architecture](architecture-android17.md) · [scope](active-scope.json).
+> **Active stack (2026-11-24):** Android 17 API37-only Kotlin/Compose; native CallLog/CalendarContract + WorkManager. Room 3.0.3 owns both existing SQLite databases through suspend DAOs and preserving migrations. `app/build.gradle` is authoritative for SDK/versions; the rest of this file includes prior checkpoints. [Architecture](architecture-android17.md) · [scope](active-scope.json).
 
 # Technology stack and decision status
 
