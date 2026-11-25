@@ -1,5 +1,7 @@
 <resources>
     <string name="navigate_up">Zurück</string>
+    <string name="calendar_picker_expanded">Ausgeklappt</string>
+    <string name="calendar_picker_collapsed">Eingeklappt</string>
 
     <string name="auto_open">Einstellungen zur automatischen Protokollierung</string>
     <string name="auto_title">Automatische Protokollierung</string>

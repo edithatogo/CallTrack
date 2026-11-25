@@ -9,6 +9,8 @@
     <string name="slice_calendar_selected" translatable="false">Calendar selected</string>
     <string name="slice_unnamed_calendar" translatable="false">Unnamed calendar</string>
     <string name="slice_choose" translatable="false">Choose a destination calendar</string>
+    <string name="calendar_picker_expanded">Expanded</string>
+    <string name="calendar_picker_collapsed">Collapsed</string>
     <string name="slice_log_latest" translatable="false">Log latest call</string>
     <string name="slice_permission_needed" translatable="false">Calendar and call-log access are required for this action.</string>
     <string name="slice_working" translatable="false">Saving and checking the event…</string>
