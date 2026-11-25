@@ -714,9 +714,13 @@ class UiSafety(unittest.TestCase):
             '#runActionsRequireEnabledStateAndExplicitTaps',
             'com.markobl.calllogsync.slice.HistoricalImportDestinationPanelTest'
             '#destinationListIsPresentedAndOnlyExplicitSelectionReturnsOpaqueToken',
-        ], selectors[:2])
+            'com.markobl.calllogsync.slice.HistoricalImportFiltersPanelTest'
+            '#dateAndCallTypeFiltersEmitOnlyExplicitUserChanges',
+            'com.markobl.calllogsync.slice.HistoricalImportFiltersPanelTest'
+            '#controlsRemainAccessibleWithLargeFontAndRightToLeftLayout',
+        ], selectors[:4])
         self.assertTrue(all(method.startswith('com.markobl.calllogsync.slice.ImportUiTest#')
-                            for method in selectors[2:]))
+                            for method in selectors[4:]))
         self.assertEqual('com.markobl.calllogsync.slice.ImportUiTest#cleanupFixture', selectors[-1])
         self.assertTrue(any('latestCallUsesNewestDateAndHighestIdOnTies' in method for method in methods))
         self.assertTrue(any('renderedDestinationAndFiltersSurviveProcessDeathWithoutPreview' in method
