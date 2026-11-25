@@ -760,7 +760,8 @@ class UiSafety(unittest.TestCase):
     def test_recovery_suite_keeps_read_only_permission_boundary(self):
         self.assertEqual(0, self.run_fixture('recovery'))
         methods = [' '.join(c) for c in self.calls if c[:3] == ['shell', 'am', 'instrument']]
-        self.assertTrue(all('RecoveryUiTest#' in method for method in methods))
+        self.assertIn('RecoveryCardsPanelTest#busyManagementAndPaginationActionsAreDisabled', methods[0])
+        self.assertTrue(all('RecoveryUiTest#' in method for method in methods[1:]))
         self.assertTrue(any('renderedPendingRecoverySurvivesProcessDeathWithoutApproval' in method
                             and 'ProcessRecoveryRunner' in method for method in methods))
         self.assertTrue(any('renderedPendingRecoverySurvivesRecreationWithoutApproval' in method for method in methods))

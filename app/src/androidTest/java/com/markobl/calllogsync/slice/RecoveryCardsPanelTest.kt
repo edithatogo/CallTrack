@@ -145,17 +145,16 @@ class RecoveryCardsPanelTest {
 
     @Test
     fun busyManagementAndPaginationActionsAreDisabled() {
+        var navigation by
+            mutableStateOf(
+                RecoveryNavigationUiState(busy = true, previousEnabled = true, moreEnabled = true),
+            )
         compose.setContent {
             Column {
                 RecoveryRefreshPanel(busy = true, refreshLabel = "Refresh records", onRefresh = {})
                 RecoveryRetentionPanel(busy = true, label = "Clear expired payloads", onExpire = {})
                 RecoveryNavigationPanel(
-                    state =
-                        RecoveryNavigationUiState(
-                            busy = true,
-                            previousEnabled = true,
-                            moreEnabled = true,
-                        ),
+                    state = navigation,
                     previousLabel = "Previous records",
                     moreLabel = "More records",
                     onPrevious = {},
@@ -168,5 +167,8 @@ class RecoveryCardsPanelTest {
         compose.onNodeWithTag("recovery_retention_action").assertIsNotEnabled()
         compose.onNodeWithTag("recovery_previous_action").assertIsNotEnabled()
         compose.onNodeWithTag("recovery_more_action").assertIsNotEnabled()
+        compose.runOnIdle { navigation = RecoveryNavigationUiState() }
+        compose.onNodeWithTag("recovery_previous_action").assertDoesNotExist()
+        compose.onNodeWithTag("recovery_more_action").assertDoesNotExist()
     }
 }

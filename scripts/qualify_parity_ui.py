@@ -744,6 +744,8 @@ def qualify(serial, suite="settings", receipt_dir=None):
             check('renderedExplicitHistoryResumeCompletesPartialWork')
             check('removedDestinationBlocksDeliveryWithoutSwitchingCalendars')
         else:
+            check('busyManagementAndPaginationActionsAreDisabled',
+                  'com.markobl.calllogsync.slice.RecoveryCardsPanelTest')
             check('preparePendingWithoutCallAccess')
             ui_attempted = True
             check('renderedPendingRecoverySurvivesProcessDeathWithoutApproval',

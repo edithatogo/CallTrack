@@ -176,6 +176,7 @@ internal fun RecoveryNavigationPanel(
     onPrevious: () -> Unit,
     onMore: () -> Unit,
 ) {
+    if (!state.previousEnabled && !state.moreEnabled) return
     Row(
         modifier =
             Modifier.fillMaxWidth().padding(vertical = 8.dp).semantics {
