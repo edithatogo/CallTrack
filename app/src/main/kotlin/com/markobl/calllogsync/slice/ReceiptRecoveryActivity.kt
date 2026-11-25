@@ -7,22 +7,57 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.CalendarContract
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.markobl.calllogsync.R
+import dagger.hilt.android.AndroidEntryPoint
 import java.text.DateFormat
 import java.util.Date
-import java.util.concurrent.Executors
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val RECOVERY_PAGE_SIZE = 10
 
 /** Existing-effect checks remain separate from explicitly confirmed never-attempted insertion. */
+@AndroidEntryPoint
 class ReceiptRecoveryActivity : ComponentActivity() {
-    private val executor = Executors.newSingleThreadExecutor()
+    public override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setCallTrackNavigation(CallTrackRoute.Recovery)
+    }
+}
+
+@Composable
+internal fun ReceiptRecoveryScreen(activity: ComponentActivity) {
+    val scope = rememberCoroutineScope()
+    val state = remember(activity, scope) { ReceiptRecoveryState(activity, scope) }
+    val permissions =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            state.permissionsChanged()
+        }
+    LifecycleResumeEffect(state) {
+        state.resume()
+        onPauseOrDispose { state.pause() }
+    }
+    state.Content { permissions.launch(it) }
+}
+
+private class ReceiptRecoveryState(
+    private val activity: ComponentActivity,
+    private val scope: CoroutineScope,
+) {
+    private val worker = Dispatchers.IO.limitedParallelism(1)
     private val back = ArrayList<SqliteLedger.RecoveryCursor?>()
     private var current: SqliteLedger.RecoveryCursor? = null
     private var next: SqliteLedger.RecoveryCursor? = null
@@ -41,30 +76,26 @@ class ReceiptRecoveryActivity : ComponentActivity() {
 
     @Volatile private var approvalSession = Any()
     private var version = 0L
-    private val permissions =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            if (!busy) load(current)
-        }
+    private var opened = false
 
-    public override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setCallTrackContent(R.string.recovery_title) {
-            RecoveryOverview()
-            RecoveryReceipts()
-            RecoveryRetention()
-            confirmation?.let { ConfirmationDialog(it) { confirmation = null } }
-        }
-        load(null)
+    fun permissionsChanged() {
+        if (!busy) load(current)
     }
 
     @Composable
-    private fun RecoveryOverview() {
+    fun Content(requestAccess: (Array<String>) -> Unit) {
+        RecoveryOverview { requestAccess(arrayOf(Manifest.permission.READ_CALENDAR)) }
+        RecoveryReceipts(requestAccess)
+        RecoveryRetention()
+        confirmation?.let { ConfirmationDialog(it) { confirmation = null } }
+    }
+
+    @Composable
+    private fun RecoveryOverview(requestReadAccess: () -> Unit) {
         RecoveryAccessPanel(
             label = stringResource(R.string.recovery_access),
             hasCalendarAccess = hasCalendarReadAccess,
-            onRequestAccess = {
-                permissions.launch(arrayOf(Manifest.permission.READ_CALENDAR))
-            },
+            onRequestAccess = requestReadAccess,
         )
         RecoveryRefreshPanel(
             busy = navigationState.busy,
@@ -79,7 +110,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun RecoveryReceipts() {
+    private fun RecoveryReceipts(requestAccess: (Array<String>) -> Unit) {
         SectionHeading(stringResource(R.string.recovery_records_heading))
         RecoveryStatusPanel(feedbackText)
         RecoveryEmptyPanel(
@@ -100,7 +131,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                 visibleRecords[token]?.let { confirmSuppression(it.first) }
             },
             onReapprove = { token ->
-                visibleRecords[token]?.let { confirmReapproval(it.first, it.second) }
+                visibleRecords[token]?.let { confirmReapproval(it.first, it.second, requestAccess) }
             },
             onOpenEvent = { token ->
                 visibleRecords[token]?.let { openEvent(it.first) }
@@ -146,14 +177,14 @@ class ReceiptRecoveryActivity : ComponentActivity() {
         busy = true
         val ticket = ++version
         navigation()
-        executor.execute {
+        scope.launch(worker) {
             try {
-                SqliteLedger(applicationContext).use { ledger ->
+                SqliteLedger(activity.applicationContext).use { ledger ->
                     ledger.expirePayloads(RECEIPT_RETENTION_BATCH_SIZE)
                     val page = ledger.recoveryPage(cursor, RECOVERY_PAGE_SIZE + 1)
                     val labels = readCalendarLabels(page)
-                    runOnUiThread {
-                        if (isDestroyed || ticket != version) return@runOnUiThread
+                    withContext(Dispatchers.Main.immediate) {
+                        if (activity.isDestroyed || ticket != version) return@withContext
                         busy = false
                         current = cursor
                         val size = minOf(RECOVERY_PAGE_SIZE, page.size)
@@ -177,9 +208,11 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                         navigation()
                     }
                 }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (ignored: RuntimeException) {
-                runOnUiThread {
-                    if (isDestroyed || ticket != version) return@runOnUiThread
+                withContext(Dispatchers.Main.immediate) {
+                    if (activity.isDestroyed || ticket != version) return@withContext
                     busy = false
                     setFeedback(R.string.recovery_failed)
                     navigation()
@@ -190,21 +223,21 @@ class ReceiptRecoveryActivity : ComponentActivity() {
 
     private fun readCalendarLabels(page: List<SqliteLedger.RecoveryItem>): Map<Long, String> {
         val labels = HashMap<Long, String>()
-        val sink = AndroidCalendarSink(applicationContext)
+        val sink = AndroidCalendarSink(activity.applicationContext)
         for (item in page) {
             val intent = item.intent!!
             if (!labels.containsKey(intent.calendar)) {
-                var label = getString(R.string.recovery_calendar_hidden)
+                var label = activity.getString(R.string.recovery_calendar_hidden)
                 if (
-                    checkSelfPermission(Manifest.permission.READ_CALENDAR) ==
+                    activity.checkSelfPermission(Manifest.permission.READ_CALENDAR) ==
                         PackageManager.PERMISSION_GRANTED
                 ) {
                     label =
                         try {
                             sink.calendarLabel(intent.calendar)
-                                ?: getString(R.string.auto_destination_unavailable)
+                                ?: activity.getString(R.string.auto_destination_unavailable)
                         } catch (ignored: RuntimeException) {
-                            getString(R.string.recovery_calendar_unverified)
+                            activity.getString(R.string.recovery_calendar_unverified)
                         }
                 }
                 labels[intent.calendar] = label
@@ -215,7 +248,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
 
     private fun navigation() {
         hasCalendarReadAccess =
-            checkSelfPermission(Manifest.permission.READ_CALENDAR) ==
+            activity.checkSelfPermission(Manifest.permission.READ_CALENDAR) ==
                 PackageManager.PERMISSION_GRANTED
         navigationState =
             RecoveryNavigationUiState(
@@ -226,7 +259,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
     }
 
     private fun setFeedback(message: Int) {
-        feedbackText = getString(message)
+        feedbackText = activity.getString(message)
     }
 
     private fun setFeedback(text: String) {
@@ -238,7 +271,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
         intent: DurableDelivery.Intent,
         calendar: String?,
     ): RecoveryCardUiState {
-        var source = getString(R.string.recovery_source_unknown)
+        var source = activity.getString(R.string.recovery_source_unknown)
         val facts = intent.facts
         if (facts != null) {
             val type =
@@ -249,10 +282,10 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                     else -> R.string.recovery_call
                 }
             source =
-                resources.getQuantityString(
+                activity.resources.getQuantityString(
                     R.plurals.recovery_source,
                     facts.seconds.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
-                    getString(type),
+                    activity.getString(type),
                     DateFormat.getDateTimeInstance().format(Date(facts.start)),
                     facts.seconds,
                 )
@@ -260,11 +293,11 @@ class ReceiptRecoveryActivity : ComponentActivity() {
         return RecoveryCardUiState(
             token = token,
             detail =
-                getString(
+                activity.getString(
                     R.string.recovery_item,
                     source,
                     calendar,
-                    getString(stateLabel(intent.state)),
+                    activity.getString(stateLabel(intent.state)),
                 ),
             checkEnabled = intent.state != DurableDelivery.State.SUPPRESSED,
             suppressEnabled = intent.state != DurableDelivery.State.SUPPRESSED,
@@ -277,9 +310,9 @@ class ReceiptRecoveryActivity : ComponentActivity() {
         if (busy) return
         confirmation =
             Confirmation(
-                title = getString(R.string.recovery_suppress),
-                message = getString(R.string.recovery_suppress_confirm),
-                actionLabel = getString(R.string.recovery_suppress),
+                title = activity.getString(R.string.recovery_suppress),
+                message = activity.getString(R.string.recovery_suppress_confirm),
+                actionLabel = activity.getString(R.string.recovery_suppress),
             ) {
                 action(intent, true)
             }
@@ -288,7 +321,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
     private fun openEvent(intent: DurableDelivery.Intent) {
         if (intent.eventId < 0) return
         try {
-            startActivity(
+            activity.startActivity(
                 Intent(
                     Intent.ACTION_VIEW,
                     ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, intent.eventId),
@@ -304,38 +337,48 @@ class ReceiptRecoveryActivity : ComponentActivity() {
         retentionFeedback = ""
         busy = true
         navigation()
-        executor.execute {
+        scope.launch(worker) {
             try {
-                SqliteLedger(applicationContext).use { ledger ->
+                SqliteLedger(activity.applicationContext).use { ledger ->
                     val count = ledger.expirePayloads(50)
-                    runOnUiThread {
-                        if (isDestroyed) return@runOnUiThread
+                    withContext(Dispatchers.Main.immediate) {
+                        if (activity.isDestroyed) return@withContext
                         busy = false
                         retentionFeedback =
-                            resources.getQuantityString(R.plurals.retention_result, count, count)
+                            activity.resources.getQuantityString(
+                                R.plurals.retention_result,
+                                count,
+                                count,
+                            )
                         load(current)
                     }
                 }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (ignored: RuntimeException) {
-                runOnUiThread {
-                    if (isDestroyed) return@runOnUiThread
+                withContext(Dispatchers.Main.immediate) {
+                    if (activity.isDestroyed) return@withContext
                     busy = false
-                    retentionFeedback = getString(R.string.recovery_failed)
+                    retentionFeedback = activity.getString(R.string.recovery_failed)
                     navigation()
                 }
             }
         }
     }
 
-    private fun confirmReapproval(intent: DurableDelivery.Intent, calendar: String?) {
+    private fun confirmReapproval(
+        intent: DurableDelivery.Intent,
+        calendar: String?,
+        requestAccess: (Array<String>) -> Unit,
+    ) {
         if (busy || !ReadyReapproval.eligible(intent)) return
         if (
-            checkSelfPermission(Manifest.permission.READ_CALENDAR) !=
+            activity.checkSelfPermission(Manifest.permission.READ_CALENDAR) !=
                 PackageManager.PERMISSION_GRANTED ||
-                checkSelfPermission(Manifest.permission.WRITE_CALENDAR) !=
+                activity.checkSelfPermission(Manifest.permission.WRITE_CALENDAR) !=
                     PackageManager.PERMISSION_GRANTED
         ) {
-            permissions.launch(
+            requestAccess(
                 arrayOf(Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR),
             )
             setFeedback(R.string.reapproval_tap_again)
@@ -343,7 +386,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
         }
         val payload = intent.payload!!
         val preview =
-            getString(
+            activity.getString(
                 R.string.reapproval_preview,
                 calendar,
                 payload.title,
@@ -353,9 +396,9 @@ class ReceiptRecoveryActivity : ComponentActivity() {
             )
         confirmation =
             Confirmation(
-                title = getString(R.string.reapproval_open),
+                title = activity.getString(R.string.reapproval_open),
                 message = preview,
-                actionLabel = getString(R.string.reapproval_confirm),
+                actionLabel = activity.getString(R.string.reapproval_confirm),
             ) {
                 reapprove(intent)
             }
@@ -366,18 +409,21 @@ class ReceiptRecoveryActivity : ComponentActivity() {
         busy = true
         val approvedSession = approvalSession
         navigation()
-        executor.execute {
+        scope.launch(worker) {
             val outcome =
                 try {
-                    SqliteLedger(applicationContext).use { ledger ->
-                        ReadyReapproval(ledger.outbox(), AndroidCalendarSink(applicationContext))
+                    SqliteLedger(activity.applicationContext).use { ledger ->
+                        ReadyReapproval(
+                                ledger.outbox(),
+                                AndroidCalendarSink(activity.applicationContext),
+                            )
                             .approve(expected) { resumed && approvalSession === approvedSession }
                     }
                 } catch (ignored: RuntimeException) {
                     DurableDelivery.Result.FAILED
                 }
-            runOnUiThread {
-                if (isDestroyed) return@runOnUiThread
+            withContext(Dispatchers.Main.immediate) {
+                if (activity.isDestroyed) return@withContext
                 busy = false
                 val label =
                     when (outcome) {
@@ -403,28 +449,30 @@ class ReceiptRecoveryActivity : ComponentActivity() {
         }
     }
 
-    public override fun onResume() {
-        super.onResume()
+    fun resume() {
         resumed = true
         navigation()
+        if (!opened) {
+            opened = true
+            load(null)
+        }
     }
 
-    public override fun onPause() {
+    fun pause() {
         confirmation = null
         resumed = false
         approvalSession = Any() // Returning cannot revive an earlier queued approval.
-        super.onPause()
     }
 
     private fun action(intent: DurableDelivery.Intent, suppress: Boolean) {
         if (busy) return
         busy = true
         navigation()
-        executor.execute {
+        scope.launch(worker) {
             val outcome =
                 try {
-                    SqliteLedger(applicationContext).use { ledger ->
-                        val sink = AndroidCalendarSink(applicationContext)
+                    SqliteLedger(activity.applicationContext).use { ledger ->
+                        val sink = AndroidCalendarSink(activity.applicationContext)
                         val recovery =
                             ReceiptRecovery(
                                 ledger.outbox(),
@@ -447,8 +495,8 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                 } catch (ignored: RuntimeException) {
                     ReceiptRecovery.Result.FAILED
                 }
-            runOnUiThread {
-                if (isDestroyed) return@runOnUiThread
+            withContext(Dispatchers.Main.immediate) {
+                if (activity.isDestroyed) return@withContext
                 busy = false
                 setFeedback(resultLabel(outcome))
                 load(current)
@@ -478,11 +526,4 @@ class ReceiptRecoveryActivity : ComponentActivity() {
             ReceiptRecovery.Result.NOT_FOUND -> R.string.recovery_not_found
             else -> R.string.recovery_failed
         }
-
-    public override fun onDestroy() {
-        resumed = false
-        version++
-        executor.shutdown()
-        super.onDestroy()
-    }
 }

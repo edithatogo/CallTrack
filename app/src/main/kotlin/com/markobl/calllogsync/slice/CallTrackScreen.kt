@@ -67,13 +67,8 @@ private val FormMaxWidth = 640.dp
 private val MinimumTargetSize = 48.dp
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-internal fun ComponentActivity.setCallTrackContent(
-    @StringRes title: Int,
-    showUp: Boolean = true,
-    content: @Composable ColumnScope.() -> Unit,
-) {
+internal fun ComponentActivity.setCallTrackContent(content: @Composable () -> Unit) {
     enableEdgeToEdge()
-    val navigateUp = if (showUp) ::finish else null
     setContentView(
         ComposeView(this).apply {
             id = R.id.calltrack_root
@@ -89,16 +84,14 @@ internal fun ComponentActivity.setCallTrackContent(
                             dynamicLightColorScheme(context)
                         }
                     }
-                MaterialExpressiveTheme(colorScheme = colors) {
-                    CallTrackScaffold(title, navigateUp, content)
-                }
+                MaterialExpressiveTheme(colorScheme = colors, content = content)
             }
         },
     )
 }
 
 @Composable
-private fun CallTrackScaffold(
+internal fun CallTrackScaffold(
     @StringRes title: Int,
     onNavigateUp: (() -> Unit)?,
     content: @Composable ColumnScope.() -> Unit,

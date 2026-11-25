@@ -20,6 +20,7 @@ AUDITS = (
     'conductor/tracks/release_20261020/canonical-runtime-audit-20261124.json',
     'conductor/tracks/release_20261020/datastore-runtime-audit-20261125.json',
     'conductor/tracks/release_20261020/hilt-runtime-audit-20261125.json',
+    'conductor/tracks/release_20261020/navigation-runtime-audit-20261125.json',
 )
 SOURCES = 'qualification/release/runtime-sources.json'
 
@@ -46,6 +47,22 @@ def checked_file(root, name, expected):
     if digest(data) != expected:
         raise ValueError('Source cache checksum mismatch: ' + name)
     return data
+
+
+def audited_inventory(paths):
+    artifacts = {}
+    for path in paths:
+        audit = json.loads((ROOT / path).read_text())
+        for coordinate in audit.get('superseded_coordinates', ()):
+            if coordinate not in artifacts:
+                raise ValueError('Unknown superseded runtime coordinate: ' + coordinate)
+            del artifacts[coordinate]
+        for row in audit['artifacts']:
+            coordinate = row['coordinate']
+            if coordinate in artifacts:
+                raise ValueError('Duplicate coordinate in the canonical runtime audits: ' + coordinate)
+            artifacts[coordinate] = row
+    return list(artifacts.values())
 
 
 def validate_inventory(actual, expected):
@@ -135,12 +152,10 @@ def run(output, build_receipt, inventory, source_cache):
             build.get('signed') is not False or len(build.get('builds', [])) != 2):
         raise ValueError('Two successful matching-source unsigned build receipts required')
     actual = json.loads(inventory.read_text())['artifacts']
-    audited = [row for path in AUDITS for row in json.loads((ROOT / path).read_text())['artifacts']]
+    audited = audited_inventory(AUDITS)
     validate_inventory(actual, audited)
     sources = json.loads((ROOT / SOURCES).read_text())['artifacts']
     expected = {r['coordinate']: r['sha256'] for r in audited}
-    if len(expected) != len(audited):
-        raise ValueError('Duplicate coordinate in the canonical runtime audits')
     if len(sources) != len(expected) or {r['coordinate'] for r in sources} != set(expected):
         raise ValueError('Dependency source coverage is incomplete/duplicated')
     files = source_snapshot(revision)

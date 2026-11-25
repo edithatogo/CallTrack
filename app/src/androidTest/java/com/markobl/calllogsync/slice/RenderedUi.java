@@ -20,7 +20,9 @@ import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import androidx.activity.ComponentActivity;
 import androidx.compose.ui.platform.ComposeView;
+import androidx.lifecycle.Lifecycle;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -57,6 +59,19 @@ final class RenderedUi {
                     "Screen root must be a ComposeView",
                     content.getChildAt(0) instanceof ComposeView);
         });
+    }
+
+    static boolean isResumed(Instrumentation instrumentation, ComponentActivity activity) {
+        boolean[] resumed = new boolean[1];
+        instrumentation.runOnMainSync(() ->
+                resumed[0] = activity.getLifecycle().getCurrentState() == Lifecycle.State.RESUMED);
+        return resumed[0];
+    }
+
+    void openFromLauncher(String destination) {
+        startActivity(CalendarSliceActivity.class);
+        tapId("open_automatic");
+        tapId(destination);
     }
 
     void await(BooleanSupplier condition, String message) {

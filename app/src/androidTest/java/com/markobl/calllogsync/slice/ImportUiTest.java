@@ -171,7 +171,7 @@ public class ImportUiTest {
     public void renderedDestinationAndFiltersSurviveProcessDeathWithoutPreview() {
         RenderedUi ui = new RenderedUi(InstrumentationRegistry.getInstrumentation());
         String from = today().minusDays(1).toString(), to = today().toString();
-        ui.startActivity(HistoricalImportActivity.class);
+        ui.openFromLauncher("open_imports");
         ui.await(
                 () -> ui.find("import_calendar_picker", true) != null,
                 "Import did not render",
@@ -195,7 +195,7 @@ public class ImportUiTest {
         assertEquals(0, fixture.events(calendar()));
         ui.capture("import-before-process-death");
 
-        ui.killStoppedProcessAndReturn(HistoricalImportActivity.class);
+        ui.killStoppedProcessAndReturn(CalendarSliceActivity.class);
         ui.await(() -> ui.find("calltrack_screen", true) != null, "Import did not restore", 90000);
         ui.revealId("import_calendar_picker");
         ui.await(

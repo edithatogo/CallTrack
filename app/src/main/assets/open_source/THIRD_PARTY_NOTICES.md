@@ -72,6 +72,8 @@ original `META-INF/NOTICE.md`.
 | androidx.fragment:fragment:1.5.1 | Apache-2.0 |
 | androidx.graphics:graphics-path:1.1.0 | Apache-2.0 |
 | androidx.graphics:graphics-shapes-android:1.0.1 | Apache-2.0 |
+| androidx.hilt:hilt-lifecycle-viewmodel-compose:1.4.0 | Apache-2.0 |
+| androidx.hilt:hilt-lifecycle-viewmodel:1.4.0 | Apache-2.0 |
 | androidx.interpolator:interpolator:1.0.0 | Apache-2.0 |
 | androidx.lifecycle:lifecycle-common-java8:2.11.1 | Apache-2.0 |
 | androidx.lifecycle:lifecycle-common-jvm:2.11.1 | Apache-2.0 |
@@ -84,12 +86,16 @@ original `META-INF/NOTICE.md`.
 | androidx.lifecycle:lifecycle-runtime-ktx-android:2.11.1 | Apache-2.0 |
 | androidx.lifecycle:lifecycle-service:2.11.1 | Apache-2.0 |
 | androidx.lifecycle:lifecycle-viewmodel-android:2.11.1 | Apache-2.0 |
+| androidx.lifecycle:lifecycle-viewmodel-compose-android:2.11.1 | Apache-2.0 |
 | androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.1 | Apache-2.0 |
+| androidx.lifecycle:lifecycle-viewmodel-navigation3-android:2.11.1 | Apache-2.0 |
 | androidx.lifecycle:lifecycle-viewmodel-savedstate-android:2.11.1 | Apache-2.0 |
 | androidx.lifecycle:lifecycle-viewmodel:2.11.1 | Apache-2.0 |
 | androidx.loader:loader:1.0.0 | Apache-2.0 |
-| androidx.navigationevent:navigationevent-android:1.1.0 | Apache-2.0 |
-| androidx.navigationevent:navigationevent-compose-android:1.1.0 | Apache-2.0 |
+| androidx.navigation3:navigation3-runtime-android:1.2.2 | Apache-2.0 |
+| androidx.navigation3:navigation3-ui-android:1.2.2 | Apache-2.0 |
+| androidx.navigationevent:navigationevent-android:1.1.1 | Apache-2.0 |
+| androidx.navigationevent:navigationevent-compose-android:1.1.1 | Apache-2.0 |
 | androidx.profileinstaller:profileinstaller:1.4.0 | Apache-2.0 |
 | androidx.room3:room3-common-jvm:3.0.3 | Apache-2.0 |
 | androidx.room3:room3-runtime-android:3.0.3 | Apache-2.0 |

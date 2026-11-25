@@ -667,6 +667,8 @@ def qualify(serial, suite="settings", receipt_dir=None):
             check('prepareCalendarWithoutCallAccess')
             for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
                 command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.' + permission)
+            check('systemBackReturnsThroughLauncherNavigationStack',
+                  'com.markobl.calllogsync.slice.AutomaticSettingsTest')
             check('renderedActivitiesRespectSystemBars')
             check('renderedPermissionsFiltersConfirmPauseAndReopen')
             command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.READ_CALENDAR')

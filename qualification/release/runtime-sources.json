@@ -575,18 +575,6 @@
       "pom_url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel-savedstate-android/2.11.1/lifecycle-viewmodel-savedstate-android-2.11.1.pom"
     },
     {
-      "coordinate": "androidx.navigationevent:navigationevent-android:1.1.0",
-      "runtime_sha256": "ea7943bc61d52b42a7a2cbcbde14c9b10e7baf9e09a8fe54d8cb17d3bb5dbfd9",
-      "source_url": "https://dl.google.com/dl/android/maven2/androidx/navigationevent/navigationevent-android/1.1.0/navigationevent-android-1.1.0-sources.jar",
-      "source_sha256": "f089d4ea9953c8db3b00829a751c4997300685cb597d604444952ff3ff130ffe",
-      "source_file": "androidx.navigationevent/navigationevent-android/1.1.0/navigationevent-android-1.1.0-sources.jar",
-      "source_entries": 35,
-      "source_code_present": true,
-      "pom_file": "poms/androidx.navigationevent/navigationevent-android/1.1.0/navigationevent-android-1.1.0.pom",
-      "pom_sha256": "b0cf4fc58c165b9d1ee4836e6e21d512afebf8841746a9e2bd5fddf5d3a7714e",
-      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/navigationevent/navigationevent-android/1.1.0/navigationevent-android-1.1.0.pom"
-    },
-    {
       "coordinate": "androidx.profileinstaller:profileinstaller:1.4.0",
       "runtime_sha256": "d502141fcce902430f62b674c32aecd0f75262e7ee2cd15c74adb617cd13130a",
       "source_url": "https://dl.google.com/dl/android/maven2/androidx/profileinstaller/profileinstaller/1.4.0/profileinstaller-1.4.0-sources.jar",
@@ -909,18 +897,6 @@
       "runtime_class_entries": 0
     },
     {
-      "coordinate": "androidx.navigationevent:navigationevent-compose-android:1.1.0",
-      "runtime_sha256": "487fd434793393f4c6d2ceac0a9f5fc6d23b682f508ff6ff18793907b5882032",
-      "source_url": "https://dl.google.com/dl/android/maven2/androidx/navigationevent/navigationevent-compose-android/1.1.0/navigationevent-compose-android-1.1.0-sources.jar",
-      "source_sha256": "30ee561dae5b1d7e999720ae0c199b9c37a8aadca1f5003c2f04e891ea0c92e6",
-      "source_file": "androidx.navigationevent/navigationevent-compose-android/1.1.0/navigationevent-compose-android-1.1.0-sources.jar",
-      "source_entries": 21,
-      "source_code_present": true,
-      "pom_file": "poms/androidx.navigationevent/navigationevent-compose-android/1.1.0/navigationevent-compose-android-1.1.0.pom",
-      "pom_sha256": "3528fc88ebfcaa55b4573015483ae555a3e1378ed6ab3005bab9131afea8ea69",
-      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/navigationevent/navigationevent-compose-android/1.1.0/navigationevent-compose-android-1.1.0.pom"
-    },
-    {
       "coordinate": "androidx.room3:room3-common-jvm:3.0.3",
       "runtime_sha256": "8bbec6501fdc44dc43e01d4aa43b2b509c157c33ea1bd211399ca4f823252dcb",
       "source_url": "https://dl.google.com/dl/android/maven2/androidx/room3/room3-common-jvm/3.0.3/room3-common-jvm-3.0.3-sources.jar",
@@ -1148,6 +1124,102 @@
       "pom_file": "poms/javax.inject/javax.inject/1/javax.inject-1.pom",
       "pom_sha256": "943e12b100627804638fa285805a0ab788a680266531e650921ebfe4621a8bfa",
       "pom_url": "https://repo.maven.apache.org/maven2/javax/inject/javax.inject/1/javax.inject-1.pom"
+    },
+    {
+      "coordinate": "androidx.hilt:hilt-lifecycle-viewmodel-compose:1.4.0",
+      "runtime_sha256": "a8b85d3d8132ac7a6ca12a99fe1921897196eb5f5e1fbdf104efca5da6236c5c",
+      "source_url": "https://dl.google.com/dl/android/maven2/androidx/hilt/hilt-lifecycle-viewmodel-compose/1.4.0/hilt-lifecycle-viewmodel-compose-1.4.0-sources.jar",
+      "source_sha256": "b7b36122c8a0494d6645985857a261c7b6eefacc42f97eb3f412679b65732342",
+      "source_file": "androidx.hilt/hilt-lifecycle-viewmodel-compose/1.4.0/hilt-lifecycle-viewmodel-compose-1.4.0-sources.jar",
+      "source_entries": 12,
+      "source_code_present": true,
+      "pom_file": "poms/androidx.hilt/hilt-lifecycle-viewmodel-compose/1.4.0/hilt-lifecycle-viewmodel-compose-1.4.0.pom",
+      "pom_sha256": "1bfd1e867e89c46723bdd77fd7e7b6a6b795e628269fc3c92f9cbe8160a93324",
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/hilt/hilt-lifecycle-viewmodel-compose/1.4.0/hilt-lifecycle-viewmodel-compose-1.4.0.pom"
+    },
+    {
+      "coordinate": "androidx.hilt:hilt-lifecycle-viewmodel:1.4.0",
+      "runtime_sha256": "46c093385e66b5b7dc76b0d5c47eb05304e27229ca1f252a3d64c161fe23433c",
+      "source_url": "https://dl.google.com/dl/android/maven2/androidx/hilt/hilt-lifecycle-viewmodel/1.4.0/hilt-lifecycle-viewmodel-1.4.0-sources.jar",
+      "source_sha256": "3577e5df08e03074a3ea3081586449004138652b6f26ae3c4d2a4d1eb9519029",
+      "source_file": "androidx.hilt/hilt-lifecycle-viewmodel/1.4.0/hilt-lifecycle-viewmodel-1.4.0-sources.jar",
+      "source_entries": 11,
+      "source_code_present": true,
+      "pom_file": "poms/androidx.hilt/hilt-lifecycle-viewmodel/1.4.0/hilt-lifecycle-viewmodel-1.4.0.pom",
+      "pom_sha256": "3b0b89898c69f43fca5e5ab5ce1ef25b680f064ee66f0bb594b9020f895d0337",
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/hilt/hilt-lifecycle-viewmodel/1.4.0/hilt-lifecycle-viewmodel-1.4.0.pom"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel-compose-android:2.11.1",
+      "runtime_sha256": "ccbd1f3ed5683847240aec4e3005f3e39178aa0884491b68a905b86b80a71075",
+      "source_url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel-compose-android/2.11.1/lifecycle-viewmodel-compose-android-2.11.1-sources.jar",
+      "source_sha256": "1197bae93e66a8c55ab6ff29a2c5a6b30a8d64ad563de874c28a2c0054630dce",
+      "source_file": "androidx.lifecycle/lifecycle-viewmodel-compose-android/2.11.1/lifecycle-viewmodel-compose-android-2.11.1-sources.jar",
+      "source_entries": 31,
+      "source_code_present": true,
+      "pom_file": "poms/androidx.lifecycle/lifecycle-viewmodel-compose-android/2.11.1/lifecycle-viewmodel-compose-android-2.11.1.pom",
+      "pom_sha256": "f2ac1e31bb0342d2ff3f7703b79ac635f01ccd7fa9824cd270607fa71554136f",
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel-compose-android/2.11.1/lifecycle-viewmodel-compose-android-2.11.1.pom"
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel-navigation3-android:2.11.1",
+      "runtime_sha256": "0455f603945f1ef2ee7242fa8c7654d52d892e934d510536efd07f5d18b7d7a4",
+      "source_url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel-navigation3-android/2.11.1/lifecycle-viewmodel-navigation3-android-2.11.1-sources.jar",
+      "source_sha256": "65e4dd0177d2a72c8aee1f5336550ede156be013a80cdc906a6e262986840194",
+      "source_file": "androidx.lifecycle/lifecycle-viewmodel-navigation3-android/2.11.1/lifecycle-viewmodel-navigation3-android-2.11.1-sources.jar",
+      "source_entries": 12,
+      "source_code_present": true,
+      "pom_file": "poms/androidx.lifecycle/lifecycle-viewmodel-navigation3-android/2.11.1/lifecycle-viewmodel-navigation3-android-2.11.1.pom",
+      "pom_sha256": "affda861494da6ebecc43f95fbdc8ac517a7df52c2b9f0dc9ef169ada6b5266d",
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel-navigation3-android/2.11.1/lifecycle-viewmodel-navigation3-android-2.11.1.pom"
+    },
+    {
+      "coordinate": "androidx.navigation3:navigation3-runtime-android:1.2.2",
+      "runtime_sha256": "4efd6b6f1d8a924f6276607b25b0d3291988c2c7347aa6a2335c2bc2c28a0443",
+      "source_url": "https://dl.google.com/dl/android/maven2/androidx/navigation3/navigation3-runtime-android/1.2.2/navigation3-runtime-android-1.2.2-sources.jar",
+      "source_sha256": "34ee8af5cde26c77c902c69a556ddde67dc7d7afba7df4c35132ca41008a6ab1",
+      "source_file": "androidx.navigation3/navigation3-runtime-android/1.2.2/navigation3-runtime-android-1.2.2-sources.jar",
+      "source_entries": 48,
+      "source_code_present": true,
+      "pom_file": "poms/androidx.navigation3/navigation3-runtime-android/1.2.2/navigation3-runtime-android-1.2.2.pom",
+      "pom_sha256": "99d99881b130f8fe337119ab674176c8ce04ff815f282cb7c0d021f3e422e1f3",
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/navigation3/navigation3-runtime-android/1.2.2/navigation3-runtime-android-1.2.2.pom"
+    },
+    {
+      "coordinate": "androidx.navigation3:navigation3-ui-android:1.2.2",
+      "runtime_sha256": "2da1cfacc2370c400cf969bc61986fe72ca9ac1185bb5b1f6fd2c127c2685991",
+      "source_url": "https://dl.google.com/dl/android/maven2/androidx/navigation3/navigation3-ui-android/1.2.2/navigation3-ui-android-1.2.2-sources.jar",
+      "source_sha256": "effb125c9e8058bc7eeaa603f3b5c917d6b02a874f3f479338c9e57383664a66",
+      "source_file": "androidx.navigation3/navigation3-ui-android/1.2.2/navigation3-ui-android-1.2.2-sources.jar",
+      "source_entries": 32,
+      "source_code_present": true,
+      "pom_file": "poms/androidx.navigation3/navigation3-ui-android/1.2.2/navigation3-ui-android-1.2.2.pom",
+      "pom_sha256": "bfea9566e45b05139e783810ea83a3976007a009f91cdbc13687a72ee3f8c9c8",
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/navigation3/navigation3-ui-android/1.2.2/navigation3-ui-android-1.2.2.pom"
+    },
+    {
+      "coordinate": "androidx.navigationevent:navigationevent-android:1.1.1",
+      "runtime_sha256": "4d6c49832f7d92cf6c0b8d8f12ff7fc2fc59b9d09862667b89bb867dbc19760d",
+      "source_url": "https://dl.google.com/dl/android/maven2/androidx/navigationevent/navigationevent-android/1.1.1/navigationevent-android-1.1.1-sources.jar",
+      "source_sha256": "f089d4ea9953c8db3b00829a751c4997300685cb597d604444952ff3ff130ffe",
+      "source_file": "androidx.navigationevent/navigationevent-android/1.1.1/navigationevent-android-1.1.1-sources.jar",
+      "source_entries": 35,
+      "source_code_present": true,
+      "pom_file": "poms/androidx.navigationevent/navigationevent-android/1.1.1/navigationevent-android-1.1.1.pom",
+      "pom_sha256": "67267f70a63307bb76d38d925404440a5dde0562af3f36feb85b125fc7b8f89e",
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/navigationevent/navigationevent-android/1.1.1/navigationevent-android-1.1.1.pom"
+    },
+    {
+      "coordinate": "androidx.navigationevent:navigationevent-compose-android:1.1.1",
+      "runtime_sha256": "4c978461881d0506dd8d38deb25f84f56ea28756a14e583f2561c0ee98dff2d6",
+      "source_url": "https://dl.google.com/dl/android/maven2/androidx/navigationevent/navigationevent-compose-android/1.1.1/navigationevent-compose-android-1.1.1-sources.jar",
+      "source_sha256": "d643f7507fcc2ebe67c98bdce1d4b37582154960bf53f0b4ac9c70881e52cdc1",
+      "source_file": "androidx.navigationevent/navigationevent-compose-android/1.1.1/navigationevent-compose-android-1.1.1-sources.jar",
+      "source_entries": 20,
+      "source_code_present": true,
+      "pom_file": "poms/androidx.navigationevent/navigationevent-compose-android/1.1.1/navigationevent-compose-android-1.1.1.pom",
+      "pom_sha256": "b2abb117d0ef481087a4477d3b9e2ae4ba89e3127238780f8603b57c27acb2c6",
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/navigationevent/navigationevent-compose-android/1.1.1/navigationevent-compose-android-1.1.1.pom"
     }
   ]
 }

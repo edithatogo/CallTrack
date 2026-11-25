@@ -34,6 +34,11 @@
             <sha256 value="2a746b0126a8ab2f576e7167f1a785b452ef7ee997abd979ee0c5a29c36f6ea6" origin="Canonical HTTPS repository byte comparison 2026-10-23; Track14 dependency qualification"/>
          </artifact>
       </component>
+      <component group="androidx.activity" name="activity-compose" version="1.12.0">
+         <artifact name="activity-compose-1.12.0.module">
+            <sha256 value="195823aa4b605f4dc1c12f4070ce568538581840de49da7dc191017dae157a9a" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+      </component>
       <component group="androidx.activity" name="activity-compose" version="1.13.0">
          <artifact name="activity-compose-1.13.0.aar">
             <sha256 value="2b5da3033d4924e833868e140c3edfc0c03208710b6b9fb2c9d9a47560ba55fa" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification"/>
@@ -1241,6 +1246,22 @@
             <sha256 value="d2523d73abbe2f1e787106ad4e1f7acee30a7c62370f85bb4d782700f0fd0701" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification"/>
          </artifact>
       </component>
+      <component group="androidx.hilt" name="hilt-lifecycle-viewmodel" version="1.4.0">
+         <artifact name="hilt-lifecycle-viewmodel-1.4.0.aar">
+            <sha256 value="46c093385e66b5b7dc76b0d5c47eb05304e27229ca1f252a3d64c161fe23433c" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+         <artifact name="hilt-lifecycle-viewmodel-1.4.0.module">
+            <sha256 value="89e0c7bb7b8427c26256639fa6ad00bb1adb4f29096f1a4fce82e2243e3be655" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+      </component>
+      <component group="androidx.hilt" name="hilt-lifecycle-viewmodel-compose" version="1.4.0">
+         <artifact name="hilt-lifecycle-viewmodel-compose-1.4.0.aar">
+            <sha256 value="a8b85d3d8132ac7a6ca12a99fe1921897196eb5f5e1fbdf104efca5da6236c5c" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+         <artifact name="hilt-lifecycle-viewmodel-compose-1.4.0.module">
+            <sha256 value="36da3b995c8baf1ba81f53be146fe1ca82f21459000acb599e4d750bb5edb9f2" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+      </component>
       <component group="androidx.interpolator" name="interpolator" version="1.0.0">
          <artifact name="interpolator-1.0.0.aar">
             <sha256 value="33193135a64fe21fa2c35eec6688f1a76e512606c0fc83dc1b689e37add7732a" origin="Canonical HTTPS repository byte comparison 2026-10-21; selected macOS build scopes"/>
@@ -1794,6 +1815,29 @@
             <sha256 value="4b236b2e504db5ca5d09334fef05aa8cdc31ee35a433c3aa4d0420efa9613332" origin="Canonical HTTPS repository byte comparison 2026-10-23; Track14 dependency qualification"/>
          </artifact>
       </component>
+      <component group="androidx.lifecycle" name="lifecycle-viewmodel-compose" version="2.11.0">
+         <artifact name="lifecycle-viewmodel-compose-2.11.0.module">
+            <sha256 value="997b2a3833183f94e6013ad40982fcf5e7c8600e1070994f330645462a546c18" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+      </component>
+      <component group="androidx.lifecycle" name="lifecycle-viewmodel-compose" version="2.11.1">
+         <artifact name="lifecycle-viewmodel-compose-2.11.1.module">
+            <sha256 value="b715335e3981b3403582b4985cc7f0aa340b5f2e8f06ea67f482b05f27c5b4cf" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+      </component>
+      <component group="androidx.lifecycle" name="lifecycle-viewmodel-compose-android" version="2.11.0">
+         <artifact name="lifecycle-viewmodel-compose-android-2.11.0.module">
+            <sha256 value="a163bee48b8a0856fc6a25e9deac651e6d427729acdb35c3d8efdc1ec0c1683c" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+      </component>
+      <component group="androidx.lifecycle" name="lifecycle-viewmodel-compose-android" version="2.11.1">
+         <artifact name="lifecycle-viewmodel-compose-android-2.11.1.module">
+            <sha256 value="fd7660558618672171f98c3ffdef50836c85f1967655049d53e43a259fb5f28d" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+         <artifact name="lifecycle-viewmodel-compose.aar">
+            <sha256 value="ccbd1f3ed5683847240aec4e3005f3e39178aa0884491b68a905b86b80a71075" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+      </component>
       <component group="androidx.lifecycle" name="lifecycle-viewmodel-ktx" version="2.10.0">
          <artifact name="lifecycle-viewmodel-ktx-2.10.0.module">
             <sha256 value="837bfdd848eefef77544fa289dbff4c428680dd9820641eadb841cc7a74c83f9" origin="Generated by Gradle"/>
@@ -1844,6 +1888,19 @@
          </artifact>
          <artifact name="lifecycle-viewmodel-ktx-2.9.4.module">
             <sha256 value="5631efeab797f79a1adba5df64b2f0cca54e08b428756df7630cb23b90098a67" origin="Canonical HTTPS repository byte comparison 2026-10-23; Track14 dependency qualification"/>
+         </artifact>
+      </component>
+      <component group="androidx.lifecycle" name="lifecycle-viewmodel-navigation3" version="2.11.1">
+         <artifact name="lifecycle-viewmodel-navigation3-2.11.1.module">
+            <sha256 value="9ce4db532cc8200424b9156fc752a59bf41545aa2443e57e76c6283fbcc2994d" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+      </component>
+      <component group="androidx.lifecycle" name="lifecycle-viewmodel-navigation3-android" version="2.11.1">
+         <artifact name="lifecycle-viewmodel-navigation3-android-2.11.1.module">
+            <sha256 value="58985101d1f106de0c48beac370af7fe84edd3529fc089ed8440257519e40533" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+         <artifact name="lifecycle-viewmodel-navigation3.aar">
+            <sha256 value="0455f603945f1ef2ee7242fa8c7654d52d892e934d510536efd07f5d18b7d7a4" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
          </artifact>
       </component>
       <component group="androidx.lifecycle" name="lifecycle-viewmodel-savedstate" version="2.10.0">
@@ -1929,6 +1986,32 @@
             <sha256 value="a000041f5a1f79283c5175e1bb60cf3683780f401c6a9d34fbe9751253fa6ff9" origin="Generated by Gradle"/>
          </artifact>
       </component>
+      <component group="androidx.navigation3" name="navigation3-runtime" version="1.2.2">
+         <artifact name="navigation3-runtime-1.2.2.module">
+            <sha256 value="f9b970efe707087633c2760eadc3392731648e97aaf509b85802ffb9f31f848a" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+      </component>
+      <component group="androidx.navigation3" name="navigation3-runtime-android" version="1.2.2">
+         <artifact name="navigation3-runtime-android-1.2.2.module">
+            <sha256 value="5bb48eb8943a743a10d4b8d23d06aa668a413ee0d4a80638eea25f976b3e59d8" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+         <artifact name="navigation3-runtime.aar">
+            <sha256 value="4efd6b6f1d8a924f6276607b25b0d3291988c2c7347aa6a2335c2bc2c28a0443" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+      </component>
+      <component group="androidx.navigation3" name="navigation3-ui" version="1.2.2">
+         <artifact name="navigation3-ui-1.2.2.module">
+            <sha256 value="84d2934797315e9d724eb5a66af7a30ca890ffa01eda3d81161a55a8c494f761" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+      </component>
+      <component group="androidx.navigation3" name="navigation3-ui-android" version="1.2.2">
+         <artifact name="navigation3-ui-android-1.2.2.module">
+            <sha256 value="c61746c405adff6b8e72f68aea059d1df4ee2b56e547f52a5f86e472ea4b90dc" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+         <artifact name="navigation3-ui.aar">
+            <sha256 value="2da1cfacc2370c400cf969bc61986fe72ca9ac1185bb5b1f6fd2c127c2685991" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+      </component>
       <component group="androidx.navigationevent" name="navigationevent" version="1.0.0">
          <artifact name="navigationevent-1.0.0.module">
             <sha256 value="f33f1e030a0a7d10aab608a5a5d3ff70d25df325ce825ca204aa19c0e0578b53" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification"/>
@@ -1937,6 +2020,11 @@
       <component group="androidx.navigationevent" name="navigationevent" version="1.1.0">
          <artifact name="navigationevent-1.1.0.module">
             <sha256 value="300df304bc00e64121a1c7e1099c9c7c45b4c790501fe402e0bf239a7eb63b40" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification"/>
+         </artifact>
+      </component>
+      <component group="androidx.navigationevent" name="navigationevent" version="1.1.1">
+         <artifact name="navigationevent-1.1.1.module">
+            <sha256 value="ed89d604fd391ddd183337f64b86ff02909293d751eab2dbcaf58d20a33f930f" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
          </artifact>
       </component>
       <component group="androidx.navigationevent" name="navigationevent-android" version="1.0.0">
@@ -1955,6 +2043,14 @@
             <sha256 value="ea7943bc61d52b42a7a2cbcbde14c9b10e7baf9e09a8fe54d8cb17d3bb5dbfd9" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification"/>
          </artifact>
       </component>
+      <component group="androidx.navigationevent" name="navigationevent-android" version="1.1.1">
+         <artifact name="navigationevent-android-1.1.1.module">
+            <sha256 value="574d71a384a20c75ad9d6dd26a0d31a6614036039ce0e20b8f4d05e146904758" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+         <artifact name="navigationevent.aar">
+            <sha256 value="4d6c49832f7d92cf6c0b8d8f12ff7fc2fc59b9d09862667b89bb867dbc19760d" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+      </component>
       <component group="androidx.navigationevent" name="navigationevent-compose" version="1.0.0">
          <artifact name="navigationevent-compose-1.0.0.module">
             <sha256 value="a51c8f63cb5f188561903d8f2ef1496d9eff57e7acddf87d56859b09859baaaf" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification"/>
@@ -1963,6 +2059,11 @@
       <component group="androidx.navigationevent" name="navigationevent-compose" version="1.1.0">
          <artifact name="navigationevent-compose-1.1.0.module">
             <sha256 value="ce77061c13da511ef132464650d48677a460ff061787ace64c194bb057b7e0a6" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification"/>
+         </artifact>
+      </component>
+      <component group="androidx.navigationevent" name="navigationevent-compose" version="1.1.1">
+         <artifact name="navigationevent-compose-1.1.1.module">
+            <sha256 value="9911c7abc222d6b21a987b649a2c9a4e67f154a43133b3261d57b59e8b9761a9" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
          </artifact>
       </component>
       <component group="androidx.navigationevent" name="navigationevent-compose-android" version="1.0.0">
@@ -1976,6 +2077,14 @@
          </artifact>
          <artifact name="navigationevent-compose.aar">
             <sha256 value="487fd434793393f4c6d2ceac0a9f5fc6d23b682f508ff6ff18793907b5882032" origin="Canonical HTTPS repository byte comparison 2026-11-24; Android app qualification"/>
+         </artifact>
+      </component>
+      <component group="androidx.navigationevent" name="navigationevent-compose-android" version="1.1.1">
+         <artifact name="navigationevent-compose-android-1.1.1.module">
+            <sha256 value="bfcb45e5b079b6c69628b1e8827190f974df0e92893256d00dc9819d84538ce4" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+         <artifact name="navigationevent-compose.aar">
+            <sha256 value="4c978461881d0506dd8d38deb25f84f56ea28756a14e583f2561c0ee98dff2d6" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
          </artifact>
       </component>
       <component group="androidx.print" name="print" version="1.0.0">
@@ -2244,6 +2353,11 @@
          </artifact>
          <artifact name="savedstate-compose.aar">
             <sha256 value="93426691f25441cc3179494b25f401a8a468aabbee4c40b90c0327413fd65523" origin="Canonical HTTPS repository byte comparison 2026-10-23; Track14 dependency qualification"/>
+         </artifact>
+      </component>
+      <component group="androidx.savedstate" name="savedstate-compose-android" version="1.4.0">
+         <artifact name="savedstate-compose-android-1.4.0.module">
+            <sha256 value="2be8c753a07c920cf2f5d63d66e8743fb08a933d04c02b7a388b77b66fca848f" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
          </artifact>
       </component>
       <component group="androidx.savedstate" name="savedstate-compose-android" version="1.5.0">
@@ -7036,6 +7150,22 @@
          </artifact>
          <artifact name="kotlin-scripting-jvm-2.4.21.pom">
             <sha256 value="f9de68cf49f356252fe4af9185f1dd3a2a5cf6ca236da03452a83513e223dbfc" origin="Canonical HTTPS repository byte comparison 2026-11-23; build-tool security qualification"/>
+         </artifact>
+      </component>
+      <component group="org.jetbrains.kotlin" name="kotlin-serialization" version="2.4.21">
+         <artifact name="kotlin-serialization-2.4.21-gradle96.jar">
+            <sha256 value="f5b6f5fdf64ec7ae5716816e9e77baa9eda6ae76291ca17b38fe4241e99aad3c" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+         <artifact name="kotlin-serialization-2.4.21.module">
+            <sha256 value="d2360f353ab9ac4dc84bfbc8c9a1d39ed69ba97eb57c68625213e867b6654abc" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+      </component>
+      <component group="org.jetbrains.kotlin" name="kotlin-serialization-compiler-plugin-embeddable" version="2.4.21">
+         <artifact name="kotlin-serialization-compiler-plugin-embeddable-2.4.21.jar">
+            <sha256 value="63b381018a7d45221795d18301150fb80a1d00f30aae7be0550ab86f9ddd0ce8" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
+         </artifact>
+         <artifact name="kotlin-serialization-compiler-plugin-embeddable-2.4.21.pom">
+            <sha256 value="5312290bafa68648ab5de4487932852be2a212a762ed3b103848ef2fab1cec47" origin="Canonical HTTPS repository byte comparison 2026-11-25"/>
          </artifact>
       </component>
       <component group="org.jetbrains.kotlin" name="kotlin-stdlib" version="1.8.21">

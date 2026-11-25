@@ -1,9 +1,11 @@
 """Boundary tests for a distributable source/notices archive."""
 import io
 import importlib.util
+import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 import zipfile
 
 SPEC = importlib.util.spec_from_file_location('release_bundle', Path(__file__).resolve().parents[1] / 'scripts/prepare_release_bundle.py')
@@ -23,6 +25,26 @@ class BundleBoundaries(unittest.TestCase):
         for changed in ([], [dict(rows[0], sha256='b' * 64)], [dict(rows[0], name='other.jar')]):
             with self.assertRaises(ValueError):
                 bundle.validate_inventory(changed, rows)
+
+    def test_runtime_audits_require_an_explicit_known_replacement(self):
+        prior = {'coordinate': 'a:b:1', 'name': 'b.jar', 'sha256': 'a' * 64}
+        replacement = dict(prior, coordinate='a:b:2', sha256='b' * 64)
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(bundle, 'ROOT', Path(tmp)):
+            (bundle.ROOT / 'prior.json').write_text(json.dumps({'artifacts': [prior]}))
+            candidate = bundle.ROOT / 'candidate.json'
+            paths = ('prior.json', 'candidate.json')
+            candidate.write_text(json.dumps({'artifacts': [replacement]}))
+            with self.assertRaises(ValueError):
+                bundle.validate_inventory([replacement], bundle.audited_inventory(paths))
+            candidate.write_text(json.dumps({
+                'artifacts': [replacement], 'superseded_coordinates': ['a:b:1'],
+            }))
+            bundle.validate_inventory([replacement], bundle.audited_inventory(paths))
+            candidate.write_text(json.dumps({
+                'artifacts': [replacement], 'superseded_coordinates': ['a:b:11'],
+            }))
+            with self.assertRaisesRegex(ValueError, 'Unknown superseded runtime coordinate'):
+                bundle.audited_inventory(paths)
 
     def test_modified_or_external_source_cache_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:

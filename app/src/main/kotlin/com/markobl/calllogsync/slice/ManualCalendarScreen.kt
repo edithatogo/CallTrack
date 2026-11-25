@@ -11,7 +11,7 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 
-/** Presentation for manual logging. Provider, permission and delivery effects stay in Activity. */
+/** Presentation for manual logging. */
 @Composable
 internal fun ManualCalendarScreen(
     intro: String,

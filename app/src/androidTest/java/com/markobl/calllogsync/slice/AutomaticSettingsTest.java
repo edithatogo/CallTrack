@@ -2,7 +2,9 @@ package com.markobl.calllogsync.slice;
 
 import static org.junit.Assert.*;
 
+import android.accessibilityservice.AccessibilityService;
 import android.app.Activity;
+import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -15,6 +17,41 @@ import org.junit.Test;
 
 /** Activity state contracts only; no permission dialog, provider data or automatic activation. */
 public class AutomaticSettingsTest {
+    @Test
+    public void systemBackReturnsThroughLauncherNavigationStack() {
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        Context context = instrumentation.getTargetContext();
+        CalendarSliceActivity activity =
+                (CalendarSliceActivity)
+                        instrumentation.startActivitySync(
+                                new Intent(context, CalendarSliceActivity.class)
+                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        try {
+            RenderedUi ui = new RenderedUi(instrumentation);
+            ui.tapId("open_automatic");
+            ui.tapId("open_imports");
+            ui.await(() -> ui.shown("import_summary_text", true) != null, "Import did not render");
+            assertTrue(
+                    "Import must stay in the launcher activity",
+                    RenderedUi.isResumed(instrumentation, activity));
+            assertTrue(ui.automation.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK));
+            ui.await(
+                    () ->
+                            ui.find("import_summary_text", true) == null
+                                    && ui.shown("open_imports", true) != null,
+                    "System Back did not return to Automatic logging");
+            assertTrue(ui.automation.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK));
+            ui.await(
+                    () ->
+                            ui.find("auto_state", true) == null
+                                    && ui.shown("open_automatic", true) != null,
+                    "System Back did not return to Manual logging");
+            assertTrue(RenderedUi.isResumed(instrumentation, activity));
+        } finally {
+            instrumentation.runOnMainSync(activity::finish);
+        }
+    }
+
     @Test
     public void openingSettingsDoesNotEnableOrSelectDestinationWithoutAccess() {
         android.app.Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
