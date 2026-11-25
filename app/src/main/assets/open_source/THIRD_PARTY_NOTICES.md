@@ -112,8 +112,8 @@ original `META-INF/NOTICE.md`.
 | androidx.tracing:tracing-ktx:2.0.5 | Apache-2.0 |
 | androidx.versionedparcelable:versionedparcelable:1.1.1 | Apache-2.0 |
 | androidx.viewpager:viewpager:1.0.0 | Apache-2.0 |
-| androidx.window:window-core-android:1.5.0 | Apache-2.0 |
-| androidx.window:window:1.5.0 | Apache-2.0 |
+| androidx.window:window-core-android:1.5.1 | Apache-2.0 |
+| androidx.window:window:1.5.1 | Apache-2.0 |
 | androidx.work:work-runtime:2.12.0 | Apache-2.0 |
 | com.google.code.findbugs:jsr305:3.0.2 | Apache-2.0 |
 | com.google.dagger:dagger-lint-aar:2.60.1 | Apache-2.0 |

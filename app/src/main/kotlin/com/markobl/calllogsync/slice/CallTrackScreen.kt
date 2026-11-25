@@ -41,11 +41,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -61,9 +65,15 @@ import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowSizeClass.Companion.BREAKPOINTS_V2
+import androidx.window.core.layout.WindowSizeClass.Companion.HEIGHT_DP_MEDIUM_LOWER_BOUND
+import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_LOWER_BOUND
+import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
+import androidx.window.core.layout.computeWindowSizeClass
 import com.markobl.calllogsync.R
 
 private val FormMaxWidth = 640.dp
+private val ExpandedFormMaxWidth = 720.dp
 private val MinimumTargetSize = 48.dp
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -96,6 +106,22 @@ internal fun CallTrackScaffold(
     onNavigateUp: (() -> Unit)?,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val windowInfo = LocalWindowInfo.current
+    val windowSizeClass by
+        remember(windowInfo) {
+            derivedStateOf(structuralEqualityPolicy()) {
+                val size = windowInfo.containerDpSize
+                BREAKPOINTS_V2.computeWindowSizeClass(size.width.value, size.height.value)
+            }
+        }
+    val roomy =
+        windowSizeClass.isAtLeastBreakpoint(
+            WIDTH_DP_EXPANDED_LOWER_BOUND,
+            HEIGHT_DP_MEDIUM_LOWER_BOUND,
+        )
+    val formWidth = if (roomy) ExpandedFormMaxWidth else FormMaxWidth
+    val formGutter =
+        if (windowSizeClass.isWidthAtLeastBreakpoint(WIDTH_DP_MEDIUM_LOWER_BOUND)) 24.dp else 16.dp
     Scaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
         contentWindowInsets = WindowInsets.safeDrawing,
@@ -107,12 +133,12 @@ internal fun CallTrackScaffold(
         ) {
             Column(
                 modifier =
-                    Modifier.widthIn(max = FormMaxWidth)
+                    Modifier.widthIn(max = formWidth)
                         .fillMaxWidth()
                         .fillMaxHeight()
                         .testTag("calltrack_screen")
                         .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                        .padding(horizontal = formGutter, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 content = content,
             )
