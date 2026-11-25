@@ -251,6 +251,10 @@ archive traversal, changed checksum or differing APK fails closed. Retain failur
 and audit newly requested dependency metadata against canonical origins; never
 turn off verification or blindly generate checksums to obtain a green build.
 
+Supply the exact release JVM test count from the two matching macOS builds for
+the selected commit. Linux must run that count, with at least 119 tests and zero
+failures, errors, or skips.
+
 A Docker/Linux guest with no host mounts and fresh SDK/JDK/Gradle dependencies
 provides a separate software environment, but still shares this physical computer.
 It does not establish a second physical host, hosted CI or independent contributor

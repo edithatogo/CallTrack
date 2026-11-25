@@ -154,8 +154,10 @@ def junit_counts(source):
     return counts
 
 
-def run(source, output, revision, expected_apk):
+def run(source, output, revision, expected_apk, expected_jvm_test_count):
     validate_revision(revision)
+    if expected_jvm_test_count < 119:
+        raise ValueError('Expected at least 119 release JVM tests')
     if platform.system() != 'Linux':
         raise ValueError('A Linux environment is required')
     if subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=source, text=True).strip() != revision:
@@ -167,6 +169,7 @@ def run(source, output, revision, expected_apk):
     evidence.mkdir()
     sdk, cache = output / 'sdk', output / 'gradle-home'
     receipt = dict(success=False, release_ready=False, revision=revision,
+                   expected_jvm_test_count=expected_jvm_test_count,
                    linux=True, kernel=platform.release(), machine=platform.machine(),
                    physical_host_independence=False, hosted_ci=False,
                    cache_empty_before=not cache.exists(), sdk_empty_before=not sdk.exists(),
@@ -217,9 +220,7 @@ def run(source, output, revision, expected_apk):
         if result.returncode:
             raise RuntimeError('Linux build failed; inspect retained build.log')
         receipt['jvm'] = junit_counts(source)
-        # The current Compose/KMP candidate has 119 release JVM tests. Older
-        # frozen candidates retain their separately recorded 115-test baseline.
-        if receipt['jvm'] != dict(tests=119, failures=0, errors=0, skipped=0):
+        if receipt['jvm'] != dict(tests=expected_jvm_test_count, failures=0, errors=0, skipped=0):
             raise RuntimeError('Candidate JVM acceptance count/outcome changed')
         lint = parse_xml_file(source / 'app/build/reports/lint-results-release.xml')
         counts = {}
@@ -259,6 +260,7 @@ if __name__ == '__main__':
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--expected-revision', required=True)
     parser.add_argument('--expected-apk-sha256', required=True)
+    parser.add_argument('--expected-jvm-test-count', type=int, required=True)
     args = parser.parse_args()
     print(json.dumps(run(args.source.resolve(), args.output.resolve(), args.expected_revision,
-                         args.expected_apk_sha256), indent=2))
+                         args.expected_apk_sha256, args.expected_jvm_test_count), indent=2))
