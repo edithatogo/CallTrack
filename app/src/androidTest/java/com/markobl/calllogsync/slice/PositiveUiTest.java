@@ -3,6 +3,7 @@ package com.markobl.calllogsync.slice;
 import static org.junit.Assert.*;
 
 import android.Manifest;
+import android.accessibilityservice.AccessibilityService;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.ContentValues;
@@ -19,6 +20,7 @@ import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import androidx.lifecycle.Lifecycle;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.work.WorkManager;
@@ -544,9 +546,9 @@ public class PositiveUiTest {
     public void renderedPermissionsFiltersConfirmPauseAndReopen() {
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         RenderedUi ui = new RenderedUi(instrumentation);
-        Activity activity = null;
+        ActivityScenario<AutomaticSettingsActivity> scenario = null;
         try {
-            activity = open(instrumentation);
+            scenario = ActivityScenario.launch(AutomaticSettingsActivity.class);
             ui.await(() -> ui.find("auto_access_action", true) != null, "Settings not rendered");
             ui.capture("settings-before-access");
             assertFalse(allGranted());
@@ -569,7 +571,7 @@ public class PositiveUiTest {
                         }) {
                     ui.automation.grantRuntimePermission(context().getPackageName(), permission);
                 }
-                instrumentation.runOnMainSync(activity::recreate);
+                scenario.recreate();
             } else {
                 ui.tapId("auto_access_action");
                 ui.permissionDialogs(false, this::allGranted);
@@ -594,6 +596,22 @@ public class PositiveUiTest {
             assertNull(active());
             assertEquals(0, fixture.events(state().getLong("calendar", -1)));
             ui.tapId("auto_enable");
+            ui.await(() -> ui.find("calltrack_dialog_confirm", true) != null, "Review missing");
+            scenario.moveToState(Lifecycle.State.CREATED);
+            scenario.moveToState(Lifecycle.State.RESUMED);
+            awaitUnconfirmedDraft(ui);
+            for (String[] route :
+                    new String[][] {
+                        {"open_imports", "import_summary_text"},
+                        {"open_recovery", "recovery_refresh_action"},
+                    }) {
+                ui.tapId(route[0]);
+                ui.await(() -> ui.find(route[1], true) != null, "Destination route not rendered");
+                assertTrue(
+                        ui.automation.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK));
+                awaitUnconfirmedDraft(ui);
+            }
+            ui.tapId("auto_enable");
             ui.tapId("calltrack_dialog_confirm");
             ui.await(() -> active() != null && active().enabled, "Enable not committed");
             ActivationControl.Settings enabled = active();
@@ -615,8 +633,8 @@ public class PositiveUiTest {
                                             != null,
                     "Pause not rendered/committed");
             ui.capture("settings-paused");
-            finish(instrumentation, activity);
-            activity = open(instrumentation);
+            scenario.close();
+            scenario = ActivityScenario.launch(AutomaticSettingsActivity.class);
             ui.await(
                     () -> ui.find("auto_outgoing", true) != null, "Reopened settings not rendered");
             assertFalse(active().enabled);
@@ -637,8 +655,22 @@ public class PositiveUiTest {
             }
             throw failure;
         } finally {
-            finish(instrumentation, activity);
+            if (scenario != null) scenario.close();
         }
+    }
+
+    private void awaitUnconfirmedDraft(RenderedUi ui) {
+        ui.await(
+                () ->
+                        ui.find("calltrack_dialog_confirm", true) == null
+                                && ui.shown("auto_enable", true) != null
+                                && ui.shown("auto_enable", true).isEnabled(),
+                "Settings draft should remain available for fresh review");
+        assertEquals(
+                AccessibilityNodeInfo.CHECKED_STATE_FALSE,
+                ui.shown("auto_outgoing", true).getChecked());
+        assertNull("Returning to settings must require new confirmation", active());
+        assertEquals(0, fixture.events(state().getLong("calendar", -1)));
     }
 
     @Test

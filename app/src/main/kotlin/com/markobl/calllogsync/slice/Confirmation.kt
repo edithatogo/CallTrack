@@ -21,12 +21,32 @@ internal data class Confirmation(
 
 @Composable
 internal fun ConfirmationDialog(confirmation: Confirmation, onDismiss: () -> Unit) {
+    ConfirmationDialog(
+        title = confirmation.title,
+        message = confirmation.message,
+        actionLabel = confirmation.actionLabel,
+        onConfirm = {
+            onDismiss()
+            confirmation.onConfirm()
+        },
+        onDismiss = onDismiss,
+    )
+}
+
+@Composable
+internal fun ConfirmationDialog(
+    title: String,
+    message: String,
+    actionLabel: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(confirmation.title) },
+        title = { Text(title) },
         text = {
             Text(
-                confirmation.message,
+                message,
                 Modifier.testTag("calltrack_dialog_message")
                     .semantics { testTagsAsResourceId = true }
                     .verticalScroll(rememberScrollState()),
@@ -43,13 +63,10 @@ internal fun ConfirmationDialog(confirmation: Confirmation, onDismiss: () -> Uni
         },
         confirmButton = {
             ActionButton(
-                label = confirmation.actionLabel,
+                label = actionLabel,
                 tag = "calltrack_dialog_confirm",
                 enabled = true,
-                onClick = {
-                    onDismiss()
-                    confirmation.onConfirm()
-                },
+                onClick = onConfirm,
                 style = ButtonStyle.Text,
             )
         },
