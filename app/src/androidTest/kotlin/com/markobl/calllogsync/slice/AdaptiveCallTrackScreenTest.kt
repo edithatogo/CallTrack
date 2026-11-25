@@ -23,14 +23,11 @@ import org.junit.Test
 class AdaptiveCallTrackScreenTest {
     @get:Rule val compose = createComposeRule()
 
-    @Test
-    fun compactWindowKeepsPrimaryActionAccessible() = checkForm("compact", 360.dp)
+    @Test fun compactWindowKeepsPrimaryActionAccessible() = checkForm("compact", 360.dp)
 
-    @Test
-    fun mediumWindowKeepsPrimaryActionAccessible() = checkForm("medium", 640.dp)
+    @Test fun mediumWindowKeepsPrimaryActionAccessible() = checkForm("medium", 640.dp)
 
-    @Test
-    fun expandedWindowKeepsPrimaryActionAccessible() = checkForm("expanded", 720.dp)
+    @Test fun expandedWindowKeepsPrimaryActionAccessible() = checkForm("expanded", 720.dp)
 
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)
     private fun checkForm(profile: String, formWidth: Dp) {
