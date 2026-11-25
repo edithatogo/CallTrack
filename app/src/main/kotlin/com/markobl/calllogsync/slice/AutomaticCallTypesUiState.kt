@@ -1,11 +1,12 @@
 package com.markobl.calllogsync.slice
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
@@ -22,6 +23,15 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
+import com.markobl.calllogsync.R
+
+internal fun Context.callTypeLabels(incoming: Boolean, outgoing: Boolean, missed: Boolean): String =
+    buildList {
+        if (incoming) add(getString(R.string.auto_incoming))
+        if (outgoing) add(getString(R.string.auto_outgoing))
+        if (missed) add(getString(R.string.auto_missed))
+    }
+    .joinToString()
 
 internal data class AutomaticCallTypesUiState(
     val incoming: Boolean = true,
@@ -38,17 +48,18 @@ internal fun AutomaticCallTypesPanel(
     enabled: Boolean,
     onStateChange: (AutomaticCallTypesUiState) -> Unit,
 ) {
-    Column(
+    FlowRow(
         modifier = Modifier.fillMaxWidth().semantics { testTagsAsResourceId = true },
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        CallTypeOption("auto_incoming", incomingLabel, state.incoming, enabled) {
+        CallTypeOption("auto_incoming", incomingLabel, state.incoming, enabled = enabled) {
             onStateChange(state.copy(incoming = it))
         }
-        CallTypeOption("auto_outgoing", outgoingLabel, state.outgoing, enabled) {
+        CallTypeOption("auto_outgoing", outgoingLabel, state.outgoing, enabled = enabled) {
             onStateChange(state.copy(outgoing = it))
         }
-        CallTypeOption("auto_missed", missedLabel, state.missed, enabled) {
+        CallTypeOption("auto_missed", missedLabel, state.missed, enabled = enabled) {
             onStateChange(state.copy(missed = it))
         }
     }
@@ -59,13 +70,14 @@ internal fun CallTypeOption(
     tag: String,
     label: String,
     checked: Boolean,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     onCheckedChange: (Boolean) -> Unit,
 ) {
     Row(
         modifier =
-            Modifier.fillMaxWidth()
-                .heightIn(min = 48.dp)
+            modifier
+                .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
                 .toggleable(
                     value = checked,
                     enabled = enabled,

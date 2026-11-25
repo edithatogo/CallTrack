@@ -29,8 +29,8 @@ class HistoricalImportActivityComposeTest {
             .performScrollTo()
             .assertIsDisplayed()
             .assertIsNotEnabled()
-        compose.onNodeWithTag("import_confirm").assertIsNotEnabled()
-        compose.onNodeWithTag("import_continue").assertIsNotEnabled()
+        compose.onNodeWithTag("import_confirm").assertDoesNotExist()
+        compose.onNodeWithTag("import_continue").assertDoesNotExist()
         compose
             .onNodeWithText(compose.activity.getString(R.string.import_none))
             .performScrollTo()

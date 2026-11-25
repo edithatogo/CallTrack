@@ -16,7 +16,10 @@ import tarfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-AUDIT = 'conductor/tracks/release_20261020/canonical-runtime-audit-20261124.json'
+AUDITS = (
+    'conductor/tracks/release_20261020/canonical-runtime-audit-20261124.json',
+    'conductor/tracks/release_20261020/datastore-runtime-audit-20261125.json',
+)
 SOURCES = 'qualification/release/runtime-sources.json'
 
 
@@ -131,10 +134,12 @@ def run(output, build_receipt, inventory, source_cache):
             build.get('signed') is not False or len(build.get('builds', [])) != 2):
         raise ValueError('Two successful matching-source unsigned build receipts required')
     actual = json.loads(inventory.read_text())['artifacts']
-    audit = json.loads((ROOT / AUDIT).read_text())
-    validate_inventory(actual, audit['artifacts'])
+    audited = [row for path in AUDITS for row in json.loads((ROOT / path).read_text())['artifacts']]
+    validate_inventory(actual, audited)
     sources = json.loads((ROOT / SOURCES).read_text())['artifacts']
-    expected = {r['coordinate']: r['sha256'] for r in audit['artifacts']}
+    expected = {r['coordinate']: r['sha256'] for r in audited}
+    if len(expected) != len(audited):
+        raise ValueError('Duplicate coordinate in the canonical runtime audits')
     if len(sources) != len(expected) or {r['coordinate'] for r in sources} != set(expected):
         raise ValueError('Dependency source coverage is incomplete/duplicated')
     files = source_snapshot(revision)
@@ -153,7 +158,10 @@ def run(output, build_receipt, inventory, source_cache):
         files['dependency-sources/' + row['pom_file']] = checked_file(source_cache, row['pom_file'], row['pom_sha256'])
     prefix = 'source/app/src/main/assets/open_source/'
     legal = {name[len(prefix):]: data for name, data in files.items() if name.startswith(prefix)}
-    required = {'GPL-3.0.txt', 'Apache-2.0.txt', 'NOTICE.md', 'THIRD_PARTY_NOTICES.md', 'retained-index.json'}
+    required = {
+        'GPL-3.0.txt', 'Apache-2.0.txt', 'Protobuf-BSD-3-Clause.txt', 'NOTICE.md',
+        'THIRD_PARTY_NOTICES.md', 'retained-index.json',
+    }
     if not required.issubset(legal):
         raise ValueError('Required licence/notices payload missing from committed source')
     for name, data in legal.items():

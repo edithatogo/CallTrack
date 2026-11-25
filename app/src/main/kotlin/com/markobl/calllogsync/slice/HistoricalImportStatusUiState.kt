@@ -24,13 +24,15 @@ internal fun HistoricalImportStatusPanel(state: HistoricalImportStatusUiState) {
 
 @Composable
 internal fun HistoricalImportSummaryText(text: String) {
-    Text(
-        text = text,
-        modifier =
-            Modifier.fillMaxWidth()
-                .semantics { liveRegion = LiveRegionMode.Polite }
-                .testTag("import_summary_text"),
-    )
+    StatusCard {
+        Text(
+            text = text,
+            modifier =
+                Modifier.fillMaxWidth()
+                    .semantics { liveRegion = LiveRegionMode.Polite }
+                    .testTag("import_summary_text"),
+        )
+    }
 }
 
 @Composable

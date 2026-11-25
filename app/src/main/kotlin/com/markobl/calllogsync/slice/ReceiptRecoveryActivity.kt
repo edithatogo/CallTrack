@@ -1,7 +1,6 @@
 package com.markobl.calllogsync.slice
 
 import android.Manifest
-import android.app.AlertDialog
 import android.content.ContentUris
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -29,6 +28,9 @@ class ReceiptRecoveryActivity : ComponentActivity() {
     private var next: SqliteLedger.RecoveryCursor? = null
     private var emptyState by mutableStateOf(false)
     private var feedbackText by mutableStateOf("")
+    private var retentionFeedback by mutableStateOf("")
+    private var confirmation by mutableStateOf<Confirmation?>(null)
+    private var hasCalendarReadAccess by mutableStateOf(false)
     private var cards by mutableStateOf<List<RecoveryCardUiState>>(emptyList())
     private var visibleRecords: Map<Long, Pair<DurableDelivery.Intent, String?>> = emptyMap()
     private var nextCardToken = 0L
@@ -39,7 +41,6 @@ class ReceiptRecoveryActivity : ComponentActivity() {
 
     @Volatile private var approvalSession = Any()
     private var version = 0L
-
     private val permissions =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             if (!busy) load(current)
@@ -47,21 +48,20 @@ class ReceiptRecoveryActivity : ComponentActivity() {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setCallTrackContent {
+        setCallTrackContent(R.string.recovery_title) {
             RecoveryOverview()
             RecoveryReceipts()
+            RecoveryRetention()
+            confirmation?.let { ConfirmationDialog(it) { confirmation = null } }
         }
         load(null)
     }
 
     @Composable
     private fun RecoveryOverview() {
-        RecoveryCopyPanel(
-            text = stringResource(R.string.recovery_intro),
-            tag = "recovery_intro_text",
-        )
         RecoveryAccessPanel(
             label = stringResource(R.string.recovery_access),
+            hasCalendarAccess = hasCalendarReadAccess,
             onRequestAccess = {
                 permissions.launch(arrayOf(Manifest.permission.READ_CALENDAR))
             },
@@ -76,24 +76,16 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                 }
             },
         )
-        RecoveryCopyPanel(
-            text = stringResource(R.string.retention_policy),
-            tag = "recovery_retention_copy_text",
-        )
-        RecoveryRetentionPanel(
-            busy = navigationState.busy,
-            label = stringResource(R.string.retention_run),
-            onExpire = ::expireOldPayloads,
-        )
+    }
+
+    @Composable
+    private fun RecoveryReceipts() {
+        SectionHeading(stringResource(R.string.recovery_records_heading))
         RecoveryStatusPanel(feedbackText)
         RecoveryEmptyPanel(
             visible = emptyState,
             message = stringResource(R.string.recovery_empty),
         )
-    }
-
-    @Composable
-    private fun RecoveryReceipts() {
         RecoveryCardsPanel(
             cards = cards,
             busy = navigationState.busy,
@@ -128,6 +120,25 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                 }
             },
         )
+    }
+
+    @Composable
+    private fun RecoveryRetention() {
+        RecoveryCopyPanel(
+            text = stringResource(R.string.recovery_intro),
+            tag = "recovery_intro_text",
+        )
+        SectionHeading(stringResource(R.string.recovery_retention_heading))
+        RecoveryCopyPanel(
+            text = stringResource(R.string.retention_policy),
+            tag = "recovery_retention_copy_text",
+        )
+        RecoveryRetentionPanel(
+            busy = navigationState.busy,
+            label = stringResource(R.string.retention_run),
+            onExpire = ::expireOldPayloads,
+        )
+        RecoveryStatusPanel(retentionFeedback, tag = "recovery_retention_feedback")
     }
 
     private fun load(cursor: SqliteLedger.RecoveryCursor?) {
@@ -203,6 +214,9 @@ class ReceiptRecoveryActivity : ComponentActivity() {
     }
 
     private fun navigation() {
+        hasCalendarReadAccess =
+            checkSelfPermission(Manifest.permission.READ_CALENDAR) ==
+                PackageManager.PERMISSION_GRANTED
         navigationState =
             RecoveryNavigationUiState(
                 busy = busy,
@@ -235,8 +249,9 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                     else -> R.string.recovery_call
                 }
             source =
-                getString(
-                    R.string.recovery_source,
+                resources.getQuantityString(
+                    R.plurals.recovery_source,
+                    facts.seconds.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
                     getString(type),
                     DateFormat.getDateTimeInstance().format(Date(facts.start)),
                     facts.seconds,
@@ -260,11 +275,14 @@ class ReceiptRecoveryActivity : ComponentActivity() {
 
     private fun confirmSuppression(intent: DurableDelivery.Intent) {
         if (busy) return
-        AlertDialog.Builder(this)
-            .setMessage(R.string.recovery_suppress_confirm)
-            .setNegativeButton(android.R.string.cancel, null)
-            .setPositiveButton(R.string.recovery_suppress) { _, _ -> action(intent, true) }
-            .show()
+        confirmation =
+            Confirmation(
+                title = getString(R.string.recovery_suppress),
+                message = getString(R.string.recovery_suppress_confirm),
+                actionLabel = getString(R.string.recovery_suppress),
+            ) {
+                action(intent, true)
+            }
     }
 
     private fun openEvent(intent: DurableDelivery.Intent) {
@@ -283,16 +301,18 @@ class ReceiptRecoveryActivity : ComponentActivity() {
 
     private fun expireOldPayloads() {
         if (busy) return
+        retentionFeedback = ""
         busy = true
         navigation()
         executor.execute {
             try {
                 SqliteLedger(applicationContext).use { ledger ->
-                    val count = ledger.expirePayloads(RECEIPT_RETENTION_BATCH_SIZE)
+                    val count = ledger.expirePayloads(50)
                     runOnUiThread {
                         if (isDestroyed) return@runOnUiThread
                         busy = false
-                        setFeedback(getString(R.string.retention_result, count))
+                        retentionFeedback =
+                            resources.getQuantityString(R.plurals.retention_result, count, count)
                         load(current)
                     }
                 }
@@ -300,7 +320,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                 runOnUiThread {
                     if (isDestroyed) return@runOnUiThread
                     busy = false
-                    setFeedback(R.string.recovery_failed)
+                    retentionFeedback = getString(R.string.recovery_failed)
                     navigation()
                 }
             }
@@ -331,12 +351,14 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                 DateFormat.getDateTimeInstance().format(Date(payload.start)),
                 DateFormat.getDateTimeInstance().format(Date(payload.end)),
             )
-        AlertDialog.Builder(this)
-            .setTitle(R.string.reapproval_open)
-            .setMessage(preview)
-            .setNegativeButton(android.R.string.cancel, null)
-            .setPositiveButton(R.string.reapproval_confirm) { _, _ -> reapprove(intent) }
-            .show()
+        confirmation =
+            Confirmation(
+                title = getString(R.string.reapproval_open),
+                message = preview,
+                actionLabel = getString(R.string.reapproval_confirm),
+            ) {
+                reapprove(intent)
+            }
     }
 
     private fun reapprove(expected: DurableDelivery.Intent) {
@@ -384,9 +406,11 @@ class ReceiptRecoveryActivity : ComponentActivity() {
     public override fun onResume() {
         super.onResume()
         resumed = true
+        navigation()
     }
 
     public override fun onPause() {
+        confirmation = null
         resumed = false
         approvalSession = Any() // Returning cannot revive an earlier queued approval.
         super.onPause()

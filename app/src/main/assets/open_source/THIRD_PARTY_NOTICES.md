@@ -1,9 +1,8 @@
 # Runtime third-party notices — development candidate
 
 The application source retains the GPLv3 licence and upstream attribution in
-[LICENSE](LICENSE) and [NOTICE.md](NOTICE.md). Runtime dependencies below declare
-Apache License2.0; the retained licence text is in
-[Apache-2.0.txt](qualification/release/licences/Apache-2.0.txt).
+[GPL-3.0](GPL-3.0.txt) and [NOTICE.md](NOTICE.md). The runtime licence texts are
+[Apache-2.0](Apache-2.0.txt) and [Protobuf BSD-3-Clause](Protobuf-BSD-3-Clause.txt).
 
 This inventory accompanies the exact-source candidate bundle; it does not
 authorise publication or assert permanent trademark rights. Published source
@@ -19,6 +18,10 @@ header supply the Apache 2.0 evidence.
 Build-only dependency licences are recorded separately in the Track5 tool audit;
 those tools are not included as application runtime libraries. Do not bundle SDK,
 JDK or Gradle distributions with an app/source release by default.
+
+The Back and chevron drawables use Google Material Symbols Outlined under
+Apache-2.0. Compose applies the theme tint to their original paths.
+[Material Symbols source](https://github.com/google/material-design-icons/tree/10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7/symbols/android)
 
 | Runtime coordinate | Licence declaration |
 |---|---|
@@ -55,6 +58,9 @@ JDK or Gradle distributions with an app/source release by default.
 | androidx.core:core-viewtree:1.0.0 | Apache-2.0 |
 | androidx.core:core:1.19.0 | Apache-2.0 |
 | androidx.customview:customview-poolingcontainer:1.0.0 | Apache-2.0 |
+| androidx.datastore:datastore-android:1.3.0 | Apache-2.0 |
+| androidx.datastore:datastore-core-android:1.3.0 | Apache-2.0 |
+| androidx.datastore:datastore-core-okio-jvm:1.3.0 | Apache-2.0 |
 | androidx.emoji2:emoji2:1.7.0 | Apache-2.0 |
 | androidx.graphics:graphics-path:1.1.0 | Apache-2.0 |
 | androidx.graphics:graphics-shapes-android:1.0.1 | Apache-2.0 |
@@ -93,6 +99,8 @@ JDK or Gradle distributions with an app/source release by default.
 | androidx.window:window:1.5.0 | Apache-2.0 |
 | androidx.work:work-runtime:2.12.0 | Apache-2.0 |
 | com.google.guava:listenablefuture:1.0 | Apache-2.0 (parent POM and source header) |
+| com.google.protobuf:protobuf-javalite:4.36.2 | BSD-3-Clause |
+| com.squareup.okio:okio-jvm:3.17.0 | Apache-2.0 |
 | org.jetbrains.kotlin:kotlin-stdlib:2.4.21 | Apache-2.0 |
 | org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0 | Apache-2.0 |
 | org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.9.0 | Apache-2.0 |

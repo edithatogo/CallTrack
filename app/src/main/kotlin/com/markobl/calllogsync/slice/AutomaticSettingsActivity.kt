@@ -1,7 +1,6 @@
 package com.markobl.calllogsync.slice
 
 import android.Manifest
-import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,7 +8,10 @@ import android.os.Bundle
 import android.telecom.TelecomManager
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,9 +19,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
 import com.markobl.calllogsync.R
 import java.util.Collections
 import java.util.TimeZone
@@ -32,21 +36,36 @@ internal data class AutomaticStatusUiState(
     val lastRun: String,
 )
 
-@androidx.compose.runtime.Composable
+@Composable
 internal fun AutomaticStatusLine(text: String, tag: String, announceChanges: Boolean = false) {
+    if (text.isEmpty()) return
     var modifier = Modifier.testTag(tag)
     if (announceChanges) modifier = modifier.semantics { liveRegion = LiveRegionMode.Polite }
-    Text(text, modifier = modifier)
+    Text(
+        text,
+        modifier = modifier,
+        style =
+            if (announceChanges) {
+                MaterialTheme.typography.titleSmall
+            } else {
+                MaterialTheme.typography.bodySmall
+            },
+    )
 }
 
-@androidx.compose.runtime.Composable
-internal fun AutomaticStatusPanel(state: AutomaticStatusUiState) {
-    Column {
+@Composable
+internal fun AutomaticStatusPanel(state: AutomaticStatusUiState, showDetails: Boolean = true) {
+    StatusCard {
         AutomaticStatusLine(state.state, "auto_state", announceChanges = true)
-        AutomaticStatusLine(state.counts, "auto_counts")
-        AutomaticStatusLine(state.feedback, "auto_feedback")
-        AutomaticStatusLine(state.lastRun, "auto_last")
+        if (showDetails) AutomaticStatusDetails(state)
     }
+}
+
+@Composable
+private fun AutomaticStatusDetails(state: AutomaticStatusUiState) {
+    AutomaticStatusLine(state.counts, "auto_counts")
+    AutomaticStatusLine(state.feedback, "auto_feedback")
+    AutomaticStatusLine(state.lastRun, "auto_last")
 }
 
 /** Explicit activation controls; reopening can resume enabled policy but never enable it. */
@@ -56,6 +75,7 @@ class AutomaticSettingsActivity : ComponentActivity() {
     private var countsText by mutableStateOf("")
     private var lastText by mutableStateOf("")
     private var feedbackText by mutableStateOf("")
+    private var confirmation by mutableStateOf<Confirmation?>(null)
     private var choices: List<AndroidCalendarSink.Choice> = Collections.emptyList()
     private var calendarLabels: Map<Long, String> = emptyMap()
     private var availableBindings: Map<Long, String> = emptyMap()
@@ -73,9 +93,9 @@ class AutomaticSettingsActivity : ComponentActivity() {
     private var destinationUiState by mutableStateOf(CalendarDestinationUiState())
     private var sourceUiState by mutableStateOf(CalendarDestinationUiState())
     private var actionsUiState by mutableStateOf(AutomaticSettingsActionsUiState())
+    private var hasRequiredAccess by mutableStateOf(false)
     private var restoredCallTypes = false
     private var destinationOptionTokens: List<String> = Collections.emptyList()
-
     private val permissions =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             initialised = false
@@ -84,15 +104,16 @@ class AutomaticSettingsActivity : ComponentActivity() {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        source = savedInstanceState?.getString(STATE_SOURCE) ?: CallRecord.PHONE
+        val saved = savedInstanceState
+        source = saved?.getString(STATE_SOURCE) ?: CallRecord.PHONE
         draft =
-            savedInstanceState?.getBundle(STATE_DESTINATIONS)?.let { routes ->
+            saved?.getBundle(STATE_DESTINATIONS)?.let { routes ->
                 routes.keySet().associate {
                     it.toLong() to routes.getStringArrayList(it).orEmpty().toSet()
                 }
             }
         draftBindings =
-            savedInstanceState
+            saved
                 ?.getBundle(STATE_BINDINGS)
                 ?.let { stored ->
                     stored.keySet().associate { it.toLong() to checkNotNull(stored.getString(it)) }
@@ -100,14 +121,25 @@ class AutomaticSettingsActivity : ComponentActivity() {
                 .orEmpty()
         callTypesState =
             AutomaticCallTypesUiState(
-                incoming = savedInstanceState?.getBoolean(STATE_INCOMING, true) ?: true,
-                outgoing = savedInstanceState?.getBoolean(STATE_OUTGOING, true) ?: true,
-                missed = savedInstanceState?.getBoolean(STATE_MISSED, true) ?: true,
+                incoming = saved?.getBoolean(STATE_INCOMING, true) ?: true,
+                outgoing = saved?.getBoolean(STATE_OUTGOING, true) ?: true,
+                missed = saved?.getBoolean(STATE_MISSED, true) ?: true,
             )
-        restoredCallTypes = savedInstanceState != null
-        setCallTrackContent {
+        restoredCallTypes = saved != null
+        setCallTrackContent(R.string.auto_title) {
+            val status = AutomaticStatusUiState(stateText, countsText, feedbackText, lastText)
+            AutomaticStatusPanel(status, showDetails = false)
+            AutomaticStatusActions(
+                state = actionsUiState,
+                pauseLabel = getString(R.string.auto_pause),
+                refreshLabel = getString(R.string.auto_refresh),
+                onPause = { change { AutomaticScheduling.pause(applicationContext) } },
+                onRefresh = { load(false) },
+            )
             SettingsForm()
             SettingsActions()
+            AutomaticStatusDetails(status)
+            confirmation?.let { ConfirmationDialog(it) { confirmation = null } }
         }
         buttons()
     }
@@ -117,6 +149,7 @@ class AutomaticSettingsActivity : ComponentActivity() {
         AutomaticSettingsIntroPanel(text = getString(R.string.auto_intro))
         AutomaticSettingsAccessPanel(
             label = getString(R.string.auto_access),
+            hasRequiredAccess = hasRequiredAccess,
             onRequestAccess = {
                 permissions.launch(
                     arrayOf(
@@ -129,6 +162,7 @@ class AutomaticSettingsActivity : ComponentActivity() {
             },
         )
         if (sourceUiState.options.size > 1) {
+            SectionHeading(stringResource(R.string.auto_source_heading))
             CalendarDestinationPicker(
                 state = sourceUiState,
                 tagPrefix = "auto_source",
@@ -143,38 +177,55 @@ class AutomaticSettingsActivity : ComponentActivity() {
                 tag = "auto_system_history",
                 enabled = sourceUiState.enabled,
                 onClick = ::openAndroidHistorySettings,
+                style = ButtonStyle.Text,
             )
         }
-        CalendarDestinationPicker(
-            state = destinationUiState,
-            tagPrefix = "auto_calendar",
-            chooseLabel = getString(R.string.slice_choose),
-            onSelect = ::toggleDestination,
-        )
-        AutomaticCallTypesPanel(
-            state = callTypesState,
-            incomingLabel = getString(R.string.auto_incoming),
-            outgoingLabel = getString(R.string.auto_outgoing),
-            missedLabel = getString(R.string.auto_missed),
-            enabled = callTypesEnabled,
-            onStateChange = {
-                callTypesState = it
-                buttons()
-            },
-        )
+        CalendarSelection()
+        Column {
+            SectionHeading(stringResource(R.string.auto_types_heading))
+            AutomaticCallTypesPanel(
+                state = callTypesState,
+                incomingLabel = getString(R.string.auto_incoming),
+                outgoingLabel = getString(R.string.auto_outgoing),
+                missedLabel = getString(R.string.auto_missed),
+                enabled = callTypesEnabled,
+                onStateChange = {
+                    callTypesState = it
+                    buttons()
+                },
+            )
+        }
+    }
+
+    @Composable
+    private fun CalendarSelection() {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            SectionHeading(
+                stringResource(
+                    if (sourceUiState.options.size > 1) {
+                        R.string.auto_calendars_heading
+                    } else {
+                        R.string.auto_phone_calendars_heading
+                    },
+                ),
+            )
+            CalendarDestinationPicker(
+                state = destinationUiState,
+                tagPrefix = "auto_calendar",
+                chooseLabel = getString(R.string.auto_choose_calendars),
+                onSelect = ::toggleDestination,
+            )
+        }
     }
 
     @Composable
     private fun SettingsActions() {
-        AutomaticSettingsActionsPanel(
+        AutomaticApplyButton(
             state = actionsUiState,
-            enableLabel = getString(R.string.auto_enable),
-            pauseLabel = getString(R.string.auto_pause),
-            refreshLabel = getString(R.string.auto_refresh),
-            onEnable = ::confirmEnable,
-            onPause = { change { AutomaticScheduling.pause(applicationContext) } },
-            onRefresh = { load(false) },
+            label = getString(R.string.auto_enable),
+            onApply = ::confirmEnable,
         )
+        HorizontalDivider()
         AutomaticSettingsNavigationPanel(
             importLabel = getString(R.string.import_open),
             recoveryLabel = getString(R.string.recovery_open),
@@ -195,9 +246,6 @@ class AutomaticSettingsActivity : ComponentActivity() {
                 )
             },
         )
-        AutomaticStatusPanel(
-            AutomaticStatusUiState(stateText, countsText, feedbackText, lastText),
-        )
     }
 
     public override fun onResume() {
@@ -215,13 +263,13 @@ class AutomaticSettingsActivity : ComponentActivity() {
         checkSelfPermission(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
 
     private fun buttons() {
+        hasRequiredAccess = calendarAccess() && callAccess()
         actionsUiState =
             AutomaticSettingsActionsUiState(
                 enableEnabled =
                     !busy &&
                         !draft.isNullOrEmpty() &&
-                        calendarAccess() &&
-                        callAccess() &&
+                        hasRequiredAccess &&
                         (callTypesState.incoming ||
                             callTypesState.outgoing ||
                             callTypesState.missed),
@@ -240,11 +288,19 @@ class AutomaticSettingsActivity : ComponentActivity() {
         val inCalls = callTypesState.incoming
         val outCalls = callTypesState.outgoing
         val missedCalls = callTypesState.missed
-        AlertDialog.Builder(this)
-            .setTitle(R.string.auto_enable)
-            .setMessage(getString(R.string.auto_confirm) + "\n\n" + routeSummary(destinations))
-            .setNegativeButton(android.R.string.cancel, null)
-            .setPositiveButton(R.string.auto_enable) { _, _ ->
+        val directionLabels = callTypeLabels(inCalls, outCalls, missedCalls)
+        confirmation =
+            Confirmation(
+                title = getString(R.string.auto_enable),
+                message =
+                    listOf(
+                            getString(R.string.auto_confirm),
+                            routeSummary(destinations),
+                            getString(R.string.auto_confirm_types, directionLabels),
+                        )
+                        .joinToString("\n\n"),
+                actionLabel = getString(R.string.auto_enable),
+            ) {
                 change {
                     AutomaticScheduling.activate(
                         applicationContext,
@@ -257,7 +313,6 @@ class AutomaticSettingsActivity : ComponentActivity() {
                     )
                 }
             }
-            .show()
     }
 
     private fun openAndroidHistorySettings() {
@@ -312,6 +367,12 @@ class AutomaticSettingsActivity : ComponentActivity() {
                     } else {
                         Collections.emptyList()
                     }
+                val preferred =
+                    if (loaded.isEmpty()) {
+                        -1L
+                    } else {
+                        AndroidSettingsStore(applicationContext).selectedCalendar()
+                    }
                 val apps =
                     AndroidCallSources.apps(
                         applicationContext,
@@ -330,7 +391,7 @@ class AutomaticSettingsActivity : ComponentActivity() {
                     }
                 runOnUiThread {
                     if (isDestroyed) return@runOnUiThread
-                    showLoadedSettings(settings, loaded, apps, summary, worker)
+                    showLoadedSettings(settings, loaded, apps, summary, worker, preferred)
                 }
             } catch (ignored: RuntimeException) {
                 runOnUiThread {
@@ -350,16 +411,17 @@ class AutomaticSettingsActivity : ComponentActivity() {
         apps: List<AndroidCallSources.App>,
         summary: DeliveryCounts,
         worker: WorkStatus?,
+        preferred: Long,
     ) {
         busy = false
         active = settings?.enabled == true
         choices = loaded
         appSources = apps
-        calendarLabels = labels(loaded)
+        calendarLabels = calendarChoiceLabels(loaded, getString(R.string.slice_unnamed_calendar))
         availableBindings = loaded.associate { it.id to checkNotNull(it.binding) }
         showWorkStatus(settings, summary, worker)
         destinationOptionTokens = loaded.map { java.util.UUID.randomUUID().toString() }
-        restoreRoutingDraft(settings)
+        restoreRoutingDraft(settings, preferred)
         updateRoutingForm()
         if (!initialised && settings != null && !restoredCallTypes) {
             callTypesState =
@@ -411,9 +473,8 @@ class AutomaticSettingsActivity : ComponentActivity() {
             )
     }
 
-    private fun restoreRoutingDraft(settings: ActivationControl.Settings?) {
+    private fun restoreRoutingDraft(settings: ActivationControl.Settings?, preferred: Long) {
         if (!calendarAccess()) return
-        val preferred = getSharedPreferences("slice", MODE_PRIVATE).getLong("calendar", -1)
         val fallback = mapOf(preferred to setOf(CallRecord.PHONE))
         val priorBindings =
             if (draft == null) settings?.calendarBindings.orEmpty() else draftBindings
@@ -490,27 +551,6 @@ class AutomaticSettingsActivity : ComponentActivity() {
     private fun calendarLabel(id: Long, expected: Map<Long, String> = emptyMap()): String =
         calendarLabels[id]?.takeIf { id !in expected || expected[id] == availableBindings[id] }
             ?: getString(R.string.auto_destination_unavailable)
-
-    private fun labels(calendars: List<AndroidCalendarSink.Choice>): Map<Long, String> {
-        val named = calendars.groupBy { it.name }
-        return calendars.associate { calendar ->
-            val title = calendar.name ?: getString(R.string.auto_destination_unavailable)
-            val peers = named.getValue(calendar.name)
-            val label =
-                if (peers.size == 1) {
-                    title
-                } else {
-                    val account =
-                        calendar.accountName ?: calendar.accountType ?: calendar.id.toString()
-                    if (peers.count { (it.accountName ?: it.accountType) == account } > 1) {
-                        "$title ($account, ${calendar.id})"
-                    } else {
-                        "$title ($account)"
-                    }
-                }
-            calendar.id to label
-        }
-    }
 
     private fun sourceLabel(id: String): String =
         if (id == CallRecord.PHONE) {

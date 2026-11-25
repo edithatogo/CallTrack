@@ -341,7 +341,7 @@ class UiSafety(unittest.TestCase):
     def test_failure_summary_uses_fixed_import_dialog_category(self):
         summary = device.native_failure_summary(
             'renderedRangePreviewCancelConfirmAndRepeat',
-            'java.lang.AssertionError: Visible enabled control missing: button1\n'
+            'java.lang.AssertionError: Visible enabled dialog action missing: calltrack_dialog_confirm\n'
             '    at com.markobl.calllogsync.slice.RenderedUi.tap(RenderedUi.java:154)\n'
             '    at com.markobl.calllogsync.slice.ImportUiTest.confirm(ImportUiTest.java:104)\n',
         )
@@ -351,8 +351,8 @@ class UiSafety(unittest.TestCase):
     def test_failure_summary_retains_only_allowlisted_dialog_action_metadata(self):
         summary = device.native_failure_summary(
             'renderedRangePreviewCancelConfirmAndRepeat',
-            'Visible enabled positive dialog action missing; dialog-active=input-method '
-            'dialog-windows=[app:application:[button1:android.widget.Button:'
+            'Visible enabled dialog action missing: calltrack_dialog_confirm; dialog-active=input-method '
+            'dialog-windows=[app:application:[calltrack_dialog_confirm:android.widget.Button:'
             'enabled=false:clickable=true], permission:application:'
             '[permission_allow_button:android.widget.Button:enabled=true:clickable=true], '
             'input-method:input-method:[]] app-permissions=[calendar-read=granted,'
@@ -369,7 +369,7 @@ class UiSafety(unittest.TestCase):
             'dialog-windows=app:application,permission:application,input-method:input-method',
             summary,
         )
-        self.assertIn('dialog-controls=button1:android.widget.Button:false', summary)
+        self.assertIn('dialog-controls=calltrack_dialog_confirm:android.widget.Button:false', summary)
         self.assertIn(
             'permission_allow_button:android.widget.Button:true', summary)
         self.assertIn('app-permissions=calendar-read:granted,calendar-write:granted,'

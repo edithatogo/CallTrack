@@ -42,14 +42,16 @@ class Android17Scope(unittest.TestCase):
         root = (screens / "CallTrackScreen.kt").read_text()
         self.assertEqual(1, root.count("ComposeView(this)"))
         self.assertIn("DisposeOnViewTreeLifecycleDestroyed", root)
-        self.assertIn("safeDrawingPadding()", root)
+        self.assertIn("enableEdgeToEdge()", root)
+        self.assertIn("contentWindowInsets = WindowInsets.safeDrawing", root)
+        self.assertIn(".padding(padding).consumeWindowInsets(padding).imePadding()", root)
         self.assertIn("verticalScroll(", root)
         self.assertFalse((screens / "ActivityInsets.kt").exists())
         self.assertFalse((screens / "ComposeActionButton.kt").exists())
         for name in ("CalendarSlice", "AutomaticSettings", "HistoricalImport", "ReceiptRecovery"):
             with self.subTest(screen=name):
                 source = (screens / f"{name}Activity.kt").read_text()
-                self.assertEqual(1, source.count("setCallTrackContent {"))
+                self.assertEqual(1, source.count("setCallTrackContent("))
                 self.assertNotIn("ScrollView", source)
                 self.assertNotIn("LinearLayout", source)
                 self.assertNotIn("setContentView", source)

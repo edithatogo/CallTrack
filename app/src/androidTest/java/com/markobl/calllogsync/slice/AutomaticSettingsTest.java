@@ -19,9 +19,7 @@ public class AutomaticSettingsTest {
     public void openingSettingsDoesNotEnableOrSelectDestinationWithoutAccess() {
         android.app.Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         Context context = instrumentation.getTargetContext();
-        assertFalse(
-                context.getSharedPreferences("slice", Context.MODE_PRIVATE)
-                        .contains("automaticActivation"));
+        assertFalse(SettingsTestFixture.snapshot(context).hasAutomatic());
         Activity activity =
                 instrumentation.startActivitySync(
                         new Intent(context, AutomaticSettingsActivity.class)
@@ -52,7 +50,8 @@ public class AutomaticSettingsTest {
             AccessibilityNodeInfo picker = rendered.shown("auto_calendar_picker", true);
             assertNotNull(picker);
             assertEquals(
-                    context.getString(R.string.slice_choose), String.valueOf(picker.getText()));
+                    context.getString(R.string.auto_choose_calendars),
+                    String.valueOf(picker.getText()));
             assertFalse(picker.isEnabled());
             assertEquals(
                     AccessibilityNodeInfo.CHECKED_STATE_TRUE,
@@ -63,9 +62,7 @@ public class AutomaticSettingsTest {
             assertEquals(
                     AccessibilityNodeInfo.CHECKED_STATE_TRUE,
                     rendered.shown("auto_missed", true).getChecked());
-            assertFalse(
-                    context.getSharedPreferences("slice", Context.MODE_PRIVATE)
-                            .contains("automaticActivation"));
+            assertFalse(SettingsTestFixture.snapshot(context).hasAutomatic());
         } finally {
             instrumentation.runOnMainSync(activity::finish);
         }
@@ -85,10 +82,20 @@ public class AutomaticSettingsTest {
         try {
             RenderedUi rendered = new RenderedUi(instrumentation);
             RenderedUi.assertComposeRoot(instrumentation, activity);
-            assertNotNull(rendered.shown("import_summary_text", true));
+            rendered.await(
+                    () -> rendered.shown("import_summary_text", true) != null,
+                    "Historical import summary did not render");
             assertFalse(rendered.shown("import_create", true).isEnabled());
-            assertNotNull(rendered.shown("import_from", true));
-            assertNotNull(rendered.shown("import_to", true));
+            AccessibilityNodeInfo startDate = rendered.shown("import_from", true);
+            AccessibilityNodeInfo endDate = rendered.shown("import_to", true);
+            assertNotNull(startDate);
+            assertNotNull(endDate);
+            assertEquals(
+                    context.getString(R.string.import_from),
+                    String.valueOf(startDate.getHintText()));
+            assertEquals(
+                    context.getString(R.string.import_to), String.valueOf(endDate.getHintText()));
+            assertNull(rendered.find("import_calendar_unavailable", true));
             rendered.revealId("import_history_empty");
             assertNotNull(rendered.find(context.getString(R.string.import_empty_history), false));
             try (SqliteImportStore store = new SqliteImportStore(context)) {
@@ -125,9 +132,7 @@ public class AutomaticSettingsTest {
             try (SqliteLedger ledger = new SqliteLedger(context)) {
                 assertTrue(ledger.recoveryPage(null, 10).isEmpty());
             }
-            assertFalse(
-                    context.getSharedPreferences("slice", Context.MODE_PRIVATE)
-                            .contains("automaticActivation"));
+            assertFalse(SettingsTestFixture.snapshot(context).hasAutomatic());
         } finally {
             instrumentation.runOnMainSync(activity::finish);
         }

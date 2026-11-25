@@ -341,6 +341,45 @@
       "pom_url": "https://dl.google.com/dl/android/maven2/androidx/customview/customview-poolingcontainer/1.0.0/customview-poolingcontainer-1.0.0.pom"
     },
     {
+      "coordinate": "androidx.datastore:datastore-android:1.3.0",
+      "runtime_sha256": "c187fea8ed248eb25f43c71af323e6108db1d3c35945120983954f77e7769eb9",
+      "source_url": "https://dl.google.com/dl/android/maven2/androidx/datastore/datastore-android/1.3.0/datastore-android-1.3.0-sources.jar",
+      "source_sha256": "fe703ba74a3a8c1c86f286921d8f4f69fc266c964f9e6d73e1a82c107617e251",
+      "source_file": "androidx.datastore/datastore-android/1.3.0/datastore-android-1.3.0-sources.jar",
+      "source_entries": 17,
+      "source_code_present": true,
+      "pom_file": "poms/androidx.datastore/datastore-android/1.3.0/datastore-android-1.3.0.pom",
+      "pom_sha256": "ab652694e3d2087e14a71b059c85e18df9d8e77c724418ec7a093531dcaa08af",
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/datastore/datastore-android/1.3.0/datastore-android-1.3.0.pom",
+      "runtime_class_entries": 13
+    },
+    {
+      "coordinate": "androidx.datastore:datastore-core-android:1.3.0",
+      "runtime_sha256": "b518fe03fbc8cdd1bfaddc1c0ab8a28ba7570c42462ac0a8c6caed7a389cc875",
+      "source_url": "https://dl.google.com/dl/android/maven2/androidx/datastore/datastore-core-android/1.3.0/datastore-core-android-1.3.0-sources.jar",
+      "source_sha256": "014b606881ac1eaf51e3d16b2f37fc0acee816b935a9a63125f1ea9d91fefc23",
+      "source_file": "androidx.datastore/datastore-core-android/1.3.0/datastore-core-android-1.3.0-sources.jar",
+      "source_entries": 67,
+      "source_code_present": true,
+      "pom_file": "poms/androidx.datastore/datastore-core-android/1.3.0/datastore-core-android-1.3.0.pom",
+      "pom_sha256": "f3f3058388634d0f012467e6123a11c2095a9d866fcd828199e8cd5262f9f759",
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/datastore/datastore-core-android/1.3.0/datastore-core-android-1.3.0.pom",
+      "runtime_class_entries": 151
+    },
+    {
+      "coordinate": "androidx.datastore:datastore-core-okio-jvm:1.3.0",
+      "runtime_sha256": "54cbdc3e6d477078a2f1dba43b6328870dfee23cc356da5aa1b2271151cc29a4",
+      "source_url": "https://dl.google.com/dl/android/maven2/androidx/datastore/datastore-core-okio-jvm/1.3.0/datastore-core-okio-jvm-1.3.0-sources.jar",
+      "source_sha256": "542ae24cc33dcece8449091b2e1e98a0e4414516281194a479c9bd5f43abfafd",
+      "source_file": "androidx.datastore/datastore-core-okio-jvm/1.3.0/datastore-core-okio-jvm-1.3.0-sources.jar",
+      "source_entries": 20,
+      "source_code_present": true,
+      "pom_file": "poms/androidx.datastore/datastore-core-okio-jvm/1.3.0/datastore-core-okio-jvm-1.3.0.pom",
+      "pom_sha256": "591f0db1357b30378a0338682404235232f96e5f735ccfb16a01639cebfb44b0",
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/datastore/datastore-core-okio-jvm/1.3.0/datastore-core-okio-jvm-1.3.0.pom",
+      "runtime_class_entries": 14
+    },
+    {
       "coordinate": "androidx.emoji2:emoji2:1.7.0",
       "runtime_sha256": "121738bd60060c7bb3742f10c034edc93f2a38b6de8ca8648bc799eda65b1bbf",
       "source_url": "https://dl.google.com/dl/android/maven2/androidx/emoji2/emoji2/1.7.0/emoji2-1.7.0-sources.jar",
@@ -697,6 +736,32 @@
           "sha256": "f8698ab46ca996ce889c1afc8ca4f25eb8ac6b034dc898d4583742360016cc04"
         }
       ]
+    },
+    {
+      "coordinate": "com.google.protobuf:protobuf-javalite:4.36.2",
+      "runtime_sha256": "8f4f93d08cb37130ecb0bc69d376d7d27c36ff04ddb1bb27430b06caa9fa062e",
+      "source_url": "https://repo.maven.apache.org/maven2/com/google/protobuf/protobuf-javalite/4.36.2/protobuf-javalite-4.36.2-sources.jar",
+      "source_sha256": "b60178ff7e8899df001b520703d46f62d10aef7def1fd2c03549a69781f17eff",
+      "source_file": "com.google.protobuf/protobuf-javalite/4.36.2/protobuf-javalite-4.36.2-sources.jar",
+      "source_entries": 162,
+      "source_code_present": true,
+      "pom_file": "poms/com.google.protobuf/protobuf-javalite/4.36.2/protobuf-javalite-4.36.2.pom",
+      "pom_sha256": "c84538e48562849ee3ad5df5f00b45ec77bc7c0512f6cbfb42234890329f4f48",
+      "pom_url": "https://repo.maven.apache.org/maven2/com/google/protobuf/protobuf-javalite/4.36.2/protobuf-javalite-4.36.2.pom",
+      "runtime_class_entries": 529
+    },
+    {
+      "coordinate": "com.squareup.okio:okio-jvm:3.17.0",
+      "runtime_sha256": "3b13dcc3e1573047c2d507fc4f7fcb0bb0cbcd9d395da21d20e09406e2cd6a73",
+      "source_url": "https://repo.maven.apache.org/maven2/com/squareup/okio/okio-jvm/3.17.0/okio-jvm-3.17.0-sources.jar",
+      "source_sha256": "5603dfecfe4c71b36d6a591616be345fdd9d41a0a63553a3bd883d5ab6ee09a6",
+      "source_file": "com.squareup.okio/okio-jvm/3.17.0/okio-jvm-3.17.0-sources.jar",
+      "source_entries": 111,
+      "source_code_present": true,
+      "pom_file": "poms/com.squareup.okio/okio-jvm/3.17.0/okio-jvm-3.17.0.pom",
+      "pom_sha256": "e4e44237a66f4091bc0f5b1d5a2bbe228ac014ab3c0f918cd6fc02ba31999030",
+      "pom_url": "https://repo.maven.apache.org/maven2/com/squareup/okio/okio-jvm/3.17.0/okio-jvm-3.17.0.pom",
+      "runtime_class_entries": 117
     },
     {
       "coordinate": "org.jetbrains.kotlin:kotlin-stdlib:2.4.21",

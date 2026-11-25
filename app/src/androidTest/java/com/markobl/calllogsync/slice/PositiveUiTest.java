@@ -145,11 +145,10 @@ public class PositiveUiTest {
     @Test
     public void renderedManualCalendarChoiceRequiresAnExplicitTap() {
         Context context = context();
-        SharedPreferences preferences = context.getSharedPreferences("slice", Context.MODE_PRIVATE);
-        long previous = preferences.getLong("calendar", -1);
+        long previous = SettingsTestFixture.calendar(context);
         long expected = state().getLong("calendar", -1);
         assertTrue("Prepared synthetic calendar is required", expected > 0);
-        assertTrue(preferences.edit().putLong("calendar", Long.MAX_VALUE).commit());
+        SettingsTestFixture.select(context, Long.MAX_VALUE);
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         RenderedUi ui = new RenderedUi(instrumentation);
         Activity[] activity = {null};
@@ -184,7 +183,7 @@ public class PositiveUiTest {
             assertEquals(
                     "A provider read must not select or persist a destination",
                     -1,
-                    preferences.getLong("calendar", -1));
+                    SettingsTestFixture.calendar(context));
             AccessibilityNodeInfo log = ui.shown("slice_log_latest", true);
             assertNotNull("Manual logging action is missing", log);
             assertFalse("A missing saved destination must leave logging disabled", log.isEnabled());
@@ -199,10 +198,13 @@ public class PositiveUiTest {
                     "Permission and refresh alone must not deliver", 0, fixture.events(expected));
             ui.tapVisibleId("slice_calendar_picker");
             ui.tapVisibleText(fixture.calendarDisplayName());
+            ui.await(
+                    () -> SettingsTestFixture.calendar(context) == expected,
+                    "Calendar selection did not commit");
             assertEquals(
                     "Only the explicit option tap persists the provider ID",
                     expected,
-                    preferences.getLong("calendar", -1));
+                    SettingsTestFixture.calendar(context));
             ui.await(
                     () -> ui.find(fixture.calendarDisplayName(), false) != null,
                     "Selected local calendar is not shown by the manual picker");
@@ -210,7 +212,7 @@ public class PositiveUiTest {
                     "Destination selection alone must not deliver", 0, fixture.events(expected));
         } finally {
             if (activity[0] != null) instrumentation.runOnMainSync(activity[0]::finish);
-            assertTrue(preferences.edit().putLong("calendar", previous).commit());
+            SettingsTestFixture.select(context, previous);
         }
     }
 
@@ -220,8 +222,7 @@ public class PositiveUiTest {
         long calendar = state().getLong("calendar", -1);
         assertTrue("Prepared synthetic calendar is required", calendar > 0);
         assertNull("Automatic delivery must be inactive for the manual fixture", active());
-        SharedPreferences preferences = context.getSharedPreferences("slice", Context.MODE_PRIVATE);
-        long previous = preferences.getLong("calendar", -1);
+        long previous = SettingsTestFixture.calendar(context);
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         RenderedUi ui = new RenderedUi(instrumentation);
         try {
@@ -244,7 +245,7 @@ public class PositiveUiTest {
                 row.put(Calls.PHONE_ACCOUNT_ID, manualCallTag());
                 assertNotNull(FixtureCallLog.insert(context, row));
             });
-            assertTrue(preferences.edit().putLong("calendar", calendar).commit());
+            SettingsTestFixture.select(context, calendar);
             try (ActivityScenario<CalendarSliceActivity> scenario =
                     ActivityScenario.launch(CalendarSliceActivity.class)) {
                 awaitManualSelection(ui);
@@ -260,7 +261,7 @@ public class PositiveUiTest {
 
                 scenario.recreate();
                 awaitManualSelection(ui);
-                assertEquals(calendar, preferences.getLong("calendar", -1));
+                assertEquals(calendar, SettingsTestFixture.calendar(context));
                 assertEquals("Recreation must not repeat delivery", 1, fixture.events(calendar));
                 ui.capture("manual-recreated-single-event");
             }
@@ -268,7 +269,7 @@ public class PositiveUiTest {
             try {
                 cleanManualCall();
             } finally {
-                assertTrue(preferences.edit().putLong("calendar", previous).commit());
+                SettingsTestFixture.select(context, previous);
             }
         }
     }
@@ -589,11 +590,11 @@ public class PositiveUiTest {
             ui.tapId("auto_missed");
             ui.tapId("auto_enable");
             ui.capture("settings-enable-preview");
-            ui.tapId("button2");
+            ui.tapId("calltrack_dialog_cancel");
             assertNull(active());
             assertEquals(0, fixture.events(state().getLong("calendar", -1)));
             ui.tapId("auto_enable");
-            ui.tapId("button1");
+            ui.tapId("calltrack_dialog_confirm");
             ui.await(() -> active() != null && active().enabled, "Enable not committed");
             ActivationControl.Settings enabled = active();
             assertEquals(state().getLong("calendar", -1), enabled.calendar);
@@ -644,9 +645,8 @@ public class PositiveUiTest {
     public void revokedCalendarAndVisibleRestoreDoNotEnableLogging() {
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         RenderedUi ui = new RenderedUi(instrumentation);
-        SharedPreferences manual = context().getSharedPreferences("slice", Context.MODE_PRIVATE);
-        long prior = manual.getLong("calendar", -1);
-        assertTrue(manual.edit().putLong("calendar", state().getLong("calendar", -1)).commit());
+        long prior = SettingsTestFixture.calendar(context());
+        SettingsTestFixture.select(context(), state().getLong("calendar", -1));
         try (ActivityScenario<CalendarSliceActivity> scenario =
                 ActivityScenario.launch(CalendarSliceActivity.class)) {
             ui.await(
@@ -658,7 +658,7 @@ public class PositiveUiTest {
             assertNotNull("Manual logging action is missing", action);
             assertFalse("Revoked calendar access must disable manual delivery", action.isEnabled());
         } finally {
-            assertTrue(manual.edit().putLong("calendar", prior).commit());
+            SettingsTestFixture.select(context(), prior);
         }
         Activity activity = null;
         try {

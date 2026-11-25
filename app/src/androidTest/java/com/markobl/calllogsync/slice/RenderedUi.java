@@ -432,6 +432,10 @@ final class RenderedUi {
     }
 
     void tapId(String id) {
+        if (id.equals("calltrack_dialog_confirm") || id.equals("calltrack_dialog_cancel")) {
+            tapDialogAction(id);
+            return;
+        }
         tap(id, true);
     }
 
@@ -441,15 +445,19 @@ final class RenderedUi {
 
     /** Tap the app-owned positive dialog action across interactive windows. */
     void tapDialogPositive() {
+        tapDialogAction("calltrack_dialog_confirm");
+    }
+
+    private void tapDialogAction(String tag) {
         dismissKeyboardContactsPromptIfVisible();
         final AccessibilityNodeInfo[] found = new AccessibilityNodeInfo[1];
         try {
             await(
                     () -> {
-                        found[0] = findDialogPositive(automation.getWindows());
+                        found[0] = findDialogAction(automation.getWindows(), tag);
                         return found[0] != null;
                     },
-                    "Visible enabled positive dialog action missing");
+                    "Visible enabled dialog action missing: " + tag);
         } catch (AssertionError missing) {
             throw new AssertionError(
                     missing.getMessage()
@@ -460,14 +468,14 @@ final class RenderedUi {
                     missing);
         }
         settle();
-        found[0] = findDialogPositive(automation.getWindows());
+        found[0] = findDialogAction(automation.getWindows(), tag);
         if (found[0] == null)
             throw new AssertionError(
                     "Dialog action disappeared before touch; "
                             + permissionControlSummary()
                             + "; "
                             + dialogActionSummary());
-        touch(found[0], "dialog_positive");
+        touch(found[0], tag);
     }
 
     /** Select a visible permission-controller action using only known resource IDs. */
@@ -542,8 +550,6 @@ final class RenderedUi {
     }
 
     private void tap(String value, boolean id, boolean waitForIdle) {
-        if (id && (value.equals("button1") || value.equals("button2")))
-            dismissKeyboardContactsPromptIfVisible();
         if (id && value.equals("import_confirm")) {
             dismissKeyboardContactsPromptIfVisible();
             dismissKeyboard();
@@ -574,27 +580,28 @@ final class RenderedUi {
             dismissKeyboardContactsPromptIfVisible();
     }
 
-    private AccessibilityNodeInfo findDialogPositive(
-            java.util.List<android.view.accessibility.AccessibilityWindowInfo> windows) {
+    private AccessibilityNodeInfo findDialogAction(
+            java.util.List<android.view.accessibility.AccessibilityWindowInfo> windows,
+            String tag) {
         for (android.view.accessibility.AccessibilityWindowInfo window : windows) {
-            AccessibilityNodeInfo found = findDialogPositive(window.getRoot());
+            AccessibilityNodeInfo found = findDialogAction(window.getRoot(), tag);
             if (found != null) return found;
         }
         return null;
     }
 
-    private AccessibilityNodeInfo findDialogPositive(AccessibilityNodeInfo node) {
+    private AccessibilityNodeInfo findDialogAction(AccessibilityNodeInfo node, String tag) {
         if (node == null || !node.refresh() || !node.isVisibleToUser()) return null;
         CharSequence owner = node.getPackageName();
         CharSequence resourceId = node.getViewIdResourceName();
         if (owner != null
                 && context.getPackageName().contentEquals(owner)
                 && resourceId != null
-                && resourceId.toString().endsWith(":id/button1")
+                && tag.contentEquals(resourceId)
                 && node.isClickable()
                 && node.isEnabled()) return node;
         for (int i = 0; i < node.getChildCount(); i++) {
-            AccessibilityNodeInfo found = findDialogPositive(node.getChild(i));
+            AccessibilityNodeInfo found = findDialogAction(node.getChild(i), tag);
             if (found != null) return found;
         }
         return null;
@@ -765,13 +772,15 @@ final class RenderedUi {
         CharSequence resourceId = node.getViewIdResourceName();
         String id = resourceId == null ? "" : resourceId.toString();
         String control =
-                id.endsWith(":id/button1")
-                        ? "button1"
-                        : id.endsWith(":id/button2")
-                                ? "button2"
-                                : id.endsWith(":id/button3")
-                                        ? "button3"
-                                        : knownPermissionControl(id);
+                id.equals("calltrack_dialog_confirm") || id.equals("calltrack_dialog_cancel")
+                        ? id
+                        : id.endsWith(":id/button1")
+                                ? "button1"
+                                : id.endsWith(":id/button2")
+                                        ? "button2"
+                                        : id.endsWith(":id/button3")
+                                                ? "button3"
+                                                : knownPermissionControl(id);
         boolean appOwner =
                 packageName != null && context.getPackageName().contentEquals(packageName);
         boolean permissionOwner = packageName != null && permissionPackage(packageName.toString());
@@ -1057,7 +1066,7 @@ final class RenderedUi {
                 .append(" focused=")
                 .append(node.isFocused())
                 .append(" checked=")
-                .append(node.getChecked() == AccessibilityNodeInfo.CHECKED_STATE_TRUE)
+                .append(node.getChecked())
                 .append(' ')
                 .append(bounds)
                 .append(' ')

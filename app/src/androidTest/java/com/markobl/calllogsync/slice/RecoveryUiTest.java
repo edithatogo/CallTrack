@@ -164,7 +164,9 @@ public class RecoveryUiTest {
         awaitPendingAction(ui, "initial");
         tap(ui, R.string.reapproval_open);
         try {
-            ui.await(() -> ui.find("button1", true) != null, "Reapproval dialog did not open");
+            ui.await(
+                    () -> ui.find("calltrack_dialog_confirm", true) != null,
+                    "Reapproval dialog did not open");
         } catch (AssertionError failure) {
             try {
                 ui.capture("recovery-reapproval-dialog-failure");
@@ -184,7 +186,7 @@ public class RecoveryUiTest {
         awaitPendingAction(ui, "after-process-death");
         assertNull(
                 "Process restoration must not revive the approval dialog",
-                ui.find("button1", true));
+                ui.find("calltrack_dialog_confirm", true));
         assertEquals(DurableDelivery.State.READY, saved("pending").state);
         assertEquals(0, fixture.events(calendar()));
         ui.capture("recovery-after-process-death");
@@ -256,7 +258,7 @@ public class RecoveryUiTest {
             });
             assertTrue(entered.await(10, java.util.concurrent.TimeUnit.SECONDS));
             tap(ui, R.string.reapproval_open);
-            ui.tapId("button1");
+            ui.tapId("calltrack_dialog_confirm");
             ui.await(() -> isBusy(i, activity), "Rendered approval did not queue");
             assertTrue(
                     ui.automation.performGlobalAction(
@@ -312,14 +314,14 @@ public class RecoveryUiTest {
                     ui.capture("recovery-permission-is-not-approval");
                     tap(ui, R.string.reapproval_open);
                     ui.await(
-                            () -> ui.find("button1", true) != null,
+                            () -> ui.find("calltrack_dialog_confirm", true) != null,
                             "Reapproval preview dialog missing");
                     ui.capture("recovery-explicit-preview");
-                    ui.tapId("button2");
+                    ui.tapId("calltrack_dialog_cancel");
                     assertEquals(DurableDelivery.State.READY, saved("pending").state);
                     assertEquals(0, fixture.events(calendar()));
                     tap(ui, R.string.reapproval_open);
-                    ui.tapId("button1");
+                    ui.tapId("calltrack_dialog_confirm");
                     awaitState(ui, DurableDelivery.State.CONFIRMED);
                     ui.await(
                             () ->
@@ -403,10 +405,10 @@ public class RecoveryUiTest {
                     assertEquals(0, fixture.events(calendar()));
                     ui.capture("recovery-does-not-recreate-deleted-event");
                     tap(ui, R.string.recovery_suppress);
-                    ui.tapId("button2");
+                    ui.tapId("calltrack_dialog_cancel");
                     assertEquals(DurableDelivery.State.REVIEW, saved("pending").state);
                     tap(ui, R.string.recovery_suppress);
-                    ui.tapId("button1");
+                    ui.tapId("calltrack_dialog_confirm");
                     awaitState(ui, DurableDelivery.State.SUPPRESSED);
                     assertNull(saved("pending").payload);
                     assertTrue(saved("pending").eventId >= 0);
@@ -440,6 +442,13 @@ public class RecoveryUiTest {
                     ui.await(
                             () -> saved("expired").state == DurableDelivery.State.EXPIRED_READY,
                             "Explicit retention did not expire old payload");
+                    ui.revealId("recovery_retention_feedback");
+                    assertEquals(
+                            context()
+                                    .getResources()
+                                    .getQuantityString(R.plurals.retention_result, 1, 1),
+                            String.valueOf(
+                                    ui.shown("recovery_retention_feedback", true).getText()));
                     DurableDelivery.Intent expired = saved("expired");
                     assertNull(expired.payload);
                     assertNotNull(expired.marker);
