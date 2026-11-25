@@ -622,7 +622,7 @@ public class PositiveUiTest {
             String enabledText =
                     context().getString(R.string.auto_enabled, fixture.calendarDisplayName());
             ui.await(
-                    () -> ui.find(enabledText, false) != null,
+                    () -> ui.shown(enabledText, false) != null,
                     "Enabled state not visibly rendered");
             ui.capture("settings-enabled");
             ui.tapId("auto_pause");

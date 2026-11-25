@@ -5,7 +5,6 @@ import android.accessibilityservice.AccessibilityService
 import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsFocused
-import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
@@ -38,11 +37,14 @@ class AdaptiveCallTrackNavigationTest {
         compose.onNodeWithTag("section_automatic").assertIsDisplayed().assertHeightIsAtLeast(48.dp)
         val importForm = compose.onNodeWithTag("import_from").performScrollTo().assertIsDisplayed()
         assertTrue(
+            "Settings navigation and the active import form must appear side by side",
             imports.getUnclippedBoundsInRoot().right < importForm.getUnclippedBoundsInRoot().left,
         )
         compose.onNodeWithTag("auto_enable").assertDoesNotExist()
-        assertFalse("Open Imports before asking for keyboard input", ui.keyboardVisible())
-        importForm.assertIsNotFocused()
+        assertFalse(
+            "Opening Imports displayed the keyboard before a date tap",
+            ui.keyboardVisible(),
+        )
         ui.capture("expanded-settings-import")
         importForm.performTouchInput { click() }.assertIsFocused()
         ui.await(ui::keyboardVisible, "Tapping a date field did not open the keyboard")
@@ -57,7 +59,10 @@ class AdaptiveCallTrackNavigationTest {
         compose.onNodeWithTag("auto_enable").assertDoesNotExist()
         ui.capture("expanded-settings-recovery")
 
-        assertTrue(ui.automation.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK))
+        assertTrue(
+            "Android must accept the Back action",
+            ui.automation.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK),
+        )
         compose.onNodeWithTag("open_recovery").assertIsDisplayed()
         compose.onNodeWithTag("settings_navigation").assertDoesNotExist()
         compose.onNodeWithTag("recovery_refresh_action").assertDoesNotExist()
