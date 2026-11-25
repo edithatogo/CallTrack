@@ -2,14 +2,20 @@ package com.markobl.calllogsync.slice
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -170,15 +176,23 @@ private fun CalendarPickerAnchor(
         stringResource(
             if (expanded) R.string.calendar_picker_expanded else R.string.calendar_picker_collapsed,
         )
-    ActionButton(
-        label = label,
-        tag = tag,
-        enabled = state.enabled && state.options.isNotEmpty(),
+    OutlinedButton(
         onClick = onToggle,
-        style = ButtonStyle.Outlined,
-        modifier = modifier.semantics { stateDescription = disclosureState },
-        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-    )
+        modifier =
+            modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp).testTag(tag).semantics {
+                role = Role.Button
+                stateDescription = disclosureState
+                text = AnnotatedString(label)
+            },
+        enabled = state.enabled && state.options.isNotEmpty(),
+    ) {
+        Text(label, modifier = Modifier.weight(1f, fill = false).clearAndSetSemantics {})
+        Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+        ExposedDropdownMenuDefaults.TrailingIcon(
+            expanded = expanded,
+            modifier = Modifier.size(ButtonDefaults.IconSize),
+        )
+    }
 }
 
 @Composable

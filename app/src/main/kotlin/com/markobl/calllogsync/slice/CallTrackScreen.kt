@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -20,12 +19,10 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -201,12 +198,9 @@ internal fun ActionButton(
     enabled: Boolean,
     onClick: () -> Unit,
     style: ButtonStyle = ButtonStyle.Filled,
-    modifier: Modifier = Modifier,
-    trailingIcon: (@Composable () -> Unit)? = null,
 ) {
     val target =
-        modifier
-            .sizeIn(minWidth = MinimumTargetSize, minHeight = MinimumTargetSize)
+        Modifier.sizeIn(minWidth = MinimumTargetSize, minHeight = MinimumTargetSize)
             .testTag(tag)
             .semantics {
                 testTagsAsResourceId = true
@@ -215,10 +209,6 @@ internal fun ActionButton(
             }
     val content: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit = {
         Text(label, modifier = Modifier.clearAndSetSemantics {})
-        if (trailingIcon != null) {
-            Spacer(Modifier.width(ButtonDefaults.IconSpacing))
-            trailingIcon()
-        }
     }
 
     when (style) {
