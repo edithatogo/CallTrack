@@ -4,11 +4,11 @@ import android.os.SystemClock
 import android.view.InputDevice
 import android.view.KeyCharacterMap
 import android.view.KeyEvent
-import android.view.accessibility.AccessibilityNodeInfo
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
@@ -20,6 +20,7 @@ import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.platform.app.InstrumentationRegistry
 import com.markobl.calllogsync.R
 import org.junit.Assert.assertEquals
@@ -113,14 +114,24 @@ class HistoricalImportDestinationPanelTest {
                 SemanticsProperties.StateDescription,
                 resources.getString(R.string.calendar_picker_expanded),
             )
-        val pickerTag = "import_calendar_picker"
-        val picker = compose.onNodeWithTag(pickerTag)
+        val picker = compose.onNodeWithTag("import_calendar_picker")
         val first = compose.onNodeWithTag("import_calendar_option_0")
         val second = compose.onNodeWithTag("import_calendar_option_1")
 
         picker.assertIsDisplayed()
         val ui = RenderedUi(instrumentation)
-        focusPicker(ui, pickerTag)
+        ui.await(
+            { compose.runOnUiThread { compose.activity.hasWindowFocus() } },
+            "The picker test window must receive keyboard focus",
+        )
+        ui.pressKeyboardKey(KeyEvent.KEYCODE_TAB)
+        picker.performSemanticsAction(SemanticsActions.RequestFocus) { requestFocus ->
+            assertTrue("The picker must accept keyboard focus", requestFocus())
+        }
+        assertTrue(
+            "Android must be in keyboard mode",
+            compose.runOnUiThread { !compose.activity.window.decorView.isInTouchMode },
+        )
         picker.assertIsFocused().assert(collapsed)
         ui.pressKeyboardKey(KeyEvent.KEYCODE_ENTER)
         picker.assert(expanded)
@@ -136,28 +147,6 @@ class HistoricalImportDestinationPanelTest {
             destination = destination.copy(selectedToken = selected.single(), enabled = true)
         }
         picker.assertTextEquals("Work calendar").assertIsFocused()
-    }
-
-    private fun focusPicker(ui: RenderedUi, tag: String) {
-        ui.await(
-            { compose.runOnUiThread { compose.activity.hasWindowFocus() } },
-            "The picker test window must receive keyboard focus",
-        )
-        ui.await({ ui.find(tag, true) != null }, "The rendered picker must be visible")
-        val target = checkNotNull(ui.find(tag, true))
-        assertTrue(
-            "The native picker must accept keyboard focus",
-            target.isFocused || target.performAction(AccessibilityNodeInfo.ACTION_FOCUS),
-        )
-        compose.waitForIdle()
-        ui.await(
-            { target.refresh() && target.isFocused },
-            "The native picker must hold keyboard focus",
-        )
-        assertTrue(
-            "Android must be in keyboard mode",
-            compose.runOnUiThread { !compose.activity.window.decorView.isInTouchMode },
-        )
     }
 
     private fun RenderedUi.pressKeyboardKey(keyCode: Int) {
