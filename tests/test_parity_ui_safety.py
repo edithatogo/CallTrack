@@ -12,6 +12,22 @@ from parity_targets import RECOVERY_AVD, TRACK14_UI_AVD
 
 
 class UiSafety(unittest.TestCase):
+    def test_adaptive_windows_restore_original_override_after_failed_accessibility_check(self):
+        physical = 'Physical size: 1080x2400'
+        original = physical + '\nOverride size: 1200x2500'
+        command = Mock(side_effect=[
+            original, 'Physical density: 420',
+            '', physical + '\nOverride size: 945x1890',
+            '', physical + '\nOverride size: 1890x2362',
+            '', original,
+        ])
+        check = Mock(side_effect=[None, RuntimeError('Accessibility check failed')])
+        with self.assertRaisesRegex(RuntimeError, 'Accessibility check failed'):
+            device.check_adaptive_windows(command, check)
+        self.assertEqual(check.call_count, 2)
+        self.assertEqual(command.call_args_list[-2].args, ('shell', 'wm', 'size', '1200x2500'))
+        self.assertEqual(command.call_args.args, ('shell', 'wm', 'size'))
+
     def test_instrumentation_failures_keep_only_protocol_state_categories(self):
         cases = (
             ('', 'instrumentation-output-empty', 'instrumentation-protocol=none'),
@@ -454,6 +470,7 @@ class UiSafety(unittest.TestCase):
         self.install_timeout = False
         self.app_permission = ''
         self.avd = RECOVERY_AVD
+        self.display_override = None
 
     def command(self, command, **kwargs):
         args = command[3:]
@@ -465,6 +482,14 @@ class UiSafety(unittest.TestCase):
             output = 'Service phone: found' if self.phone_available else 'Service phone: not found'
         elif args == ['emu', 'avd', 'name']:
             output = self.avd + '\nOK'
+        elif args == ['shell', 'wm', 'size']:
+            output = 'Physical size: 1080x2400'
+            if self.display_override:
+                output += '\nOverride size: ' + self.display_override
+        elif args[:3] == ['shell', 'wm', 'size']:
+            self.display_override = None if args[3] == 'reset' else args[3]
+        elif args == ['shell', 'wm', 'density']:
+            output = 'Physical density: 420'
         elif args == ['shell', 'dumpsys', 'window']:
             output = 'mCurrentFocus=Window{Application Not Responding: com.android.systemui}' if self.systemui_anr else 'mCurrentFocus=Window{Launcher}'
         elif args[0] == 'install' and self.install_timeout:

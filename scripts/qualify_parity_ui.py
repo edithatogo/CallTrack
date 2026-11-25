@@ -30,6 +30,31 @@ RECEIPT_NAMES = {
 }
 
 
+def check_adaptive_windows(command, check):
+    # Resize the dedicated display itself so ATF measures the same device pixels
+    # as Compose. A virtual Compose density can shrink a 48 dp target in Android.
+    original = command('shell', 'wm', 'size')
+    size = re.fullmatch(r'Physical size: \d+x\d+(?:\nOverride size: (\d+x\d+))?', original)
+    density = re.fullmatch(
+        r'Physical density: (\d+)(?:\nOverride density: (\d+))?', command('shell', 'wm', 'density'))
+    if not size or not density:
+        raise RuntimeError('Unqualified emulator dimensions')
+    scale = int(density[2] or density[1]) / 160
+    try:
+        for profile, width, height in (('compact', 360, 720), ('medium', 720, 900),
+                                       ('expanded', 1200, 1260)):
+            pixels = f'{round(width * scale)}x{round(height * scale)}'
+            command('shell', 'wm', 'size', pixels)
+            if f'Override size: {pixels}' not in command('shell', 'wm', 'size').splitlines():
+                raise RuntimeError(f'Emulator {profile} dimensions not confirmed')
+            check(f'{profile}WindowKeepsPrimaryActionAccessible',
+                  'com.markobl.calllogsync.slice.AdaptiveCallTrackScreenTest')
+    finally:
+        command('shell', 'wm', 'size', size[1] or 'reset')
+        if command('shell', 'wm', 'size') != original:
+            raise RuntimeError('Emulator dimensions were not restored')
+
+
 def write_receipt(directory, expected, suite, receipt, replace):
     """Write only a regular receipt in the directory selected for this run."""
     filename = RECEIPT_NAMES[suite]
@@ -70,7 +95,8 @@ def native_failure_summary(method, output, declared_permissions=None):
         frame = line.strip()
         if (frame.startswith('at com.markobl.calllogsync.slice.')
                 and re.search(
-                    r'(?:(?:PositiveUiTest|ImportUiTest|RecoveryUiTest|ParityProviderTest|RenderedUi)\.java|ManualCalendarScreenTest\.kt):\d+',
+                    r'(?:(?:PositiveUiTest|ImportUiTest|RecoveryUiTest|ParityProviderTest|RenderedUi)\.java|'
+                    r'(?:ManualCalendarScreenTest|AdaptiveCallTrackScreenTest)\.kt):\d+',
                     frame,
                 )):
             frames.append(frame)
@@ -667,8 +693,7 @@ def qualify(serial, suite="settings", receipt_dir=None):
             check('prepareCalendarWithoutCallAccess')
             for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
                 command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.' + permission)
-            check('compactMediumAndExpandedWindowsKeepPrimaryActionAccessible',
-                  'com.markobl.calllogsync.slice.AdaptiveCallTrackScreenTest')
+            check_adaptive_windows(command, check)
             check('systemBackReturnsThroughLauncherNavigationStack',
                   'com.markobl.calllogsync.slice.AutomaticSettingsTest')
             check('renderedActivitiesRespectSystemBars')
