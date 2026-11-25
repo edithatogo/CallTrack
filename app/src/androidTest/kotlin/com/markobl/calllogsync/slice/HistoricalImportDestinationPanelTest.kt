@@ -118,6 +118,7 @@ class HistoricalImportDestinationPanelTest {
         val first = compose.onNodeWithTag("import_calendar_option_0")
         val second = compose.onNodeWithTag("import_calendar_option_1")
 
+        picker.assertIsDisplayed()
         val ui = RenderedUi(instrumentation)
         focusPicker(ui, pickerTag)
         picker.assertIsFocused().assert(collapsed)
