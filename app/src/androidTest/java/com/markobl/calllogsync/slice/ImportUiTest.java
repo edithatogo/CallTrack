@@ -272,9 +272,18 @@ public class ImportUiTest {
     public void renderedRangePreviewCancelConfirmAndRepeat() {
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         RenderedUi ui = new RenderedUi(instrumentation);
-        Activity activity = null;
+        CalendarSliceActivity activity = null;
         try {
-            activity = open(instrumentation);
+            activity =
+                    (CalendarSliceActivity)
+                            instrumentation.startActivitySync(
+                                    new Intent(context(), CalendarSliceActivity.class)
+                                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            ui.tapId("open_automatic");
+            ui.tapId("open_imports");
+            assertTrue(
+                    "Import keyboard journey must run inside the launcher",
+                    RenderedUi.isResumed(instrumentation, activity));
             ui.tapId("import_calendar_picker");
             ui.tapText(fixture.calendarDisplayName());
             String from = today().minusDays(1).toString(), to = today().toString();
