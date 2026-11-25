@@ -3,6 +3,7 @@ package com.markobl.calllogsync.slice;
 import static org.junit.Assert.*;
 
 import android.Manifest;
+import android.accessibilityservice.AccessibilityService;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.ContentUris;
@@ -12,6 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.provider.CalendarContract;
+import android.view.accessibility.AccessibilityNodeInfo;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -76,10 +78,11 @@ public class RecoveryUiTest {
         }
     }
 
-    private Activity open(Instrumentation i) {
-        return i.startActivitySync(
-                new Intent(context(), ReceiptRecoveryActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+    private ReceiptRecoveryActivity open(Instrumentation i) {
+        return (ReceiptRecoveryActivity)
+                i.startActivitySync(
+                        new Intent(context(), ReceiptRecoveryActivity.class)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 
     private interface Journey {
@@ -160,11 +163,13 @@ public class RecoveryUiTest {
     @Test
     public void renderedPendingRecoverySurvivesProcessDeathWithoutApproval() {
         RenderedUi ui = new RenderedUi(InstrumentationRegistry.getInstrumentation());
-        ui.startActivity(ReceiptRecoveryActivity.class);
+        ui.openFromLauncher("open_recovery");
         awaitPendingAction(ui, "initial");
         tap(ui, R.string.reapproval_open);
         try {
-            ui.await(() -> ui.find("button1", true) != null, "Reapproval dialog did not open");
+            ui.await(
+                    () -> ui.find("calltrack_dialog_confirm", true) != null,
+                    "Reapproval dialog did not open");
         } catch (AssertionError failure) {
             try {
                 ui.capture("recovery-reapproval-dialog-failure");
@@ -178,13 +183,13 @@ public class RecoveryUiTest {
         assertEquals(0, fixture.events(calendar()));
         ui.capture("recovery-before-process-death");
 
-        ui.killStoppedProcessAndReturn(ReceiptRecoveryActivity.class);
+        ui.killStoppedProcessAndReturn(CalendarSliceActivity.class);
         assertEquals(DurableDelivery.State.READY, saved("pending").state);
         assertEquals(0, fixture.events(calendar()));
         awaitPendingAction(ui, "after-process-death");
         assertNull(
                 "Process restoration must not revive the approval dialog",
-                ui.find("button1", true));
+                ui.find("calltrack_dialog_confirm", true));
         assertEquals(DurableDelivery.State.READY, saved("pending").state);
         assertEquals(0, fixture.events(calendar()));
         ui.capture("recovery-after-process-death");
@@ -216,65 +221,38 @@ public class RecoveryUiTest {
         }
     }
 
-    private Object field(Activity activity, String name) {
-        try {
-            java.lang.reflect.Field field = ReceiptRecoveryActivity.class.getDeclaredField(name);
-            field.setAccessible(true);
-            return field.get(activity);
-        } catch (ReflectiveOperationException failure) {
-            throw new AssertionError(failure);
-        }
-    }
-
-    private boolean isBusy(Instrumentation instrumentation, Activity activity) {
-        boolean[] busy = new boolean[1];
-        instrumentation.runOnMainSync(() -> busy[0] = (Boolean) field(activity, "busy"));
-        return busy[0];
+    private boolean refreshEnabled(RenderedUi ui, boolean enabled) {
+        AccessibilityNodeInfo refresh = ui.shown("recovery_refresh_action", true);
+        return refresh != null && refresh.isEnabled() == enabled;
     }
 
     @Test
-    public void leavingAndReturningWithdrawsQueuedApproval() throws Exception {
+    public void leavingAndReturningWithdrawsQueuedApproval() {
         Instrumentation i = InstrumentationRegistry.getInstrumentation();
         RenderedUi ui = new RenderedUi(i);
-        Activity activity = open(i);
-        java.util.concurrent.CountDownLatch entered = new java.util.concurrent.CountDownLatch(1);
-        java.util.concurrent.CountDownLatch release = new java.util.concurrent.CountDownLatch(1);
+        ReceiptRecoveryActivity activity = open(i);
         try {
-            ui.await(
-                    () -> ui.shown(context().getString(R.string.reapproval_open), false) != null,
-                    "Pending reapproval control missing");
-            java.util.concurrent.ExecutorService executor =
-                    (java.util.concurrent.ExecutorService) field(activity, "executor");
-            // Hold only the executor: real UI confirmation is queued behind simulated delayed IO.
-            executor.execute(() -> {
-                entered.countDown();
-                try {
-                    release.await();
-                } catch (InterruptedException interrupted) {
-                    Thread.currentThread().interrupt();
-                }
-            });
-            assertTrue(entered.await(10, java.util.concurrent.TimeUnit.SECONDS));
-            tap(ui, R.string.reapproval_open);
-            ui.tapId("button1");
-            ui.await(() -> isBusy(i, activity), "Rendered approval did not queue");
-            assertTrue(
-                    ui.automation.performGlobalAction(
-                            android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME));
-            ui.await(() -> !(Boolean) field(activity, "resumed"), "Leaving did not pause activity");
-            i.runOnMainSync(() ->
-                    context()
-                            .startActivity(
-                                    new Intent(context(), ReceiptRecoveryActivity.class)
-                                            .addFlags(
-                                                    Intent.FLAG_ACTIVITY_NEW_TASK
-                                                            | Intent
-                                                                    .FLAG_ACTIVITY_REORDER_TO_FRONT)));
-            ui.await(
-                    () -> (Boolean) field(activity, "resumed"),
-                    "Returning did not resume same activity");
-            release.countDown();
-            ui.await(() -> !isBusy(i, activity), "Queued action did not settle");
+            awaitPendingAction(ui, "before approval");
+            ui.await(() -> refreshEnabled(ui, true), "Initial recovery read did not settle");
+            // Hold the same lock that gates consent and insertion in ReadyReapproval.
+            synchronized (DurableDelivery.DELIVERY_LOCK) {
+                tap(ui, R.string.reapproval_open);
+                ui.tapId("calltrack_dialog_confirm");
+                ui.await(() -> refreshEnabled(ui, false), "Rendered approval did not queue");
+                assertTrue(
+                        ui.automation.performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME));
+                ui.await(
+                        () -> !RenderedUi.isResumed(i, activity), "Leaving did not pause activity");
+                ui.startActivity(ReceiptRecoveryActivity.class);
+                ui.await(
+                        () -> RenderedUi.isResumed(i, activity),
+                        "Returning did not resume the same activity");
+                ui.await(
+                        () -> refreshEnabled(ui, false),
+                        "Queued action settled before lock release");
+            }
+            ui.await(() -> refreshEnabled(ui, true), "Queued action did not settle");
+            assertNotNull(ui.shown(context().getString(R.string.reapproval_paused), false));
             assertEquals(
                     "Leaving must permanently withdraw the earlier queued approval",
                     DurableDelivery.State.READY,
@@ -289,7 +267,6 @@ public class RecoveryUiTest {
             }
             throw failure;
         } finally {
-            release.countDown();
             i.runOnMainSync(activity::finish);
         }
     }
@@ -312,14 +289,14 @@ public class RecoveryUiTest {
                     ui.capture("recovery-permission-is-not-approval");
                     tap(ui, R.string.reapproval_open);
                     ui.await(
-                            () -> ui.find("button1", true) != null,
+                            () -> ui.find("calltrack_dialog_confirm", true) != null,
                             "Reapproval preview dialog missing");
                     ui.capture("recovery-explicit-preview");
-                    ui.tapId("button2");
+                    ui.tapId("calltrack_dialog_cancel");
                     assertEquals(DurableDelivery.State.READY, saved("pending").state);
                     assertEquals(0, fixture.events(calendar()));
                     tap(ui, R.string.reapproval_open);
-                    ui.tapId("button1");
+                    ui.tapId("calltrack_dialog_confirm");
                     awaitState(ui, DurableDelivery.State.CONFIRMED);
                     ui.await(
                             () ->
@@ -403,10 +380,10 @@ public class RecoveryUiTest {
                     assertEquals(0, fixture.events(calendar()));
                     ui.capture("recovery-does-not-recreate-deleted-event");
                     tap(ui, R.string.recovery_suppress);
-                    ui.tapId("button2");
+                    ui.tapId("calltrack_dialog_cancel");
                     assertEquals(DurableDelivery.State.REVIEW, saved("pending").state);
                     tap(ui, R.string.recovery_suppress);
-                    ui.tapId("button1");
+                    ui.tapId("calltrack_dialog_confirm");
                     awaitState(ui, DurableDelivery.State.SUPPRESSED);
                     assertNull(saved("pending").payload);
                     assertTrue(saved("pending").eventId >= 0);
@@ -440,6 +417,13 @@ public class RecoveryUiTest {
                     ui.await(
                             () -> saved("expired").state == DurableDelivery.State.EXPIRED_READY,
                             "Explicit retention did not expire old payload");
+                    ui.revealId("recovery_retention_feedback");
+                    assertEquals(
+                            context()
+                                    .getResources()
+                                    .getQuantityString(R.plurals.retention_result, 1, 1),
+                            String.valueOf(
+                                    ui.shown("recovery_retention_feedback", true).getText()));
                     DurableDelivery.Intent expired = saved("expired");
                     assertNull(expired.payload);
                     assertNotNull(expired.marker);

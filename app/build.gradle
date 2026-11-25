@@ -1,7 +1,10 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.plugin.compose'
+    id 'org.jetbrains.kotlin.plugin.serialization'
     id 'com.google.devtools.ksp' version '2.3.14'
+    id 'com.google.protobuf' version '0.10.1'
+    id 'com.google.dagger.hilt.android' version '2.60.1'
 }
 
 def developmentRelease = providers.gradleProperty('calltrackDevelopmentRelease').orElse('false').get() == 'true'
@@ -17,10 +20,9 @@ android {
 
     defaultConfig {
         applicationId "org.calltrack.community.dev"
-        manifestPlaceholders.calltrackAppLabel = "@string/app_name"
         minSdk 37
         targetSdk 37
-        versionCode 13
+        versionCode 14
         versionName "0.1.0-dev"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -28,16 +30,21 @@ android {
 
     buildTypes {
         release {
-            if (!developmentRelease) {
-                manifestPlaceholders.calltrackAppLabel = "@string/release_app_name"
-            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    if (!developmentRelease) {
+        sourceSets.named('release') {
+            res.srcDir 'src/community/res'
         }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
+    }
+    lint {
+        warningsAsErrors = true
     }
 }
 
@@ -54,12 +61,25 @@ androidComponents {
 }
 
 dependencies {
+    constraints {
+        // Use the same patched Guava floor in the annotation processor classpath.
+        ksp 'com.google.guava:guava:33.8.0-jre'
+    }
+    implementation 'androidx.datastore:datastore:1.3.0'
+    implementation 'com.google.protobuf:protobuf-javalite:4.36.2'
+    implementation 'com.google.dagger:hilt-android:2.60.1'
+    ksp 'com.google.dagger:hilt-compiler:2.60.1'
     // Room 3 owns both existing on-disk databases.
     implementation 'androidx.room3:room3-runtime:3.0.3'
     implementation 'androidx.sqlite:sqlite-framework:2.7.1'
     ksp 'androidx.room3:room3-compiler:3.0.3'
     implementation platform('androidx.compose:compose-bom:2026.11.01')
     implementation 'androidx.activity:activity:1.13.0'
+    implementation 'androidx.hilt:hilt-lifecycle-viewmodel-compose:1.4.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.11.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-navigation3:2.11.1'
+    implementation 'androidx.navigation3:navigation3-runtime:1.2.2'
+    implementation 'androidx.navigation3:navigation3-ui:1.2.2'
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.foundation:foundation'
     implementation 'androidx.compose.material3:material3'
@@ -73,11 +93,22 @@ dependencies {
         }
     }
     testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0'
+    testImplementation 'app.cash.turbine:turbine:1.2.1'
     androidTestImplementation platform('androidx.compose:compose-bom:2026.11.01')
     androidTestImplementation 'androidx.test.ext:junit:1.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
+}
+
+protobuf {
+    protoc { artifact = 'com.google.protobuf:protoc:4.36.2' }
+    generateProtoTasks {
+        all().configureEach { task ->
+            task.builtins { java { option 'lite' } }
+        }
+    }
 }
 // Keep Android Java and Kotlin bytecode targets aligned.
 kotlin {

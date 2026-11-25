@@ -20,16 +20,14 @@ internal fun AutomaticSettingsNavigationPanel(
         modifier = Modifier.fillMaxWidth().semantics { testTagsAsResourceId = true },
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        ActionButton(
+        NavigationItem(
             label = importLabel,
             tag = "open_imports",
-            enabled = true,
             onClick = onOpenImports,
         )
-        ActionButton(
+        NavigationItem(
             label = recoveryLabel,
             tag = "open_recovery",
-            enabled = true,
             onClick = onOpenRecovery,
         )
     }

@@ -10,14 +10,14 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 
 @Composable
-internal fun RecoveryStatusPanel(feedback: String) {
+internal fun RecoveryStatusPanel(feedback: String, tag: String = "recovery_feedback_text") {
     if (feedback.isNotEmpty()) {
         Text(
             text = feedback,
             modifier =
                 Modifier.fillMaxWidth()
                     .semantics { liveRegion = LiveRegionMode.Polite }
-                    .testTag("recovery_feedback_text"),
+                    .testTag(tag),
         )
     }
 }

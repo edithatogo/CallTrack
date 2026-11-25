@@ -1,9 +1,12 @@
 <resources>
-    <string name="app_name">CallTrack Community (dev)</string>
-    <string name="release_app_name" translatable="false">CallTrack Community</string>
+    <string name="app_name" translatable="false">CallTrack Community (dev)</string>
 
-    <string name="slice_intro" translatable="false">Choose a calendar, then log the latest call. To log calls automatically, enable Automatic logging in settings. Calendar providers may sync saved events to their accounts.</string>
-    <string name="slice_calendar_access" translatable="false">Allow calendar access / refresh calendars</string>
+    <string name="calltrack_title" translatable="false">CallTrack</string>
+    <string name="navigate_up">Back</string>
+    <string name="slice_intro" translatable="false">Save your latest phone call to a calendar. Your calendar provider may sync the event to your account.</string>
+    <string name="slice_calendar_access" translatable="false">Allow calendar access</string>
+    <string name="slice_calendar_refresh" translatable="false">Refresh calendars</string>
+    <string name="slice_calendar_selected" translatable="false">Calendar selected</string>
     <string name="slice_unnamed_calendar" translatable="false">Unnamed calendar</string>
     <string name="slice_choose" translatable="false">Choose a destination calendar</string>
     <string name="slice_log_latest" translatable="false">Log latest call</string>
@@ -22,14 +25,25 @@
     <string name="slice_failed" translatable="false">The operation could not be verified. Retry can reconcile an existing event; check the calendar before further action.</string>
 
     <string name="auto_open">Automatic logging settings</string>
-    <string name="auto_intro">Choose calendars for each call source and select the call types to log. Apply to start a new logging period. Calendar providers may sync events to their accounts. Phone-state access helps Android check after phone calls. Shared app calls use periodic checks.</string>
-    <string name="auto_access">Grant call/calendar access</string>
+    <string name="auto_title">Automatic logging</string>
+    <string name="auto_intro">Choose calendars for each call source. Your calendar provider may sync saved events. Phone-state access helps check after phone calls. Shared app calls are checked periodically.</string>
+    <string name="auto_access">Allow call and calendar access</string>
+    <string name="auto_source_heading">Call source</string>
+    <string name="auto_calendars_heading">Calendars for this source</string>
+    <string name="auto_phone_calendars_heading">Calendars for phone calls</string>
+    <string name="auto_choose_calendars">Choose calendars</string>
+    <string name="auto_types_heading">Call types for all routes</string>
+    <plurals name="calendar_selection_count">
+        <item quantity="one">%1$d calendar selected</item>
+        <item quantity="other">%1$d calendars selected</item>
+    </plurals>
     <string name="auto_incoming">Incoming calls</string>
     <string name="auto_outgoing">Outgoing calls</string>
     <string name="auto_missed">Missed calls</string>
-    <string name="auto_enable">Enable / apply from now</string>
+    <string name="auto_enable">Apply from now</string>
     <string name="auto_pause">Pause automatic logging</string>
-    <string name="auto_confirm">Start logging new calls to the calendars below? The selected call types apply to every route. Reopen this screen to request a background check.</string>
+    <string name="auto_confirm">Start logging new calls to these calendars? Reopen this screen to request a background check.</string>
+    <string name="auto_confirm_types">Call types for all routes — %1$s</string>
     <string name="auto_refresh">Refresh logging status</string>
     <string name="auto_enabled">Automatic logging enabled. Active destination: %1$s</string>
     <string name="auto_enabled_routes">Automatic logging enabled\n%1$s</string>
@@ -53,14 +67,17 @@
     <string name="auto_unknown">The latest attempt status is unavailable. Refresh or request recovery.</string>
 
     <string name="import_open">Historical imports</string>
-    <string name="import_intro">Preview a historical range before importing. Dates use %1$s and YYYY-MM-DD format. The end date is excluded. Previewing never writes calendar events. Closing or stopping a run leaves its saved session available to resume.</string>
-    <string name="import_from">Start date (inclusive, YYYY-MM-DD)</string>
-    <string name="import_to">End date (exclusive, YYYY-MM-DD)</string>
+    <string name="import_intro">Preview earlier calls before adding them to a calendar. Dates use %1$s and YYYY-MM-DD format. You can resume a saved session after closing or stopping it.</string>
+    <string name="import_from">Start date (included)</string>
+    <string name="import_to">End date (excluded)</string>
     <string name="import_create">Create read-only preview</string>
     <string name="import_none">No import session selected.</string>
     <string name="import_continue">Continue selected preview / import</string>
     <string name="import_confirm">Confirm historical import</string>
-    <string name="import_confirm_text">Import the frozen set of %1$d calls into %2$s? Range: %3$s. Current call data is checked before writing. Existing edited or deleted events are not recreated automatically. Some items may require review.</string>
+    <plurals name="import_confirm_text">
+        <item quantity="one">Import the frozen set of %1$d call into %2$s? Date range %3$s. Current call data is checked before writing. Existing edited or deleted events are not recreated automatically. This item may require review.</item>
+        <item quantity="other">Import the frozen set of %1$d calls into %2$s? Date range %3$s. Current call data is checked before writing. Existing edited or deleted events are not recreated automatically. Some items may require review.</item>
+    </plurals>
     <string name="import_stop">Stop this run; keep session</string>
     <string name="import_stopping">Stopping at the next safe boundary. The session remains available to resume.</string>
     <string name="import_cancel">Cancel remaining work</string>
@@ -84,6 +101,9 @@
     <string name="auto_status_summary">%1$s\n%2$s</string>
     <string name="import_history_item">%1$s — %2$s</string>
     <string name="recovery_open">Delivery review and recovery</string>
+    <string name="recovery_title">Delivery review</string>
+    <string name="recovery_records_heading">Delivery records</string>
+    <string name="recovery_retention_heading">Data retention</string>
     <string name="recovery_intro">Review saved delivery records across all calendars. Times use the current device timezone. Checking only reads existing calendar events; it never creates or changes one. Suppression stops app retries and clears the pending personal payload while retaining duplicate protection. Calendar events remain untouched. Reapproval is a separate, explicitly confirmed action for never-attempted work.</string>
     <string name="recovery_access">Allow calendar read access</string>
     <string name="recovery_refresh">Refresh recent records</string>
@@ -94,7 +114,10 @@
     <string name="recovery_empty">No delivery records are available.</string>
     <string name="recovery_source_unknown">Earlier source details unavailable</string>
     <string name="recovery_call">Call</string>
-    <string name="recovery_source">%1$s — %2$s; actual duration: %3$d seconds</string>
+    <plurals name="recovery_source">
+        <item quantity="one">%1$s — %2$s. Actual duration is %3$d second.</item>
+        <item quantity="other">%1$s — %2$s. Actual duration is %3$d seconds.</item>
+    </plurals>
     <string name="recovery_item">%1$s\nCalendar: %2$s\n%3$s</string>
     <string name="recovery_check">Check existing effect only</string>
     <string name="recovery_suppress">Suppress further retries</string>
@@ -128,5 +151,8 @@
     <string name="recovery_expired">Pending payload expired — no insertion attempted</string>
     <string name="retention_policy">Pending personal event payloads expire after seven days from storage, checked on access and in bounded maintenance batches. Existing payloads of unknown age receive seven days from migration. Phone history dates do not determine this age. IDs, hashes, source facts and calendar events remain. Expired never-attempted work requires a confirmed import to collect fresh source data; it is never inserted automatically. Offline or inactive apps may defer clearing until their next check.</string>
     <string name="retention_run">Clear expired pending payloads now</string>
-    <string name="retention_result">%1$d expired payloads cleared in this pass. More may remain. Receipt metadata and calendar events were retained.</string>
+    <plurals name="retention_result">
+        <item quantity="one">%1$d expired payload cleared in this pass. More may remain. Receipt metadata and calendar events were retained.</item>
+        <item quantity="other">%1$d expired payloads cleared in this pass. More may remain. Receipt metadata and calendar events were retained.</item>
+    </plurals>
 </resources>

@@ -39,7 +39,7 @@ public class KotlinPackageUpdateTest {
     @Test
     public void freshInstallIsUnconfiguredAndDenied() {
         SharedPreferences prefs = context().getSharedPreferences("slice", Context.MODE_PRIVATE);
-        assertFalse(prefs.contains("calendar"));
+        assertFalse(SettingsTestFixture.snapshot(context()).hasSelectedCalendar());
         assertFalse(prefs.contains("kotlinUpdateFixture"));
         assertNull(new AndroidActivationStore(context()).get());
         for (String permission :
@@ -75,12 +75,9 @@ public class KotlinPackageUpdateTest {
     public void seedJavaEraState() {
         SharedPreferences prefs = context().getSharedPreferences("slice", Context.MODE_PRIVATE);
         assertFalse(prefs.contains("kotlinUpdateFixture"));
-        assertTrue(
-                prefs.edit()
-                        .putString("kotlinUpdateFixture", token())
-                        .putString("sourceNamespace", "package-update/" + token())
-                        .putLong("calendar", 7)
-                        .commit());
+        assertTrue(prefs.edit().putString("kotlinUpdateFixture", token()).commit());
+        SettingsTestFixture.namespace(context(), "package-update/" + token());
+        SettingsTestFixture.select(context(), 7);
         new AndroidActivationStore(context())
                 .put(new ActivationControl.Settings(7, false, 7, "UTC", 0, true, false, true));
         try (SqliteLedger ledger = new SqliteLedger(context())) {
@@ -116,8 +113,10 @@ public class KotlinPackageUpdateTest {
     public void verifyPersistedState() {
         SharedPreferences prefs = context().getSharedPreferences("slice", Context.MODE_PRIVATE);
         assertEquals(token(), prefs.getString("kotlinUpdateFixture", null));
-        assertEquals("package-update/" + token(), prefs.getString("sourceNamespace", null));
-        assertEquals(7, prefs.getLong("calendar", -1));
+        assertEquals(
+                "package-update/" + token(),
+                SettingsTestFixture.snapshot(context()).getSourceNamespace());
+        assertEquals(7, SettingsTestFixture.calendar(context()));
         ActivationControl.Settings settings = new AndroidActivationStore(context()).get();
         assertNotNull(settings);
         assertFalse(settings.enabled);

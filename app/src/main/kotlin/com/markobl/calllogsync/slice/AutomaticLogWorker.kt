@@ -1,21 +1,30 @@
 package com.markobl.calllogsync.slice
 
 import android.content.Context
+import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ListenableWorker.Result
-import androidx.work.Worker
 import androidx.work.WorkerParameters
 import java.util.UUID
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.job
+import kotlinx.coroutines.withContext
 
 private const val CALLS_PER_BATCH = 50
 private const val BATCHES_PER_DESTINATION = 8
 
 /** Local provider work only; work input/output contain no personal call fields. */
 class AutomaticLogWorker(context: Context, parameters: WorkerParameters) :
-    Worker(context, parameters) {
+    CoroutineWorker(context, parameters) {
     private val statusToken = UUID.randomUUID().toString()
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result =
+        withContext(Dispatchers.IO) { runDelivery(coroutineContext.job) }
+
+    private fun runDelivery(execution: Job): Result {
         val generation = inputData.getLong(GENERATION, -1)
         return try {
             val control = ActivationControl(AndroidActivationStore(applicationContext))
@@ -23,9 +32,12 @@ class AutomaticLogWorker(context: Context, parameters: WorkerParameters) :
             if (settings == null || !mayRun(settings, generation)) {
                 report(generation, "PAUSED", 0, 0, false)
             } else {
-                deliver(settings, control, generation)
+                deliver(settings, control, generation, execution)
             }
+        } catch (cancelled: CancellationException) {
+            throw cancelled
         } catch (ignored: RuntimeException) {
+            execution.ensureActive()
             report(generation, "FAILED", 0, 0, runAttemptCount < AutomaticWorkPolicy.MAX_ATTEMPTS)
         }
     }
@@ -37,6 +49,7 @@ class AutomaticLogWorker(context: Context, parameters: WorkerParameters) :
         settings: ActivationControl.Settings,
         control: ActivationControl,
         generation: Long,
+        execution: Job,
     ): Result {
         var delivered = 0
         var review = 0
@@ -59,10 +72,11 @@ class AutomaticLogWorker(context: Context, parameters: WorkerParameters) :
                 val runner = AutomaticDelivery(control, source, ledger, delivery)
                 var settled = false
                 repeat(BATCHES_PER_DESTINATION) {
+                    execution.ensureActive()
                     if (!settled) {
                         val batch =
                             runner.runForCalendar(settings, calendar, CALLS_PER_BATCH) {
-                                !isStopped
+                                execution.isActive && !isStopped
                             }
                         delivered += batch.delivered
                         review += batch.review
@@ -77,6 +91,7 @@ class AutomaticLogWorker(context: Context, parameters: WorkerParameters) :
                 backlog = backlog || !settled
             }
         }
+        execution.ensureActive()
         val status = stopped?.name ?: if (backlog) "BACKLOG" else "COMPLETE"
         return report(generation, status, delivered, review, retry || backlog)
     }
@@ -99,6 +114,8 @@ class AutomaticLogWorker(context: Context, parameters: WorkerParameters) :
                         delivered,
                         review,
                     )
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (ignored: RuntimeException) {
                 false
             }

@@ -93,11 +93,7 @@ public class CalendarSliceTest {
     }
 
     private void verifyPicker(long savedCalendar, boolean expectChoice) {
-        context()
-                .getSharedPreferences("slice", Context.MODE_PRIVATE)
-                .edit()
-                .putLong("calendar", savedCalendar)
-                .commit();
+        SettingsTestFixture.select(context(), savedCalendar);
         android.app.Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         RenderedUi ui = new RenderedUi(instrumentation);
         android.app.Activity activity =
@@ -114,10 +110,7 @@ public class CalendarSliceTest {
                     "Compose picker did not restore explicit choice / missing-destination"
                             + " placeholder");
             assertEquals(
-                    expectChoice ? savedCalendar : -1,
-                    context()
-                            .getSharedPreferences("slice", Context.MODE_PRIVATE)
-                            .getLong("calendar", -1));
+                    expectChoice ? savedCalendar : -1, SettingsTestFixture.calendar(context()));
             String expectedLabel =
                     expectChoice
                             ? calendarDisplayName()
@@ -125,13 +118,8 @@ public class CalendarSliceTest {
             ui.await(
                     () -> ui.find(expectedLabel, false) != null,
                     "Compose picker did not show the saved choice / placeholder label");
-            instrumentation.runOnMainSync(() -> {
-                long actual =
-                        context()
-                                .getSharedPreferences("slice", Context.MODE_PRIVATE)
-                                .getLong("calendar", -1);
-                assertEquals(expectChoice ? savedCalendar : -1, actual);
-            });
+            assertEquals(
+                    expectChoice ? savedCalendar : -1, SettingsTestFixture.calendar(context()));
         } finally {
             instrumentation.runOnMainSync(activity::finish);
         }
@@ -154,12 +142,13 @@ public class CalendarSliceTest {
                     "Manual Compose destination picker did not load provider choices");
             ui.tapVisibleId("slice_calendar_picker");
             ui.tapVisibleText(calendarDisplayName());
+            ui.await(
+                    () -> SettingsTestFixture.calendar(context()) == expectedId,
+                    "Calendar selection did not commit");
             assertEquals(
                     "Only the explicit provider option tap persists its calendar ID",
                     expectedId,
-                    context()
-                            .getSharedPreferences("slice", Context.MODE_PRIVATE)
-                            .getLong("calendar", -1));
+                    SettingsTestFixture.calendar(context()));
             ui.await(
                     () -> ui.find(calendarDisplayName(), false) != null,
                     "Manual Compose picker did not show the explicitly selected calendar");

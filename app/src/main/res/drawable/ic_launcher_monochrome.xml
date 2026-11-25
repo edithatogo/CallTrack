@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only; derived from ic_launcher_foreground.xml. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M30,32 L78,32 L78,78 L30,78 Z M34,46 L74,46 L74,74 L34,74 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,26 L44,26 L44,38 L38,38 Z M64,26 L70,26 L70,38 L64,38 Z M40,52 L46,52 L46,58 L40,58 Z M50,52 L68,52 L68,58 L50,58 Z M40,62 L46,62 L46,68 L40,68 Z M50,62 L62,62 L62,68 L50,68 Z" />
+</vector>

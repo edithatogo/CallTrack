@@ -2,7 +2,9 @@ package com.markobl.calllogsync.slice;
 
 import static org.junit.Assert.*;
 
+import android.accessibilityservice.AccessibilityService;
 import android.app.Activity;
+import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -16,12 +18,45 @@ import org.junit.Test;
 /** Activity state contracts only; no permission dialog, provider data or automatic activation. */
 public class AutomaticSettingsTest {
     @Test
+    public void systemBackReturnsThroughLauncherNavigationStack() {
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        Context context = instrumentation.getTargetContext();
+        CalendarSliceActivity activity =
+                (CalendarSliceActivity)
+                        instrumentation.startActivitySync(
+                                new Intent(context, CalendarSliceActivity.class)
+                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        try {
+            RenderedUi ui = new RenderedUi(instrumentation);
+            ui.tapId("open_automatic");
+            ui.tapId("open_imports");
+            ui.await(() -> ui.shown("import_summary_text", true) != null, "Import did not render");
+            assertTrue(
+                    "Import must stay in the launcher activity",
+                    RenderedUi.isResumed(instrumentation, activity));
+            assertTrue(ui.automation.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK));
+            ui.await(
+                    () ->
+                            ui.find("import_summary_text", true) == null
+                                    && ui.shown("open_imports", true) != null,
+                    "System Back did not return to Automatic logging");
+            assertTrue(ui.automation.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK));
+            ui.await(
+                    () ->
+                            ui.find("auto_state", true) == null
+                                    && ui.shown("open_automatic", true) != null,
+                    "System Back did not return to Manual logging");
+            assertTrue(RenderedUi.isResumed(instrumentation, activity));
+        } finally {
+            instrumentation.runOnMainSync(activity::finish);
+        }
+    }
+
+    @Test
     public void openingSettingsDoesNotEnableOrSelectDestinationWithoutAccess() {
         android.app.Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         Context context = instrumentation.getTargetContext();
-        assertFalse(
-                context.getSharedPreferences("slice", Context.MODE_PRIVATE)
-                        .contains("automaticActivation"));
+        assertFalse(SettingsTestFixture.snapshot(context).hasAutomatic());
         Activity activity =
                 instrumentation.startActivitySync(
                         new Intent(context, AutomaticSettingsActivity.class)
@@ -52,7 +87,8 @@ public class AutomaticSettingsTest {
             AccessibilityNodeInfo picker = rendered.shown("auto_calendar_picker", true);
             assertNotNull(picker);
             assertEquals(
-                    context.getString(R.string.slice_choose), String.valueOf(picker.getText()));
+                    context.getString(R.string.auto_choose_calendars),
+                    String.valueOf(picker.getText()));
             assertFalse(picker.isEnabled());
             assertEquals(
                     AccessibilityNodeInfo.CHECKED_STATE_TRUE,
@@ -63,9 +99,7 @@ public class AutomaticSettingsTest {
             assertEquals(
                     AccessibilityNodeInfo.CHECKED_STATE_TRUE,
                     rendered.shown("auto_missed", true).getChecked());
-            assertFalse(
-                    context.getSharedPreferences("slice", Context.MODE_PRIVATE)
-                            .contains("automaticActivation"));
+            assertFalse(SettingsTestFixture.snapshot(context).hasAutomatic());
         } finally {
             instrumentation.runOnMainSync(activity::finish);
         }
@@ -85,10 +119,20 @@ public class AutomaticSettingsTest {
         try {
             RenderedUi rendered = new RenderedUi(instrumentation);
             RenderedUi.assertComposeRoot(instrumentation, activity);
-            assertNotNull(rendered.shown("import_summary_text", true));
+            rendered.await(
+                    () -> rendered.shown("import_summary_text", true) != null,
+                    "Historical import summary did not render");
             assertFalse(rendered.shown("import_create", true).isEnabled());
-            assertNotNull(rendered.shown("import_from", true));
-            assertNotNull(rendered.shown("import_to", true));
+            AccessibilityNodeInfo startDate = rendered.shown("import_from", true);
+            AccessibilityNodeInfo endDate = rendered.shown("import_to", true);
+            assertNotNull(startDate);
+            assertNotNull(endDate);
+            assertEquals(
+                    context.getString(R.string.import_from),
+                    String.valueOf(startDate.getHintText()));
+            assertEquals(
+                    context.getString(R.string.import_to), String.valueOf(endDate.getHintText()));
+            assertNull(rendered.find("import_calendar_unavailable", true));
             rendered.revealId("import_history_empty");
             assertNotNull(rendered.find(context.getString(R.string.import_empty_history), false));
             try (SqliteImportStore store = new SqliteImportStore(context)) {
@@ -125,9 +169,7 @@ public class AutomaticSettingsTest {
             try (SqliteLedger ledger = new SqliteLedger(context)) {
                 assertTrue(ledger.recoveryPage(null, 10).isEmpty());
             }
-            assertFalse(
-                    context.getSharedPreferences("slice", Context.MODE_PRIVATE)
-                            .contains("automaticActivation"));
+            assertFalse(SettingsTestFixture.snapshot(context).hasAutomatic());
         } finally {
             instrumentation.runOnMainSync(activity::finish);
         }

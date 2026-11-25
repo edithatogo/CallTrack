@@ -105,6 +105,7 @@ public class ImportUiTest {
     }
 
     private void confirm(RenderedUi ui) {
+        ui.revealId("import_confirm");
         ui.tapId("import_confirm");
         ui.tapDialogPositive();
         ui.await(
@@ -170,7 +171,7 @@ public class ImportUiTest {
     public void renderedDestinationAndFiltersSurviveProcessDeathWithoutPreview() {
         RenderedUi ui = new RenderedUi(InstrumentationRegistry.getInstrumentation());
         String from = today().minusDays(1).toString(), to = today().toString();
-        ui.startActivity(HistoricalImportActivity.class);
+        ui.openFromLauncher("open_imports");
         ui.await(
                 () -> ui.find("import_calendar_picker", true) != null,
                 "Import did not render",
@@ -194,7 +195,7 @@ public class ImportUiTest {
         assertEquals(0, fixture.events(calendar()));
         ui.capture("import-before-process-death");
 
-        ui.killStoppedProcessAndReturn(HistoricalImportActivity.class);
+        ui.killStoppedProcessAndReturn(CalendarSliceActivity.class);
         ui.await(() -> ui.find("calltrack_screen", true) != null, "Import did not restore", 90000);
         ui.revealId("import_calendar_picker");
         ui.await(
@@ -284,10 +285,12 @@ public class ImportUiTest {
             assertEquals(day(LocalDate.parse(from)), latest().from);
             assertEquals(day(LocalDate.parse(to)), latest().to);
             assertEquals(0, fixture.events(calendar()));
+            ui.await(() -> !ui.keyboardVisible(), "Preview left the date keyboard open");
             ui.capture("import-read-only-preview");
+            ui.revealId("import_confirm");
             ui.tapId("import_confirm");
             ui.capture("import-confirmation-preview");
-            ui.tapId("button2");
+            ui.tapId("calltrack_dialog_cancel");
             ui.await(
                     () -> ui.find("calltrack_screen", true) != null,
                     "Import screen did not regain its active window after confirmation");
@@ -476,12 +479,13 @@ public class ImportUiTest {
             assertEquals(HistoricalImport.Phase.PREVIEW, latest().phase);
             assertEquals(remainingEvents, fixture.events(calendar()));
 
+            ui.revealId("import_confirm");
             ui.tapId("import_confirm");
             String unavailable = context().getString(R.string.auto_destination_unavailable);
             ui.await(
                     () -> {
                         android.view.accessibility.AccessibilityNodeInfo message =
-                                ui.find("message", true);
+                                ui.find("calltrack_dialog_message", true);
                         return message != null
                                 && message.getText() != null
                                 && message.getText().toString().contains(unavailable);

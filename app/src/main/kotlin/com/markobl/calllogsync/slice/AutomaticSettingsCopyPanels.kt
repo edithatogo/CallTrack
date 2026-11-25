@@ -21,13 +21,18 @@ internal fun AutomaticSettingsIntroPanel(text: String) {
 }
 
 @Composable
-internal fun AutomaticSettingsAccessPanel(label: String, onRequestAccess: () -> Unit) {
+internal fun AutomaticSettingsAccessPanel(
+    label: String,
+    hasRequiredAccess: Boolean = false,
+    onRequestAccess: () -> Unit,
+) {
     Column(Modifier.fillMaxWidth()) {
         ActionButton(
             label = label,
             tag = "auto_access_action",
             enabled = true,
             onClick = onRequestAccess,
+            style = if (hasRequiredAccess) ButtonStyle.Text else ButtonStyle.Filled,
         )
     }
 }

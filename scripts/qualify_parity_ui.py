@@ -200,7 +200,7 @@ def native_failure_summary(method, output, declared_permissions=None):
         detail = (detail + '; ' if detail else '') + 'synthetic-calllog-provider-not-empty'
     if 'java.lang.AssertionError: expected non-null' in output:
         detail = (detail + '; ' if detail else '') + 'expected-provider-result-was-null'
-    if 'Visible enabled control missing: button1' in output:
+    if 'Visible enabled dialog action missing: calltrack_dialog_confirm' in output:
         detail = (detail + '; ' if detail else '') + 'import-confirmation-dialog-action-missing'
     if 'Refusing a control in an unexpected package:' in output:
         detail = (detail + '; ' if detail else '') + 'dialog-action-owned-by-unexpected-window'
@@ -215,7 +215,8 @@ def native_failure_summary(method, output, declared_permissions=None):
         detail = (detail + '; ' if detail else '') + 'dialog-windows=' + ','.join(
             owner + ':' + kind for owner, kind in dialog_windows[:8])
     dialog_controls = re.findall(
-        r'(button[1-3]|permission_(?:allow|allow_one_time|allow_foreground_only|deny|deny_and_dont_ask_again)_button|other):'
+        r'(button[1-3]|calltrack_dialog_(?:confirm|cancel)|'
+        r'permission_(?:allow|allow_one_time|allow_foreground_only|deny|deny_and_dont_ask_again)_button|other):'
         r'(android\.widget\.Button|other):enabled=(true|false):'
         r'clickable=true', output)
     if dialog_controls:
@@ -666,6 +667,8 @@ def qualify(serial, suite="settings", receipt_dir=None):
             check('prepareCalendarWithoutCallAccess')
             for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
                 command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.' + permission)
+            check('systemBackReturnsThroughLauncherNavigationStack',
+                  'com.markobl.calllogsync.slice.AutomaticSettingsTest')
             check('renderedActivitiesRespectSystemBars')
             check('renderedPermissionsFiltersConfirmPauseAndReopen')
             command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.READ_CALENDAR')
@@ -688,6 +691,8 @@ def qualify(serial, suite="settings", receipt_dir=None):
                 command('shell', 'pm', 'grant', PACKAGE, 'android.permission.' + permission)
             check('nativeSharedHistoryRoutesIndependentlyAndRetriesWithoutDuplicates',
                   'com.markobl.calllogsync.slice.CallRoutingProviderTest')
+            check('movesRoutesNamespaceAndWorkerStatusTogether',
+                  'com.markobl.calllogsync.slice.SettingsMigrationTest')
         elif suite == 'imports':
             check('runActionsRequireEnabledStateAndExplicitTaps',
                   'com.markobl.calllogsync.slice.HistoricalImportActionsPanelTest')

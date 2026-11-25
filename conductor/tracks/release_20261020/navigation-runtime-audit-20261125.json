@@ -1,0 +1,284 @@
+{
+  "scope": "Compare runtime inventory with fresh canonical HTTPS repository downloads.\n\nRepository byte agreement and POM declarations are evidence, not legal clearance,\nindependent signatures, build-plugin verification or a complete SBOM.\n",
+  "inventory_sha256": "131624c6c7afbdc2eb7c8ca16cb691ad01bd4da94538987a0c2efa97cc4dc78d",
+  "resolved_rows": 8,
+  "unique_artifacts": 8,
+  "artifacts": [
+    {
+      "coordinate": "androidx.hilt:hilt-lifecycle-viewmodel-compose:1.4.0",
+      "name": "hilt-lifecycle-viewmodel-compose-1.4.0.aar",
+      "sha256": "a8b85d3d8132ac7a6ca12a99fe1921897196eb5f5e1fbdf104efca5da6236c5c",
+      "artifact_url": "https://dl.google.com/dl/android/maven2/androidx/hilt/hilt-lifecycle-viewmodel-compose/1.4.0/hilt-lifecycle-viewmodel-compose-1.4.0.aar",
+      "artifact_sha256": "a8b85d3d8132ac7a6ca12a99fe1921897196eb5f5e1fbdf104efca5da6236c5c",
+      "repository_bytes_match": true,
+      "embedded_notices": [
+        {
+          "path": "META-INF/androidx/hilt/hilt-lifecycle-viewmodel-compose/LICENSE.txt",
+          "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+          "size": 10175
+        }
+      ],
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/hilt/hilt-lifecycle-viewmodel-compose/1.4.0/hilt-lifecycle-viewmodel-compose-1.4.0.pom",
+      "pom_sha256": "1bfd1e867e89c46723bdd77fd7e7b6a6b795e628269fc3c92f9cbe8160a93324",
+      "declared_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.hilt:hilt-lifecycle-viewmodel:1.4.0",
+      "name": "hilt-lifecycle-viewmodel-1.4.0.aar",
+      "sha256": "46c093385e66b5b7dc76b0d5c47eb05304e27229ca1f252a3d64c161fe23433c",
+      "artifact_url": "https://dl.google.com/dl/android/maven2/androidx/hilt/hilt-lifecycle-viewmodel/1.4.0/hilt-lifecycle-viewmodel-1.4.0.aar",
+      "artifact_sha256": "46c093385e66b5b7dc76b0d5c47eb05304e27229ca1f252a3d64c161fe23433c",
+      "repository_bytes_match": true,
+      "embedded_notices": [
+        {
+          "path": "META-INF/androidx/hilt/hilt-lifecycle-viewmodel/LICENSE.txt",
+          "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+          "size": 10175
+        }
+      ],
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/hilt/hilt-lifecycle-viewmodel/1.4.0/hilt-lifecycle-viewmodel-1.4.0.pom",
+      "pom_sha256": "3b0b89898c69f43fca5e5ab5ce1ef25b680f064ee66f0bb594b9020f895d0337",
+      "declared_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel-compose-android:2.11.1",
+      "name": "lifecycle-viewmodel-compose.aar",
+      "sha256": "ccbd1f3ed5683847240aec4e3005f3e39178aa0884491b68a905b86b80a71075",
+      "module_url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel-compose-android/2.11.1/lifecycle-viewmodel-compose-android-2.11.1.module",
+      "module_sha256": "fd7660558618672171f98c3ffdef50836c85f1967655049d53e43a259fb5f28d",
+      "artifact_url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel-compose-android/2.11.1/lifecycle-viewmodel-compose-android-2.11.1.aar",
+      "artifact_sha256": "ccbd1f3ed5683847240aec4e3005f3e39178aa0884491b68a905b86b80a71075",
+      "repository_bytes_match": true,
+      "embedded_notices": [
+        {
+          "path": "META-INF/androidx/lifecycle/lifecycle-viewmodel-compose/LICENSE.txt",
+          "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+          "size": 10175
+        }
+      ],
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel-compose-android/2.11.1/lifecycle-viewmodel-compose-android-2.11.1.pom",
+      "pom_sha256": "f2ac1e31bb0342d2ff3f7703b79ac635f01ccd7fa9824cd270607fa71554136f",
+      "declared_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel-navigation3-android:2.11.1",
+      "name": "lifecycle-viewmodel-navigation3.aar",
+      "sha256": "0455f603945f1ef2ee7242fa8c7654d52d892e934d510536efd07f5d18b7d7a4",
+      "module_url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel-navigation3-android/2.11.1/lifecycle-viewmodel-navigation3-android-2.11.1.module",
+      "module_sha256": "58985101d1f106de0c48beac370af7fe84edd3529fc089ed8440257519e40533",
+      "artifact_url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel-navigation3-android/2.11.1/lifecycle-viewmodel-navigation3-android-2.11.1.aar",
+      "artifact_sha256": "0455f603945f1ef2ee7242fa8c7654d52d892e934d510536efd07f5d18b7d7a4",
+      "repository_bytes_match": true,
+      "embedded_notices": [
+        {
+          "path": "META-INF/androidx/lifecycle/lifecycle-viewmodel-navigation3/LICENSE.txt",
+          "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+          "size": 10175
+        }
+      ],
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel-navigation3-android/2.11.1/lifecycle-viewmodel-navigation3-android-2.11.1.pom",
+      "pom_sha256": "affda861494da6ebecc43f95fbdc8ac517a7df52c2b9f0dc9ef169ada6b5266d",
+      "declared_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.navigation3:navigation3-runtime-android:1.2.2",
+      "name": "navigation3-runtime.aar",
+      "sha256": "4efd6b6f1d8a924f6276607b25b0d3291988c2c7347aa6a2335c2bc2c28a0443",
+      "module_url": "https://dl.google.com/dl/android/maven2/androidx/navigation3/navigation3-runtime-android/1.2.2/navigation3-runtime-android-1.2.2.module",
+      "module_sha256": "5bb48eb8943a743a10d4b8d23d06aa668a413ee0d4a80638eea25f976b3e59d8",
+      "artifact_url": "https://dl.google.com/dl/android/maven2/androidx/navigation3/navigation3-runtime-android/1.2.2/navigation3-runtime-android-1.2.2.aar",
+      "artifact_sha256": "4efd6b6f1d8a924f6276607b25b0d3291988c2c7347aa6a2335c2bc2c28a0443",
+      "repository_bytes_match": true,
+      "embedded_notices": [
+        {
+          "path": "META-INF/androidx/navigation3/navigation3-runtime/LICENSE.txt",
+          "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+          "size": 10175
+        }
+      ],
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/navigation3/navigation3-runtime-android/1.2.2/navigation3-runtime-android-1.2.2.pom",
+      "pom_sha256": "99d99881b130f8fe337119ab674176c8ce04ff815f282cb7c0d021f3e422e1f3",
+      "declared_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.navigation3:navigation3-ui-android:1.2.2",
+      "name": "navigation3-ui.aar",
+      "sha256": "2da1cfacc2370c400cf969bc61986fe72ca9ac1185bb5b1f6fd2c127c2685991",
+      "module_url": "https://dl.google.com/dl/android/maven2/androidx/navigation3/navigation3-ui-android/1.2.2/navigation3-ui-android-1.2.2.module",
+      "module_sha256": "c61746c405adff6b8e72f68aea059d1df4ee2b56e547f52a5f86e472ea4b90dc",
+      "artifact_url": "https://dl.google.com/dl/android/maven2/androidx/navigation3/navigation3-ui-android/1.2.2/navigation3-ui-android-1.2.2.aar",
+      "artifact_sha256": "2da1cfacc2370c400cf969bc61986fe72ca9ac1185bb5b1f6fd2c127c2685991",
+      "repository_bytes_match": true,
+      "embedded_notices": [
+        {
+          "path": "META-INF/androidx/navigation3/navigation3-ui/LICENSE.txt",
+          "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+          "size": 10175
+        }
+      ],
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/navigation3/navigation3-ui-android/1.2.2/navigation3-ui-android-1.2.2.pom",
+      "pom_sha256": "bfea9566e45b05139e783810ea83a3976007a009f91cdbc13687a72ee3f8c9c8",
+      "declared_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.navigationevent:navigationevent-android:1.1.1",
+      "name": "navigationevent.aar",
+      "sha256": "4d6c49832f7d92cf6c0b8d8f12ff7fc2fc59b9d09862667b89bb867dbc19760d",
+      "module_url": "https://dl.google.com/dl/android/maven2/androidx/navigationevent/navigationevent-android/1.1.1/navigationevent-android-1.1.1.module",
+      "module_sha256": "574d71a384a20c75ad9d6dd26a0d31a6614036039ce0e20b8f4d05e146904758",
+      "artifact_url": "https://dl.google.com/dl/android/maven2/androidx/navigationevent/navigationevent-android/1.1.1/navigationevent-android-1.1.1.aar",
+      "artifact_sha256": "4d6c49832f7d92cf6c0b8d8f12ff7fc2fc59b9d09862667b89bb867dbc19760d",
+      "repository_bytes_match": true,
+      "embedded_notices": [
+        {
+          "path": "META-INF/androidx/navigationevent/navigationevent/LICENSE.txt",
+          "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+          "size": 10175
+        }
+      ],
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/navigationevent/navigationevent-android/1.1.1/navigationevent-android-1.1.1.pom",
+      "pom_sha256": "67267f70a63307bb76d38d925404440a5dde0562af3f36feb85b125fc7b8f89e",
+      "declared_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.navigationevent:navigationevent-compose-android:1.1.1",
+      "name": "navigationevent-compose.aar",
+      "sha256": "4c978461881d0506dd8d38deb25f84f56ea28756a14e583f2561c0ee98dff2d6",
+      "module_url": "https://dl.google.com/dl/android/maven2/androidx/navigationevent/navigationevent-compose-android/1.1.1/navigationevent-compose-android-1.1.1.module",
+      "module_sha256": "bfcb45e5b079b6c69628b1e8827190f974df0e92893256d00dc9819d84538ce4",
+      "artifact_url": "https://dl.google.com/dl/android/maven2/androidx/navigationevent/navigationevent-compose-android/1.1.1/navigationevent-compose-android-1.1.1.aar",
+      "artifact_sha256": "4c978461881d0506dd8d38deb25f84f56ea28756a14e583f2561c0ee98dff2d6",
+      "repository_bytes_match": true,
+      "embedded_notices": [
+        {
+          "path": "META-INF/androidx/navigationevent/navigationevent-compose/LICENSE.txt",
+          "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+          "size": 10175
+        }
+      ],
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/navigationevent/navigationevent-compose-android/1.1.1/navigationevent-compose-android-1.1.1.pom",
+      "pom_sha256": "b2abb117d0ef481087a4477d3b9e2ae4ba89e3127238780f8603b57c27acb2c6",
+      "declared_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    }
+  ],
+  "all_repository_bytes_match": true,
+  "licence_clearance": false,
+  "build_tool_trust": false,
+  "release_ready": false,
+  "superseded_coordinates": [
+    "androidx.navigationevent:navigationevent-android:1.1.0",
+    "androidx.navigationevent:navigationevent-compose-android:1.1.0"
+  ]
+}

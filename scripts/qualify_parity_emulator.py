@@ -84,11 +84,11 @@ def qualify(serial, suite="store"):
         if suite == 'wake-budget':
             check('WakeBudgetTest', 'heldDeliveryLockCannotHoldWakePastDeadline')
         elif suite == 'source-identity':
-            check('SourceNamespaceStoreTest', 'falseIdentityCommitCannotBeReusedFromCache')
-            check('SourceNamespaceStoreTest', 'thrownIdentityCommitCannotBeReusedFromCache')
+            check('SourceNamespaceStoreTest', 'failedWriteCannotPublishSourceIdentity')
+            check('SourceNamespaceStoreTest', 'interruptedSerializationCannotPublishSourceIdentity')
             check('SourceNamespaceStoreTest', 'committedNamespaceIsReusedAcrossAdapters')
         else:
-            check('WorkStatusStoreTest', 'uncertainCommitIsHiddenAcrossStoreInstancesUntilSuccessfulPublication')
+            check('WorkStatusStoreTest', 'failedWriteRetainsLastCommittedStatus')
             check('AutomaticSettingsTest', 'openingRecoveryDoesNotCreateReceiptsOrEnableLogging')
             check('HistoricalImportStoreTest', 'sessionHistoryPagesNewestFirstWithoutLosingOlderSessions')
             check('AutomaticSettingsTest', 'openingImportsDoesNotCreatePreviewOrConfirmWithoutAccess')
@@ -104,9 +104,9 @@ def qualify(serial, suite="store"):
             check('HistoricalImportStoreTest', 'failedCandidateAppendRollsBackPreviewAndStaleRevisionIsRejected')
             check('ActivationStoreTest', 'activationAndPauseCommitToDiskAndRejectOldGeneration')
             check('ActivationStoreTest', 'malformedOrFutureSettingsCannotBecomeEnabled')
-            check('ActivationStoreTest', 'falseCommitAfterCacheMutationBlocksAllActivationAdapters')
-            check('ActivationStoreTest', 'thrownCommitAfterCacheMutationBlocksAllActivationAdapters')
-            check('WorkStatusStoreTest', 'thrownCommitIsHiddenAcrossStoreInstancesUntilSuccessfulPublication')
+            check('ActivationStoreTest', 'failedWriteCannotPublishActivation')
+            check('ActivationStoreTest', 'interruptedSerializationCannotPublishActivation')
+            check('WorkStatusStoreTest', 'interruptedSerializationRetainsLastCommittedStatus')
             check('CalendarSliceTest', 'syntheticCursorMapsPresentationWithoutPersonalQuery')
             check('CalendarSliceTest', 'syntheticCursorRetainsNullAndExtendedPresentation')
             check('CalendarSliceTest', 'syntheticPagingUsesBoundedQueriesAndPreservesEveryRow')
