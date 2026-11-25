@@ -22,6 +22,7 @@ AUDITS = (
     'conductor/tracks/release_20261020/hilt-runtime-audit-20261125.json',
     'conductor/tracks/release_20261020/navigation-runtime-audit-20261125.json',
     'conductor/tracks/release_20261020/adaptive-runtime-audit-20261125.json',
+    'conductor/tracks/release_20261020/material-adaptive-runtime-audit-20261125.json',
 )
 SOURCES = 'qualification/release/runtime-sources.json'
 
