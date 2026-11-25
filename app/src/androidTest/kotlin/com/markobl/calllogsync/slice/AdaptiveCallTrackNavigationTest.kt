@@ -5,6 +5,7 @@ import android.accessibilityservice.AccessibilityService
 import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsFocused
+import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
@@ -41,6 +42,7 @@ class AdaptiveCallTrackNavigationTest {
         )
         compose.onNodeWithTag("auto_enable").assertDoesNotExist()
         assertFalse("Open Imports before asking for keyboard input", ui.keyboardVisible())
+        importForm.assertIsNotFocused()
         ui.capture("expanded-settings-import")
         importForm.performTouchInput { click() }.assertIsFocused()
         ui.await(ui::keyboardVisible, "Tapping a date field did not open the keyboard")

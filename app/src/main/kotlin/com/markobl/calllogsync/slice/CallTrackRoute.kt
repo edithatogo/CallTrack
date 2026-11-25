@@ -35,6 +35,24 @@ internal sealed interface CallTrackRoute : NavKey {
     @Serializable data object Recovery : CallTrackRoute
 }
 
+internal fun MutableList<NavKey>.selectSettingsSection(section: CallTrackRoute) {
+    when (last()) {
+        section -> Unit
+
+        CallTrackRoute.Automatic -> add(section)
+
+        CallTrackRoute.Import,
+        CallTrackRoute.Recovery -> {
+            if (getOrNull(lastIndex - 1) != CallTrackRoute.Automatic) return
+            if (section == CallTrackRoute.Automatic) {
+                removeAt(lastIndex)
+            } else {
+                this[lastIndex] = section
+            }
+        }
+    }
+}
+
 internal fun ComponentActivity.setCallTrackNavigation(root: CallTrackRoute) {
     setCallTrackContent { CallTrackNavigation(this, root) }
 }
@@ -49,15 +67,6 @@ private fun CallTrackNavigation(activity: ComponentActivity, root: CallTrackRout
             popEntry()
         } else {
             activity.finish()
-        }
-    }
-    val openSettingsSection: (CallTrackRoute) -> Unit = { section ->
-        if (stack.last() != section) {
-            when {
-                section == CallTrackRoute.Automatic -> popEntry()
-                stack.last() == CallTrackRoute.Automatic -> stack.add(section)
-                else -> stack[stack.lastIndex] = section
-            }
         }
     }
     NavDisplay(
@@ -81,7 +90,7 @@ private fun CallTrackNavigation(activity: ComponentActivity, root: CallTrackRout
                     }
                 }
                 entry<CallTrackRoute.Automatic>(metadata = ListDetailSceneStrategy.listPane()) {
-                    SettingsEntry(activity, stack.last(), navigateUp, openSettingsSection)
+                    SettingsEntry(activity, stack.last(), navigateUp, stack::selectSettingsSection)
                 }
                 entry<CallTrackRoute.Import>(metadata = ListDetailSceneStrategy.detailPane()) {
                     SettingsDetail(R.string.import_open, navigateUp) {
