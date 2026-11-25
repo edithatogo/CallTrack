@@ -30,9 +30,17 @@ The encrypted recovery copy reopened with the same certificate. The dedicated
 16 KiB Android 17 emulator installed the exact signed APK through Downloads,
 launched it in both themes and verified the standard call-log permission flow.
 
-Physical-call and calendar acceptance, seven days of controlled observation and
-GitHub distribution remain open. Keep results for any later source revision
-with that revision's artifacts.
+The selected Android 17 phone installed the same signed APK through Files by
+Google. Readback verified the installed bytes, the separate development app and
+restoration of the installation-source setting. A confirmed missed test call
+produced one local event and one matching event in the dedicated Google
+Calendar. The event used a one-minute marker with zero actual call duration.
+Repeating the manual action returned the original event on the phone and on
+Google. The exact call and event identifiers are retained privately.
+
+Complete the remaining physical-call and calendar cases, seven days of
+controlled observation and GitHub distribution. Keep results for any later
+source revision with that revision's artifacts.
 
 ## Android 17 unsigned baselines
 

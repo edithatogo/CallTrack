@@ -17,7 +17,10 @@
   },
   "native_stack": [
     "Kotlin",
-    "Jetpack Compose with Material 3",
+    "Jetpack Compose with Material 3 Expressive and Android window size classes",
+    "Navigation 3",
+    "Proto DataStore",
+    "Hilt (manual logging ViewModel)",
     "Android CallLog",
     "Android CalendarContract",
     "WorkManager",
@@ -28,7 +31,8 @@
     "kotlin_20261020",
     "release_20261020",
     "compose_app_20261021",
-    "android17_call_routing_20261125"
+    "android17_call_routing_20261125",
+    "android17_standards_20261125"
   ],
   "deferred_tracks": [
     "shared_core_20261021",

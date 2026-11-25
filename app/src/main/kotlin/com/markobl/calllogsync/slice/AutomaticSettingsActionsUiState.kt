@@ -1,7 +1,7 @@
 package com.markobl.calllogsync.slice
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,36 +16,39 @@ internal data class AutomaticSettingsActionsUiState(
 )
 
 @Composable
-internal fun AutomaticSettingsActionsPanel(
+internal fun AutomaticStatusActions(
     state: AutomaticSettingsActionsUiState,
-    enableLabel: String,
     pauseLabel: String,
     refreshLabel: String,
-    onEnable: () -> Unit,
     onPause: () -> Unit,
     onRefresh: () -> Unit,
 ) {
-    Column(
+    FlowRow(
         modifier = Modifier.fillMaxWidth().semantics { testTagsAsResourceId = true },
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
+        ActionButton(pauseLabel, "auto_pause", state.pauseEnabled, onPause, ButtonStyle.Outlined)
         ActionButton(
-            label = enableLabel,
-            tag = "auto_enable",
-            enabled = state.enableEnabled,
-            onClick = onEnable,
-        )
-        ActionButton(
-            label = pauseLabel,
-            tag = "auto_pause",
-            enabled = state.pauseEnabled,
-            onClick = onPause,
-        )
-        ActionButton(
-            label = refreshLabel,
-            tag = "auto_refresh",
-            enabled = state.refreshEnabled,
-            onClick = onRefresh,
+            refreshLabel,
+            "auto_refresh",
+            state.refreshEnabled,
+            onRefresh,
+            ButtonStyle.Text,
         )
     }
+}
+
+@Composable
+internal fun AutomaticApplyButton(
+    state: AutomaticSettingsActionsUiState,
+    label: String,
+    onApply: () -> Unit,
+) {
+    ActionButton(
+        label = label,
+        tag = "auto_enable",
+        enabled = state.enableEnabled,
+        onClick = onApply,
+    )
 }

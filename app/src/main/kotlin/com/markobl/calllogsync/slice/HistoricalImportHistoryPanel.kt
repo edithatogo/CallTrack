@@ -28,15 +28,14 @@ internal fun HistoricalImportHistoryPanel(
         modifier = Modifier.fillMaxWidth().semantics { testTagsAsResourceId = true },
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Text(title, modifier = Modifier.testTag("import_history_title"))
+        SectionHeading(title, modifier = Modifier.testTag("import_history_title"))
         if (state.items.isEmpty()) {
             Text(emptyMessage, modifier = Modifier.testTag("import_history_empty"))
         } else {
             state.items.forEachIndexed { index, item ->
-                ActionButton(
+                NavigationItem(
                     label = item.label,
                     tag = "import_history_item_$index",
-                    enabled = true,
                     onClick = { onOpen(item.token) },
                 )
             }

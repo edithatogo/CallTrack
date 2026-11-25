@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.database.Cursor
 import android.os.Bundle
 import android.provider.CallLog.Calls
-import java.util.UUID
 
 /** Call-only adapter; queries occur only on explicit coordinator requests. */
 class AndroidCallLogSource
@@ -42,11 +41,11 @@ constructor(context: Context?, includeAppCalls: Boolean = false) :
             )
             .use { cursor ->
                 checkNotNull(cursor) { "Call provider unavailable" }
-                return first(cursor, namespace(context))
+                return first(cursor, namespace())
             }
     }
 
-    override fun namespace(): String = namespace(context)
+    override fun namespace(): String = AndroidSettingsStore(context).namespace()
 
     internal fun observedAppPackages(): Set<String> {
         permission()
@@ -139,27 +138,6 @@ constructor(context: Context?, includeAppCalls: Boolean = false) :
                 Calls.NUMBER_PRESENTATION,
                 Calls.PHONE_ACCOUNT_ID,
             )
-        private var namespaceCommitUncertain = false
-
-        private fun namespace(context: Context): String =
-            synchronized(AndroidCallLogSource::class.java) {
-                if (namespaceCommitUncertain) {
-                    throw IllegalStateException(
-                        "Source identity commit uncertain; restart required",
-                    )
-                }
-                val prefs = context.getSharedPreferences("slice", Context.MODE_PRIVATE)
-                var id = prefs.getString("sourceNamespace", null)
-                if (id == null) {
-                    id = "android-call-log/" + UUID.randomUUID()
-                    namespaceCommitUncertain = true
-                    if (!prefs.edit().putString("sourceNamespace", id).commit()) {
-                        throw IllegalStateException("Identity not persisted")
-                    }
-                    namespaceCommitUncertain = false
-                }
-                id
-            }
 
         @JvmStatic
         fun pageQuery(

@@ -20,11 +20,12 @@
     </queries>
 
     <application
+        android:name=".slice.CallTrackApplication"
         android:allowBackup="false"
         android:fullBackupContent="@xml/slice_backup_rules"
         android:dataExtractionRules="@xml/slice_extraction_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="${calltrackAppLabel}"
+        android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CallHistory"
@@ -44,7 +45,10 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".slice.AutomaticSettingsActivity" android:exported="false" />
-        <activity android:name=".slice.CalendarSliceActivity" android:exported="true">
+        <activity
+            android:name=".slice.CalendarSliceActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

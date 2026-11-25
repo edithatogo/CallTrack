@@ -42,14 +42,22 @@ class Android17Scope(unittest.TestCase):
         root = (screens / "CallTrackScreen.kt").read_text()
         self.assertEqual(1, root.count("ComposeView(this)"))
         self.assertIn("DisposeOnViewTreeLifecycleDestroyed", root)
-        self.assertIn("safeDrawingPadding()", root)
+        self.assertIn("enableEdgeToEdge()", root)
+        self.assertIn("contentWindowInsets = WindowInsets.safeDrawing", root)
+        self.assertIn(".padding(padding).consumeWindowInsets(padding).imePadding()", root)
         self.assertIn("verticalScroll(", root)
         self.assertFalse((screens / "ActivityInsets.kt").exists())
         self.assertFalse((screens / "ComposeActionButton.kt").exists())
-        for name in ("CalendarSlice", "AutomaticSettings", "HistoricalImport", "ReceiptRecovery"):
+        navigation = (screens / "CallTrackRoute.kt").read_text()
+        self.assertEqual(1, navigation.count("setCallTrackContent {"))
+        self.assertEqual(1, navigation.count("rememberNavBackStack(root)"))
+        self.assertEqual(1, navigation.count("NavDisplay("))
+        for name, route in (("CalendarSlice", "Manual"), ("AutomaticSettings", "Automatic"),
+                            ("HistoricalImport", "Import"), ("ReceiptRecovery", "Recovery")):
             with self.subTest(screen=name):
                 source = (screens / f"{name}Activity.kt").read_text()
-                self.assertEqual(1, source.count("setCallTrackContent {"))
+                self.assertEqual(1, source.count(f"setCallTrackNavigation(CallTrackRoute.{route})"))
+                self.assertEqual(1, navigation.count(f"entry<CallTrackRoute.{route}>"))
                 self.assertNotIn("ScrollView", source)
                 self.assertNotIn("LinearLayout", source)
                 self.assertNotIn("setContentView", source)

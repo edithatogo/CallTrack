@@ -1,5 +1,6 @@
 package com.markobl.calllogsync.slice
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
@@ -8,8 +9,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.unit.dp
 
-/** Presentation for manual logging. Provider, permission and delivery effects stay in Activity. */
+/** Presentation for manual logging. */
 @Composable
 internal fun ManualCalendarScreen(
     intro: String,
@@ -17,14 +19,16 @@ internal fun ManualCalendarScreen(
     logState: ManualLogUiState,
     chooseLabel: String,
     accessLabel: String,
-    unavailableLabel: String,
+    unavailableLabel: String?,
     automaticLabel: String,
     onRequestAccess: () -> Unit,
     onSelect: (String) -> Unit,
     onLogLatest: () -> Unit,
     onOpenAutomatic: () -> Unit,
+    hasCalendarAccess: Boolean = false,
 ) {
     Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier =
             Modifier.fillMaxWidth().semantics {
                 testTagsAsResourceId = true
@@ -52,6 +56,7 @@ internal fun ManualCalendarScreen(
                 unavailableLabel = unavailableLabel,
                 onRequestAccess = onRequestAccess,
                 onSelect = onSelect,
+                hasCalendarAccess = hasCalendarAccess,
             )
         }
         Column(
@@ -62,10 +67,9 @@ internal fun ManualCalendarScreen(
         ) {
             ManualLogPanel(state = logState, onLogLatest = onLogLatest)
         }
-        ActionButton(
+        NavigationItem(
             label = automaticLabel,
             tag = "open_automatic",
-            enabled = true,
             onClick = onOpenAutomatic,
         )
     }

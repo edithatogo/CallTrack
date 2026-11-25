@@ -122,7 +122,13 @@ class CallRoutingProviderTest {
                 )
                 .commit(),
         )
-        val upgraded = checkNotNull(AndroidActivationStore(old).get())
+        val upgraded =
+            SettingsTestFixture(context, account).use { migration ->
+                checkNotNull(migration.activation().get()).also {
+                    assertTrue(migration.disk().hasAutomatic())
+                    assertFalse(old.contains("automaticActivation"))
+                }
+            }
         assertEquals(mapOf(combined to setOf(CallRecord.PHONE)), upgraded.destinations)
         assertEquals("automatic", upgraded.operation().owner)
         assertEquals(8L, upgraded.generation)

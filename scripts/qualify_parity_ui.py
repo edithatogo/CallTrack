@@ -30,6 +30,31 @@ RECEIPT_NAMES = {
 }
 
 
+def check_adaptive_windows(command, check):
+    # Resize the dedicated display itself so ATF measures the same device pixels
+    # as Compose. A virtual Compose density can shrink a 48 dp target in Android.
+    original = command('shell', 'wm', 'size')
+    size = re.fullmatch(r'Physical size: \d+x\d+(?:\nOverride size: (\d+x\d+))?', original)
+    density = re.fullmatch(
+        r'Physical density: (\d+)(?:\nOverride density: (\d+))?', command('shell', 'wm', 'density'))
+    if not size or not density:
+        raise RuntimeError('Unqualified emulator dimensions')
+    scale = int(density[2] or density[1]) / 160
+    try:
+        for profile, width, height in (('compact', 360, 720), ('medium', 720, 900),
+                                       ('expanded', 1200, 1260)):
+            pixels = f'{round(width * scale)}x{round(height * scale)}'
+            command('shell', 'wm', 'size', pixels)
+            if f'Override size: {pixels}' not in command('shell', 'wm', 'size').splitlines():
+                raise RuntimeError(f'Emulator {profile} dimensions not confirmed')
+            check(f'{profile}WindowKeepsPrimaryActionAccessible',
+                  'com.markobl.calllogsync.slice.AdaptiveCallTrackScreenTest')
+    finally:
+        command('shell', 'wm', 'size', size[1] or 'reset')
+        if command('shell', 'wm', 'size') != original:
+            raise RuntimeError('Emulator dimensions were not restored')
+
+
 def write_receipt(directory, expected, suite, receipt, replace):
     """Write only a regular receipt in the directory selected for this run."""
     filename = RECEIPT_NAMES[suite]
@@ -70,7 +95,9 @@ def native_failure_summary(method, output, declared_permissions=None):
         frame = line.strip()
         if (frame.startswith('at com.markobl.calllogsync.slice.')
                 and re.search(
-                    r'(?:(?:PositiveUiTest|ImportUiTest|RecoveryUiTest|ParityProviderTest|RenderedUi)\.java|ManualCalendarScreenTest\.kt):\d+',
+                    r'(?:(?:PositiveUiTest|ImportUiTest|RecoveryUiTest|ParityProviderTest|RenderedUi)\.java|'
+                    r'(?:ManualCalendarScreenTest|AdaptiveCallTrackScreenTest|'
+                    r'HistoricalImport(?:Destination|Filters)PanelTest)\.kt):\d+',
                     frame,
                 )):
             frames.append(frame)
@@ -200,7 +227,7 @@ def native_failure_summary(method, output, declared_permissions=None):
         detail = (detail + '; ' if detail else '') + 'synthetic-calllog-provider-not-empty'
     if 'java.lang.AssertionError: expected non-null' in output:
         detail = (detail + '; ' if detail else '') + 'expected-provider-result-was-null'
-    if 'Visible enabled control missing: button1' in output:
+    if 'Visible enabled dialog action missing: calltrack_dialog_confirm' in output:
         detail = (detail + '; ' if detail else '') + 'import-confirmation-dialog-action-missing'
     if 'Refusing a control in an unexpected package:' in output:
         detail = (detail + '; ' if detail else '') + 'dialog-action-owned-by-unexpected-window'
@@ -215,7 +242,8 @@ def native_failure_summary(method, output, declared_permissions=None):
         detail = (detail + '; ' if detail else '') + 'dialog-windows=' + ','.join(
             owner + ':' + kind for owner, kind in dialog_windows[:8])
     dialog_controls = re.findall(
-        r'(button[1-3]|permission_(?:allow|allow_one_time|allow_foreground_only|deny|deny_and_dont_ask_again)_button|other):'
+        r'(button[1-3]|calltrack_dialog_(?:confirm|cancel)|'
+        r'permission_(?:allow|allow_one_time|allow_foreground_only|deny|deny_and_dont_ask_again)_button|other):'
         r'(android\.widget\.Button|other):enabled=(true|false):'
         r'clickable=true', output)
     if dialog_controls:
@@ -666,6 +694,9 @@ def qualify(serial, suite="settings", receipt_dir=None):
             check('prepareCalendarWithoutCallAccess')
             for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
                 command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.' + permission)
+            check_adaptive_windows(command, check)
+            check('systemBackReturnsThroughLauncherNavigationStack',
+                  'com.markobl.calllogsync.slice.AutomaticSettingsTest')
             check('renderedActivitiesRespectSystemBars')
             check('renderedPermissionsFiltersConfirmPauseAndReopen')
             command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.READ_CALENDAR')
@@ -688,11 +719,19 @@ def qualify(serial, suite="settings", receipt_dir=None):
                 command('shell', 'pm', 'grant', PACKAGE, 'android.permission.' + permission)
             check('nativeSharedHistoryRoutesIndependentlyAndRetriesWithoutDuplicates',
                   'com.markobl.calllogsync.slice.CallRoutingProviderTest')
+            check('movesRoutesNamespaceAndWorkerStatusTogether',
+                  'com.markobl.calllogsync.slice.SettingsMigrationTest')
         elif suite == 'imports':
             check('runActionsRequireEnabledStateAndExplicitTaps',
                   'com.markobl.calllogsync.slice.HistoricalImportActionsPanelTest')
             check('destinationListIsPresentedAndOnlyExplicitSelectionReturnsOpaqueToken',
                   'com.markobl.calllogsync.slice.HistoricalImportDestinationPanelTest')
+            check('keyboardSelectionRestoresPickerFocusWhenSaveFinishes',
+                  'com.markobl.calllogsync.slice.HistoricalImportDestinationPanelTest')
+            check('dateAndCallTypeFiltersEmitOnlyExplicitUserChanges',
+                  'com.markobl.calllogsync.slice.HistoricalImportFiltersPanelTest')
+            check('controlsRemainAccessibleWithLargeFontAndRightToLeftLayout',
+                  'com.markobl.calllogsync.slice.HistoricalImportFiltersPanelTest')
             check('prepareCalendarAndTaggedHistory')
             command('shell', 'pm', 'grant', PACKAGE, 'android.permission.READ_CALL_LOG')
             check('latestCallUsesNewestDateAndHighestIdOnTies')
@@ -705,6 +744,8 @@ def qualify(serial, suite="settings", receipt_dir=None):
             check('renderedExplicitHistoryResumeCompletesPartialWork')
             check('removedDestinationBlocksDeliveryWithoutSwitchingCalendars')
         else:
+            check('busyManagementAndPaginationActionsAreDisabled',
+                  'com.markobl.calllogsync.slice.RecoveryCardsPanelTest')
             check('preparePendingWithoutCallAccess')
             ui_attempted = True
             check('renderedPendingRecoverySurvivesProcessDeathWithoutApproval',

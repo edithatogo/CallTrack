@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.SystemClock;
 
@@ -25,20 +24,6 @@ public class AutomaticWorkTest {
         String token = InstrumentationRegistry.getArguments().getString("fixtureToken", "");
         if (!token.matches("[a-f0-9]{32}")) throw new IllegalArgumentException("Fixture required");
         return "work-" + token;
-    }
-
-    private void clearStatus(SharedPreferences p) {
-        assertTrue(
-                p.edit()
-                        .remove("automaticActivation")
-                        .remove("automaticStatusGeneration")
-                        .remove("automaticStatusAt")
-                        .remove("automaticStatusCode")
-                        .remove("automaticStatusDelivered")
-                        .remove("automaticStatusReview")
-                        .remove("automaticStatusFailures")
-                        .remove("automaticStatusToken")
-                        .commit());
     }
 
     private WorkInfo execute(long generation) throws Exception {
@@ -66,8 +51,7 @@ public class AutomaticWorkTest {
 
     @Test
     public void absentActivationExecutesWithoutCallCalendarPermission() throws Exception {
-        SharedPreferences p = context().getSharedPreferences("slice", Context.MODE_PRIVATE);
-        assertFalse(p.contains("automaticActivation"));
+        assertFalse(SettingsTestFixture.snapshot(context()).hasAutomatic());
         try {
             assertEquals(
                     PackageManager.PERMISSION_DENIED,
@@ -81,14 +65,13 @@ public class AutomaticWorkTest {
                     .cancelUniqueWork(fixture())
                     .getResult()
                     .get(15, TimeUnit.SECONDS);
-            clearStatus(p);
+            SettingsTestFixture.clearAutomatic(context());
         }
     }
 
     @Test
     public void staleGenerationExecutesWithoutOpeningProviders() throws Exception {
-        SharedPreferences p = context().getSharedPreferences("slice", Context.MODE_PRIVATE);
-        assertFalse(p.contains("automaticActivation"));
+        assertFalse(SettingsTestFixture.snapshot(context()).hasAutomatic());
         try {
             ActivationControl control =
                     new ActivationControl(new AndroidActivationStore(context()));
@@ -107,7 +90,7 @@ public class AutomaticWorkTest {
                     .cancelUniqueWork(fixture())
                     .getResult()
                     .get(15, TimeUnit.SECONDS);
-            clearStatus(p);
+            SettingsTestFixture.clearAutomatic(context());
         }
     }
 
@@ -141,7 +124,7 @@ public class AutomaticWorkTest {
         } finally {
             manager.cancelUniqueWork(fixture() + "-prompt").getResult().get(15, TimeUnit.SECONDS);
             manager.cancelUniqueWork(fixture() + "-periodic").getResult().get(15, TimeUnit.SECONDS);
-            clearStatus(context().getSharedPreferences("slice", Context.MODE_PRIVATE));
+            SettingsTestFixture.clearAutomatic(context());
         }
     }
 }

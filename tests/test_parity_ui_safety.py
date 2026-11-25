@@ -12,6 +12,22 @@ from parity_targets import RECOVERY_AVD, TRACK14_UI_AVD
 
 
 class UiSafety(unittest.TestCase):
+    def test_adaptive_windows_restore_original_override_after_failed_accessibility_check(self):
+        physical = 'Physical size: 1080x2400'
+        original = physical + '\nOverride size: 1200x2500'
+        command = Mock(side_effect=[
+            original, 'Physical density: 420',
+            '', physical + '\nOverride size: 945x1890',
+            '', physical + '\nOverride size: 1890x2362',
+            '', original,
+        ])
+        check = Mock(side_effect=[None, RuntimeError('Accessibility check failed')])
+        with self.assertRaisesRegex(RuntimeError, 'Accessibility check failed'):
+            device.check_adaptive_windows(command, check)
+        self.assertEqual(check.call_count, 2)
+        self.assertEqual(command.call_args_list[-2].args, ('shell', 'wm', 'size', '1200x2500'))
+        self.assertEqual(command.call_args.args, ('shell', 'wm', 'size'))
+
     def test_instrumentation_failures_keep_only_protocol_state_categories(self):
         cases = (
             ('', 'instrumentation-output-empty', 'instrumentation-protocol=none'),
@@ -341,7 +357,7 @@ class UiSafety(unittest.TestCase):
     def test_failure_summary_uses_fixed_import_dialog_category(self):
         summary = device.native_failure_summary(
             'renderedRangePreviewCancelConfirmAndRepeat',
-            'java.lang.AssertionError: Visible enabled control missing: button1\n'
+            'java.lang.AssertionError: Visible enabled dialog action missing: calltrack_dialog_confirm\n'
             '    at com.markobl.calllogsync.slice.RenderedUi.tap(RenderedUi.java:154)\n'
             '    at com.markobl.calllogsync.slice.ImportUiTest.confirm(ImportUiTest.java:104)\n',
         )
@@ -351,8 +367,8 @@ class UiSafety(unittest.TestCase):
     def test_failure_summary_retains_only_allowlisted_dialog_action_metadata(self):
         summary = device.native_failure_summary(
             'renderedRangePreviewCancelConfirmAndRepeat',
-            'Visible enabled positive dialog action missing; dialog-active=input-method '
-            'dialog-windows=[app:application:[button1:android.widget.Button:'
+            'Visible enabled dialog action missing: calltrack_dialog_confirm; dialog-active=input-method '
+            'dialog-windows=[app:application:[calltrack_dialog_confirm:android.widget.Button:'
             'enabled=false:clickable=true], permission:application:'
             '[permission_allow_button:android.widget.Button:enabled=true:clickable=true], '
             'input-method:input-method:[]] app-permissions=[calendar-read=granted,'
@@ -369,7 +385,7 @@ class UiSafety(unittest.TestCase):
             'dialog-windows=app:application,permission:application,input-method:input-method',
             summary,
         )
-        self.assertIn('dialog-controls=button1:android.widget.Button:false', summary)
+        self.assertIn('dialog-controls=calltrack_dialog_confirm:android.widget.Button:false', summary)
         self.assertIn(
             'permission_allow_button:android.widget.Button:true', summary)
         self.assertIn('app-permissions=calendar-read:granted,calendar-write:granted,'
@@ -454,6 +470,7 @@ class UiSafety(unittest.TestCase):
         self.install_timeout = False
         self.app_permission = ''
         self.avd = RECOVERY_AVD
+        self.display_override = None
 
     def command(self, command, **kwargs):
         args = command[3:]
@@ -465,6 +482,14 @@ class UiSafety(unittest.TestCase):
             output = 'Service phone: found' if self.phone_available else 'Service phone: not found'
         elif args == ['emu', 'avd', 'name']:
             output = self.avd + '\nOK'
+        elif args == ['shell', 'wm', 'size']:
+            output = 'Physical size: 1080x2400'
+            if self.display_override:
+                output += '\nOverride size: ' + self.display_override
+        elif args[:3] == ['shell', 'wm', 'size']:
+            self.display_override = None if args[3] == 'reset' else args[3]
+        elif args == ['shell', 'wm', 'density']:
+            output = 'Physical density: 420'
         elif args == ['shell', 'dumpsys', 'window']:
             output = 'mCurrentFocus=Window{Application Not Responding: com.android.systemui}' if self.systemui_anr else 'mCurrentFocus=Window{Launcher}'
         elif args[0] == 'install' and self.install_timeout:
@@ -714,9 +739,15 @@ class UiSafety(unittest.TestCase):
             '#runActionsRequireEnabledStateAndExplicitTaps',
             'com.markobl.calllogsync.slice.HistoricalImportDestinationPanelTest'
             '#destinationListIsPresentedAndOnlyExplicitSelectionReturnsOpaqueToken',
-        ], selectors[:2])
+            'com.markobl.calllogsync.slice.HistoricalImportDestinationPanelTest'
+            '#keyboardSelectionRestoresPickerFocusWhenSaveFinishes',
+            'com.markobl.calllogsync.slice.HistoricalImportFiltersPanelTest'
+            '#dateAndCallTypeFiltersEmitOnlyExplicitUserChanges',
+            'com.markobl.calllogsync.slice.HistoricalImportFiltersPanelTest'
+            '#controlsRemainAccessibleWithLargeFontAndRightToLeftLayout',
+        ], selectors[:5])
         self.assertTrue(all(method.startswith('com.markobl.calllogsync.slice.ImportUiTest#')
-                            for method in selectors[2:]))
+                            for method in selectors[5:]))
         self.assertEqual('com.markobl.calllogsync.slice.ImportUiTest#cleanupFixture', selectors[-1])
         self.assertTrue(any('latestCallUsesNewestDateAndHighestIdOnTies' in method for method in methods))
         self.assertTrue(any('renderedDestinationAndFiltersSurviveProcessDeathWithoutPreview' in method
@@ -729,7 +760,8 @@ class UiSafety(unittest.TestCase):
     def test_recovery_suite_keeps_read_only_permission_boundary(self):
         self.assertEqual(0, self.run_fixture('recovery'))
         methods = [' '.join(c) for c in self.calls if c[:3] == ['shell', 'am', 'instrument']]
-        self.assertTrue(all('RecoveryUiTest#' in method for method in methods))
+        self.assertIn('RecoveryCardsPanelTest#busyManagementAndPaginationActionsAreDisabled', methods[0])
+        self.assertTrue(all('RecoveryUiTest#' in method for method in methods[1:]))
         self.assertTrue(any('renderedPendingRecoverySurvivesProcessDeathWithoutApproval' in method
                             and 'ProcessRecoveryRunner' in method for method in methods))
         self.assertTrue(any('renderedPendingRecoverySurvivesRecreationWithoutApproval' in method for method in methods))

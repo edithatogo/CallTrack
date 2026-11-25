@@ -1,0 +1,41 @@
+// SPDX-License-Identifier: Apache-2.0
+syntax = "proto3";
+
+package calltrack.settings;
+option java_package = "com.markobl.calllogsync.settings";
+option java_multiple_files = true;
+option java_outer_classname = "CallTrackSettingsSchema";
+
+message CallTrackSettings {
+  optional int64 selected_calendar = 1;
+  string source_namespace = 2;
+  AutomaticSettings automatic = 3;
+  ExecutionStatus execution = 4;
+}
+
+message AutomaticSettings {
+  int64 generation = 1;
+  bool enabled = 2;
+  repeated CalendarRoute destinations = 3;
+  string timezone = 4;
+  int64 start = 5;
+  bool incoming = 6;
+  bool outgoing = 7;
+  bool missed = 8;
+}
+
+message CalendarRoute {
+  int64 calendar = 1;
+  repeated string sources = 2;
+  string binding = 3;
+}
+
+message ExecutionStatus {
+  int64 generation = 1;
+  int64 at = 2;
+  string token = 3;
+  string code = 4;
+  int32 delivered = 5;
+  int32 review = 6;
+  int64 failures = 7;
+}

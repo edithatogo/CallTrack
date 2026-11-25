@@ -20,7 +20,9 @@ import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import androidx.activity.ComponentActivity;
 import androidx.compose.ui.platform.ComposeView;
+import androidx.lifecycle.Lifecycle;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -57,6 +59,19 @@ final class RenderedUi {
                     "Screen root must be a ComposeView",
                     content.getChildAt(0) instanceof ComposeView);
         });
+    }
+
+    static boolean isResumed(Instrumentation instrumentation, ComponentActivity activity) {
+        boolean[] resumed = new boolean[1];
+        instrumentation.runOnMainSync(() ->
+                resumed[0] = activity.getLifecycle().getCurrentState() == Lifecycle.State.RESUMED);
+        return resumed[0];
+    }
+
+    void openFromLauncher(String destination) {
+        startActivity(CalendarSliceActivity.class);
+        tapId("open_automatic");
+        tapId(destination);
     }
 
     void await(BooleanSupplier condition, String message) {
@@ -394,16 +409,11 @@ final class RenderedUi {
         final AccessibilityNodeInfo[] reachable = new AccessibilityNodeInfo[1];
         await(
                 () -> {
-                    Rect keyboard = keyboardBounds();
-                    if (keyboard == null) return false;
-                    AccessibilityNodeInfo node = find(id, true);
-                    if (node != null && node.isEnabled() && touchPointIsVisible(node)) {
-                        Rect control = new Rect();
-                        node.getBoundsInScreen(control);
-                        if (!control.isEmpty() && !Rect.intersects(control, keyboard)) {
-                            reachable[0] = node;
-                            return true;
-                        }
+                    if (!keyboardVisible()) return false;
+                    if (controlAboveKeyboard(id) != null) {
+                        settle();
+                        reachable[0] = controlAboveKeyboard(id);
+                        if (reachable[0] != null) return true;
                     }
                     AccessibilityNodeInfo scroll = scrollable(automation.getRootInActiveWindow());
                     if (scroll != null
@@ -414,6 +424,16 @@ final class RenderedUi {
                 },
                 "Control not reachable above the visible keyboard: " + id);
         touch(reachable[0], id);
+    }
+
+    private AccessibilityNodeInfo controlAboveKeyboard(String id) {
+        Rect keyboard = keyboardBounds();
+        if (keyboard == null) return null;
+        AccessibilityNodeInfo node = find(id, true);
+        if (node == null || !node.isEnabled() || !touchPointIsVisible(node)) return null;
+        Rect control = new Rect();
+        node.getBoundsInScreen(control);
+        return !control.isEmpty() && !Rect.intersects(control, keyboard) ? node : null;
     }
 
     void dismissKeyboard() {
@@ -432,6 +452,10 @@ final class RenderedUi {
     }
 
     void tapId(String id) {
+        if (id.equals("calltrack_dialog_confirm") || id.equals("calltrack_dialog_cancel")) {
+            tapDialogAction(id);
+            return;
+        }
         tap(id, true);
     }
 
@@ -441,15 +465,19 @@ final class RenderedUi {
 
     /** Tap the app-owned positive dialog action across interactive windows. */
     void tapDialogPositive() {
+        tapDialogAction("calltrack_dialog_confirm");
+    }
+
+    private void tapDialogAction(String tag) {
         dismissKeyboardContactsPromptIfVisible();
         final AccessibilityNodeInfo[] found = new AccessibilityNodeInfo[1];
         try {
             await(
                     () -> {
-                        found[0] = findDialogPositive(automation.getWindows());
+                        found[0] = findDialogAction(automation.getWindows(), tag);
                         return found[0] != null;
                     },
-                    "Visible enabled positive dialog action missing");
+                    "Visible enabled dialog action missing: " + tag);
         } catch (AssertionError missing) {
             throw new AssertionError(
                     missing.getMessage()
@@ -460,14 +488,14 @@ final class RenderedUi {
                     missing);
         }
         settle();
-        found[0] = findDialogPositive(automation.getWindows());
+        found[0] = findDialogAction(automation.getWindows(), tag);
         if (found[0] == null)
             throw new AssertionError(
                     "Dialog action disappeared before touch; "
                             + permissionControlSummary()
                             + "; "
                             + dialogActionSummary());
-        touch(found[0], "dialog_positive");
+        touch(found[0], tag);
     }
 
     /** Select a visible permission-controller action using only known resource IDs. */
@@ -542,8 +570,6 @@ final class RenderedUi {
     }
 
     private void tap(String value, boolean id, boolean waitForIdle) {
-        if (id && (value.equals("button1") || value.equals("button2")))
-            dismissKeyboardContactsPromptIfVisible();
         if (id && value.equals("import_confirm")) {
             dismissKeyboardContactsPromptIfVisible();
             dismissKeyboard();
@@ -574,27 +600,28 @@ final class RenderedUi {
             dismissKeyboardContactsPromptIfVisible();
     }
 
-    private AccessibilityNodeInfo findDialogPositive(
-            java.util.List<android.view.accessibility.AccessibilityWindowInfo> windows) {
+    private AccessibilityNodeInfo findDialogAction(
+            java.util.List<android.view.accessibility.AccessibilityWindowInfo> windows,
+            String tag) {
         for (android.view.accessibility.AccessibilityWindowInfo window : windows) {
-            AccessibilityNodeInfo found = findDialogPositive(window.getRoot());
+            AccessibilityNodeInfo found = findDialogAction(window.getRoot(), tag);
             if (found != null) return found;
         }
         return null;
     }
 
-    private AccessibilityNodeInfo findDialogPositive(AccessibilityNodeInfo node) {
+    private AccessibilityNodeInfo findDialogAction(AccessibilityNodeInfo node, String tag) {
         if (node == null || !node.refresh() || !node.isVisibleToUser()) return null;
         CharSequence owner = node.getPackageName();
         CharSequence resourceId = node.getViewIdResourceName();
         if (owner != null
                 && context.getPackageName().contentEquals(owner)
                 && resourceId != null
-                && resourceId.toString().endsWith(":id/button1")
+                && tag.contentEquals(resourceId)
                 && node.isClickable()
                 && node.isEnabled()) return node;
         for (int i = 0; i < node.getChildCount(); i++) {
-            AccessibilityNodeInfo found = findDialogPositive(node.getChild(i));
+            AccessibilityNodeInfo found = findDialogAction(node.getChild(i), tag);
             if (found != null) return found;
         }
         return null;
@@ -765,13 +792,15 @@ final class RenderedUi {
         CharSequence resourceId = node.getViewIdResourceName();
         String id = resourceId == null ? "" : resourceId.toString();
         String control =
-                id.endsWith(":id/button1")
-                        ? "button1"
-                        : id.endsWith(":id/button2")
-                                ? "button2"
-                                : id.endsWith(":id/button3")
-                                        ? "button3"
-                                        : knownPermissionControl(id);
+                id.equals("calltrack_dialog_confirm") || id.equals("calltrack_dialog_cancel")
+                        ? id
+                        : id.endsWith(":id/button1")
+                                ? "button1"
+                                : id.endsWith(":id/button2")
+                                        ? "button2"
+                                        : id.endsWith(":id/button3")
+                                                ? "button3"
+                                                : knownPermissionControl(id);
         boolean appOwner =
                 packageName != null && context.getPackageName().contentEquals(packageName);
         boolean permissionOwner = packageName != null && permissionPackage(packageName.toString());
@@ -1057,7 +1086,7 @@ final class RenderedUi {
                 .append(" focused=")
                 .append(node.isFocused())
                 .append(" checked=")
-                .append(node.getChecked() == AccessibilityNodeInfo.CHECKED_STATE_TRUE)
+                .append(node.getChecked())
                 .append(' ')
                 .append(bounds)
                 .append(' ')

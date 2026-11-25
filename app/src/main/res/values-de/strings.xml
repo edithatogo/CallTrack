@@ -1,15 +1,28 @@
 <resources>
-    <string name="app_name">CallTrack Community (dev)</string>
+    <string name="navigate_up">Zurück</string>
+    <string name="calendar_picker_expanded">Ausgeklappt</string>
+    <string name="calendar_picker_collapsed">Eingeklappt</string>
 
     <string name="auto_open">Einstellungen zur automatischen Protokollierung</string>
-    <string name="auto_intro">Wähle Kalender für jede Anrufquelle und die gewünschten Anrufarten. Anwenden startet einen neuen Protokollierungszeitraum. Kalenderanbieter können Termine mit ihren Konten synchronisieren. Der Zugriff auf den Telefonstatus ermöglicht Prüfungen nach Telefonanrufen. Geteilte App-Anrufe werden regelmäßig geprüft.</string>
+    <string name="auto_title">Automatische Protokollierung</string>
+    <string name="auto_intro">Wähle Kalender für jede Anrufquelle. Kalenderanbieter können gespeicherte Termine synchronisieren. Der Zugriff auf den Telefonstatus ermöglicht Prüfungen nach Telefonanrufen. Geteilte App-Anrufe werden regelmäßig geprüft.</string>
     <string name="auto_access">Zugriff auf Anrufe und Kalender erlauben</string>
+    <string name="auto_source_heading">Anrufquelle</string>
+    <string name="auto_calendars_heading">Kalender für diese Quelle</string>
+    <string name="auto_phone_calendars_heading">Kalender für Telefonanrufe</string>
+    <string name="auto_choose_calendars">Kalender auswählen</string>
+    <string name="auto_types_heading">Anrufarten für alle Kalender</string>
+    <plurals name="calendar_selection_count">
+        <item quantity="one">%1$d Kalender ausgewählt</item>
+        <item quantity="other">%1$d Kalender ausgewählt</item>
+    </plurals>
     <string name="auto_incoming">Eingehende Anrufe</string>
     <string name="auto_outgoing">Ausgehende Anrufe</string>
     <string name="auto_missed">Verpasste Anrufe</string>
-    <string name="auto_enable">Ab jetzt aktivieren / anwenden</string>
+    <string name="auto_enable">Ab jetzt anwenden</string>
     <string name="auto_pause">Automatische Protokollierung pausieren</string>
-    <string name="auto_confirm">Neue Anrufe in den unten aufgeführten Kalendern protokollieren? Die gewählten Anrufarten gelten für alle Kalender. Öffne diese Ansicht erneut, um eine Hintergrundprüfung anzufordern.</string>
+    <string name="auto_confirm">Neue Anrufe in diesen Kalendern protokollieren? Öffne diese Ansicht erneut, um eine Hintergrundprüfung anzufordern.</string>
+    <string name="auto_confirm_types">Anrufarten für alle Kalender — %1$s</string>
     <string name="auto_enabled_routes">Automatische Protokollierung ist aktiv\n%1$s</string>
     <string name="auto_source_phone">Telefonanrufe</string>
     <string name="auto_source_observed">%1$s — geteilte Anrufe gefunden</string>
@@ -33,14 +46,17 @@
     <string name="auto_unknown">Der Status des letzten Versuchs ist nicht verfügbar. Aktualisiere den Status oder fordere eine Wiederherstellung an.</string>
 
     <string name="import_open">Historische Importe</string>
-    <string name="import_intro">Prüfe einen historischen Zeitraum vor dem Import. Datumsangaben verwenden %1$s und das Format YYYY-MM-DD. Das Enddatum ist ausgeschlossen. Die Vorschau schreibt keine Termine. Beim Schließen oder Anhalten bleibt die gespeicherte Sitzung zur Fortsetzung erhalten.</string>
-    <string name="import_from">Startdatum (einschließlich, YYYY-MM-DD)</string>
-    <string name="import_to">Enddatum (ausschließlich, YYYY-MM-DD)</string>
+    <string name="import_intro">Prüfe frühere Anrufe, bevor du sie einem Kalender hinzufügst. Datumsangaben verwenden %1$s und das Format YYYY-MM-DD. Eine gespeicherte Sitzung lässt sich nach dem Schließen oder Anhalten fortsetzen.</string>
+    <string name="import_from">Startdatum (einschließlich)</string>
+    <string name="import_to">Enddatum (ausschließlich)</string>
     <string name="import_create">Schreibgeschützte Vorschau erstellen</string>
     <string name="import_none">Keine Importsitzung ausgewählt.</string>
     <string name="import_continue">Ausgewählte Vorschau / Import fortsetzen</string>
     <string name="import_confirm">Historischen Import bestätigen</string>
-    <string name="import_confirm_text">Die festgelegte Menge von %1$d Anrufen in %2$s importieren? Zeitraum: %3$s. Aktuelle Anrufdaten werden vor dem Schreiben geprüft. Geänderte oder gelöschte Termine werden nicht automatisch neu erstellt. Einige Einträge müssen möglicherweise geprüft werden.</string>
+    <plurals name="import_confirm_text">
+        <item quantity="one">Den festgelegten Datensatz mit %1$d Anruf in %2$s importieren? Zeitraum %3$s. Aktuelle Anrufdaten werden vor dem Schreiben geprüft. Geänderte oder gelöschte Termine werden nicht automatisch neu erstellt. Dieser Eintrag muss möglicherweise geprüft werden.</item>
+        <item quantity="other">Die festgelegte Menge von %1$d Anrufen in %2$s importieren? Zeitraum %3$s. Aktuelle Anrufdaten werden vor dem Schreiben geprüft. Geänderte oder gelöschte Termine werden nicht automatisch neu erstellt. Einige Einträge müssen möglicherweise geprüft werden.</item>
+    </plurals>
     <string name="import_stop">Diesen Lauf anhalten; Sitzung behalten</string>
     <string name="import_stopping">Der Lauf wird am nächsten sicheren Punkt angehalten. Die Sitzung kann später fortgesetzt werden.</string>
     <string name="import_cancel">Verbleibende Vorgänge abbrechen</string>
@@ -64,6 +80,9 @@
     <string name="auto_status_summary">%1$s\n%2$s</string>
     <string name="import_history_item">%1$s — %2$s</string>
     <string name="recovery_open">Übertragungen prüfen und wiederherstellen</string>
+    <string name="recovery_title">Übertragungen prüfen</string>
+    <string name="recovery_records_heading">Übertragungsnachweise</string>
+    <string name="recovery_retention_heading">Datenaufbewahrung</string>
     <string name="recovery_intro">Prüfe gespeicherte Übertragungsnachweise aller Kalender. Zeiten verwenden die aktuelle Gerätezeitzone. Die Prüfung liest nur bestehende Termine und erstellt oder ändert keine. Das Unterdrücken stoppt Wiederholungen und entfernt ausstehende persönliche Nutzdaten; der Duplikatschutz bleibt erhalten. Termine bleiben unverändert. Eine neue Einfügefreigabe ist eine getrennte, ausdrücklich bestätigte Aktion für noch nicht versuchte Vorgänge.</string>
     <string name="recovery_access">Lesezugriff auf Kalender erlauben</string>
     <string name="recovery_refresh">Aktuelle Nachweise aktualisieren</string>
@@ -74,7 +93,10 @@
     <string name="recovery_empty">Keine Übertragungsnachweise verfügbar.</string>
     <string name="recovery_source_unknown">Frühere Quelldetails nicht verfügbar</string>
     <string name="recovery_call">Anruf</string>
-    <string name="recovery_source">%1$s — %2$s; tatsächliche Dauer: %3$d Sekunden</string>
+    <plurals name="recovery_source">
+        <item quantity="one">%1$s — %2$s. Tatsächliche Dauer %3$d Sekunde.</item>
+        <item quantity="other">%1$s — %2$s. Tatsächliche Dauer %3$d Sekunden.</item>
+    </plurals>
     <string name="recovery_item">%1$s\nKalender: %2$s\n%3$s</string>
     <string name="recovery_check">Nur bestehende Wirkung prüfen</string>
     <string name="recovery_suppress">Weitere Wiederholungen unterdrücken</string>
@@ -108,5 +130,8 @@
     <string name="recovery_expired">Ausstehende Nutzdaten abgelaufen — kein Einfügeversuch</string>
     <string name="retention_policy">Ausstehende persönliche Termindaten laufen sieben Tage nach der Speicherung ab. Die Prüfung erfolgt beim Zugriff und in begrenzten Wartungsläufen. Bestehende Daten unbekannten Alters erhalten sieben Tage ab der Migration. Das Datum des Anrufs bestimmt dieses Alter nicht. IDs, Hashwerte, Quelldaten und Termine bleiben erhalten. Noch nicht versuchte abgelaufene Vorgänge benötigen einen bestätigten Import zum erneuten Lesen der Quelle und werden nie automatisch eingefügt. Offline oder inaktive Apps können die Bereinigung bis zur nächsten Prüfung verzögern.</string>
     <string name="retention_run">Abgelaufene ausstehende Nutzdaten jetzt entfernen</string>
-    <string name="retention_result">%1$d abgelaufene Nutzdatensätze in diesem Lauf entfernt. Weitere können verbleiben. Nachweismetadaten und Termine bleiben erhalten.</string>
+    <plurals name="retention_result">
+        <item quantity="one">%1$d abgelaufener Nutzdatensatz in diesem Lauf entfernt. Weitere können verbleiben. Nachweismetadaten und Termine bleiben erhalten.</item>
+        <item quantity="other">%1$d abgelaufene Nutzdatensätze in diesem Lauf entfernt. Weitere können verbleiben. Nachweismetadaten und Termine bleiben erhalten.</item>
+    </plurals>
 </resources>

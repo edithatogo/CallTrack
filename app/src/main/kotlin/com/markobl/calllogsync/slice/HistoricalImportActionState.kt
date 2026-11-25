@@ -2,6 +2,7 @@ package com.markobl.calllogsync.slice
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,8 @@ internal data class HistoricalImportActionState(
     val cancelEnabled: Boolean = false,
     val newerEnabled: Boolean = false,
     val olderEnabled: Boolean = false,
+    val hasRequiredAccess: Boolean = false,
+    val sessionSelected: Boolean = false,
 )
 
 @Composable
@@ -33,6 +36,12 @@ internal fun HistoricalImportCreateActionPanel(
             tag = "import_create",
             enabled = state.createEnabled,
             onClick = onCreate,
+            style =
+                if (state.confirmEnabled || state.continueEnabled) {
+                    ButtonStyle.Outlined
+                } else {
+                    ButtonStyle.Filled
+                },
         )
     }
 }
@@ -56,10 +65,34 @@ internal fun HistoricalImportRunActionsPanel(
             },
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        ActionButton(continueLabel, "import_continue", state.continueEnabled, onContinue)
-        ActionButton(confirmLabel, "import_confirm", state.confirmEnabled, onConfirm)
-        ActionButton(stopLabel, "import_stop", state.stopEnabled, onStop)
-        ActionButton(cancelLabel, "import_cancel", state.cancelEnabled, onCancel)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            ActionButton(
+                confirmLabel,
+                "import_confirm",
+                state.confirmEnabled,
+                onConfirm,
+                if (state.confirmEnabled) ButtonStyle.Filled else ButtonStyle.Outlined,
+            )
+            ActionButton(
+                continueLabel,
+                "import_continue",
+                state.continueEnabled,
+                onContinue,
+                if (state.continueEnabled && !state.confirmEnabled) {
+                    ButtonStyle.Filled
+                } else {
+                    ButtonStyle.Outlined
+                },
+            )
+            ActionButton(stopLabel, "import_stop", state.stopEnabled, onStop, ButtonStyle.Outlined)
+            ActionButton(
+                cancelLabel,
+                "import_cancel",
+                state.cancelEnabled,
+                onCancel,
+                ButtonStyle.Text,
+            )
+        }
     }
 }
 
@@ -79,10 +112,10 @@ internal fun HistoricalImportPaginationPanel(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         androidx.compose.foundation.layout.Box(Modifier.weight(1f)) {
-            ActionButton(newerLabel, "import_newer", state.newerEnabled, onNewer)
+            ActionButton(newerLabel, "import_newer", state.newerEnabled, onNewer, ButtonStyle.Text)
         }
         androidx.compose.foundation.layout.Box(Modifier.weight(1f)) {
-            ActionButton(olderLabel, "import_older", state.olderEnabled, onOlder)
+            ActionButton(olderLabel, "import_older", state.olderEnabled, onOlder, ButtonStyle.Text)
         }
     }
 }

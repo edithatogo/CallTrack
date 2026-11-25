@@ -1,0 +1,329 @@
+{
+  "scope": "Compare runtime inventory with fresh canonical HTTPS repository downloads.\n\nRepository byte agreement and POM declarations are evidence, not legal clearance,\nindependent signatures, build-plugin verification or a complete SBOM.\n",
+  "inventory_sha256": "a8eaf72b0a3eab84370d2a4c458c010266b87ac287e2bccc7b6f79f55dc7fccc",
+  "resolved_rows": 12,
+  "unique_artifacts": 12,
+  "artifacts": [
+    {
+      "coordinate": "com.google.dagger:hilt-android:2.60.1",
+      "name": "hilt-android-2.60.1.aar",
+      "sha256": "2f56128cb843697a683bacd697c1bb18e93c9f87be835922ad1c192c1786f177",
+      "artifact_url": "https://repo.maven.apache.org/maven2/com/google/dagger/hilt-android/2.60.1/hilt-android-2.60.1.aar",
+      "artifact_sha256": "2f56128cb843697a683bacd697c1bb18e93c9f87be835922ad1c192c1786f177",
+      "repository_bytes_match": true,
+      "embedded_notices": [],
+      "pom_url": "https://repo.maven.apache.org/maven2/com/google/dagger/hilt-android/2.60.1/hilt-android-2.60.1.pom",
+      "pom_sha256": "c450ae8df138c7cc430b80e20bb232f4548635e3665a8fed80f27dbb8a205c80",
+      "declared_licences": [
+        {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": ""
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": ""
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.fragment:fragment:1.5.1",
+      "name": "fragment-1.5.1.aar",
+      "sha256": "82b04780eda21b0a5eea02475415887a1cadfb368b371221aeb40703c067f338",
+      "artifact_url": "https://dl.google.com/dl/android/maven2/androidx/fragment/fragment/1.5.1/fragment-1.5.1.aar",
+      "artifact_sha256": "82b04780eda21b0a5eea02475415887a1cadfb368b371221aeb40703c067f338",
+      "repository_bytes_match": true,
+      "embedded_notices": [],
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/fragment/fragment/1.5.1/fragment-1.5.1.pom",
+      "pom_sha256": "7cb14fb27be5c8a140de416812f408a870a074f65ae2ad3f232d3d4b96df7b5a",
+      "declared_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.loader:loader:1.0.0",
+      "name": "loader-1.0.0.aar",
+      "sha256": "11f735cb3b55c458d470bed9e25254375b518b4b1bad6926783a7026db0f5025",
+      "artifact_url": "https://dl.google.com/dl/android/maven2/androidx/loader/loader/1.0.0/loader-1.0.0.aar",
+      "artifact_sha256": "11f735cb3b55c458d470bed9e25254375b518b4b1bad6926783a7026db0f5025",
+      "repository_bytes_match": true,
+      "embedded_notices": [],
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/loader/loader/1.0.0/loader-1.0.0.pom",
+      "pom_sha256": "c978d550808b47434aa49a63164110a50b55b0bcc6160a93a2e37d5110df8c5e",
+      "declared_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.viewpager:viewpager:1.0.0",
+      "name": "viewpager-1.0.0.aar",
+      "sha256": "147af4e14a1984010d8f155e5e19d781f03c1d70dfed02a8e0d18428b8fc8682",
+      "artifact_url": "https://dl.google.com/dl/android/maven2/androidx/viewpager/viewpager/1.0.0/viewpager-1.0.0.aar",
+      "artifact_sha256": "147af4e14a1984010d8f155e5e19d781f03c1d70dfed02a8e0d18428b8fc8682",
+      "repository_bytes_match": true,
+      "embedded_notices": [],
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/viewpager/viewpager/1.0.0/viewpager-1.0.0.pom",
+      "pom_sha256": "1f72f836339d03c6eb013f65075e76ca87075a577578eb4f95f74a3a5d253128",
+      "declared_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.customview:customview:1.0.0",
+      "name": "customview-1.0.0.aar",
+      "sha256": "20e5b8f6526a34595a604f56718da81167c0b40a7a94a57daa355663f2594df2",
+      "artifact_url": "https://dl.google.com/dl/android/maven2/androidx/customview/customview/1.0.0/customview-1.0.0.aar",
+      "artifact_sha256": "20e5b8f6526a34595a604f56718da81167c0b40a7a94a57daa355663f2594df2",
+      "repository_bytes_match": true,
+      "embedded_notices": [],
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/customview/customview/1.0.0/customview-1.0.0.pom",
+      "pom_sha256": "ce9e47b87184f5bd5e139e9becd5b26476d42d78c31bf2fdedc37acb41b9ad49",
+      "declared_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel:2.11.1",
+      "name": "lifecycle-viewmodel-2.11.1.aar",
+      "sha256": "4b809cf9eb7323d200504e95921feb777ff080215cadb8237742d5ed0ba5b792",
+      "artifact_url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel/2.11.1/lifecycle-viewmodel-2.11.1.aar",
+      "artifact_sha256": "4b809cf9eb7323d200504e95921feb777ff080215cadb8237742d5ed0ba5b792",
+      "repository_bytes_match": true,
+      "embedded_notices": [
+        {
+          "path": "META-INF/androidx/lifecycle/lifecycle-viewmodel/LICENSE.txt",
+          "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+          "size": 10175
+        }
+      ],
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel/2.11.1/lifecycle-viewmodel-2.11.1.pom",
+      "pom_sha256": "49889a7b5c09358ecb8278974518bec11e4fcbe7849645ffa4bde0df53641bb7",
+      "declared_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.dagger:hilt-core:2.60.1",
+      "name": "hilt-core-2.60.1.jar",
+      "sha256": "a1be36be762a86450e2a9dca97a8554a3252caaf236fdd9bf9fca7636926d2c6",
+      "artifact_url": "https://repo.maven.apache.org/maven2/com/google/dagger/hilt-core/2.60.1/hilt-core-2.60.1.jar",
+      "artifact_sha256": "a1be36be762a86450e2a9dca97a8554a3252caaf236fdd9bf9fca7636926d2c6",
+      "repository_bytes_match": true,
+      "embedded_notices": [],
+      "pom_url": "https://repo.maven.apache.org/maven2/com/google/dagger/hilt-core/2.60.1/hilt-core-2.60.1.pom",
+      "pom_sha256": "3b70e349215dfc2a0e6b6854076b82eaa089a9896a543ca2fa0f559d9fe26df8",
+      "declared_licences": [
+        {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": ""
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": ""
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.dagger:dagger:2.60.1",
+      "name": "dagger-2.60.1.jar",
+      "sha256": "b012d0df527b51bfcd8953d5fcb4d022a45ebe66010d6f181ede68d1572b5cb2",
+      "artifact_url": "https://repo.maven.apache.org/maven2/com/google/dagger/dagger/2.60.1/dagger-2.60.1.jar",
+      "artifact_sha256": "b012d0df527b51bfcd8953d5fcb4d022a45ebe66010d6f181ede68d1572b5cb2",
+      "repository_bytes_match": true,
+      "embedded_notices": [],
+      "pom_url": "https://repo.maven.apache.org/maven2/com/google/dagger/dagger/2.60.1/dagger-2.60.1.pom",
+      "pom_sha256": "480863eac1ed459454773692d57c24b9591ccc9843fbac8c7a7043b7b58993a1",
+      "declared_licences": [
+        {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": ""
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": ""
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.dagger:dagger-lint-aar:2.60.1",
+      "name": "dagger-lint-aar-2.60.1.aar",
+      "sha256": "353d67061603769702b0e53175af1bf62ca58596c9fb1bfbf13ea9fbda76caba",
+      "artifact_url": "https://repo.maven.apache.org/maven2/com/google/dagger/dagger-lint-aar/2.60.1/dagger-lint-aar-2.60.1.aar",
+      "artifact_sha256": "353d67061603769702b0e53175af1bf62ca58596c9fb1bfbf13ea9fbda76caba",
+      "repository_bytes_match": true,
+      "embedded_notices": [],
+      "pom_url": "https://repo.maven.apache.org/maven2/com/google/dagger/dagger-lint-aar/2.60.1/dagger-lint-aar-2.60.1.pom",
+      "pom_sha256": "a61fa6241933ab93ab0b04ccd6d4907a895b07fdc24c38e6194e4c5c6870626a",
+      "declared_licences": [
+        {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": ""
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": ""
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.code.findbugs:jsr305:3.0.2",
+      "name": "jsr305-3.0.2.jar",
+      "sha256": "766ad2a0783f2687962c8ad74ceecc38a28b9f72a2d085ee438b7813e928d0c7",
+      "artifact_url": "https://repo.maven.apache.org/maven2/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar",
+      "artifact_sha256": "766ad2a0783f2687962c8ad74ceecc38a28b9f72a2d085ee438b7813e928d0c7",
+      "repository_bytes_match": true,
+      "embedded_notices": [],
+      "pom_url": "https://repo.maven.apache.org/maven2/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.pom",
+      "pom_sha256": "19889dbdf1b254b2601a5ee645b8147a974644882297684c798afe5d63d78dfe",
+      "declared_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "javax.inject:javax.inject:1",
+      "name": "javax.inject-1.jar",
+      "sha256": "91c77044a50c481636c32d916fd89c9118a72195390452c81065080f957de7ff",
+      "artifact_url": "https://repo.maven.apache.org/maven2/javax/inject/javax.inject/1/javax.inject-1.jar",
+      "artifact_sha256": "91c77044a50c481636c32d916fd89c9118a72195390452c81065080f957de7ff",
+      "repository_bytes_match": true,
+      "embedded_notices": [],
+      "pom_url": "https://repo.maven.apache.org/maven2/javax/inject/javax.inject/1/javax.inject-1.pom",
+      "pom_sha256": "943e12b100627804638fa285805a0ab788a680266531e650921ebfe4621a8bfa",
+      "declared_licences": [],
+      "parent_pom_evidence": [],
+      "effective_licences": []
+    },
+    {
+      "coordinate": "jakarta.inject:jakarta.inject-api:2.0.1",
+      "name": "jakarta.inject-api-2.0.1.jar",
+      "sha256": "f7dc98062fccf14126abb751b64fab12c312566e8cbdc8483598bffcea93af7c",
+      "artifact_url": "https://repo.maven.apache.org/maven2/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar",
+      "artifact_sha256": "f7dc98062fccf14126abb751b64fab12c312566e8cbdc8483598bffcea93af7c",
+      "repository_bytes_match": true,
+      "embedded_notices": [
+        {
+          "path": "META-INF/LICENSE.txt",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "size": 11358
+        },
+        {
+          "path": "META-INF/NOTICE.md",
+          "sha256": "992ed62dd3ee17d73ce6a4a5e02dd0fed9eb326bf386aa5304e6a512214df540",
+          "size": 1074
+        }
+      ],
+      "pom_url": "https://repo.maven.apache.org/maven2/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.pom",
+      "pom_sha256": "e7fd7232e96307a575b2494c9367d68cf43ec98244aace3ccc23e1773ffa6fda",
+      "declared_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    }
+  ],
+  "all_repository_bytes_match": true,
+  "licence_clearance": false,
+  "build_tool_trust": false,
+  "release_ready": false
+}
