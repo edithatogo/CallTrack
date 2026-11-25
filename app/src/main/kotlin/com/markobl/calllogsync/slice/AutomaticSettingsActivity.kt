@@ -200,20 +200,35 @@ private class AutomaticSettingsState(
             onPause = { change { AutomaticScheduling.pause(activity.applicationContext) } },
             onRefresh = { load(false) },
         )
-        SettingsForm(onRequestAccess)
-        SettingsActions(onOpenImports, onOpenRecovery)
+        SettingsForm(onRequestAccess, onOpenImports, onOpenRecovery)
+        AutomaticApplyButton(
+            state = actionsUiState,
+            label = activity.getString(R.string.auto_enable),
+            onApply = ::confirmEnable,
+        )
         AutomaticStatusDetails(status)
         confirmation?.let { ConfirmationDialog(it) { confirmation = null } }
     }
 
     @Composable
-    private fun SettingsForm(onRequestAccess: () -> Unit) {
+    private fun SettingsForm(
+        onRequestAccess: () -> Unit,
+        onOpenImports: () -> Unit,
+        onOpenRecovery: () -> Unit,
+    ) {
         AutomaticSettingsIntroPanel(text = activity.getString(R.string.auto_intro))
         AutomaticSettingsAccessPanel(
             label = activity.getString(R.string.auto_access),
             hasRequiredAccess = hasRequiredAccess,
             onRequestAccess = onRequestAccess,
         )
+        AutomaticSettingsNavigationPanel(
+            importLabel = activity.getString(R.string.import_open),
+            recoveryLabel = activity.getString(R.string.recovery_open),
+            onOpenImports = onOpenImports,
+            onOpenRecovery = onOpenRecovery,
+        )
+        HorizontalDivider()
         if (sourceUiState.options.size > 1) {
             SectionHeading(stringResource(R.string.auto_source_heading))
             CalendarDestinationPicker(
@@ -269,22 +284,6 @@ private class AutomaticSettingsState(
                 onSelect = ::toggleDestination,
             )
         }
-    }
-
-    @Composable
-    private fun SettingsActions(onOpenImports: () -> Unit, onOpenRecovery: () -> Unit) {
-        AutomaticApplyButton(
-            state = actionsUiState,
-            label = activity.getString(R.string.auto_enable),
-            onApply = ::confirmEnable,
-        )
-        HorizontalDivider()
-        AutomaticSettingsNavigationPanel(
-            importLabel = activity.getString(R.string.import_open),
-            recoveryLabel = activity.getString(R.string.recovery_open),
-            onOpenImports = onOpenImports,
-            onOpenRecovery = onOpenRecovery,
-        )
     }
 
     fun resume() {

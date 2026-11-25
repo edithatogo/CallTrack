@@ -96,7 +96,8 @@ def native_failure_summary(method, output, declared_permissions=None):
         if (frame.startswith('at com.markobl.calllogsync.slice.')
                 and re.search(
                     r'(?:(?:PositiveUiTest|ImportUiTest|RecoveryUiTest|ParityProviderTest|RenderedUi)\.java|'
-                    r'(?:ManualCalendarScreenTest|AdaptiveCallTrackScreenTest)\.kt):\d+',
+                    r'(?:ManualCalendarScreenTest|AdaptiveCallTrackScreenTest|'
+                    r'HistoricalImport(?:Destination|Filters)PanelTest)\.kt):\d+',
                     frame,
                 )):
             frames.append(frame)
@@ -724,6 +725,8 @@ def qualify(serial, suite="settings", receipt_dir=None):
             check('runActionsRequireEnabledStateAndExplicitTaps',
                   'com.markobl.calllogsync.slice.HistoricalImportActionsPanelTest')
             check('destinationListIsPresentedAndOnlyExplicitSelectionReturnsOpaqueToken',
+                  'com.markobl.calllogsync.slice.HistoricalImportDestinationPanelTest')
+            check('keyboardSelectionRestoresPickerFocusWhenSaveFinishes',
                   'com.markobl.calllogsync.slice.HistoricalImportDestinationPanelTest')
             check('dateAndCallTypeFiltersEmitOnlyExplicitUserChanges',
                   'com.markobl.calllogsync.slice.HistoricalImportFiltersPanelTest')
