@@ -8,6 +8,10 @@ on:
       expected_apk_sha256:
         description: Expected unsigned macOS APK SHA256
         required: true
+      expected_jvm_test_count:
+        description: Release JVM test count observed in both macOS builds
+        type: number
+        required: true
 permissions:
   contents: read
 cache-mode: none
@@ -71,12 +75,14 @@ jobs:
         env:
           CANDIDATE_SHA: ${{ inputs.candidate_sha }}
           EXPECTED_APK_SHA256: ${{ inputs.expected_apk_sha256 }}
+          EXPECTED_JVM_TEST_COUNT: ${{ inputs.expected_jvm_test_count }}
         run: |
           "$CALLTRACK_PYTHON" qualification-tools/scripts/qualify_linux_build.py \
             --source "$GITHUB_WORKSPACE/candidate" \
             --output "$RUNNER_TEMP/calltrack-cold-linux" \
             --expected-revision "$CANDIDATE_SHA" \
-            --expected-apk-sha256 "$EXPECTED_APK_SHA256"
+            --expected-apk-sha256 "$EXPECTED_APK_SHA256" \
+            --expected-jvm-test-count "$EXPECTED_JVM_TEST_COUNT"
       - name: Retain unsigned artifact and evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

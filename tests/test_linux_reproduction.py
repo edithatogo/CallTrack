@@ -135,7 +135,7 @@ class LinuxBoundaries(unittest.TestCase):
             with patch.object(linux.platform, 'system', return_value='Linux'), \
                  patch.object(linux.subprocess, 'check_output', side_effect=calls):
                 with self.assertRaisesRegex(ValueError, 'JDK25 required'):
-                    linux.run(source, output, revision, '0' * 64)
+                    linux.run(source, output, revision, '0' * 64, 119)
             receipt = json.loads((output / 'evidence/receipt.json').read_text())
             helper = Path(linux.__file__).with_name('redirect_validation.py')
             self.assertEqual(hashlib.sha256(helper.read_bytes()).hexdigest(), receipt['redirect_policy_sha256'])
@@ -178,16 +178,17 @@ class LinuxBoundaries(unittest.TestCase):
                      patch.object(linux, 'extract_sdk'), \
                      patch.object(linux, 'install_minor_platform_metadata', return_value={}), \
                      patch.object(linux, 'junit_counts', return_value={
-                         'tests':118 if name == 'missing-jvm-test' else 119,
+                         'tests':119 if name == 'missing-jvm-test' else 120,
                          'failures':0, 'errors':0, 'skipped':0}), \
                      contextlib.redirect_stdout(io.StringIO()):
                     if error_type:
                         with self.assertRaisesRegex(error_type, message):
-                            linux.run(source, root / 'output', revision, apk_hash)
+                            linux.run(source, root / 'output', revision, apk_hash, 120)
                     else:
-                        self.assertTrue(linux.run(source, root / 'output', revision, apk_hash)['success'])
+                        self.assertTrue(linux.run(source, root / 'output', revision, apk_hash, 120)['success'])
                 receipt = json.loads((root / 'output/evidence/receipt.json').read_text())
                 self.assertEqual(xml_hash, receipt['xml_policy_sha256'])
+                self.assertEqual(120, receipt['expected_jvm_test_count'])
                 self.assertEqual(error_type is None, receipt['success'])
                 if name == 'lint-error':
                     self.assertEqual({'Error': 1}, receipt['lint'])
@@ -204,7 +205,11 @@ class LinuxBoundaries(unittest.TestCase):
             with patch.object(linux.platform, 'system', return_value='Linux'), \
                  patch.object(linux.subprocess, 'check_output', side_effect=calls):
                 with self.assertRaisesRegex(ValueError, 'JDK25 required'):
-                    linux.run(source, root / 'output', revision, '0' * 64)
+                    linux.run(source, root / 'output', revision, '0' * 64, 119)
             receipt = json.loads((root / 'output/evidence/receipt.json').read_text())
             self.assertFalse(receipt['success'])
             self.assertEqual('JDK25 required', receipt['error'])
+
+    def test_release_test_count_preserves_minimum_coverage(self):
+        with self.assertRaisesRegex(ValueError, 'Expected at least 119 release JVM tests'):
+            linux.run(Path('source'), Path('output'), 'a' * 40, '0' * 64, 118)
