@@ -409,16 +409,11 @@ final class RenderedUi {
         final AccessibilityNodeInfo[] reachable = new AccessibilityNodeInfo[1];
         await(
                 () -> {
-                    Rect keyboard = keyboardBounds();
-                    if (keyboard == null) return false;
-                    AccessibilityNodeInfo node = find(id, true);
-                    if (node != null && node.isEnabled() && touchPointIsVisible(node)) {
-                        Rect control = new Rect();
-                        node.getBoundsInScreen(control);
-                        if (!control.isEmpty() && !Rect.intersects(control, keyboard)) {
-                            reachable[0] = node;
-                            return true;
-                        }
+                    if (!keyboardVisible()) return false;
+                    if (controlAboveKeyboard(id) != null) {
+                        settle();
+                        reachable[0] = controlAboveKeyboard(id);
+                        if (reachable[0] != null) return true;
                     }
                     AccessibilityNodeInfo scroll = scrollable(automation.getRootInActiveWindow());
                     if (scroll != null
@@ -429,6 +424,16 @@ final class RenderedUi {
                 },
                 "Control not reachable above the visible keyboard: " + id);
         touch(reachable[0], id);
+    }
+
+    private AccessibilityNodeInfo controlAboveKeyboard(String id) {
+        Rect keyboard = keyboardBounds();
+        if (keyboard == null) return null;
+        AccessibilityNodeInfo node = find(id, true);
+        if (node == null || !node.isEnabled() || !touchPointIsVisible(node)) return null;
+        Rect control = new Rect();
+        node.getBoundsInScreen(control);
+        return !control.isEmpty() && !Rect.intersects(control, keyboard) ? node : null;
     }
 
     void dismissKeyboard() {
