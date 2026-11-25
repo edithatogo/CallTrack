@@ -174,11 +174,9 @@ constructor(@param:ApplicationContext private val context: Context) : ViewModel(
         if (pending.review !== review) return
         pendingReview = null
         publish()
+        if (!confirmed || busy) return
         if (
-            confirmed &&
-                !busy &&
-                approvalSession === pending.session &&
-                visibleRecords[pending.token] === pending.record
+            approvalSession === pending.session && visibleRecords[pending.token] === pending.record
         ) {
             pending.confirm()
         }
