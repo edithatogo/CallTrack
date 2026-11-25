@@ -700,6 +700,10 @@ def qualify(serial, suite="settings", receipt_dir=None):
                   'com.markobl.calllogsync.slice.HistoricalImportActionsPanelTest')
             check('destinationListIsPresentedAndOnlyExplicitSelectionReturnsOpaqueToken',
                   'com.markobl.calllogsync.slice.HistoricalImportDestinationPanelTest')
+            check('dateAndCallTypeFiltersEmitOnlyExplicitUserChanges',
+                  'com.markobl.calllogsync.slice.HistoricalImportFiltersPanelTest')
+            check('controlsRemainAccessibleWithLargeFontAndRightToLeftLayout',
+                  'com.markobl.calllogsync.slice.HistoricalImportFiltersPanelTest')
             check('prepareCalendarAndTaggedHistory')
             command('shell', 'pm', 'grant', PACKAGE, 'android.permission.READ_CALL_LOG')
             check('latestCallUsesNewestDateAndHighestIdOnTies')

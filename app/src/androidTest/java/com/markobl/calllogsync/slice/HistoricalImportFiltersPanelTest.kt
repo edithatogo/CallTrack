@@ -11,12 +11,12 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.junit4.v2.createComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -78,8 +78,9 @@ class HistoricalImportFiltersPanelTest {
             }
         }
 
-        compose.onNodeWithContentDescription("From date").assertIsDisplayed()
-        compose.onNodeWithContentDescription("To date").assertIsDisplayed()
+        val rendered = RenderedUi(InstrumentationRegistry.getInstrumentation())
+        assertEquals("From date", rendered.shown("import_from", true)?.hintText?.toString())
+        assertEquals("To date", rendered.shown("import_to", true)?.hintText?.toString())
         val outgoing = compose.onNodeWithTag("import_outgoing")
         outgoing.assertIsDisplayed().assertIsOn()
         val semantics = outgoing.fetchSemanticsNode()
