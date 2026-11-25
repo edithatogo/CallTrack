@@ -2,6 +2,7 @@ package com.markobl.calllogsync.slice;
 
 import static org.junit.Assert.*;
 
+import android.accessibilityservice.AccessibilityService;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.ContentUris;
@@ -303,6 +304,25 @@ public class ImportUiTest {
             ui.await(
                     () -> ui.find("calltrack_screen", true) != null,
                     "Import screen did not regain its active window after confirmation");
+            assertEquals(HistoricalImport.Phase.PREVIEW, latest().phase);
+            assertEquals(0, fixture.events(calendar()));
+            String previewId = latest().id;
+            ui.revealId("import_confirm");
+            ui.tapId("import_confirm");
+            ui.await(() -> ui.find("calltrack_dialog_confirm", true) != null, "Review missing");
+            CalendarSliceActivity importActivity = activity;
+            assertTrue(ui.automation.performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME));
+            ui.await(
+                    () -> !RenderedUi.isResumed(instrumentation, importActivity),
+                    "Import did not pause while the review was displayed");
+            ui.startActivity(CalendarSliceActivity.class);
+            ui.await(
+                    () ->
+                            RenderedUi.isResumed(instrumentation, importActivity)
+                                    && ui.find("import_summary_text", true) != null
+                                    && ui.find("calltrack_dialog_confirm", true) == null,
+                    "Import did not return to its preview with the review closed");
+            assertEquals(previewId, latest().id);
             assertEquals(HistoricalImport.Phase.PREVIEW, latest().phase);
             assertEquals(0, fixture.events(calendar()));
             // Dismissing the dialog can restore the end field and its keyboard.
