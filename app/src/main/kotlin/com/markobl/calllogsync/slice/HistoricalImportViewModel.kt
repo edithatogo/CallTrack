@@ -359,8 +359,11 @@ constructor(
             viewModelScope.launch(worker) {
                 try {
                     val loaded =
-                        if (calendarAccess()) AndroidCalendarSink(context).choices()
-                        else emptyList()
+                        if (calendarAccess()) {
+                            AndroidCalendarSink(context).choices()
+                        } else {
+                            emptyList()
+                        }
                     withContext(Dispatchers.Main.immediate) {
                         val preferred = selected
                         destinationTargets.clear()
@@ -380,9 +383,12 @@ constructor(
                         val message =
                             when {
                                 !calendarAccess() -> null
+
                                 preferred >= 0 && selected < 0 ->
                                     R.string.auto_destination_unavailable
+
                                 options.isEmpty() -> R.string.slice_no_calendars
+
                                 else -> null
                             }
                         form =
