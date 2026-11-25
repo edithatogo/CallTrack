@@ -34,7 +34,7 @@ original `META-INF/NOTICE.md`.
 | androidx.activity:activity-compose:1.13.0 | Apache-2.0 |
 | androidx.activity:activity-ktx:1.13.0 | Apache-2.0 |
 | androidx.activity:activity:1.13.0 | Apache-2.0 |
-| androidx.annotation:annotation-experimental:1.5.0 | Apache-2.0 |
+| androidx.annotation:annotation-experimental:1.5.1 | Apache-2.0 |
 | androidx.annotation:annotation-jvm:1.10.0 | Apache-2.0 |
 | androidx.arch.core:core-common:2.2.0 | Apache-2.0 |
 | androidx.arch.core:core-runtime:2.2.0 | Apache-2.0 |
@@ -45,6 +45,10 @@ original `META-INF/NOTICE.md`.
 | androidx.compose.animation:animation-core-android:1.13.0 | Apache-2.0 |
 | androidx.compose.foundation:foundation-android:1.13.0 | Apache-2.0 |
 | androidx.compose.foundation:foundation-layout-android:1.13.0 | Apache-2.0 |
+| androidx.compose.material3.adaptive:adaptive-android:1.3.0 | Apache-2.0 |
+| androidx.compose.material3.adaptive:adaptive-layout-android:1.3.0 | Apache-2.0 |
+| androidx.compose.material3.adaptive:adaptive-navigation-android:1.3.0 | Apache-2.0 |
+| androidx.compose.material3.adaptive:adaptive-navigation3-android:1.3.0 | Apache-2.0 |
 | androidx.compose.material3:material3-android:1.5.0 | Apache-2.0 |
 | androidx.compose.material3:material3-ripple-android:1.5.0 | Apache-2.0 |
 | androidx.compose.material:material-ripple-android:1.13.0 | Apache-2.0 |
@@ -136,12 +140,11 @@ original `META-INF/NOTICE.md`.
 
 The fork and original replacement vector artwork use GPLv3; upstream attribution
 is retained in NOTICE.md. See [asset provenance](ASSET_PROVENANCE.md) and
-[modification notices](MODIFICATIONS.md). The 77 runtime dependency source
-coordinates and hashes are in
-[the source inventory](qualification/release/runtime-sources.json). 9 published
-source archives contain metadata and licence text only; their runtime artifacts
-contain no JVM class entries. Retained notice entries include earlier audited
-origins as well as the current runtime graph.
+[modification notices](MODIFICATIONS.md). Retained notice entries include earlier
+audited origins and the current runtime dependencies. Metadata-only source
+archives correspond to runtime artifacts with zero JVM class entries.
+[Runtime source coordinates and hashes](../../../../../qualification/release/runtime-sources.json)
+
 The APK carries this notice, GPL/Apache texts and retained embedded notices under
 `assets/open_source/`. No original CallTrack APK material, upstream launcher bitmap,
 font, screenshot or store artwork is used in the current app.
