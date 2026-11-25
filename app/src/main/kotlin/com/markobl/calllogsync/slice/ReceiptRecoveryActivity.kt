@@ -78,8 +78,8 @@ internal fun ReceiptRecoveryScreen(activity: ComponentActivity) {
         state = page.navigation,
         previousLabel = stringResource(R.string.recovery_previous),
         moreLabel = stringResource(R.string.recovery_more),
-        onPrevious = model::previous,
-        onMore = model::more,
+        onPrevious = { model.navigateHistory(forward = false) },
+        onMore = { model.navigateHistory(forward = true) },
     )
     RecoveryRetention(page, model::expireOldPayloads)
 
@@ -89,8 +89,8 @@ internal fun ReceiptRecoveryScreen(activity: ComponentActivity) {
             title = stringResource(review.title),
             message = review.message,
             actionLabel = stringResource(review.actionLabel),
-            onConfirm = { model.confirmReview(review) },
-            onDismiss = { model.dismissReview(review) },
+            onConfirm = { model.resolveReview(review, confirmed = true) },
+            onDismiss = { model.resolveReview(review, confirmed = false) },
         )
     }
 }

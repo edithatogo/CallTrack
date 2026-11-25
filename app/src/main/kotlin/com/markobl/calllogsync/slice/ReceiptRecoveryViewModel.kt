@@ -81,7 +81,7 @@ constructor(@param:ApplicationContext private val context: Context) : ViewModel(
     fun setResumed(resumed: Boolean) {
         if (!resumed) {
             approvalSession = null
-            pendingReview?.let { dismissReview(it.review) }
+            pendingReview?.let { resolveReview(it.review, confirmed = false) }
             return
         }
         approvalSession = Any()
@@ -109,17 +109,15 @@ constructor(@param:ApplicationContext private val context: Context) : ViewModel(
     }
 
     @MainThread
-    fun previous() {
-        if (busy || approvalSession == null || back.isEmpty()) return
-        load(back.removeAt(back.lastIndex))
-    }
-
-    @MainThread
-    fun more() {
+    fun navigateHistory(forward: Boolean) {
         if (busy || approvalSession == null) return
-        val cursor = next ?: return
-        back.add(current)
-        load(cursor)
+        if (forward) {
+            val cursor = next ?: return
+            back.add(current)
+            load(cursor)
+        } else if (back.isNotEmpty()) {
+            load(back.removeAt(back.lastIndex))
+        }
     }
 
     @MainThread
@@ -171,24 +169,19 @@ constructor(@param:ApplicationContext private val context: Context) : ViewModel(
     }
 
     @MainThread
-    fun confirmReview(review: RecoveryReview) {
+    fun resolveReview(review: RecoveryReview, confirmed: Boolean) {
         val pending = pendingReview ?: return
         if (pending.review !== review) return
-        dismissReview(review)
+        pendingReview = null
+        publish()
         if (
-            !busy &&
+            confirmed &&
+                !busy &&
                 approvalSession === pending.session &&
                 visibleRecords[pending.token] === pending.record
         ) {
             pending.confirm()
         }
-    }
-
-    @MainThread
-    fun dismissReview(review: RecoveryReview) {
-        if (pendingReview?.review !== review) return
-        pendingReview = null
-        publish()
     }
 
     @MainThread
