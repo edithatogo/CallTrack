@@ -20,6 +20,7 @@
     </queries>
 
     <application
+        android:name=".slice.CallTrackApplication"
         android:allowBackup="false"
         android:fullBackupContent="@xml/slice_backup_rules"
         android:dataExtractionRules="@xml/slice_extraction_rules"

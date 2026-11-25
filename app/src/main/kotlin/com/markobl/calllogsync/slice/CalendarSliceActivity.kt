@@ -10,20 +10,13 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.markobl.calllogsync.R
+import dagger.hilt.android.AndroidEntryPoint
 
 /** Explicit manual action; any enabled automatic policy is controlled independently. */
+@AndroidEntryPoint
 class CalendarSliceActivity : ComponentActivity() {
-    private val model by
-        viewModels<ManualLoggingViewModel> {
-            viewModelFactory {
-                initializer {
-                    ManualLoggingViewModel(AndroidManualLoggingDataSource(applicationContext))
-                }
-            }
-        }
+    private val model by viewModels<ManualLoggingViewModel>()
 
     private val calendarPermissions =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {

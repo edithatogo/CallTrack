@@ -7,8 +7,10 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.markobl.calllogsync.R
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.IOException
 import java.util.UUID
+import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +37,10 @@ internal sealed interface ManualLoggingUiState {
     ) : ManualLoggingUiState
 }
 
-internal class ManualLoggingViewModel(private val data: ManualLoggingDataSource) : ViewModel() {
+@HiltViewModel
+internal class ManualLoggingViewModel
+@Inject
+constructor(private val data: ManualLoggingDataSource) : ViewModel() {
     private val state =
         MutableStateFlow<ManualLoggingUiState>(ManualLoggingUiState.PermissionRequired)
     val uiState =

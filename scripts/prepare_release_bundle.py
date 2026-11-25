@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 AUDITS = (
     'conductor/tracks/release_20261020/canonical-runtime-audit-20261124.json',
     'conductor/tracks/release_20261020/datastore-runtime-audit-20261125.json',
+    'conductor/tracks/release_20261020/hilt-runtime-audit-20261125.json',
 )
 SOURCES = 'qualification/release/runtime-sources.json'
 

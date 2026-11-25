@@ -3,7 +3,13 @@ package com.markobl.calllogsync.slice
 
 import android.content.Context
 import com.markobl.calllogsync.R
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.TimeZone
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -20,8 +26,9 @@ internal interface ManualLoggingDataSource {
     suspend fun maintain()
 }
 
-internal class AndroidManualLoggingDataSource(private val context: Context) :
-    ManualLoggingDataSource {
+internal class AndroidManualLoggingDataSource
+@Inject
+constructor(@ApplicationContext private val context: Context) : ManualLoggingDataSource {
     private val settings = AndroidSettingsStore(context)
 
     override suspend fun calendars(): ManualCalendars =
@@ -66,6 +73,12 @@ internal class AndroidManualLoggingDataSource(private val context: Context) :
             }
         }
     }
+}
+
+@Module
+@InstallIn(ViewModelComponent::class)
+internal interface ManualLoggingModule {
+    @Binds fun dataSource(source: AndroidManualLoggingDataSource): ManualLoggingDataSource
 }
 
 private const val FOREGROUND_RETENTION_BATCH = 50

@@ -964,5 +964,35 @@
     "origin": "https://raw.githubusercontent.com/protocolbuffers/protobuf/v36.2/LICENSE",
     "sha256": "6e5e117324afd944dcf67f36cf329843bc1a92229a8cd9bb573d7a83130fea7d",
     "asset": "Protobuf-BSD-3-Clause.txt"
+  },
+  {
+    "coordinate": "androidx.lifecycle:lifecycle-viewmodel:2.11.1",
+    "origin": "META-INF/androidx/lifecycle/lifecycle-viewmodel/LICENSE.txt",
+    "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+    "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
+  },
+  {
+    "coordinate": "androidx.lifecycle:lifecycle-viewmodel:2.11.1",
+    "origin": "sources!/META-INF/androidx/lifecycle/lifecycle-viewmodel/LICENSE.txt",
+    "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+    "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
+  },
+  {
+    "coordinate": "com.google.dagger:dagger-lint-aar:2.60.1",
+    "origin": "sources!/dagger-f7a89b6cea7d47167f2d5f9912f61f3fee333d88/LICENSE.txt",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "asset": "retained/56-cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30.txt"
+  },
+  {
+    "coordinate": "jakarta.inject:jakarta.inject-api:2.0.1",
+    "origin": "META-INF/LICENSE.txt",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "asset": "retained/56-cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30.txt"
+  },
+  {
+    "coordinate": "jakarta.inject:jakarta.inject-api:2.0.1",
+    "origin": "sources!/META-INF/LICENSE.txt",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "asset": "retained/56-cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30.txt"
   }
 ]

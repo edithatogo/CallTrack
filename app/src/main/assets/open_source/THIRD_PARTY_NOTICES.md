@@ -23,6 +23,12 @@ The Back and chevron drawables use Google Material Symbols Outlined under
 Apache-2.0. Compose applies the theme tint to their original paths.
 [Material Symbols source](https://github.com/google/material-design-icons/tree/10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7/symbols/android)
 
+The Dagger lint bundle uses the official release commit archive for corresponding
+source. The published JSR-330 source headers record the Apache-2.0 licence of
+`javax.inject`.
+The APK and the published source archive retain Jakarta Inject's
+original `META-INF/NOTICE.md`.
+
 | Runtime coordinate | Licence declaration |
 |---|---|
 | androidx.activity:activity-compose:1.13.0 | Apache-2.0 |
@@ -58,10 +64,12 @@ Apache-2.0. Compose applies the theme tint to their original paths.
 | androidx.core:core-viewtree:1.0.0 | Apache-2.0 |
 | androidx.core:core:1.19.0 | Apache-2.0 |
 | androidx.customview:customview-poolingcontainer:1.0.0 | Apache-2.0 |
+| androidx.customview:customview:1.0.0 | Apache-2.0 |
 | androidx.datastore:datastore-android:1.3.0 | Apache-2.0 |
 | androidx.datastore:datastore-core-android:1.3.0 | Apache-2.0 |
 | androidx.datastore:datastore-core-okio-jvm:1.3.0 | Apache-2.0 |
 | androidx.emoji2:emoji2:1.7.0 | Apache-2.0 |
+| androidx.fragment:fragment:1.5.1 | Apache-2.0 |
 | androidx.graphics:graphics-path:1.1.0 | Apache-2.0 |
 | androidx.graphics:graphics-shapes-android:1.0.1 | Apache-2.0 |
 | androidx.interpolator:interpolator:1.0.0 | Apache-2.0 |
@@ -78,6 +86,8 @@ Apache-2.0. Compose applies the theme tint to their original paths.
 | androidx.lifecycle:lifecycle-viewmodel-android:2.11.1 | Apache-2.0 |
 | androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.1 | Apache-2.0 |
 | androidx.lifecycle:lifecycle-viewmodel-savedstate-android:2.11.1 | Apache-2.0 |
+| androidx.lifecycle:lifecycle-viewmodel:2.11.1 | Apache-2.0 |
+| androidx.loader:loader:1.0.0 | Apache-2.0 |
 | androidx.navigationevent:navigationevent-android:1.1.0 | Apache-2.0 |
 | androidx.navigationevent:navigationevent-compose-android:1.1.0 | Apache-2.0 |
 | androidx.profileinstaller:profileinstaller:1.4.0 | Apache-2.0 |
@@ -95,12 +105,20 @@ Apache-2.0. Compose applies the theme tint to their original paths.
 | androidx.tracing:tracing-android:2.0.5 | Apache-2.0 |
 | androidx.tracing:tracing-ktx:2.0.5 | Apache-2.0 |
 | androidx.versionedparcelable:versionedparcelable:1.1.1 | Apache-2.0 |
+| androidx.viewpager:viewpager:1.0.0 | Apache-2.0 |
 | androidx.window:window-core-android:1.5.0 | Apache-2.0 |
 | androidx.window:window:1.5.0 | Apache-2.0 |
 | androidx.work:work-runtime:2.12.0 | Apache-2.0 |
+| com.google.code.findbugs:jsr305:3.0.2 | Apache-2.0 |
+| com.google.dagger:dagger-lint-aar:2.60.1 | Apache-2.0 |
+| com.google.dagger:dagger:2.60.1 | Apache-2.0 |
+| com.google.dagger:hilt-android:2.60.1 | Apache-2.0 |
+| com.google.dagger:hilt-core:2.60.1 | Apache-2.0 |
 | com.google.guava:listenablefuture:1.0 | Apache-2.0 (parent POM and source header) |
 | com.google.protobuf:protobuf-javalite:4.36.2 | BSD-3-Clause |
 | com.squareup.okio:okio-jvm:3.17.0 | Apache-2.0 |
+| jakarta.inject:jakarta.inject-api:2.0.1 | Apache-2.0 |
+| javax.inject:javax.inject:1 | Apache-2.0 |
 | org.jetbrains.kotlin:kotlin-stdlib:2.4.21 | Apache-2.0 |
 | org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0 | Apache-2.0 |
 | org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.9.0 | Apache-2.0 |
