@@ -11,6 +11,29 @@ physical-call, account-calendar and seven-day observation protocols. Review the
 remaining privacy, platform support and accessibility criteria before closing the
 track.
 
+## CallTrack Community 0.1.0 candidate
+
+The frozen candidate is commit `4c404f879a5f504450639fff4f0c4ebc8149341e`.
+Two clean macOS builds and the cache-disabled Linux build matched the unsigned
+APK SHA-256 `4297b315933a40679608c00971b5f310c286e11933d547ceac777e242845249d`.
+Each ran 120 release JVM tests with zero failures, errors or skips. [Cold Linux reproduction](https://github.com/edithatogo/CallTrack/actions/runs/45596161826)
+
+The corresponding-source archive covers 77 runtime source records and has
+SHA-256 `dd6a158553d54dd4a3387623be46c8865c64deeff2c3397506cb7aae1ca2af44`.
+It rebuilt the production variant. Only the APK entry with embedded Git metadata
+differed from the checkout build.
+
+The owner signed the candidate as `io.github.edithatogo.calltrack` version 0.1.0,
+code 1. The signed APK SHA-256 is
+`f30169edc248b3b187f55fdbb3d643d2d9ced34f8223b188a37b5fb917bd8622`.
+The encrypted recovery copy reopened with the same certificate. The dedicated
+16 KiB Android 17 emulator installed the exact signed APK through Downloads,
+launched it in both themes and verified the standard call-log permission flow.
+
+Physical-call and calendar acceptance, seven days of controlled observation and
+GitHub distribution remain open. Keep results for any later source revision
+with that revision's artifacts.
+
 ## Android 17 unsigned baselines
 
 Two clean macOS builds and a cache-disabled Linux build produced identical unsigned development APKs for `5bcb512a30af1263c6eea389f8a7e18501807b37`. Each local build passed 119 release JVM tests and lint with zero errors. Source and notices readback covered 77 runtime dependency records. Repeat these checks for the production identity. [Cold Linux reproduction](https://github.com/edithatogo/CallTrack/actions/runs/45394800204)

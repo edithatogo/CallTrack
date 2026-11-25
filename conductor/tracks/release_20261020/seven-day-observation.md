@@ -22,8 +22,9 @@ logging settings/generation and usage scope. Verify that the installed APK is th
 signed distribution candidate. Preserve the existing development installation and
 use the selected calendar.
 
-The app has one active destination per installation. Bind each operational cohort
-to one selected route/calendar. Qualifying Google and Outlook for seven days each
+The first-release cohort covers controlled sessions on the selected Google
+Calendar. Bind each operational claim to its selected route and calendar.
+Qualifying Google and Outlook for seven days each
 requires separately accounted route windows; alternating calendars during one week
 does not establish seven days on both. Do not run duplicate writers or replay the
 same receipts to manufacture cross-route coverage.

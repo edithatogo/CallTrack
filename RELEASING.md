@@ -291,8 +291,7 @@ remain pending until actual participation and readback occur.
 ## Seven-day operational follow-through
 
 Use the [observation protocol](conductor/tracks/release_20261020/seven-day-observation.md)
-and private cohort/day journal. The daily follow-up checks prerequisites first;
-only actual qualified physical use starts the clock. Unknown observations remain
-unknown. Seven scheduler runs are not seven accepted days, and final review/fixes
-must use the actual candidate's outcomes. One active calendar is supported per
-installation; each operational route claim needs its own accounted window.
+and private cohort/day journal. Start the clock with qualified physical use.
+Record missing observations as unknown. Use 168 elapsed hours and the actual
+candidate's outcomes for the final review. Each operational route claim needs
+its own accounted window. The first-release cohort uses the selected Google Calendar.
