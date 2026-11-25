@@ -204,6 +204,10 @@ public class RecoveryUiTest {
             ui.await(
                     () -> ui.shown(context().getString(R.string.reapproval_open), false) != null,
                     "Pending recovery action did not render");
+            tap(ui, R.string.reapproval_open);
+            ui.await(
+                    () -> ui.find("calltrack_dialog_confirm", true) != null,
+                    "Reapproval dialog did not open before recreation");
             assertEquals(DurableDelivery.State.READY, saved("pending").state);
             assertEquals(0, fixture.events(calendar()));
             ui.capture("recovery-before-recreation");
@@ -212,6 +216,9 @@ public class RecoveryUiTest {
             ui.await(
                     () -> ui.shown(context().getString(R.string.reapproval_open), false) != null,
                     "Pending recovery action did not return after recreation");
+            assertNull(
+                    "Recreation must withdraw the earlier review",
+                    ui.find("calltrack_dialog_confirm", true));
             assertEquals(
                     "Recreation must not approve a pending record",
                     DurableDelivery.State.READY,

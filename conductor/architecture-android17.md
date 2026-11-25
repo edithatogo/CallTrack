@@ -29,7 +29,7 @@ Room owns both existing database files. The preserving migrations retain their f
 - WorkManager is the single durable scheduler. Keep generation checks, cancellation and explicit user activation.
 - **Room 3.0.3** uses KSP, AndroidSQLiteDriver and suspend DAOs. Receipt, checkpoint and import transactions use Room’s native writer connection. Recovery persists intent before touching the calendar. [Track 22](tracks/room3_android17_20261124/plan.md).
 - Material 3 Expressive provides the standard controls and shapes. The forms respond to Android window size classes and consume system and keyboard insets. Compose nodes expose stable accessibility labels and keyboard targets.
-- Proto DataStore owns settings and migrates the existing saved choices and logging policy once. Room retains the durable delivery and import records. Hilt injects the manual logging ViewModel, which exposes immutable state through StateFlow. The remaining screen state work is in [Track 24](tracks/android17_standards_20261125/index.md).
+- Proto DataStore owns settings and migrates the saved choices and logging policy once. Room retains durable delivery and import records. Each Navigation 3 entry has a Hilt ViewModel that exposes immutable state through StateFlow. Explicit reviews are scoped to their screen session. [Track 24](tracks/android17_standards_20261125/index.md)
 - No Rust, Kotlin Multiplatform production module, cross-platform UI, Swift app or second writer in active builds.
 
 ## Test and build execution order

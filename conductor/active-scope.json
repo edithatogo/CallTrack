@@ -20,7 +20,7 @@
     "Jetpack Compose with Material 3 Expressive and Android window size classes",
     "Navigation 3",
     "Proto DataStore",
-    "Hilt (manual logging ViewModel)",
+    "Hilt and StateFlow for screen state",
     "Android CallLog",
     "Android CalendarContract",
     "WorkManager",
