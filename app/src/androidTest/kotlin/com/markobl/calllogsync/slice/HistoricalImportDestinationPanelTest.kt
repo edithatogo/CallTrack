@@ -1,9 +1,14 @@
 package com.markobl.calllogsync.slice
 
+import android.os.SystemClock
+import android.view.InputDevice
+import android.view.KeyCharacterMap
+import android.view.KeyEvent
+import android.view.accessibility.AccessibilityNodeInfo
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
@@ -11,21 +16,19 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performKeyInput
-import androidx.compose.ui.test.pressKey
 import androidx.test.platform.app.InstrumentationRegistry
 import com.markobl.calllogsync.R
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
 class HistoricalImportDestinationPanelTest {
-    @get:Rule val compose = createComposeRule()
+    @get:Rule val compose = createAndroidComposeRule<ComponentActivity>()
 
     @Test
     fun destinationListIsPresentedAndOnlyExplicitSelectionReturnsOpaqueToken() {
@@ -98,7 +101,8 @@ class HistoricalImportDestinationPanelTest {
                 },
             )
         }
-        val resources = InstrumentationRegistry.getInstrumentation().targetContext.resources
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val resources = instrumentation.targetContext.resources
         val collapsed =
             SemanticsMatcher.expectValue(
                 SemanticsProperties.StateDescription,
@@ -109,15 +113,21 @@ class HistoricalImportDestinationPanelTest {
                 SemanticsProperties.StateDescription,
                 resources.getString(R.string.calendar_picker_expanded),
             )
-        val picker = compose.onNodeWithTag("import_calendar_picker")
+        val pickerTag = "import_calendar_picker"
+        val picker = compose.onNodeWithTag(pickerTag)
         val first = compose.onNodeWithTag("import_calendar_option_0")
         val second = compose.onNodeWithTag("import_calendar_option_1")
 
-        compose.onRoot().performKeyInput { pressKey(Key.Tab) }
-        picker.assertIsFocused().assert(collapsed).performKeyInput { pressKey(Key.Enter) }
-        picker.assert(expanded).performKeyInput { pressKey(Key.Tab) }
-        first.assertIsFocused().performKeyInput { pressKey(Key.Tab) }
-        second.assertIsFocused().performKeyInput { pressKey(Key.Enter) }
+        val ui = RenderedUi(instrumentation)
+        focusPicker(ui, pickerTag)
+        picker.assertIsFocused().assert(collapsed)
+        ui.pressKeyboardKey(KeyEvent.KEYCODE_ENTER)
+        picker.assert(expanded)
+        ui.pressKeyboardKey(KeyEvent.KEYCODE_TAB)
+        first.assertIsFocused()
+        ui.pressKeyboardKey(KeyEvent.KEYCODE_TAB)
+        second.assertIsFocused()
+        ui.pressKeyboardKey(KeyEvent.KEYCODE_ENTER)
         picker.assertIsNotEnabled().assert(collapsed)
         second.assertDoesNotExist()
         compose.runOnIdle {
@@ -125,5 +135,53 @@ class HistoricalImportDestinationPanelTest {
             destination = destination.copy(selectedToken = selected.single(), enabled = true)
         }
         picker.assertTextEquals("Work calendar").assertIsFocused()
+    }
+
+    private fun focusPicker(ui: RenderedUi, tag: String) {
+        ui.await(
+            { compose.runOnUiThread { compose.activity.hasWindowFocus() } },
+            "The picker test window must receive keyboard focus",
+        )
+        ui.await({ ui.find(tag, true) != null }, "The rendered picker must be visible")
+        val target = checkNotNull(ui.find(tag, true))
+        assertTrue(
+            "The native picker must accept keyboard focus",
+            target.isFocused || target.performAction(AccessibilityNodeInfo.ACTION_FOCUS),
+        )
+        compose.waitForIdle()
+        ui.await(
+            { target.refresh() && target.isFocused },
+            "The native picker must hold keyboard focus",
+        )
+        assertTrue(
+            "Android must be in keyboard mode",
+            compose.runOnUiThread { !compose.activity.window.decorView.isInTouchMode },
+        )
+    }
+
+    private fun RenderedUi.pressKeyboardKey(keyCode: Int) {
+        val now = SystemClock.uptimeMillis()
+        val down =
+            KeyEvent(
+                now,
+                now,
+                KeyEvent.ACTION_DOWN,
+                keyCode,
+                0,
+                0,
+                KeyCharacterMap.VIRTUAL_KEYBOARD,
+                0,
+                0,
+                InputDevice.SOURCE_KEYBOARD,
+            )
+        assertTrue(
+            "Android must accept keyboard down for $keyCode",
+            automation.injectInputEvent(down, true),
+        )
+        val up = KeyEvent.changeAction(down, KeyEvent.ACTION_UP)
+        assertTrue(
+            "Android must accept keyboard up for $keyCode",
+            automation.injectInputEvent(up, true),
+        )
     }
 }
