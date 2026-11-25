@@ -324,8 +324,11 @@ constructor(@param:ApplicationContext private val context: Context) : ViewModel(
                                     ): List<SliceEngine.StoredEvent?> = sink.find(calendar, marker)
                                 },
                             )
-                        if (suppress) recovery.suppress(intent.key, intent.calendar)
-                        else recovery.reconcile(intent.key, intent.calendar)
+                        if (suppress) {
+                            recovery.suppress(intent.key, intent.calendar)
+                        } else {
+                            recovery.reconcile(intent.key, intent.calendar)
+                        }
                     }
                 } catch (cancelled: CancellationException) {
                     throw cancelled
@@ -469,8 +472,11 @@ constructor(@param:ApplicationContext private val context: Context) : ViewModel(
     private fun publish() {
         val review = pendingReview?.review
         state.value =
-            if (review == null) ReceiptRecoveryUiState.Showing(page)
-            else ReceiptRecoveryUiState.Reviewing(page, review)
+            if (review == null) {
+                ReceiptRecoveryUiState.Showing(page)
+            } else {
+                ReceiptRecoveryUiState.Reviewing(page, review)
+            }
     }
 
     private fun stateLabel(state: DurableDelivery.State): Int =
