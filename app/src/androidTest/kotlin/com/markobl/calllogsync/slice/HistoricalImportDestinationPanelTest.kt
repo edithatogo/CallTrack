@@ -11,6 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsFocused
@@ -120,18 +121,7 @@ class HistoricalImportDestinationPanelTest {
 
         picker.assertIsDisplayed()
         val ui = RenderedUi(instrumentation)
-        ui.await(
-            { compose.runOnUiThread { compose.activity.hasWindowFocus() } },
-            "The picker test window must receive keyboard focus",
-        )
-        ui.pressKeyboardKey(KeyEvent.KEYCODE_TAB)
-        picker.performSemanticsAction(SemanticsActions.RequestFocus) { requestFocus ->
-            assertTrue("The picker must accept keyboard focus", requestFocus())
-        }
-        assertTrue(
-            "Android must be in keyboard mode",
-            compose.runOnUiThread { !compose.activity.window.decorView.isInTouchMode },
-        )
+        focusPicker(ui, picker)
         picker.assertIsFocused().assert(collapsed)
         ui.pressKeyboardKey(KeyEvent.KEYCODE_ENTER)
         picker.assert(expanded)
@@ -147,6 +137,21 @@ class HistoricalImportDestinationPanelTest {
             destination = destination.copy(selectedToken = selected.single(), enabled = true)
         }
         picker.assertTextEquals("Work calendar").assertIsFocused()
+    }
+
+    private fun focusPicker(ui: RenderedUi, picker: SemanticsNodeInteraction) {
+        ui.await(
+            { compose.runOnUiThread { compose.activity.hasWindowFocus() } },
+            "The picker test window must receive keyboard focus",
+        )
+        ui.pressKeyboardKey(KeyEvent.KEYCODE_TAB)
+        picker.performSemanticsAction(SemanticsActions.RequestFocus) { requestFocus ->
+            assertTrue("The picker must accept keyboard focus", requestFocus())
+        }
+        assertTrue(
+            "Android must be in keyboard mode",
+            compose.runOnUiThread { !compose.activity.window.decorView.isInTouchMode },
+        )
     }
 
     private fun RenderedUi.pressKeyboardKey(keyCode: Int) {
