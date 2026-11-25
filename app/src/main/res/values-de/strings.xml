@@ -3,6 +3,7 @@
     <string name="calendar_picker_expanded">Ausgeklappt</string>
     <string name="calendar_picker_collapsed">Eingeklappt</string>
 
+    <string name="settings_title">Einstellungen</string>
     <string name="auto_open">Einstellungen zur automatischen Protokollierung</string>
     <string name="auto_title">Automatische Protokollierung</string>
     <string name="auto_intro">Wähle Kalender für jede Anrufquelle. Kalenderanbieter können gespeicherte Termine synchronisieren. Der Zugriff auf den Telefonstatus ermöglicht Prüfungen nach Telefonanrufen. Geteilte App-Anrufe werden regelmäßig geprüft.</string>

@@ -49,6 +49,9 @@ def check_adaptive_windows(command, check):
                 raise RuntimeError(f'Emulator {profile} dimensions not confirmed')
             check(f'{profile}WindowKeepsPrimaryActionAccessible',
                   'com.markobl.calllogsync.slice.AdaptiveCallTrackScreenTest')
+            if profile == 'expanded':
+                check('expandedSettingsShowsOneActiveDetailWithAccessibleNavigation',
+                      'com.markobl.calllogsync.slice.AdaptiveCallTrackNavigationTest')
     finally:
         command('shell', 'wm', 'size', size[1] or 'reset')
         if command('shell', 'wm', 'size') != original:

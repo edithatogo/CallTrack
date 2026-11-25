@@ -26,6 +26,7 @@
     <string name="slice_invalid" translatable="false">The call contains invalid time or duration data.</string>
     <string name="slice_failed" translatable="false">The operation could not be verified. Retry can reconcile an existing event; check the calendar before further action.</string>
 
+    <string name="settings_title">Settings</string>
     <string name="auto_open">Automatic logging settings</string>
     <string name="auto_title">Automatic logging</string>
     <string name="auto_intro">Choose calendars for each call source. Your calendar provider may sync saved events. Phone-state access helps check after phone calls. Shared app calls are checked periodically.</string>

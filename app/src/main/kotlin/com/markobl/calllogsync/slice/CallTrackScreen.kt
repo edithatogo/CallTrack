@@ -104,6 +104,7 @@ internal fun ComponentActivity.setCallTrackContent(content: @Composable () -> Un
 internal fun CallTrackScaffold(
     @StringRes title: Int,
     onNavigateUp: (() -> Unit)?,
+    screenTag: String = "calltrack_screen",
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val windowInfo = LocalWindowInfo.current
@@ -136,7 +137,7 @@ internal fun CallTrackScaffold(
                     Modifier.widthIn(max = formWidth)
                         .fillMaxWidth()
                         .fillMaxHeight()
-                        .testTag("calltrack_screen")
+                        .testTag(screenTag)
                         .verticalScroll(rememberScrollState())
                         .padding(horizontal = formGutter, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
