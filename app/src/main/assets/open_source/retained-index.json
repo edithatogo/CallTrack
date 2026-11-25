@@ -1066,5 +1066,65 @@
     "origin": "sources!/META-INF/androidx/window/window/LICENSE.txt",
     "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
     "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
+  },
+  {
+    "coordinate": "androidx.annotation:annotation-experimental:1.5.1",
+    "origin": "META-INF/androidx/annotation/annotation-experimental/LICENSE.txt",
+    "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+    "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
+  },
+  {
+    "coordinate": "androidx.annotation:annotation-experimental:1.5.1",
+    "origin": "sources!/META-INF/androidx/annotation/annotation-experimental/LICENSE.txt",
+    "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+    "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
+  },
+  {
+    "coordinate": "androidx.compose.material3.adaptive:adaptive-android:1.3.0",
+    "origin": "META-INF/androidx/compose/material3/adaptive/adaptive/LICENSE.txt",
+    "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+    "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
+  },
+  {
+    "coordinate": "androidx.compose.material3.adaptive:adaptive-android:1.3.0",
+    "origin": "sources!/META-INF/androidx/compose/material3/adaptive/adaptive/LICENSE.txt",
+    "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+    "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
+  },
+  {
+    "coordinate": "androidx.compose.material3.adaptive:adaptive-layout-android:1.3.0",
+    "origin": "META-INF/androidx/compose/material3/adaptive/adaptive-layout/LICENSE.txt",
+    "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+    "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
+  },
+  {
+    "coordinate": "androidx.compose.material3.adaptive:adaptive-layout-android:1.3.0",
+    "origin": "sources!/META-INF/androidx/compose/material3/adaptive/adaptive-layout/LICENSE.txt",
+    "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+    "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
+  },
+  {
+    "coordinate": "androidx.compose.material3.adaptive:adaptive-navigation-android:1.3.0",
+    "origin": "META-INF/androidx/compose/material3/adaptive/adaptive-navigation/LICENSE.txt",
+    "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+    "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
+  },
+  {
+    "coordinate": "androidx.compose.material3.adaptive:adaptive-navigation-android:1.3.0",
+    "origin": "sources!/META-INF/androidx/compose/material3/adaptive/adaptive-navigation/LICENSE.txt",
+    "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+    "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
+  },
+  {
+    "coordinate": "androidx.compose.material3.adaptive:adaptive-navigation3-android:1.3.0",
+    "origin": "META-INF/androidx/compose/material3/adaptive/adaptive-navigation3/LICENSE.txt",
+    "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+    "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
+  },
+  {
+    "coordinate": "androidx.compose.material3.adaptive:adaptive-navigation3-android:1.3.0",
+    "origin": "sources!/META-INF/androidx/compose/material3/adaptive/adaptive-navigation3/LICENSE.txt",
+    "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+    "asset": "retained/2-809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0.txt"
   }
 ]

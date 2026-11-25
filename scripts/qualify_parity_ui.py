@@ -49,6 +49,9 @@ def check_adaptive_windows(command, check):
                 raise RuntimeError(f'Emulator {profile} dimensions not confirmed')
             check(f'{profile}WindowKeepsPrimaryActionAccessible',
                   'com.markobl.calllogsync.slice.AdaptiveCallTrackScreenTest')
+            if profile == 'expanded':
+                check('expandedSettingsShowsOneActiveDetailWithAccessibleNavigation',
+                      'com.markobl.calllogsync.slice.AdaptiveCallTrackNavigationTest')
     finally:
         command('shell', 'wm', 'size', size[1] or 'reset')
         if command('shell', 'wm', 'size') != original:
@@ -90,17 +93,16 @@ def write_receipt(directory, expected, suite, receipt, replace):
 
 def native_failure_summary(method, output, declared_permissions=None):
     """Return source locations and allowlisted numeric/platform diagnostics."""
+    source_frame = re.compile(
+        r'at com\.markobl\.calllogsync\.slice\.[A-Za-z0-9_.$<>-]+\('
+        r'(?:(?:PositiveUiTest|ImportUiTest|RecoveryUiTest|ParityProviderTest|RenderedUi)\.java|'
+        r'(?:ManualCalendarScreenTest|AdaptiveCallTrack(?:Screen|Navigation)Test|'
+        r'HistoricalImport(?:Destination|Filters)PanelTest)\.kt):\d+\)'
+    )
     frames = []
     for line in output.splitlines():
-        frame = line.strip()
-        if (frame.startswith('at com.markobl.calllogsync.slice.')
-                and re.search(
-                    r'(?:(?:PositiveUiTest|ImportUiTest|RecoveryUiTest|ParityProviderTest|RenderedUi)\.java|'
-                    r'(?:ManualCalendarScreenTest|AdaptiveCallTrackScreenTest|'
-                    r'HistoricalImport(?:Destination|Filters)PanelTest)\.kt):\d+',
-                    frame,
-                )):
-            frames.append(frame)
+        if match := source_frame.match(line.strip()):
+            frames.append(match.group())
     detail = '; '.join(frames[:6])
     if not output.strip():
         detail = (detail + '; ' if detail else '') + 'instrumentation-output-empty'

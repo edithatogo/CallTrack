@@ -354,6 +354,19 @@ class UiSafety(unittest.TestCase):
         self.assertIn('ParityProviderTest.java:109', summary)
         self.assertNotIn('private fixture detail', summary)
 
+    def test_adaptive_navigation_failure_reports_only_the_source_frame(self):
+        summary = device.native_failure_summary(
+            'expandedSettingsShowsOneActiveDetailWithAccessibleNavigation',
+            'INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: private fixture content\n'
+            '    at com.markobl.calllogsync.slice.AdaptiveCallTrackNavigationTest.'
+            'expandedSettingsShowsOneActiveDetailWithAccessibleNavigation('
+            'AdaptiveCallTrackNavigationTest.kt:46) private fixture content\n'
+            '    at com.markobl.calllogsync.slice.OtherTest.other(OtherTest.kt:1)\n',
+        )
+        self.assertIn('AdaptiveCallTrackNavigationTest.kt:46', summary)
+        self.assertNotIn('private fixture content', summary)
+        self.assertNotIn('OtherTest.kt', summary)
+
     def test_failure_summary_uses_fixed_import_dialog_category(self):
         summary = device.native_failure_summary(
             'renderedRangePreviewCancelConfirmAndRepeat',

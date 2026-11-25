@@ -44,7 +44,6 @@ Use the [Android 17 scope](active-scope.json) and [track registry](tracks.md) to
 | 5 · Release | The signed 0.1.0 candidate reproduced across macOS and Linux and passed emulator installation. Complete physical-call and selected calendar readbacks, seven days of observation and GitHub distribution. [Candidate and gates](tracks/release_20261020/verification.md#calltrack-community-010-candidate) |
 | 6 · Kotlin | Close K07 against the same supported upgrade, recovery and operational evidence as Track 5. [Track 6](tracks/kotlin_20261020/plan.md) |
 | 23 · Call routing | Verify controlled calls from the selected third-party apps and read back their approved calendars. Hosted Android 17 and the preserving dev upgrade passed. [Track 23](tracks/android17_call_routing_20261125/index.md) |
-| 24 · Android 17 standards | Qualify native settings, navigation, adaptive screen state and compile-time injection. [Track 24](tracks/android17_standards_20261125/index.md) |
 
 The dedicated Mac AVD, protected-main Mac dispatch and hosted Android 17 qualification passed. The local hook and runner evidence is recorded in [#117](https://github.com/edithatogo/CallTrack/issues/117). The [Renovate dashboard](https://github.com/edithatogo/CallTrack/issues/91) records current dependency updates. The [offline scanner PR](https://github.com/edithatogo/CallTrack/pull/89) requires a qualified upstream image and model plus a trusted isolated Linux x64 runner for CallTrack.
 
