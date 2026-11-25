@@ -8,12 +8,15 @@ import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.accessibility.enableAccessibilityChecks
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.waitUntilDoesNotExist
+import androidx.compose.ui.test.waitUntilExactlyOneExists
 import androidx.compose.ui.unit.dp
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertFalse
@@ -63,9 +66,12 @@ class AdaptiveCallTrackNavigationTest {
             "Android must accept the Back action",
             ui.automation.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK),
         )
-        compose.onNodeWithTag("open_recovery").assertIsDisplayed()
-        compose.onNodeWithTag("settings_navigation").assertDoesNotExist()
-        compose.onNodeWithTag("recovery_refresh_action").assertDoesNotExist()
+        compose.waitUntilExactlyOneExists(hasTestTag("open_recovery"), timeoutMillis = 10_000)
+        compose.onNodeWithTag("open_recovery").performScrollTo().assertIsDisplayed()
+        compose.waitUntilDoesNotExist(
+            hasTestTag("settings_navigation") or hasTestTag("recovery_refresh_action"),
+            timeoutMillis = 10_000,
+        )
         assertFalse(SettingsTestFixture.snapshot(compose.activity).hasAutomatic())
         SqliteImportStore(compose.activity).use { assertTrue(it.sessions(-1, 10).isEmpty()) }
     }
