@@ -22,6 +22,7 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -75,6 +76,8 @@ constructor(
     private var currentId: String? = null
     private var session: HistoricalImport.Session? = null
     private var pendingReview: PendingReview? = null
+    private var calendarRefresh: Job? = null
+    private var calendarsReady = false
     private val historyTargets = HashMap<String, String>()
     private val destinationTargets = HashMap<String, Long>()
     private var selected = -1L
@@ -125,11 +128,16 @@ constructor(
         if (!value) {
             running = false
             pendingReview = null
-        } else if (!opened) {
-            opened = true
+            calendarsReady = false
+            calendarRefresh?.cancel()
+            calendarRefresh = null
+        } else {
             loadCalendars()
-            loadHistory(-1)
-            if (currentId != null) loadSession(currentId)
+            if (!opened) {
+                opened = true
+                loadHistory(-1)
+                if (currentId != null) loadSession(currentId)
+            }
         }
         updateControls()
     }
@@ -137,7 +145,7 @@ constructor(
     @MainThread
     fun permissionsChanged() {
         pendingReview = null
-        loadCalendars()
+        if (resumed) loadCalendars()
         updateControls()
     }
 
@@ -310,15 +318,18 @@ constructor(
     private fun updateControls() {
         val phase = session?.phase
         val permitted = access()
+        val canReviewDestination = calendarsReady && !busy
         val filters = form.filters
         val hasCallTypes = filters.incoming || filters.outgoing || filters.missed
         form =
             form.copy(
                 actions =
                     HistoricalImportActionState(
-                        createEnabled = !busy && selected >= 0 && permitted && hasCallTypes,
+                        createEnabled =
+                            canReviewDestination && selected >= 0 && permitted && hasCallTypes,
                         continueEnabled = !busy && continuing(phase),
-                        confirmEnabled = !busy && phase == HistoricalImport.Phase.PREVIEW,
+                        confirmEnabled =
+                            canReviewDestination && phase == HistoricalImport.Phase.PREVIEW,
                         stopEnabled = running,
                         cancelEnabled =
                             phase != null &&
@@ -329,7 +340,8 @@ constructor(
                         hasRequiredAccess = permitted,
                         sessionSelected = phase != null,
                     ),
-                destination = form.destination.copy(enabled = !busy && calendarAccess()),
+                destination =
+                    form.destination.copy(enabled = canReviewDestination && calendarAccess()),
             )
         publish()
     }
@@ -341,51 +353,61 @@ constructor(
     }
 
     private fun loadCalendars() {
-        viewModelScope.launch(worker) {
-            try {
-                val loaded =
-                    if (calendarAccess()) AndroidCalendarSink(context).choices() else emptyList()
-                withContext(Dispatchers.Main.immediate) {
-                    val preferred = selected
-                    destinationTargets.clear()
-                    val labels =
-                        calendarChoiceLabels(
-                            loaded,
-                            context.getString(R.string.slice_unnamed_calendar),
-                        )
-                    val options = loaded.map { choice ->
-                        val token = UUID.randomUUID().toString()
-                        destinationTargets[token] = choice.id
-                        CalendarDestinationOption(token, labels.getValue(choice.id))
-                    }
-                    val token =
-                        options.firstOrNull { destinationTargets[it.token] == preferred }?.token
-                    selected = token?.let(destinationTargets::get) ?: -1L
-                    val message =
-                        when {
-                            !calendarAccess() -> null
-                            preferred >= 0 && selected < 0 -> R.string.auto_destination_unavailable
-                            options.isEmpty() -> R.string.slice_no_calendars
-                            else -> null
+        calendarsReady = false
+        calendarRefresh?.cancel()
+        calendarRefresh =
+            viewModelScope.launch(worker) {
+                try {
+                    val loaded =
+                        if (calendarAccess()) AndroidCalendarSink(context).choices()
+                        else emptyList()
+                    withContext(Dispatchers.Main.immediate) {
+                        val preferred = selected
+                        destinationTargets.clear()
+                        val labels =
+                            calendarChoiceLabels(
+                                loaded,
+                                context.getString(R.string.slice_unnamed_calendar),
+                            )
+                        val options = loaded.map { choice ->
+                            val token = UUID.randomUUID().toString()
+                            destinationTargets[token] = choice.id
+                            CalendarDestinationOption(token, labels.getValue(choice.id))
                         }
-                    form =
-                        form.copy(
-                            destination =
-                                CalendarDestinationUiState(
-                                    options = options,
-                                    selectedToken = token,
-                                ),
-                            destinationMessage = message,
-                        )
-                    if (session != null) renderSession()
-                    updateControls()
+                        val token =
+                            options.firstOrNull { destinationTargets[it.token] == preferred }?.token
+                        selected = token?.let(destinationTargets::get) ?: -1L
+                        val message =
+                            when {
+                                !calendarAccess() -> null
+                                preferred >= 0 && selected < 0 ->
+                                    R.string.auto_destination_unavailable
+                                options.isEmpty() -> R.string.slice_no_calendars
+                                else -> null
+                            }
+                        form =
+                            form.copy(
+                                destination =
+                                    CalendarDestinationUiState(
+                                        options = options,
+                                        selectedToken = token,
+                                    ),
+                                destinationMessage = message,
+                            )
+                        if (session != null) renderSession()
+                        calendarRefresh = null
+                        calendarsReady = true
+                        updateControls()
+                    }
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (_: RuntimeException) {
+                    withContext(Dispatchers.Main.immediate) {
+                        calendarRefresh = null
+                        showFailure()
+                    }
                 }
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (_: RuntimeException) {
-                showFailure()
             }
-        }
     }
 
     private fun step() {
@@ -563,16 +585,14 @@ constructor(
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (_: RuntimeException) {
-                showFailure()
+                withContext(Dispatchers.Main.immediate) { showFailure() }
             }
         }
     }
 
-    private suspend fun showFailure() {
-        withContext(Dispatchers.Main.immediate) {
-            setFeedback(R.string.import_failed)
-            updateControls()
-        }
+    private fun showFailure() {
+        setFeedback(R.string.import_failed)
+        updateControls()
     }
 
     private fun saveDraft(): Bundle =
