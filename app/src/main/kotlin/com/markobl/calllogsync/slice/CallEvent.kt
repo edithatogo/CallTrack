@@ -3,7 +3,6 @@ package com.markobl.calllogsync.slice
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
-import java.util.Locale
 import java.util.Objects
 
 /** Immutable public event fields. No network, attendees, reminders or sync-only fields. */
@@ -28,26 +27,19 @@ class CallEvent(
         )
 
     companion object {
+        private const val PAYPHONE_PRESENTATION = 4
+
         @JvmStatic
         fun from(call: CallRecord?, timezone: String?): CallEvent {
             val source = call!!
-            val person =
-                when {
-                    !source.identityAllowed && source.presentationSupplied ->
-                        when (source.numberPresentation) {
-                            2 -> "Private number"
-                            4 -> "Payphone"
-                            else -> "Unknown number"
-                        }
-                    !source.identityAllowed -> "Private number"
-                    present(source.name) -> source.name
-                    present(source.number) -> source.number
-                    else -> "Unknown number"
-                }
+            val person = displayName(source)
             var description =
                 "Number: " +
-                    (if (source.identityAllowed && present(source.number)) source.number
-                    else "Unavailable") +
+                    (if (source.identityAllowed && present(source.number)) {
+                        source.number
+                    } else {
+                        "Unavailable"
+                    }) +
                     "\nActual duration: ${source.seconds} seconds"
             if (source.source != null && source.source != CallRecord.PHONE) {
                 description += "\nCalling app: ${source.source}"
@@ -70,6 +62,24 @@ class CallEvent(
             )
         }
 
+        private fun displayName(source: CallRecord): String? =
+            when {
+                !source.identityAllowed && source.presentationSupplied ->
+                    when (source.numberPresentation) {
+                        2 -> "Private number"
+                        PAYPHONE_PRESENTATION -> "Payphone"
+                        else -> "Unknown number"
+                    }
+
+                !source.identityAllowed -> "Private number"
+
+                present(source.name) -> source.name
+
+                present(source.number) -> source.number
+
+                else -> "Unknown number"
+            }
+
         // Java String.trim() semantics are part of the stored fingerprint contract.
         private fun present(value: String?): Boolean =
             value != null && value.trim { it <= ' ' }.isNotEmpty()
@@ -81,11 +91,7 @@ class CallEvent(
                 val bytes =
                     MessageDigest.getInstance("SHA-256")
                         .digest(text.toByteArray(StandardCharsets.UTF_8))
-                return buildString {
-                    for (value in bytes) append(
-                        String.format(Locale.ROOT, "%02x", value.toInt() and 255),
-                    )
-                }
+                return bytes.toHexString()
             } catch (e: NoSuchAlgorithmException) {
                 throw AssertionError(e)
             }

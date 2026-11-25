@@ -579,7 +579,9 @@ public class PositiveUiTest {
             ui.tapText(fixture.calendarDisplayName());
             for (String filter : new String[] {"auto_incoming", "auto_outgoing", "auto_missed"}) {
                 ui.tapId(filter);
-                assertFalse(ui.find(filter, true).isChecked());
+                assertEquals(
+                        AccessibilityNodeInfo.CHECKED_STATE_FALSE,
+                        ui.find(filter, true).getChecked());
             }
             assertFalse(ui.find("auto_enable", true).isEnabled());
             ui.capture("settings-no-filters");
@@ -621,7 +623,8 @@ public class PositiveUiTest {
             ui.await(
                     () ->
                             ui.find("auto_outgoing", true) != null
-                                    && !ui.find("auto_outgoing", true).isChecked(),
+                                    && ui.find("auto_outgoing", true).getChecked()
+                                            == AccessibilityNodeInfo.CHECKED_STATE_FALSE,
                     "Reopened filter selection changed");
             ui.capture("settings-reopened-paused");
             assertEquals(0, fixture.events(enabled.calendar));

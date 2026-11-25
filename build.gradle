@@ -24,6 +24,39 @@ buildscript {
     }
 }
 
+configurations {
+    ktlintCli {
+        canBeConsumed = false
+        transitive = false
+    }
+    detektCli {
+        canBeConsumed = false
+        transitive = false
+    }
+}
+
+dependencies {
+    ktlintCli 'com.pinterest.ktlint:ktlint-cli:1.8.0:all@jar'
+    detektCli 'dev.detekt:detekt-cli:2.0.0-alpha.6:all@jar'
+}
+
+tasks.register('ktlintCheck', JavaExec) {
+    group = 'verification'
+    description = 'Run ktlint against Android Kotlin sources.'
+    classpath = configurations.ktlintCli
+    mainClass = 'com.pinterest.ktlint.Main'
+    args '--relative', 'app/src/**/*.kt'
+}
+
+tasks.register('detekt', JavaExec) {
+    group = 'verification'
+    description = 'Run detekt against Android Kotlin sources.'
+    classpath = configurations.detektCli
+    mainClass = 'dev.detekt.cli.Main'
+    args '--input', 'app/src', '--base-path', projectDir.absolutePath,
+        '--config', file('config/detekt.yml').absolutePath, '--build-upon-default-config'
+}
+
 // AGP resolves the lint engine in detached project configurations, separately
 // from the buildscript classpath. Keep its vulnerable transitives patched too.
 allprojects {
@@ -46,6 +79,6 @@ allprojects {
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+tasks.register('clean', Delete) {
+    delete layout.buildDirectory
 }

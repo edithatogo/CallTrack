@@ -8,6 +8,8 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.CalendarContract
 import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -16,6 +18,8 @@ import com.markobl.calllogsync.R
 import java.text.DateFormat
 import java.util.Date
 import java.util.concurrent.Executors
+
+private const val RECOVERY_PAGE_SIZE = 10
 
 /** Existing-effect checks remain separate from explicitly confirmed never-attempted insertion. */
 class ReceiptRecoveryActivity : ComponentActivity() {
@@ -30,83 +34,100 @@ class ReceiptRecoveryActivity : ComponentActivity() {
     private var nextCardToken = 0L
     private var navigationState by mutableStateOf(RecoveryNavigationUiState())
     private var busy = false
+
     @Volatile private var resumed = false
+
     @Volatile private var approvalSession = Any()
     private var version = 0L
 
-    public override fun onCreate(saved: Bundle?) {
-        super.onCreate(saved)
+    private val permissions =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            if (!busy) load(current)
+        }
+
+    public override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         setCallTrackContent {
-            RecoveryCopyPanel(
-                text = stringResource(R.string.recovery_intro),
-                tag = "recovery_intro_text",
-            )
-            RecoveryAccessPanel(
-                label = stringResource(R.string.recovery_access),
-                onRequestAccess = {
-                    requestPermissions(arrayOf(Manifest.permission.READ_CALENDAR), 11)
-                },
-            )
-            RecoveryRefreshPanel(
-                busy = navigationState.busy,
-                refreshLabel = stringResource(R.string.recovery_refresh),
-                onRefresh = {
-                    if (!busy) {
-                        back.clear()
-                        load(null)
-                    }
-                },
-            )
-            RecoveryCopyPanel(
-                text = stringResource(R.string.retention_policy),
-                tag = "recovery_retention_copy_text",
-            )
-            RecoveryRetentionPanel(
-                busy = navigationState.busy,
-                label = stringResource(R.string.retention_run),
-                onExpire = ::expireOldPayloads,
-            )
-            RecoveryStatusPanel(feedbackText)
-            RecoveryEmptyPanel(
-                visible = emptyState,
-                message = stringResource(R.string.recovery_empty),
-            )
-            RecoveryCardsPanel(
-                cards = cards,
-                busy = navigationState.busy,
-                checkLabel = stringResource(R.string.recovery_check),
-                suppressLabel = stringResource(R.string.recovery_suppress),
-                reapproveLabel = stringResource(R.string.reapproval_open),
-                openEventLabel = stringResource(R.string.recovery_open_event),
-                onCheck = { token ->
-                    visibleRecords[token]?.let { action(it.first, false) }
-                },
-                onSuppress = { token ->
-                    visibleRecords[token]?.let { confirmSuppression(it.first) }
-                },
-                onReapprove = { token ->
-                    visibleRecords[token]?.let { confirmReapproval(it.first, it.second) }
-                },
-                onOpenEvent = { token ->
-                    visibleRecords[token]?.let { openEvent(it.first) }
-                },
-            )
-            RecoveryNavigationPanel(
-                state = navigationState,
-                previousLabel = stringResource(R.string.recovery_previous),
-                moreLabel = stringResource(R.string.recovery_more),
-                onPrevious = {
-                    if (!busy && back.isNotEmpty()) load(back.removeAt(back.size - 1))
-                },
-                onMore = {
-                    if (!busy && next != null) {
-                        back.add(current)
-                        load(next)
-                    }
-                },
-            )
+            RecoveryOverview()
+            RecoveryReceipts()
         }
         load(null)
+    }
+
+    @Composable
+    private fun RecoveryOverview() {
+        RecoveryCopyPanel(
+            text = stringResource(R.string.recovery_intro),
+            tag = "recovery_intro_text",
+        )
+        RecoveryAccessPanel(
+            label = stringResource(R.string.recovery_access),
+            onRequestAccess = {
+                permissions.launch(arrayOf(Manifest.permission.READ_CALENDAR))
+            },
+        )
+        RecoveryRefreshPanel(
+            busy = navigationState.busy,
+            refreshLabel = stringResource(R.string.recovery_refresh),
+            onRefresh = {
+                if (!busy) {
+                    back.clear()
+                    load(null)
+                }
+            },
+        )
+        RecoveryCopyPanel(
+            text = stringResource(R.string.retention_policy),
+            tag = "recovery_retention_copy_text",
+        )
+        RecoveryRetentionPanel(
+            busy = navigationState.busy,
+            label = stringResource(R.string.retention_run),
+            onExpire = ::expireOldPayloads,
+        )
+        RecoveryStatusPanel(feedbackText)
+        RecoveryEmptyPanel(
+            visible = emptyState,
+            message = stringResource(R.string.recovery_empty),
+        )
+    }
+
+    @Composable
+    private fun RecoveryReceipts() {
+        RecoveryCardsPanel(
+            cards = cards,
+            busy = navigationState.busy,
+            checkLabel = stringResource(R.string.recovery_check),
+            suppressLabel = stringResource(R.string.recovery_suppress),
+            reapproveLabel = stringResource(R.string.reapproval_open),
+            openEventLabel = stringResource(R.string.recovery_open_event),
+            onCheck = { token ->
+                visibleRecords[token]?.let { action(it.first, false) }
+            },
+            onSuppress = { token ->
+                visibleRecords[token]?.let { confirmSuppression(it.first) }
+            },
+            onReapprove = { token ->
+                visibleRecords[token]?.let { confirmReapproval(it.first, it.second) }
+            },
+            onOpenEvent = { token ->
+                visibleRecords[token]?.let { openEvent(it.first) }
+            },
+        )
+        RecoveryNavigationPanel(
+            state = navigationState,
+            previousLabel = stringResource(R.string.recovery_previous),
+            moreLabel = stringResource(R.string.recovery_more),
+            onPrevious = {
+                if (!busy && back.isNotEmpty()) load(back.removeAt(back.size - 1))
+            },
+            onMore = {
+                if (!busy && next != null) {
+                    back.add(current)
+                    load(next)
+                }
+            },
+        )
     }
 
     private fun load(cursor: SqliteLedger.RecoveryCursor?) {
@@ -117,34 +138,14 @@ class ReceiptRecoveryActivity : ComponentActivity() {
         executor.execute {
             try {
                 SqliteLedger(applicationContext).use { ledger ->
-                    ledger.expirePayloads(50)
-                    val page = ledger.recoveryPage(cursor, 11)
-                    val labels = HashMap<Long, String>()
-                    val sink = AndroidCalendarSink(applicationContext)
-                    for (item in page) {
-                        val intent = item.intent!!
-                        if (!labels.containsKey(intent.calendar)) {
-                            var label = getString(R.string.recovery_calendar_hidden)
-                            if (
-                                checkSelfPermission(Manifest.permission.READ_CALENDAR) ==
-                                    PackageManager.PERMISSION_GRANTED
-                            ) {
-                                label =
-                                    try {
-                                        sink.calendarLabel(intent.calendar)
-                                            ?: getString(R.string.auto_destination_unavailable)
-                                    } catch (unavailable: RuntimeException) {
-                                        getString(R.string.recovery_calendar_unverified)
-                                    }
-                            }
-                            labels[intent.calendar] = label
-                        }
-                    }
+                    ledger.expirePayloads(RECEIPT_RETENTION_BATCH_SIZE)
+                    val page = ledger.recoveryPage(cursor, RECOVERY_PAGE_SIZE + 1)
+                    val labels = readCalendarLabels(page)
                     runOnUiThread {
                         if (isDestroyed || ticket != version) return@runOnUiThread
                         busy = false
                         current = cursor
-                        val size = minOf(10, page.size)
+                        val size = minOf(RECOVERY_PAGE_SIZE, page.size)
                         val records =
                             (0 until size).map { index ->
                                 val intent = page[index].intent!!
@@ -156,11 +157,16 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                             cardState(token, record.first, record.second)
                         }
                         emptyState = size == 0
-                        next = if (page.size > 10) page[9].cursor else null
+                        next =
+                            if (page.size > RECOVERY_PAGE_SIZE) {
+                                page[RECOVERY_PAGE_SIZE - 1].cursor
+                            } else {
+                                null
+                            }
                         navigation()
                     }
                 }
-            } catch (failed: RuntimeException) {
+            } catch (ignored: RuntimeException) {
                 runOnUiThread {
                     if (isDestroyed || ticket != version) return@runOnUiThread
                     busy = false
@@ -169,6 +175,31 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun readCalendarLabels(page: List<SqliteLedger.RecoveryItem>): Map<Long, String> {
+        val labels = HashMap<Long, String>()
+        val sink = AndroidCalendarSink(applicationContext)
+        for (item in page) {
+            val intent = item.intent!!
+            if (!labels.containsKey(intent.calendar)) {
+                var label = getString(R.string.recovery_calendar_hidden)
+                if (
+                    checkSelfPermission(Manifest.permission.READ_CALENDAR) ==
+                        PackageManager.PERMISSION_GRANTED
+                ) {
+                    label =
+                        try {
+                            sink.calendarLabel(intent.calendar)
+                                ?: getString(R.string.auto_destination_unavailable)
+                        } catch (ignored: RuntimeException) {
+                            getString(R.string.recovery_calendar_unverified)
+                        }
+                }
+                labels[intent.calendar] = label
+            }
+        }
+        return labels
     }
 
     private fun navigation() {
@@ -245,7 +276,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                     ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, intent.eventId),
                 ),
             )
-        } catch (unavailable: RuntimeException) {
+        } catch (ignored: RuntimeException) {
             setFeedback(R.string.recovery_open_failed)
         }
     }
@@ -257,7 +288,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
         executor.execute {
             try {
                 SqliteLedger(applicationContext).use { ledger ->
-                    val count = ledger.expirePayloads(50)
+                    val count = ledger.expirePayloads(RECEIPT_RETENTION_BATCH_SIZE)
                     runOnUiThread {
                         if (isDestroyed) return@runOnUiThread
                         busy = false
@@ -265,7 +296,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                         load(current)
                     }
                 }
-            } catch (failed: RuntimeException) {
+            } catch (ignored: RuntimeException) {
                 runOnUiThread {
                     if (isDestroyed) return@runOnUiThread
                     busy = false
@@ -284,9 +315,8 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                 checkSelfPermission(Manifest.permission.WRITE_CALENDAR) !=
                     PackageManager.PERMISSION_GRANTED
         ) {
-            requestPermissions(
+            permissions.launch(
                 arrayOf(Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR),
-                12,
             )
             setFeedback(R.string.reapproval_tap_again)
             return
@@ -321,7 +351,7 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                         ReadyReapproval(ledger.outbox(), AndroidCalendarSink(applicationContext))
                             .approve(expected) { resumed && approvalSession === approvedSession }
                     }
-                } catch (failed: RuntimeException) {
+                } catch (ignored: RuntimeException) {
                     DurableDelivery.Result.FAILED
                 }
             runOnUiThread {
@@ -332,12 +362,17 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                         DurableDelivery.Result.SAVED,
                         DurableDelivery.Result.RECOVERED,
                         DurableDelivery.Result.ALREADY_LOGGED -> R.string.reapproval_verified
+
                         DurableDelivery.Result.PERMISSION_REQUIRED -> R.string.reapproval_tap_again
+
                         DurableDelivery.Result.DESTINATION_UNAVAILABLE ->
                             R.string.slice_calendar_unavailable
+
                         DurableDelivery.Result.SOURCE_CHANGED,
                         DurableDelivery.Result.REVIEW_REQUIRED -> R.string.reapproval_changed
+
                         DurableDelivery.Result.PAUSED -> R.string.reapproval_paused
+
                         else -> R.string.reapproval_failed
                     }
                 setFeedback(label)
@@ -379,10 +414,13 @@ class ReceiptRecoveryActivity : ComponentActivity() {
                                     ): List<SliceEngine.StoredEvent?> = sink.find(calendar, marker)
                                 },
                             )
-                        if (suppress) recovery.suppress(intent.key, intent.calendar)
-                        else recovery.reconcile(intent.key, intent.calendar)
+                        if (suppress) {
+                            recovery.suppress(intent.key, intent.calendar)
+                        } else {
+                            recovery.reconcile(intent.key, intent.calendar)
+                        }
                     }
-                } catch (failed: RuntimeException) {
+                } catch (ignored: RuntimeException) {
                     ReceiptRecovery.Result.FAILED
                 }
             runOnUiThread {
@@ -416,15 +454,6 @@ class ReceiptRecoveryActivity : ComponentActivity() {
             ReceiptRecovery.Result.NOT_FOUND -> R.string.recovery_not_found
             else -> R.string.recovery_failed
         }
-
-    public override fun onRequestPermissionsResult(
-        code: Int,
-        permissions: Array<String>,
-        grants: IntArray,
-    ) {
-        super.onRequestPermissionsResult(code, permissions, grants)
-        if (!busy) load(current)
-    }
 
     public override fun onDestroy() {
         resumed = false

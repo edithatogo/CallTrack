@@ -7,6 +7,9 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import java.util.UUID
 
+private const val CALLS_PER_BATCH = 50
+private const val BATCHES_PER_DESTINATION = 8
+
 /** Local provider work only; work input/output contain no personal call fields. */
 class AutomaticLogWorker(context: Context, parameters: WorkerParameters) :
     Worker(context, parameters) {
@@ -14,57 +17,68 @@ class AutomaticLogWorker(context: Context, parameters: WorkerParameters) :
 
     override fun doWork(): Result {
         val generation = inputData.getLong(GENERATION, -1)
-        try {
+        return try {
             val control = ActivationControl(AndroidActivationStore(applicationContext))
             val settings = control.current()
-            if (
-                settings == null ||
-                    !settings.enabled ||
-                    settings.generation != generation ||
-                    isStopped
-            )
-                return report(generation, "PAUSED", 0, 0, false)
-            var delivered = 0
-            var review = 0
-            var stopped: DurableDelivery.Result? = null
-            var retry = false
-            var backlog = false
-            SqliteLedger(applicationContext).use { ledger ->
-                ledger.expirePayloads(50)
-                val delivery =
-                    DurableDelivery(
-                        ledger.outbox(),
-                        AndroidCalendarSink(applicationContext, settings.calendarBindings),
+            if (settings == null || !mayRun(settings, generation)) {
+                report(generation, "PAUSED", 0, 0, false)
+            } else {
+                deliver(settings, control, generation)
+            }
+        } catch (ignored: RuntimeException) {
+            report(generation, "FAILED", 0, 0, runAttemptCount < AutomaticWorkPolicy.MAX_ATTEMPTS)
+        }
+    }
+
+    private fun mayRun(settings: ActivationControl.Settings, generation: Long): Boolean =
+        settings.enabled && settings.generation == generation && !isStopped
+
+    private fun deliver(
+        settings: ActivationControl.Settings,
+        control: ActivationControl,
+        generation: Long,
+    ): Result {
+        var delivered = 0
+        var review = 0
+        var stopped: DurableDelivery.Result? = null
+        var retry = false
+        var backlog = false
+        SqliteLedger(applicationContext).use { ledger ->
+            ledger.expirePayloads(RECEIPT_RETENTION_BATCH_SIZE)
+            val delivery =
+                DurableDelivery(
+                    ledger.outbox(),
+                    AndroidCalendarSink(applicationContext, settings.calendarBindings),
+                )
+            for ((calendar, sources) in settings.destinations) {
+                val source =
+                    AndroidCallLogSource(
+                        applicationContext,
+                        sources.any { it != CallRecord.PHONE },
                     )
-                for ((calendar, sources) in settings.destinations) {
-                    val source =
-                        AndroidCallLogSource(
-                            applicationContext,
-                            sources.any { it != CallRecord.PHONE },
-                        )
-                    val runner = AutomaticDelivery(control, source, ledger, delivery)
-                    var settled = false
-                    repeat(8) {
-                        if (!settled) {
-                            val batch = runner.runForCalendar(settings, calendar, 50) { !isStopped }
-                            delivered += batch.delivered
-                            review += batch.review
-                            val action = AutomaticWorkPolicy.decide(batch, runAttemptCount)
-                            settled = action != AutomaticWorkPolicy.Action.CONTINUE
-                            retry = retry || action == AutomaticWorkPolicy.Action.RETRY
-                            if (stopped == null || batch.stopped == DurableDelivery.Result.FAILED) {
-                                stopped = batch.stopped
+                val runner = AutomaticDelivery(control, source, ledger, delivery)
+                var settled = false
+                repeat(BATCHES_PER_DESTINATION) {
+                    if (!settled) {
+                        val batch =
+                            runner.runForCalendar(settings, calendar, CALLS_PER_BATCH) {
+                                !isStopped
                             }
+                        delivered += batch.delivered
+                        review += batch.review
+                        val action = AutomaticWorkPolicy.decide(batch, runAttemptCount)
+                        settled = action != AutomaticWorkPolicy.Action.CONTINUE
+                        retry = retry || action == AutomaticWorkPolicy.Action.RETRY
+                        if (stopped == null || batch.stopped == DurableDelivery.Result.FAILED) {
+                            stopped = batch.stopped
                         }
                     }
-                    backlog = backlog || !settled
                 }
+                backlog = backlog || !settled
             }
-            val status = stopped?.name ?: if (backlog) "BACKLOG" else "COMPLETE"
-            return report(generation, status, delivered, review, retry || backlog)
-        } catch (unavailable: RuntimeException) {
-            return report(generation, "FAILED", 0, 0, runAttemptCount < 5)
         }
+        val status = stopped?.name ?: if (backlog) "BACKLOG" else "COMPLETE"
+        return report(generation, status, delivered, review, retry || backlog)
     }
 
     private fun report(
@@ -85,26 +99,32 @@ class AutomaticLogWorker(context: Context, parameters: WorkerParameters) :
                         delivered,
                         review,
                     )
-            } catch (unavailable: RuntimeException) {
+            } catch (ignored: RuntimeException) {
                 false
             }
         if (!committed) {
-            if (runAttemptCount < 5) return Result.retry()
-            return Result.failure(
+            return if (runAttemptCount < AutomaticWorkPolicy.MAX_ATTEMPTS) {
+                Result.retry()
+            } else {
+                Result.failure(
+                    Data.Builder()
+                        .putString("status", "UNKNOWN")
+                        .putBoolean("statusStored", false)
+                        .build(),
+                )
+            }
+        }
+        return if (retry) {
+            Result.retry()
+        } else {
+            Result.success(
                 Data.Builder()
-                    .putString("status", "UNKNOWN")
-                    .putBoolean("statusStored", false)
+                    .putString("status", code)
+                    .putInt("delivered", delivered)
+                    .putInt("review", review)
                     .build(),
             )
         }
-        if (retry) return Result.retry()
-        return Result.success(
-            Data.Builder()
-                .putString("status", code)
-                .putInt("delivered", delivered)
-                .putInt("review", review)
-                .build(),
-        )
     }
 
     companion object {

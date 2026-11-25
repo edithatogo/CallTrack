@@ -88,9 +88,13 @@ class DurableDelivery(private val store: Store?, private val sink: SliceEngine.C
         @JvmField val operation: Operation?,
         @JvmField val facts: SourceFacts?,
     ) {
-        @JvmField val state: State = state ?: throw NullPointerException()
-        @JvmField val key: String = key ?: throw NullPointerException()
-        @JvmField val fingerprint: String = fingerprint ?: throw NullPointerException()
+        @JvmField val state: State = state ?: throw NullPointerException("Delivery state required")
+
+        @JvmField val key: String = key ?: throw NullPointerException("Source key required")
+
+        @JvmField
+        val fingerprint: String =
+            fingerprint ?: throw NullPointerException("Event fingerprint required")
 
         /** Match the exact event, including a provider's whole-second sync representation. */
         fun matchesEvent(event: CallEvent?): Boolean {
@@ -103,10 +107,13 @@ class DurableDelivery(private val store: Store?, private val sink: SliceEngine.C
                 try {
                     Math.addExact(
                         source.start,
-                        if (source.seconds == 0L) 60000L
-                        else Math.multiplyExact(source.seconds, 1000L),
+                        if (source.seconds == 0L) {
+                            60000L
+                        } else {
+                            Math.multiplyExact(source.seconds, 1000L)
+                        },
                     )
-                } catch (overflow: ArithmeticException) {
+                } catch (ignored: ArithmeticException) {
                     return false
                 }
             if (event.end != originalEnd - fraction) return false
@@ -158,14 +165,14 @@ class DurableDelivery(private val store: Store?, private val sink: SliceEngine.C
 
         fun state(next: State?, id: Long): Intent {
             val retained =
-                if (
-                    next == State.CONFIRMED ||
-                        next == State.REVIEW ||
-                        next == State.SUPPRESSED ||
-                        next == State.EXPIRED_READY
-                )
-                    null
-                else payload
+                when (next) {
+                    State.CONFIRMED,
+                    State.REVIEW,
+                    State.SUPPRESSED,
+                    State.EXPIRED_READY -> null
+
+                    else -> payload
+                }
             return Intent(
                 next,
                 key,
@@ -244,24 +251,24 @@ class DurableDelivery(private val store: Store?, private val sink: SliceEngine.C
                 } else if (pending(intent) && !sameOperation(intent.operation, operation)) {
                     return Result.PAUSED
                 } else if (intent.sourceSignature == null) {
-                    if (intent.fingerprint != CallEvent.from(source, timezone).fingerprint())
+                    if (intent.fingerprint != CallEvent.from(source, timezone).fingerprint()) {
                         return review(intent, Result.REVIEW_REQUIRED)
+                    }
                     intent = intent.bind(signature)
                     store.put(intent)
                 } else if (
-                    intent.sourceSignature != signature ||
-                        intent.facts != null && !intent.facts.agrees(source)
+                    intent.sourceSignature != signature || intent.facts?.agrees(source) == false
                 ) {
                     return review(intent, Result.SOURCE_CHANGED)
                 }
                 attempt(intent, allowed)
-            } catch (denied: SecurityException) {
+            } catch (ignored: SecurityException) {
                 Result.PERMISSION_REQUIRED
-            } catch (invalid: ArithmeticException) {
+            } catch (ignored: ArithmeticException) {
                 Result.INVALID_CALL
-            } catch (invalid: IllegalArgumentException) {
+            } catch (ignored: IllegalArgumentException) {
                 Result.INVALID_CALL
-            } catch (failed: RuntimeException) {
+            } catch (ignored: RuntimeException) {
                 Result.FAILED
             }
         }
@@ -282,9 +289,9 @@ class DurableDelivery(private val store: Store?, private val sink: SliceEngine.C
                 val intent = store!!.get(key, calendar) ?: return Result.NOTHING_PENDING
                 if (!sameOperation(intent.operation, operation)) return Result.PAUSED
                 attempt(intent, allowed)
-            } catch (denied: SecurityException) {
+            } catch (ignored: SecurityException) {
                 Result.PERMISSION_REQUIRED
-            } catch (failed: RuntimeException) {
+            } catch (ignored: RuntimeException) {
                 Result.FAILED
             }
         }
@@ -299,19 +306,18 @@ class DurableDelivery(private val store: Store?, private val sink: SliceEngine.C
         synchronized(DELIVERY_LOCK) {
             try {
                 if (!confirmed!!.asBoolean) return Result.PAUSED
-                if (operation == null || !operation.owner.startsWith("import/"))
+                if (operation == null || !operation.owner.startsWith("import/")) {
                     return Result.REVIEW_REQUIRED
+                }
                 val source = call!!
                 val prior = store!!.get(source.key(), calendar)
-                if (prior == null || prior.state != State.EXPIRED_READY || prior.eventId >= 0)
+                if (prior == null || prior.state != State.EXPIRED_READY || prior.eventId >= 0) {
                     return Result.REVIEW_REQUIRED
+                }
                 val signature = CallIdentity.signature(source)
-                if (
-                    prior.sourceSignature == null ||
-                        prior.sourceSignature != signature ||
-                        prior.facts != null && !prior.facts.agrees(source)
-                )
+                if (!prior.matchesSource(signature, source)) {
                     return Result.SOURCE_CHANGED
+                }
                 if (!sink!!.writable(calendar)) return Result.DESTINATION_UNAVAILABLE
                 val event = CallEvent.from(source, timezone)
                 if (!confirmed.asBoolean) return Result.PAUSED
@@ -330,13 +336,13 @@ class DurableDelivery(private val store: Store?, private val sink: SliceEngine.C
                     )
                 store.put(refreshed)
                 attempt(refreshed, confirmed)
-            } catch (denied: SecurityException) {
+            } catch (ignored: SecurityException) {
                 Result.PERMISSION_REQUIRED
-            } catch (invalid: ArithmeticException) {
+            } catch (ignored: ArithmeticException) {
                 Result.INVALID_CALL
-            } catch (invalid: IllegalArgumentException) {
+            } catch (ignored: IllegalArgumentException) {
                 Result.INVALID_CALL
-            } catch (failed: RuntimeException) {
+            } catch (ignored: RuntimeException) {
                 Result.FAILED
             }
         }
@@ -347,12 +353,14 @@ class DurableDelivery(private val store: Store?, private val sink: SliceEngine.C
             intent.state == State.EXPIRED_READY ||
                 intent.state == State.REVIEW ||
                 intent.state == State.SUPPRESSED
-        )
+        ) {
             return Result.REVIEW_REQUIRED
+        }
         if (intent.eventId >= 0) return verify(intent, false)
         if (intent.state == State.IN_FLIGHT) return recover(intent)
-        if (intent.state != State.READY || intent.payload == null)
+        if (intent.state != State.READY || intent.payload == null) {
             return review(intent, Result.REVIEW_REQUIRED)
+        }
         if (!allowed.asBoolean) return Result.PAUSED
         if (!sink!!.writable(intent.calendar)) return Result.DESTINATION_UNAVAILABLE
         // This committed transition is never undone on exceptions/cancellation.
@@ -360,16 +368,20 @@ class DurableDelivery(private val store: Store?, private val sink: SliceEngine.C
         store!!.put(intent)
         if (!allowed.asBoolean) return Result.PAUSED
         val id = sink.insert(intent.calendar, intent.payload)
-        if (id < 0) return review(intent, Result.REVIEW_REQUIRED)
-        intent = intent.state(State.ATTEMPTED, id)
-        store.put(intent)
-        return verify(intent, true)
+        return if (id < 0) {
+            review(intent, Result.REVIEW_REQUIRED)
+        } else {
+            val attempted = intent.state(State.ATTEMPTED, id)
+            store.put(attempted)
+            verify(attempted, true)
+        }
     }
 
     private fun recover(intent: Intent): Result {
         val found = sink!!.find(intent.calendar, intent.marker)!!
-        if (found.size != 1 || !matches(found[0], intent))
+        if (found.size != 1 || !matches(found[0], intent)) {
             return review(intent, Result.REVIEW_REQUIRED)
+        }
         val known = intent.state(State.ATTEMPTED, found[0]!!.id)
         store!!.put(known)
         val result = verify(known, false)
@@ -378,11 +390,15 @@ class DurableDelivery(private val store: Store?, private val sink: SliceEngine.C
 
     private fun verify(intent: Intent, inserted: Boolean): Result {
         val existing = sink!!.read(intent.eventId)
-        if (!matches(existing, intent) || existing!!.id != intent.eventId)
+        if (!matches(existing, intent) || existing!!.id != intent.eventId) {
             return review(intent, Result.REVIEW_REQUIRED)
+        }
         store!!.put(intent.state(State.CONFIRMED, intent.eventId))
         return if (inserted) Result.SAVED else Result.ALREADY_LOGGED
     }
+
+    private fun Intent.matchesSource(signature: String, source: CallRecord): Boolean =
+        sourceSignature == signature && facts?.agrees(source) != false
 
     private fun matches(event: SliceEngine.StoredEvent?, intent: Intent): Boolean =
         event != null &&
@@ -400,8 +416,11 @@ class DurableDelivery(private val store: Store?, private val sink: SliceEngine.C
         @JvmField val DELIVERY_LOCK = Any()
 
         private fun sameOperation(left: Operation?, right: Operation?): Boolean =
-            if (left == null) right == null
-            else right != null && left.owner == right.owner && left.generation == right.generation
+            if (left == null) {
+                right == null
+            } else {
+                right != null && left.owner == right.owner && left.generation == right.generation
+            }
 
         private fun pending(intent: Intent): Boolean =
             intent.state == State.READY ||

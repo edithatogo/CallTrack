@@ -44,6 +44,7 @@ class HistoricalImport(
         @JvmField val outcome: DurableDelivery.Result?,
     ) {
         @JvmField val key: String
+
         @JvmField val binding: String
 
         init {
@@ -86,8 +87,11 @@ class HistoricalImport(
         @JvmField val stopped: DurableDelivery.Result?,
     ) {
         @JvmField val id: String
+
         @JvmField val timezone: String
+
         @JvmField val phase: Phase
+
         @JvmField val checkpoint: PagedCalls.Checkpoint
 
         init {
@@ -206,8 +210,11 @@ class HistoricalImport(
                 }
                 val next =
                     session.next(
-                        if (checkpoint.lastId == checkpoint.upperId) Phase.PREVIEW
-                        else Phase.BUILDING,
+                        if (checkpoint.lastId == checkpoint.upperId) {
+                            Phase.PREVIEW
+                        } else {
+                            Phase.BUILDING
+                        },
                         checkpoint,
                         Math.addExact(session.count, candidates.size.toLong()),
                         -1,
@@ -217,7 +224,7 @@ class HistoricalImport(
                     )
                 store!!.save(session, next, candidates)
                 next
-            } catch (changed: PagedCalls.SourceChanged) {
+            } catch (ignored: PagedCalls.SourceChanged) {
                 save(
                     session,
                     session.next(
@@ -276,11 +283,11 @@ class HistoricalImport(
         bounds(limit)
         return synchronized(DurableDelivery.DELIVERY_LOCK) {
             var session = required(id)
-            if (session.phase != Phase.CONFIRMED) return session
+            if (session.phase != Phase.CONFIRMED) return@synchronized session
             val page = store!!.candidates(id, session.processedId, limit)
             check(!page.isNullOrEmpty() && page.size <= limit) { "Import candidates unavailable" }
             for (entry in page) {
-                if (!running!!.asBoolean) return session
+                if (!running!!.asBoolean) return@synchronized session
                 val candidate = entry!!
                 check(
                     candidate.sourceId > session.processedId &&
@@ -295,10 +302,12 @@ class HistoricalImport(
                     DurableDelivery.Result.SAVED,
                     DurableDelivery.Result.RECOVERED,
                     DurableDelivery.Result.ALREADY_LOGGED -> saved = Math.addExact(saved, 1)
+
                     DurableDelivery.Result.REVIEW_REQUIRED,
                     DurableDelivery.Result.SOURCE_CHANGED -> review = Math.addExact(review, 1)
+
                     else ->
-                        return finish(
+                        return@synchronized finish(
                             session,
                             session.next(
                                 session.phase,
@@ -330,6 +339,15 @@ class HistoricalImport(
         }
     }
 
+    private fun canResume(
+        intent: DurableDelivery.Intent,
+        session: Session,
+        candidate: Candidate,
+    ): Boolean =
+        intent.state != DurableDelivery.State.EXPIRED_READY &&
+            owned(intent, session) &&
+            bindingMatches(candidate, intent)
+
     private fun attempt(
         session: Session,
         candidate: Candidate,
@@ -337,45 +355,38 @@ class HistoricalImport(
     ): DurableDelivery.Result =
         try {
             val intent = receipts!!.get(candidate.key, session.calendar)
-            if (
-                intent != null &&
-                    intent.state != DurableDelivery.State.EXPIRED_READY &&
-                    owned(intent, session) &&
-                    bindingMatches(candidate, intent)
-            ) {
-                delivery!!.resume(candidate.key, session.calendar, session.operation()) {
-                    running.asBoolean && allowed(session)
-                }
+            val permitted = BooleanSupplier { running.asBoolean && allowed(session) }
+            if (intent != null && canResume(intent, session, candidate)) {
+                delivery!!.resume(candidate.key, session.calendar, session.operation(), permitted)
             } else {
                 val call = source!!.at(candidate.sourceId)
                 if (
                     call == null ||
                         candidate.key != call.key() ||
                         candidate.binding != PagedCalls.binding(call)
-                )
+                ) {
                     DurableDelivery.Result.SOURCE_CHANGED
-                else if (intent != null && intent.state == DurableDelivery.State.EXPIRED_READY)
+                } else if (intent != null && intent.state == DurableDelivery.State.EXPIRED_READY) {
                     delivery!!.reapproveExpired(
                         call,
                         session.calendar,
                         session.timezone,
                         session.operation(),
-                    ) {
-                        running.asBoolean && allowed(session)
-                    }
-                else
+                        permitted,
+                    )
+                } else {
                     delivery!!.deliver(
                         call,
                         session.calendar,
                         session.timezone,
                         session.operation(),
-                    ) {
-                        running.asBoolean && allowed(session)
-                    }
+                        permitted,
+                    )
+                }
             }
-        } catch (denied: SecurityException) {
+        } catch (ignored: SecurityException) {
             DurableDelivery.Result.PERMISSION_REQUIRED
-        } catch (failed: RuntimeException) {
+        } catch (ignored: RuntimeException) {
             DurableDelivery.Result.FAILED
         }
 
@@ -420,6 +431,6 @@ class HistoricalImport(
         store!!.get(id) ?: throw IllegalArgumentException("Unknown import")
 
     private fun bounds(limit: Int) {
-        require(limit in 1..500) { "Invalid import batch limit" }
+        require(limit in 1..PagedCalls.MAX_PAGE_SIZE) { "Invalid import batch limit" }
     }
 }

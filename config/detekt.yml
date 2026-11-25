@@ -1,0 +1,24 @@
+config:
+  validation: true
+  warningsAsErrors: true
+
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+
+complexity:
+  # A simple case label adds no work beyond selecting the result.
+  CyclomaticComplexMethod:
+    ignoreSimpleWhenEntries: true
+  # Measure component APIs and keep private helpers and lifecycle overrides outside the count.
+  TooManyFunctions:
+    ignorePrivate: true
+    ignoreOverridden: true
+    ignoreAnnotatedFunctions: ['Composable']
+
+style:
+  # Keep validation guards at the start of a method.
+  ReturnCount:
+    excludeGuardClauses: true
+  ThrowsCount:
+    excludeGuardClauses: true

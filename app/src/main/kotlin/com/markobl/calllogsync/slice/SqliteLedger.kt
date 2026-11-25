@@ -6,6 +6,10 @@ import java.util.Collections
 import java.util.function.LongSupplier
 import kotlinx.coroutines.runBlocking
 
+internal const val RECEIPT_RETENTION_BATCH_SIZE = 50
+private const val MAX_RECEIPT_PAGE_SIZE = 50
+private const val MAX_LEDGER_BATCH_SIZE = 500
+
 /** Durable source/destination receipts; Room transactions serialize concurrent instances. */
 class SqliteLedger(context: Context?, name: String?, private val clock: LongSupplier?) :
     AutomaticDelivery.Progress, Closeable {
@@ -45,7 +49,7 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
     )
 
     fun recoveryPage(after: RecoveryCursor?, limit: Int): List<RecoveryItem> {
-        require(limit in 1..50) { "Invalid receipt page" }
+        require(limit in 1..MAX_RECEIPT_PAGE_SIZE) { "Invalid receipt page" }
         val rows = runBlocking {
             dao.recoveryPage(after?.started, after?.key, after?.calendar, limit)
         }
@@ -66,10 +70,13 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
                 DurableDelivery.State.READY,
                 DurableDelivery.State.IN_FLIGHT,
                 DurableDelivery.State.ATTEMPTED -> pending = Math.addExact(pending, row.total)
+
                 DurableDelivery.State.CONFIRMED -> verified = Math.addExact(verified, row.total)
+
                 DurableDelivery.State.REVIEW,
                 DurableDelivery.State.LEGACY,
                 DurableDelivery.State.EXPIRED_READY -> review = Math.addExact(review, row.total)
+
                 DurableDelivery.State.SUPPRESSED ->
                     suppressed = Math.addExact(suppressed, row.total)
             }
@@ -82,7 +89,9 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
         calendar: Long,
         limit: Int,
     ): List<String> {
-        require(operation != null && calendar >= 0 && limit in 1..500) { "Invalid pending query" }
+        require(operation != null && calendar >= 0 && limit in 1..MAX_LEDGER_BATCH_SIZE) {
+            "Invalid pending query"
+        }
         return Collections.unmodifiableList(
             runBlocking { dao.pending(operation.owner, operation.generation, calendar, limit) },
         )
@@ -120,11 +129,11 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
                 val prior = readCheckpoint(operation)
                 check(
                     prior == null ||
-                        prior.namespace == next.namespace &&
+                        (prior.namespace == next.namespace &&
                             prior.upperId == next.upperId &&
                             prior.upperBinding == next.upperBinding &&
                             next.lastId >= prior.lastId &&
-                            (next.lastId != prior.lastId || prior.lastBinding == next.lastBinding),
+                            (next.lastId != prior.lastId || prior.lastBinding == next.lastBinding)),
                 ) {
                     "Frozen checkpoint cannot be reset or rebound"
                 }
@@ -195,7 +204,7 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
         }
 
     fun expirePayloads(limit: Int): Int {
-        require(limit in 1..500) { "Invalid retention batch" }
+        require(limit in 1..MAX_LEDGER_BATCH_SIZE) { "Invalid retention batch" }
         return synchronized(DurableDelivery.DELIVERY_LOCK) {
             val time = now()
             if (time < PayloadRetention.WINDOW_MILLIS) return 0
@@ -227,7 +236,9 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
                     val cleared = PayloadRetention.clear(current)
                     writeIntent(cleared)
                     cleared
-                } else current
+                } else {
+                    current
+                }
             }
         }
 

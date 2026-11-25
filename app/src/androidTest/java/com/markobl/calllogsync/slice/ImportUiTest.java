@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.provider.CallLog.Calls;
+import android.view.accessibility.AccessibilityNodeInfo;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -183,7 +184,9 @@ public class ImportUiTest {
                 () -> {
                     android.view.accessibility.AccessibilityNodeInfo node =
                             ui.shown("import_outgoing", true);
-                    return node != null && node.isCheckable() && !node.isChecked();
+                    return node != null
+                            && node.isCheckable()
+                            && node.getChecked() == AccessibilityNodeInfo.CHECKED_STATE_FALSE;
                 },
                 "Outgoing filter did not switch off");
         ui.dismissKeyboard();
@@ -192,17 +195,16 @@ public class ImportUiTest {
         ui.capture("import-before-process-death");
 
         ui.killStoppedProcessAndReturn(HistoricalImportActivity.class);
-        ui.await(
-                () -> ui.find("import_calendar_picker", true) != null,
-                "Import did not restore",
-                90000);
+        ui.await(() -> ui.find("calltrack_screen", true) != null, "Import did not restore", 90000);
         ui.revealId("import_calendar_picker");
         ui.await(
                 () -> ui.find(fixture.calendarDisplayName(), false) != null,
                 "Selected destination did not return after process death");
         assertEquals(from, ui.shown("import_from", true).getText().toString());
         assertEquals(to, ui.shown("import_to", true).getText().toString());
-        assertFalse(ui.shown("import_outgoing", true).isChecked());
+        assertEquals(
+                AccessibilityNodeInfo.CHECKED_STATE_FALSE,
+                ui.shown("import_outgoing", true).getChecked());
         assertNull("Process restoration must not create a preview", latest());
         assertEquals(0, fixture.events(calendar()));
         ui.capture("import-after-process-death");
@@ -224,7 +226,9 @@ public class ImportUiTest {
                     () -> {
                         android.view.accessibility.AccessibilityNodeInfo node =
                                 ui.shown("import_outgoing", true);
-                        return node != null && node.isCheckable() && !node.isChecked();
+                        return node != null
+                                && node.isCheckable()
+                                && node.getChecked() == AccessibilityNodeInfo.CHECKED_STATE_FALSE;
                     },
                     "Outgoing filter did not switch off");
             ui.dismissKeyboard();
@@ -239,7 +243,9 @@ public class ImportUiTest {
                     "Selected destination did not return after recreation");
             assertEquals(from, ui.shown("import_from", true).getText().toString());
             assertEquals(to, ui.shown("import_to", true).getText().toString());
-            assertFalse(ui.shown("import_outgoing", true).isChecked());
+            assertEquals(
+                    AccessibilityNodeInfo.CHECKED_STATE_FALSE,
+                    ui.shown("import_outgoing", true).getChecked());
             assertNull("Recreation must not create a preview", latest());
             assertEquals(0, fixture.events(calendar()));
             ui.capture("import-after-recreation");
@@ -282,9 +288,14 @@ public class ImportUiTest {
             ui.tapId("import_confirm");
             ui.capture("import-confirmation-preview");
             ui.tapId("button2");
+            ui.await(
+                    () -> ui.find("calltrack_screen", true) != null,
+                    "Import screen did not regain its active window after confirmation");
             assertEquals(HistoricalImport.Phase.PREVIEW, latest().phase);
             assertEquals(0, fixture.events(calendar()));
-            // The end field can retain focus when the confirmation dismisses its keyboard.
+            // Dismissing the dialog can restore the end field and its keyboard.
+            ui.dismissKeyboard();
+            ui.revealId("import_from");
             ui.tapId("import_from");
             ui.await(
                     () -> {

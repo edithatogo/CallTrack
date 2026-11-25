@@ -41,8 +41,9 @@ constructor(
         if (
             context.checkSelfPermission(Manifest.permission.READ_CALENDAR) !=
                 PackageManager.PERMISSION_GRANTED
-        )
+        ) {
             throw SecurityException("Calendar read permission required")
+        }
     }
 
     private fun permission() {
@@ -51,8 +52,9 @@ constructor(
                 PackageManager.PERMISSION_GRANTED ||
                 context.checkSelfPermission(Manifest.permission.WRITE_CALENDAR) !=
                     PackageManager.PERMISSION_GRANTED
-        )
+        ) {
             throw SecurityException("Calendar permissions required")
+        }
     }
 
     fun choices(): List<Choice> {
@@ -140,8 +142,11 @@ constructor(
         values.put(Events.CUSTOM_APP_PACKAGE, context.packageName)
         values.put(Events.CUSTOM_APP_URI, event.marker)
         val uri =
-            if (expected == null) resolver.insert(Events.CONTENT_URI, values)
-            else insertBound(calendar, identity, values)
+            if (expected == null) {
+                resolver.insert(Events.CONTENT_URI, values)
+            } else {
+                insertBound(calendar, identity, values)
+            }
         checkNotNull(uri) { "Event not inserted" }
         return ContentUris.parseId(uri)
     }
@@ -180,23 +185,27 @@ constructor(
     }
 
     private fun stored(cursor: Cursor): SliceEngine.StoredEvent? {
+        val packageColumn = cursor.getColumnIndexOrThrow(Events.CUSTOM_APP_PACKAGE)
+        if (context.packageName != cursor.getString(packageColumn)) return null
         if (
-            context.packageName != cursor.getString(8) ||
-                cursor.getInt(9) != Events.ACCESS_PRIVATE ||
-                cursor.getInt(10) != Events.AVAILABILITY_FREE ||
-                cursor.getInt(11) != 0
-        )
+            cursor.getInt(cursor.getColumnIndexOrThrow(Events.ACCESS_LEVEL)) !=
+                Events.ACCESS_PRIVATE ||
+                cursor.getInt(cursor.getColumnIndexOrThrow(Events.AVAILABILITY)) !=
+                    Events.AVAILABILITY_FREE ||
+                cursor.getInt(cursor.getColumnIndexOrThrow(Events.HAS_ALARM)) != 0
+        ) {
             return null
+        }
         return SliceEngine.StoredEvent(
-            cursor.getLong(0),
-            cursor.getLong(1),
+            cursor.getLong(cursor.getColumnIndexOrThrow(Events._ID)),
+            cursor.getLong(cursor.getColumnIndexOrThrow(Events.CALENDAR_ID)),
             CallEvent(
-                cursor.getString(2),
-                cursor.getString(3),
-                cursor.getLong(4),
-                cursor.getLong(5),
-                cursor.getString(6),
-                cursor.getString(7),
+                cursor.getString(cursor.getColumnIndexOrThrow(Events.TITLE)),
+                cursor.getString(cursor.getColumnIndexOrThrow(Events.DESCRIPTION)),
+                cursor.getLong(cursor.getColumnIndexOrThrow(Events.DTSTART)),
+                cursor.getLong(cursor.getColumnIndexOrThrow(Events.DTEND)),
+                cursor.getString(cursor.getColumnIndexOrThrow(Events.EVENT_TIMEZONE)),
+                cursor.getString(cursor.getColumnIndexOrThrow(Events.CUSTOM_APP_URI)),
             ),
         )
     }

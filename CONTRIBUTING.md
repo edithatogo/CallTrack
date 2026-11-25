@@ -46,6 +46,11 @@ formatter URL/checksum and exact command. Preserve the upstream notices; contrib
 only code and assets you have the right to distribute under compatible terms.
 For Kotlin use ktfmt 0.65 with `--kotlinlang-style --dry-run --set-exit-if-changed`.
 CI pins its Maven URL and SHA-256. Follow [Kotlin style](conductor/code_styleguides/kotlin.md).
+Run `./gradlew ktlintCheck detekt` for Kotlin sources and tests in the Android
+app. The Gradle verification metadata pins both command-line tools. The required
+build qualification runs these tasks alongside the existing formatter and
+Android Lint. Detekt counts guarded work and component APIs, with conventions
+for Compose declarations and early guards.
 Describe behaviour changes and their regression evidence in the pull request.
 Keep language/UI migrations separate from synchronization behaviour changes.
 

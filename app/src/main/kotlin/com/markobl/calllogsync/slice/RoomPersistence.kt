@@ -15,6 +15,11 @@ import androidx.sqlite.driver.AndroidSQLiteDriver
 import androidx.sqlite.execSQL
 import java.util.function.LongSupplier
 
+private const val LEDGER_SCHEMA_VERSION = 7
+private const val OPERATION_FIELDS_VERSION = 3
+private const val SOURCE_FACTS_VERSION = 4
+private const val SCAN_CURSORS_VERSION = 5
+
 // These entities describe the existing on-disk schema, not a new interchange format.
 // Retaining the original DB filenames is essential for preserving installed receipts.
 @Entity(tableName = "receipts", primaryKeys = ["source", "calendar"])
@@ -93,7 +98,7 @@ internal data class ImportCandidateRow(
 
 @Database(
     entities = [ReceiptRow::class, OutboxRow::class, ScanCursorRow::class],
-    version = 7,
+    version = LEDGER_SCHEMA_VERSION,
     exportSchema = true,
 )
 internal abstract class RoomLedgerDatabase : RoomDatabase() {
@@ -127,7 +132,7 @@ internal object RoomPersistence {
         }
 
     private fun ledgerMigration(from: Int, clock: LongSupplier): Migration =
-        object : Migration(from, 7) {
+        object : Migration(from, LEDGER_SCHEMA_VERSION) {
             override suspend fun migrate(connection: SQLiteConnection) {
                 if (from == 1) {
                     connection.execSQL(OUTBOX_TABLE)
@@ -143,7 +148,7 @@ internal object RoomPersistence {
                             "ALTER TABLE outbox ADD COLUMN operation_generation INTEGER NOT NULL DEFAULT 0",
                         )
                     }
-                    if (from < 4) {
+                    if (from < SOURCE_FACTS_VERSION) {
                         connection.execSQL("ALTER TABLE outbox ADD COLUMN source_start INTEGER")
                         connection.execSQL("ALTER TABLE outbox ADD COLUMN source_seconds INTEGER")
                         connection.execSQL("ALTER TABLE outbox ADD COLUMN source_type INTEGER")
@@ -155,7 +160,7 @@ internal object RoomPersistence {
                         )
                     }
                 }
-                if (from < 5) connection.execSQL(SCANS_TABLE)
+                if (from < SCAN_CURSORS_VERSION) connection.execSQL(SCANS_TABLE)
                 if (from != 1) {
                     connection.execSQL("ALTER TABLE outbox ADD COLUMN payload_saved_at INTEGER")
                 }
@@ -190,9 +195,9 @@ internal object RoomPersistence {
                 migration6To7,
                 ledgerMigration(1, clock),
                 ledgerMigration(2, clock),
-                ledgerMigration(3, clock),
-                ledgerMigration(4, clock),
-                ledgerMigration(5, clock),
+                ledgerMigration(OPERATION_FIELDS_VERSION, clock),
+                ledgerMigration(SOURCE_FACTS_VERSION, clock),
+                ledgerMigration(SCAN_CURSORS_VERSION, clock),
             )
             .build()
 

@@ -21,8 +21,9 @@ class AutomaticWakeReceiver : BroadcastReceiver() {
             !callEnded &&
                 Intent.ACTION_BOOT_COMPLETED != action &&
                 Intent.ACTION_MY_PACKAGE_REPLACED != action
-        )
+        ) {
             return
+        }
         val pending = goAsync()
         val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(8)
         val executor = Executors.newSingleThreadExecutor()
@@ -32,7 +33,7 @@ class AutomaticWakeReceiver : BroadcastReceiver() {
             } catch (interrupted: InterruptedException) {
                 Thread.currentThread().interrupt()
                 Log.w("CallTrackScheduling", "WAKE_ENQUEUE_UNCONFIRMED")
-            } catch (unavailable: Exception) {
+            } catch (ignored: Exception) {
                 Log.w("CallTrackScheduling", "WAKE_ENQUEUE_UNCONFIRMED")
             } finally {
                 pending!!.finish()

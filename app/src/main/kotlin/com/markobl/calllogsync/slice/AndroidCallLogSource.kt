@@ -18,8 +18,11 @@ constructor(context: Context?, includeAppCalls: Boolean = false) :
     private val context = context!!.applicationContext
     private val uri = if (includeAppCalls) Calls.CONTENT_URI_WITH_VOIP_CALLS else Calls.CONTENT_URI
     private val projection =
-        if (includeAppCalls) PROJECTION + arrayOf(Calls.UUID, Calls.PHONE_ACCOUNT_COMPONENT_NAME)
-        else PROJECTION
+        if (includeAppCalls) {
+            PROJECTION + arrayOf(Calls.UUID, Calls.PHONE_ACCOUNT_COMPONENT_NAME)
+        } else {
+            PROJECTION
+        }
 
     override fun latest(): CallRecord? {
         permission()
@@ -47,11 +50,14 @@ constructor(context: Context?, includeAppCalls: Boolean = false) :
 
     internal fun observedAppPackages(): Set<String> {
         permission()
-        val query = pageQuery("${Calls.UUID} IS NOT NULL", null, false, 500)
+        val query = pageQuery("${Calls.UUID} IS NOT NULL", null, false, PagedCalls.MAX_PAGE_SIZE)
         return context.contentResolver
             .query(
                 Calls.CONTENT_URI_WITH_VOIP_CALLS.buildUpon()
-                    .appendQueryParameter(Calls.LIMIT_PARAM_KEY, "500")
+                    .appendQueryParameter(
+                        Calls.LIMIT_PARAM_KEY,
+                        PagedCalls.MAX_PAGE_SIZE.toString(),
+                    )
                     .build(),
                 arrayOf(Calls.PHONE_ACCOUNT_COMPONENT_NAME),
                 query,
@@ -77,7 +83,7 @@ constructor(context: Context?, includeAppCalls: Boolean = false) :
             afterExclusive >= -1 &&
                 upperInclusive >= 0 &&
                 afterExclusive < upperInclusive &&
-                limit in 1..500,
+                limit in 1..PagedCalls.MAX_PAGE_SIZE,
         ) {
             "Invalid source page"
         }
@@ -93,8 +99,9 @@ constructor(context: Context?, includeAppCalls: Boolean = false) :
         if (
             context.checkSelfPermission(Manifest.permission.READ_CALL_LOG) !=
                 PackageManager.PERMISSION_GRANTED
-        )
+        ) {
             throw SecurityException("Call-log permission required")
+        }
     }
 
     private fun bounded(
@@ -136,17 +143,19 @@ constructor(context: Context?, includeAppCalls: Boolean = false) :
 
         private fun namespace(context: Context): String =
             synchronized(AndroidCallLogSource::class.java) {
-                if (namespaceCommitUncertain)
+                if (namespaceCommitUncertain) {
                     throw IllegalStateException(
                         "Source identity commit uncertain; restart required",
                     )
+                }
                 val prefs = context.getSharedPreferences("slice", Context.MODE_PRIVATE)
                 var id = prefs.getString("sourceNamespace", null)
                 if (id == null) {
                     id = "android-call-log/" + UUID.randomUUID()
                     namespaceCommitUncertain = true
-                    if (!prefs.edit().putString("sourceNamespace", id).commit())
+                    if (!prefs.edit().putString("sourceNamespace", id).commit()) {
                         throw IllegalStateException("Identity not persisted")
+                    }
                     namespaceCommitUncertain = false
                 }
                 id
@@ -159,13 +168,16 @@ constructor(context: Context?, includeAppCalls: Boolean = false) :
             ascending: Boolean,
             limit: Int,
         ): Bundle {
-            require(limit in 1..500) { "Invalid page limit" }
+            require(limit in 1..PagedCalls.MAX_PAGE_SIZE) { "Invalid page limit" }
             val query = Bundle()
             query.putStringArray(ContentResolver.QUERY_ARG_SORT_COLUMNS, arrayOf(Calls._ID))
             query.putInt(
                 ContentResolver.QUERY_ARG_SORT_DIRECTION,
-                if (ascending) ContentResolver.QUERY_SORT_DIRECTION_ASCENDING
-                else ContentResolver.QUERY_SORT_DIRECTION_DESCENDING,
+                if (ascending) {
+                    ContentResolver.QUERY_SORT_DIRECTION_ASCENDING
+                } else {
+                    ContentResolver.QUERY_SORT_DIRECTION_DESCENDING
+                },
             )
             query.putInt(ContentResolver.QUERY_ARG_LIMIT, limit)
             if (selection != null) {
@@ -177,7 +189,7 @@ constructor(context: Context?, includeAppCalls: Boolean = false) :
 
         @JvmStatic
         fun pageRows(cursor: Cursor?, namespace: String?, limit: Int): List<CallRecord> {
-            require(limit in 1..500) { "Invalid page limit" }
+            require(limit in 1..PagedCalls.MAX_PAGE_SIZE) { "Invalid page limit" }
             val rows = ArrayList<CallRecord>()
             while (cursor!!.moveToNext()) {
                 if (rows.size == limit) throw PagedCalls.SourceChanged()
@@ -193,23 +205,26 @@ constructor(context: Context?, includeAppCalls: Boolean = false) :
         private fun current(cursor: Cursor, namespace: String?): CallRecord {
             val appMarker = cursor.getColumnIndex(Calls.UUID)
             val source =
-                if (appMarker < 0 || cursor.isNull(appMarker)) CallRecord.PHONE
-                else
+                if (appMarker < 0 || cursor.isNull(appMarker)) {
+                    CallRecord.PHONE
+                } else {
                     appPackage(
                         cursor.getString(
                             cursor.getColumnIndexOrThrow(Calls.PHONE_ACCOUNT_COMPONENT_NAME),
                         ),
                     )
+                }
+            val presentation = cursor.getColumnIndexOrThrow(Calls.NUMBER_PRESENTATION)
             return CallRecord(
                 namespace,
-                cursor.getString(0),
-                cursor.getLong(3),
-                cursor.getLong(4),
-                cursor.getInt(2),
-                cursor.getString(5),
-                cursor.getString(1),
-                if (cursor.isNull(6)) null else cursor.getInt(6),
-                cursor.getString(7),
+                cursor.getString(cursor.getColumnIndexOrThrow(Calls._ID)),
+                cursor.getLong(cursor.getColumnIndexOrThrow(Calls.DATE)),
+                cursor.getLong(cursor.getColumnIndexOrThrow(Calls.DURATION)),
+                cursor.getInt(cursor.getColumnIndexOrThrow(Calls.TYPE)),
+                cursor.getString(cursor.getColumnIndexOrThrow(Calls.CACHED_NAME)),
+                cursor.getString(cursor.getColumnIndexOrThrow(Calls.NUMBER)),
+                if (cursor.isNull(presentation)) null else cursor.getInt(presentation),
+                cursor.getString(cursor.getColumnIndexOrThrow(Calls.PHONE_ACCOUNT_ID)),
                 source,
             )
         }

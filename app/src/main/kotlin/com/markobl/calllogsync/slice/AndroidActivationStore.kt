@@ -19,17 +19,21 @@ class AndroidActivationStore(private val preferences: SharedPreferences?) :
         try {
             val value = JSONObject(encoded)
             val version = value.getInt("version")
+            check(version in 1..2) { "Activation migration required" }
             val routes =
-                when (version) {
-                    1 -> emptyMap()
-                    2 -> readDestinations(value.getJSONArray("destinations"))
-                    else -> throw IllegalStateException("Activation migration required")
+                if (version == 1) {
+                    emptyMap()
+                } else {
+                    readDestinations(value.getJSONArray("destinations"))
                 }
             return ActivationControl.Settings(
                 value.getLong("generation"),
                 value.getBoolean("enabled"),
-                if (version == 1) mapOf(value.getLong("calendar") to setOf(CallRecord.PHONE))
-                else routes.mapValues { it.value.first },
+                if (version == 1) {
+                    mapOf(value.getLong("calendar") to setOf(CallRecord.PHONE))
+                } else {
+                    routes.mapValues { it.value.first }
+                },
                 value.getString("timezone"),
                 value.getLong("start"),
                 value.getBoolean("incoming"),

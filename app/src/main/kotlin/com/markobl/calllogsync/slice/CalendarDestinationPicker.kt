@@ -40,13 +40,7 @@ internal fun CalendarDestinationPicker(
     onSelect: (String) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val label =
-        if (state.checkedTokens != null)
-            state.options
-                .filter { it.token in state.checkedTokens }
-                .joinToString { it.label }
-                .ifEmpty { chooseLabel }
-        else state.options.firstOrNull { it.token == state.selectedToken }?.label ?: chooseLabel
+    val label = selectedDestinationLabel(state, chooseLabel)
 
     Column(
         modifier = Modifier.fillMaxWidth().semantics { testTagsAsResourceId = true },
@@ -100,3 +94,16 @@ internal fun CalendarDestinationPicker(
         }
     }
 }
+
+private fun selectedDestinationLabel(
+    state: CalendarDestinationUiState,
+    chooseLabel: String,
+): String =
+    if (state.checkedTokens != null) {
+        state.options
+            .filter { it.token in state.checkedTokens }
+            .joinToString { it.label }
+            .ifEmpty { chooseLabel }
+    } else {
+        state.options.firstOrNull { it.token == state.selectedToken }?.label ?: chooseLabel
+    }

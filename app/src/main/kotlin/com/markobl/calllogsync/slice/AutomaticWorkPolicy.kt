@@ -9,11 +9,14 @@ class AutomaticWorkPolicy private constructor() {
     }
 
     companion object {
+        internal const val MAX_ATTEMPTS = 5
+
         @JvmStatic
         fun decide(batch: ScanDelivery.Batch?, attempt: Int): Action {
             val current = batch!!
-            if (current.stopped == DurableDelivery.Result.FAILED)
-                return if (attempt < 5) Action.RETRY else Action.STOP
+            if (current.stopped == DurableDelivery.Result.FAILED) {
+                return if (attempt < MAX_ATTEMPTS) Action.RETRY else Action.STOP
+            }
             if (current.stopped != null || current.complete) return Action.STOP
             return Action.CONTINUE
         }

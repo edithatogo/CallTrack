@@ -160,7 +160,7 @@ final class RenderedUi {
                 "The driver must run in a separate process", android.os.Process.myPid(), pid);
         ActivityManager.AppTask savedTask = activityTask(activity);
         assertNotNull("The original activity task was not retained", savedTask);
-        int taskId = savedTask.getTaskInfo().id;
+        int taskId = savedTask.getTaskInfo().taskId;
         assertTrue(
                 automation.performGlobalAction(
                         android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME));
@@ -184,7 +184,8 @@ final class RenderedUi {
         await(
                 () -> mainProcess() != null && mainProcess().pid != pid,
                 "App did not restart in a new process");
-        assertEquals("Returning must keep the original task", taskId, savedTask.getTaskInfo().id);
+        assertEquals(
+                "Returning must keep the original task", taskId, savedTask.getTaskInfo().taskId);
     }
 
     private void returnFromRecents() {
@@ -396,7 +397,7 @@ final class RenderedUi {
                     Rect keyboard = keyboardBounds();
                     if (keyboard == null) return false;
                     AccessibilityNodeInfo node = find(id, true);
-                    if (node != null && node.isEnabled()) {
+                    if (node != null && node.isEnabled() && touchPointIsVisible(node)) {
                         Rect control = new Rect();
                         node.getBoundsInScreen(control);
                         if (!control.isEmpty() && !Rect.intersects(control, keyboard)) {
@@ -405,8 +406,10 @@ final class RenderedUi {
                         }
                     }
                     AccessibilityNodeInfo scroll = scrollable(automation.getRootInActiveWindow());
-                    if (scroll != null)
-                        scroll.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
+                    if (scroll != null
+                            && scroll.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD)) {
+                        settle();
+                    }
                     return false;
                 },
                 "Control not reachable above the visible keyboard: " + id);
@@ -1054,7 +1057,7 @@ final class RenderedUi {
                 .append(" focused=")
                 .append(node.isFocused())
                 .append(" checked=")
-                .append(node.isChecked())
+                .append(node.getChecked() == AccessibilityNodeInfo.CHECKED_STATE_TRUE)
                 .append(' ')
                 .append(bounds)
                 .append(' ')

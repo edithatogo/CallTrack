@@ -7,13 +7,13 @@ plugins {
 def developmentRelease = providers.gradleProperty('calltrackDevelopmentRelease').orElse('false').get() == 'true'
 
 android {
-    namespace 'com.markobl.calllogsync'
+    namespace = 'com.markobl.calllogsync'
     compileSdk {
         version = release(37) {
             minorApiLevel = 1
         }
     }
-    buildFeatures { compose true }
+    buildFeatures { compose = true }
 
     defaultConfig {
         applicationId "org.calltrack.community.dev"
@@ -83,7 +83,12 @@ dependencies {
 kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
+        allWarningsAsErrors.set(true)
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['-Xlint:deprecation', '-Werror']
 }
 
 // Room schema JSON is an auditable, versioned migration contract.

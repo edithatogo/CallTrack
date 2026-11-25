@@ -64,9 +64,11 @@ internal class AutomaticScheduleControl(
         return synchronized(DurableDelivery.DELIVERY_LOCK) {
             if (!permitted.asBoolean) return emptyArray()
             val settings = activation!!.current()
-            if (settings != null && settings.enabled && permitted.asBoolean)
+            if (settings != null && settings.enabled && permitted.asBoolean) {
                 schedule!!.apply(settings)
-            else emptyArray()
+            } else {
+                emptyArray()
+            }
         }
     }
 }

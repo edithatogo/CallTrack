@@ -7,6 +7,9 @@ import kotlinx.coroutines.runBlocking
 import org.json.JSONException
 import org.json.JSONObject
 
+private const val MAX_SESSION_PAGE_SIZE = 50
+private const val MAX_CANDIDATE_BATCH_SIZE = 500
+
 /** Versioned import sessions; delivery authority remains in the existing receipt ledger. */
 class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Store, Closeable {
     constructor(context: Context?) : this(context, "calltrack-imports.db")
@@ -22,12 +25,17 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
     )
 
     fun sessions(beforeExclusive: Long, limit: Int): List<ListedSession> {
-        require((beforeExclusive == -1L || beforeExclusive >= 1) && limit in 1..50) {
+        require(
+            (beforeExclusive == -1L || beforeExclusive >= 1) && limit in 1..MAX_SESSION_PAGE_SIZE,
+        ) {
             "Invalid session page"
         }
         val rows = runBlocking {
-            if (beforeExclusive == -1L) dao.sessions(limit)
-            else dao.sessionsBefore(beforeExclusive, limit)
+            if (beforeExclusive == -1L) {
+                dao.sessions(limit)
+            } else {
+                dao.sessionsBefore(beforeExclusive, limit)
+            }
         }
         return Collections.unmodifiableList(rows.map { ListedSession(it.cursor, decode(it.body)) })
     }
@@ -111,42 +119,7 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
                         )
                     },
                 )
-                if (handled != null) {
-                    val pending = readCandidates(prior.id, prior.processedId, 1)
-                    check(
-                        pending.isNotEmpty() &&
-                            pending[0].sourceId == handled.sourceId &&
-                            pending[0].key == handled.key &&
-                            pending[0].binding == handled.binding,
-                    ) {
-                        "Candidate changed before result"
-                    }
-                    val terminal =
-                        outcome == DurableDelivery.Result.SAVED ||
-                            outcome == DurableDelivery.Result.RECOVERED ||
-                            outcome == DurableDelivery.Result.ALREADY_LOGGED ||
-                            outcome == DurableDelivery.Result.REVIEW_REQUIRED ||
-                            outcome == DurableDelivery.Result.SOURCE_CHANGED
-                    require(
-                        if (terminal) updated.processedId == handled.sourceId
-                        else updated.processedId == prior.processedId,
-                    ) {
-                        "Outcome disagrees with progress"
-                    }
-                    val verified =
-                        outcome == DurableDelivery.Result.SAVED ||
-                            outcome == DurableDelivery.Result.RECOVERED ||
-                            outcome == DurableDelivery.Result.ALREADY_LOGGED
-                    require(
-                        updated.saved == prior.saved + (if (verified) 1 else 0) &&
-                            updated.review == prior.review + (if (terminal && !verified) 1 else 0),
-                    ) {
-                        "Outcome disagrees with counts"
-                    }
-                    check(dao.storeOutcome(prior.id, handled.sourceId, outcome!!.name) == 1) {
-                        "Candidate outcome not stored"
-                    }
-                }
+                if (handled != null) storeCandidateOutcome(prior, updated, handled, outcome)
                 check(
                     dao.storeProgress(
                         prior.id,
@@ -161,12 +134,57 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
         }
     }
 
+    private suspend fun storeCandidateOutcome(
+        prior: HistoricalImport.Session,
+        updated: HistoricalImport.Session,
+        handled: HistoricalImport.Candidate,
+        outcome: DurableDelivery.Result?,
+    ) {
+        val pending = readCandidates(prior.id, prior.processedId, 1)
+        check(
+            pending.isNotEmpty() &&
+                pending[0].sourceId == handled.sourceId &&
+                pending[0].key == handled.key &&
+                pending[0].binding == handled.binding,
+        ) {
+            "Candidate changed before result"
+        }
+        val verified =
+            outcome == DurableDelivery.Result.SAVED ||
+                outcome == DurableDelivery.Result.RECOVERED ||
+                outcome == DurableDelivery.Result.ALREADY_LOGGED
+        val terminal =
+            verified ||
+                outcome == DurableDelivery.Result.REVIEW_REQUIRED ||
+                outcome == DurableDelivery.Result.SOURCE_CHANGED
+        require(
+            if (terminal) {
+                updated.processedId == handled.sourceId
+            } else {
+                updated.processedId == prior.processedId
+            },
+        ) {
+            "Outcome disagrees with progress"
+        }
+        require(
+            updated.saved == prior.saved + (if (verified) 1 else 0) &&
+                updated.review == prior.review + (if (terminal && !verified) 1 else 0),
+        ) {
+            "Outcome disagrees with counts"
+        }
+        check(dao.storeOutcome(prior.id, handled.sourceId, outcome!!.name) == 1) {
+            "Candidate outcome not stored"
+        }
+    }
+
     override fun candidates(
         id: String?,
         afterExclusive: Long,
         limit: Int,
     ): List<HistoricalImport.Candidate> {
-        require(afterExclusive >= -1 && limit in 1..500) { "Invalid candidate page" }
+        require(afterExclusive >= -1 && limit in 1..MAX_CANDIDATE_BATCH_SIZE) {
+            "Invalid candidate page"
+        }
         return Collections.unmodifiableList(
             runBlocking { readCandidates(id, afterExclusive, limit) },
         )
@@ -192,11 +210,21 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
             next: HistoricalImport.Session?,
             added: List<HistoricalImport.Candidate?>?,
         ) {
+            require(old != null && next != null && added != null) { "Invalid import transition" }
+            validateRequest(old, next, added.size)
+            validateCursor(old, next, added.size)
+            validatePhase(old, next, added.isEmpty())
+            validateProgress(old, next)
+            validateCandidates(old, next, added)
+        }
+
+        private fun validateRequest(
+            old: HistoricalImport.Session,
+            next: HistoricalImport.Session,
+            added: Int,
+        ) {
             require(
-                old != null &&
-                    next != null &&
-                    added != null &&
-                    added.size <= 500 &&
+                added <= MAX_CANDIDATE_BATCH_SIZE &&
                     old.id == next.id &&
                     next.revision == Math.addExact(old.revision, 1) &&
                     old.calendar == next.calendar &&
@@ -205,51 +233,83 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
                     old.to == next.to &&
                     old.incoming == next.incoming &&
                     old.outgoing == next.outgoing &&
-                    old.missed == next.missed &&
-                    old.checkpoint.namespace == next.checkpoint.namespace &&
+                    old.missed == next.missed,
+            ) {
+                "Invalid import transition"
+            }
+        }
+
+        private fun validateCursor(
+            old: HistoricalImport.Session,
+            next: HistoricalImport.Session,
+            added: Int,
+        ) {
+            require(
+                old.checkpoint.namespace == next.checkpoint.namespace &&
                     old.checkpoint.upperId == next.checkpoint.upperId &&
                     old.checkpoint.upperBinding == next.checkpoint.upperBinding &&
                     next.checkpoint.lastId >= old.checkpoint.lastId &&
                     next.processedId >= old.processedId &&
                     next.saved >= old.saved &&
                     next.review >= old.review &&
-                    next.count == Math.addExact(old.count, added.size.toLong()),
+                    next.count == Math.addExact(old.count, added.toLong()),
             ) {
                 "Invalid import transition"
             }
-            val permitted =
-                when (old.phase) {
-                    HistoricalImport.Phase.BUILDING ->
-                        next.phase == HistoricalImport.Phase.BUILDING ||
-                            next.phase == HistoricalImport.Phase.PREVIEW ||
-                            next.phase == HistoricalImport.Phase.REVIEW ||
-                            next.phase == HistoricalImport.Phase.CANCELLED
-                    HistoricalImport.Phase.PREVIEW ->
-                        next.phase == HistoricalImport.Phase.CONFIRMED ||
-                            next.phase == HistoricalImport.Phase.COMPLETE ||
-                            next.phase == HistoricalImport.Phase.CANCELLED
-                    HistoricalImport.Phase.CONFIRMED ->
-                        next.phase == HistoricalImport.Phase.CONFIRMED ||
-                            next.phase == HistoricalImport.Phase.COMPLETE ||
-                            next.phase == HistoricalImport.Phase.CANCELLED
-                    HistoricalImport.Phase.REVIEW -> next.phase == HistoricalImport.Phase.CANCELLED
-                    else -> false
-                }
+        }
+
+        private fun validatePhase(
+            old: HistoricalImport.Session,
+            next: HistoricalImport.Session,
+            noAddedCandidates: Boolean,
+        ) {
             require(
-                permitted &&
+                canTransition(old, next) &&
                     (old.phase == HistoricalImport.Phase.BUILDING ||
-                        added.isEmpty() && PagedCalls.equal(old.checkpoint, next.checkpoint)),
+                        (noAddedCandidates && PagedCalls.equal(old.checkpoint, next.checkpoint))),
             ) {
                 "Import phase cannot change this way"
             }
             require(
-                !(next.phase == HistoricalImport.Phase.PREVIEW &&
-                    next.checkpoint.lastId != next.checkpoint.upperId ||
-                    next.phase == HistoricalImport.Phase.COMPLETE &&
-                        next.saved + next.review != next.count),
+                !((next.phase == HistoricalImport.Phase.PREVIEW &&
+                    next.checkpoint.lastId != next.checkpoint.upperId) ||
+                    (next.phase == HistoricalImport.Phase.COMPLETE &&
+                        next.saved + next.review != next.count)),
             ) {
                 "Import is incomplete"
             }
+        }
+
+        private fun canTransition(
+            old: HistoricalImport.Session,
+            next: HistoricalImport.Session,
+        ): Boolean =
+            when (old.phase) {
+                HistoricalImport.Phase.BUILDING ->
+                    next.phase == HistoricalImport.Phase.BUILDING ||
+                        next.phase == HistoricalImport.Phase.PREVIEW ||
+                        next.phase == HistoricalImport.Phase.REVIEW ||
+                        next.phase == HistoricalImport.Phase.CANCELLED
+
+                HistoricalImport.Phase.PREVIEW ->
+                    next.phase == HistoricalImport.Phase.CONFIRMED ||
+                        next.phase == HistoricalImport.Phase.COMPLETE ||
+                        next.phase == HistoricalImport.Phase.CANCELLED
+
+                HistoricalImport.Phase.CONFIRMED ->
+                    next.phase == HistoricalImport.Phase.CONFIRMED ||
+                        next.phase == HistoricalImport.Phase.COMPLETE ||
+                        next.phase == HistoricalImport.Phase.CANCELLED
+
+                HistoricalImport.Phase.REVIEW -> next.phase == HistoricalImport.Phase.CANCELLED
+
+                else -> false
+            }
+
+        private fun validateProgress(
+            old: HistoricalImport.Session,
+            next: HistoricalImport.Session,
+        ) {
             val oldDone = old.saved + old.review
             val nextDone = next.saved + next.review
             if (
@@ -259,13 +319,24 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
                 require(next.processedId == old.processedId && nextDone == oldDone) {
                     "Import progress requires confirmation"
                 }
-            } else
+            } else {
                 require(
-                    if (next.processedId == old.processedId) nextDone == oldDone
-                    else nextDone == Math.addExact(oldDone, 1),
+                    if (next.processedId == old.processedId) {
+                        nextDone == oldDone
+                    } else {
+                        nextDone == Math.addExact(oldDone, 1)
+                    },
                 ) {
                     "Import progress must handle one candidate"
                 }
+            }
+        }
+
+        private fun validateCandidates(
+            old: HistoricalImport.Session,
+            next: HistoricalImport.Session,
+            added: List<HistoricalImport.Candidate?>,
+        ) {
             var previous = old.checkpoint.lastId
             for (entry in added) {
                 val candidate = entry!!
@@ -319,8 +390,7 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
         private fun decode(body: String?): HistoricalImport.Session {
             try {
                 val j = JSONObject(body!!)
-                if (j.getInt("version") != 1)
-                    throw IllegalStateException("Import document migration required")
+                check(j.getInt("version") == 1) { "Import document migration required" }
                 return HistoricalImport.Session(
                     j.getString("id"),
                     j.getLong("calendar"),
@@ -343,8 +413,11 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
                     j.getLong("processed"),
                     j.getLong("saved"),
                     j.getLong("review"),
-                    if (j.isNull("stopped")) null
-                    else DurableDelivery.Result.valueOf(j.getString("stopped")),
+                    if (j.isNull("stopped")) {
+                        null
+                    } else {
+                        DurableDelivery.Result.valueOf(j.getString("stopped"))
+                    },
                 )
             } catch (invalid: JSONException) {
                 throw IllegalStateException("Import document unavailable", invalid)

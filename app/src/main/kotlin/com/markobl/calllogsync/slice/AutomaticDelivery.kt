@@ -40,10 +40,12 @@ class AutomaticDelivery(
         limit: Int,
         running: BooleanSupplier?,
     ): ScanDelivery.Batch {
-        require(limit in 1..500) { "Invalid page limit" }
+        require(limit in 1..PagedCalls.MAX_PAGE_SIZE) { "Invalid page limit" }
         return synchronized(DurableDelivery.DELIVERY_LOCK) {
             try {
-                if (!permitted(worker, running)) return stopped(DurableDelivery.Result.PAUSED)
+                if (!permitted(worker, running)) {
+                    return@synchronized stopped(DurableDelivery.Result.PAUSED)
+                }
                 val settings = worker!!
                 val operation = settings.operation(calendar)
                 val pending = progress!!.pending(operation, calendar, limit)
@@ -55,40 +57,16 @@ class AutomaticDelivery(
                     "Invalid pending batch"
                 }
                 if (pending.isNotEmpty()) {
-                    var handled = 0
-                    var delivered = 0
-                    var review = 0
-                    for (key in pending) {
-                        check(!key.isNullOrEmpty()) { "Invalid pending key" }
-                        val result =
-                            delivery!!.resume(key, calendar, operation) {
-                                permitted(worker, running)
-                            }
-                        when (result) {
-                            DurableDelivery.Result.SAVED,
-                            DurableDelivery.Result.RECOVERED,
-                            DurableDelivery.Result.ALREADY_LOGGED -> delivered++
-                            DurableDelivery.Result.REVIEW_REQUIRED,
-                            DurableDelivery.Result.SOURCE_CHANGED -> review++
-                            else ->
-                                return ScanDelivery.Batch(
-                                    handled,
-                                    delivered,
-                                    0,
-                                    review,
-                                    false,
-                                    result,
-                                )
-                        }
-                        handled++
+                    return@synchronized resumePending(pending, calendar, operation) {
+                        permitted(worker, running)
                     }
-                    // Recovery and source scanning remain separate invocations.
-                    return ScanDelivery.Batch(handled, delivered, 0, review, false, null)
                 }
                 val checkpoint = progress.get(operation)
                 if (checkpoint != null && checkpoint.lastId == checkpoint.upperId) {
                     val next = PagedCalls.extend(source, checkpoint)
-                    if (!permitted(worker, running)) return stopped(DurableDelivery.Result.PAUSED)
+                    if (!permitted(worker, running)) {
+                        return@synchronized stopped(DurableDelivery.Result.PAUSED)
+                    }
                     progress.rollover(operation, checkpoint, next)
                 }
                 scan.run(
@@ -100,14 +78,50 @@ class AutomaticDelivery(
                 ) {
                     permitted(worker, running)
                 }
-            } catch (changed: PagedCalls.SourceChanged) {
+            } catch (ignored: PagedCalls.SourceChanged) {
                 stopped(DurableDelivery.Result.SOURCE_CHANGED)
-            } catch (denied: SecurityException) {
+            } catch (ignored: SecurityException) {
                 stopped(DurableDelivery.Result.PERMISSION_REQUIRED)
-            } catch (failed: RuntimeException) {
+            } catch (ignored: RuntimeException) {
                 stopped(DurableDelivery.Result.FAILED)
             }
         }
+    }
+
+    private fun resumePending(
+        pending: List<String?>,
+        calendar: Long,
+        operation: DurableDelivery.Operation,
+        allowed: BooleanSupplier,
+    ): ScanDelivery.Batch {
+        var handled = 0
+        var delivered = 0
+        var review = 0
+        for (key in pending) {
+            check(!key.isNullOrEmpty()) { "Invalid pending key" }
+            val result = delivery!!.resume(key, calendar, operation, allowed)
+            when (result) {
+                DurableDelivery.Result.SAVED,
+                DurableDelivery.Result.RECOVERED,
+                DurableDelivery.Result.ALREADY_LOGGED -> delivered++
+
+                DurableDelivery.Result.REVIEW_REQUIRED,
+                DurableDelivery.Result.SOURCE_CHANGED -> review++
+
+                else ->
+                    return ScanDelivery.Batch(
+                        handled,
+                        delivered,
+                        0,
+                        review,
+                        false,
+                        result,
+                    )
+            }
+            handled++
+        }
+        // Recovery and source scanning remain separate invocations.
+        return ScanDelivery.Batch(handled, delivered, 0, review, false, null)
     }
 
     private fun permitted(worker: ActivationControl.Settings?, running: BooleanSupplier?): Boolean =

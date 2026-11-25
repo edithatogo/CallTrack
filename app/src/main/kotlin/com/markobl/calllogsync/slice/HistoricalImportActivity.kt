@@ -5,6 +5,8 @@ import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -19,9 +21,13 @@ import java.util.TimeZone
 import java.util.UUID
 import java.util.concurrent.Executors
 
+private const val DEFAULT_LOOKBACK_DAYS = 7L
+private const val IMPORT_STEP_SIZE = 20
+
 /** Foreground bounded runs; opening/resuming never confirms historical delivery. */
 class HistoricalImportActivity : ComponentActivity() {
     private val executor = Executors.newSingleThreadExecutor()
+
     @Volatile private var running = false
     private var busy = false
     private var currentId: String? = null
@@ -42,112 +48,138 @@ class HistoricalImportActivity : ComponentActivity() {
     private val historyBack = ArrayList<Long>()
     private var nextHistoryCursor = -1L
 
-    public override fun onCreate(saved: Bundle?) {
-        super.onCreate(saved)
+    private val permissions =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            loadCalendars(selected)
+            buttons()
+        }
+
+    public override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         zone =
-            if (saved == null) ZoneId.systemDefault().id
-            else saved.getString("zone", ZoneId.systemDefault().id)
-        currentId = saved?.getString("session")
+            if (savedInstanceState == null) {
+                ZoneId.systemDefault().id
+            } else {
+                savedInstanceState.getString("zone", ZoneId.systemDefault().id)
+            }
+        currentId = savedInstanceState?.getString("session")
         filters =
             HistoricalImportFiltersUiState(
                 fromDate =
-                    if (saved == null) LocalDate.now(ZoneId.of(zone)).minusDays(7).toString()
-                    else saved.getString("from") ?: "",
+                    if (savedInstanceState == null) {
+                        LocalDate.now(ZoneId.of(zone)).minusDays(DEFAULT_LOOKBACK_DAYS).toString()
+                    } else {
+                        savedInstanceState.getString("from") ?: ""
+                    },
                 toDate =
-                    if (saved == null) LocalDate.now(ZoneId.of(zone)).plusDays(1).toString()
-                    else saved.getString("to") ?: "",
-                incoming = saved == null || saved.getBoolean("incoming"),
-                outgoing = saved == null || saved.getBoolean("outgoing"),
-                missed = saved == null || saved.getBoolean("missed"),
+                    if (savedInstanceState == null) {
+                        LocalDate.now(ZoneId.of(zone)).plusDays(1).toString()
+                    } else {
+                        savedInstanceState.getString("to") ?: ""
+                    },
+                incoming = savedInstanceState == null || savedInstanceState.getBoolean("incoming"),
+                outgoing = savedInstanceState == null || savedInstanceState.getBoolean("outgoing"),
+                missed = savedInstanceState == null || savedInstanceState.getBoolean("missed"),
             )
         summaryText = getString(R.string.import_none)
         setCallTrackContent {
-            HistoricalImportIntroPanel(getString(R.string.import_intro, zone))
-            HistoricalImportAccessPanel(
-                label = stringResource(R.string.auto_access),
-                onRequestAccess = {
-                    requestPermissions(
-                        arrayOf(
-                            Manifest.permission.READ_CALL_LOG,
-                            Manifest.permission.READ_CALENDAR,
-                            Manifest.permission.WRITE_CALENDAR,
-                        ),
-                        9,
-                    )
-                },
-            )
-            CalendarDestinationPicker(
-                state = destinationState,
-                tagPrefix = "import_calendar",
-                optionsEnabled = true,
-                chooseLabel = stringResource(R.string.slice_choose),
-                unavailableLabel = stringResource(R.string.auto_destination_unavailable),
-                onSelect = ::selectDestination,
-            )
-            HistoricalImportFiltersPanel(
-                state = filters,
-                fromLabel = stringResource(R.string.import_from),
-                toLabel = stringResource(R.string.import_to),
-                incomingLabel = stringResource(R.string.auto_incoming),
-                outgoingLabel = stringResource(R.string.auto_outgoing),
-                missedLabel = stringResource(R.string.auto_missed),
-                onStateChange = {
-                    filters = it
-                    buttons()
-                },
-            )
-            HistoricalImportCreateActionPanel(
-                state = actionState,
-                label = stringResource(R.string.import_create),
-                onCreate = ::startPreview,
-            )
-            HistoricalImportSummaryText(summaryText)
-            HistoricalImportRunActionsPanel(
-                state = actionState,
-                continueLabel = stringResource(R.string.import_continue),
-                confirmLabel = stringResource(R.string.import_confirm),
-                stopLabel = stringResource(R.string.import_stop),
-                cancelLabel = stringResource(R.string.import_cancel),
-                onContinue = {
-                    running = true
-                    step()
-                },
-                onConfirm = ::confirmImport,
-                onStop = {
-                    running = false
-                    setFeedback(R.string.import_stopping)
-                    buttons()
-                },
-                onCancel = ::cancelImport,
-            )
-            HistoricalImportFeedbackText(feedbackText)
-            HistoricalImportHistoryPanel(
-                state = historyState,
-                title = stringResource(R.string.import_history),
-                emptyMessage = stringResource(R.string.import_empty_history),
-                onOpen = ::openHistorySession,
-            )
-            HistoricalImportPaginationPanel(
-                state = actionState,
-                newerLabel = stringResource(R.string.import_newer),
-                olderLabel = stringResource(R.string.import_older),
-                onNewer = {
-                    if (!busy && historyBack.isNotEmpty()) {
-                        loadHistory(historyBack.removeAt(historyBack.size - 1))
-                    }
-                },
-                onOlder = {
-                    if (!busy && nextHistoryCursor > 0) {
-                        historyBack.add(historyCursor)
-                        loadHistory(nextHistoryCursor)
-                    }
-                },
-            )
+            ImportForm()
+            ImportActions()
         }
         buttons()
-        loadCalendars(if (saved == null) -1 else saved.getLong("calendar", -1))
+        loadCalendars(
+            if (savedInstanceState == null) -1 else savedInstanceState.getLong("calendar", -1),
+        )
         loadHistory(-1)
         if (currentId != null) loadSession(currentId)
+    }
+
+    @Composable
+    private fun ImportForm() {
+        HistoricalImportIntroPanel(getString(R.string.import_intro, zone))
+        HistoricalImportAccessPanel(
+            label = stringResource(R.string.auto_access),
+            onRequestAccess = {
+                permissions.launch(
+                    arrayOf(
+                        Manifest.permission.READ_CALL_LOG,
+                        Manifest.permission.READ_CALENDAR,
+                        Manifest.permission.WRITE_CALENDAR,
+                    ),
+                )
+            },
+        )
+        CalendarDestinationPicker(
+            state = destinationState,
+            tagPrefix = "import_calendar",
+            optionsEnabled = true,
+            chooseLabel = stringResource(R.string.slice_choose),
+            unavailableLabel = stringResource(R.string.auto_destination_unavailable),
+            onSelect = ::selectDestination,
+        )
+        HistoricalImportFiltersPanel(
+            state = filters,
+            fromLabel = stringResource(R.string.import_from),
+            toLabel = stringResource(R.string.import_to),
+            incomingLabel = stringResource(R.string.auto_incoming),
+            outgoingLabel = stringResource(R.string.auto_outgoing),
+            missedLabel = stringResource(R.string.auto_missed),
+            onStateChange = {
+                filters = it
+                buttons()
+            },
+        )
+    }
+
+    @Composable
+    private fun ImportActions() {
+        HistoricalImportCreateActionPanel(
+            state = actionState,
+            label = stringResource(R.string.import_create),
+            onCreate = ::startPreview,
+        )
+        HistoricalImportSummaryText(summaryText)
+        HistoricalImportRunActionsPanel(
+            state = actionState,
+            continueLabel = stringResource(R.string.import_continue),
+            confirmLabel = stringResource(R.string.import_confirm),
+            stopLabel = stringResource(R.string.import_stop),
+            cancelLabel = stringResource(R.string.import_cancel),
+            onContinue = {
+                running = true
+                step()
+            },
+            onConfirm = ::confirmImport,
+            onStop = {
+                running = false
+                setFeedback(R.string.import_stopping)
+                buttons()
+            },
+            onCancel = ::cancelImport,
+        )
+        HistoricalImportFeedbackText(feedbackText)
+        HistoricalImportHistoryPanel(
+            state = historyState,
+            title = stringResource(R.string.import_history),
+            emptyMessage = stringResource(R.string.import_empty_history),
+            onOpen = ::openHistorySession,
+        )
+        HistoricalImportPaginationPanel(
+            state = actionState,
+            newerLabel = stringResource(R.string.import_newer),
+            olderLabel = stringResource(R.string.import_older),
+            onNewer = {
+                if (!busy && historyBack.isNotEmpty()) {
+                    loadHistory(historyBack.removeAt(historyBack.size - 1))
+                }
+            },
+            onOlder = {
+                if (!busy && nextHistoryCursor > 0) {
+                    historyBack.add(historyCursor)
+                    loadHistory(nextHistoryCursor)
+                }
+            },
+        )
     }
 
     private fun setFeedback(message: Int?) {
@@ -165,23 +197,19 @@ class HistoricalImportActivity : ComponentActivity() {
                 PackageManager.PERMISSION_GRANTED
 
     private fun buttons() {
-        val value = session
+        val phase = session?.phase
+        val canContinue = continuing(phase)
         val hasCallTypes = filters.incoming || filters.outgoing || filters.missed
         actionState =
             HistoricalImportActionState(
                 createEnabled = !busy && selected >= 0 && access() && hasCallTypes,
-                continueEnabled =
-                    !busy &&
-                        value != null &&
-                        (value.phase == HistoricalImport.Phase.BUILDING ||
-                            value.phase == HistoricalImport.Phase.CONFIRMED),
-                confirmEnabled =
-                    !busy && value != null && value.phase == HistoricalImport.Phase.PREVIEW,
+                continueEnabled = !busy && canContinue,
+                confirmEnabled = !busy && phase == HistoricalImport.Phase.PREVIEW,
                 stopEnabled = running,
                 cancelEnabled =
-                    value != null &&
-                        value.phase != HistoricalImport.Phase.COMPLETE &&
-                        value.phase != HistoricalImport.Phase.CANCELLED,
+                    phase != null &&
+                        phase != HistoricalImport.Phase.COMPLETE &&
+                        phase != HistoricalImport.Phase.CANCELLED,
                 newerEnabled = !busy && historyBack.isNotEmpty(),
                 olderEnabled = !busy && nextHistoryCursor > 0,
             )
@@ -192,8 +220,11 @@ class HistoricalImportActivity : ComponentActivity() {
         executor.execute {
             try {
                 val loaded =
-                    if (calendarAccess()) AndroidCalendarSink(applicationContext).choices()
-                    else Collections.emptyList()
+                    if (calendarAccess()) {
+                        AndroidCalendarSink(applicationContext).choices()
+                    } else {
+                        Collections.emptyList()
+                    }
                 runOnUiThread {
                     if (isDestroyed) return@runOnUiThread
                     destinationTargets.clear()
@@ -217,7 +248,7 @@ class HistoricalImportActivity : ComponentActivity() {
                     if (session != null) render()
                     buttons()
                 }
-            } catch (failed: RuntimeException) {
+            } catch (ignored: RuntimeException) {
                 showFailure()
             }
         }
@@ -228,7 +259,7 @@ class HistoricalImportActivity : ComponentActivity() {
         val range =
             try {
                 ImportRange.parse(filters.fromDate, filters.toDate, zone)
-            } catch (invalid: RuntimeException) {
+            } catch (ignored: RuntimeException) {
                 setFeedback(R.string.import_invalid_range)
                 return
             }
@@ -258,13 +289,15 @@ class HistoricalImportActivity : ComponentActivity() {
             value != null &&
                 value.phase != HistoricalImport.Phase.COMPLETE &&
                 value.phase != HistoricalImport.Phase.CANCELLED
-        )
+        ) {
             AlertDialog.Builder(this)
                 .setMessage(R.string.import_another)
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(R.string.import_create) { _, _ -> start.run() }
                 .show()
-        else start.run()
+        } else {
+            start.run()
+        }
     }
 
     private fun selectDestination(token: String) {
@@ -316,10 +349,14 @@ class HistoricalImportActivity : ComponentActivity() {
         val id = currentId
         perform(
             { importer, store ->
-                val latest = store.get(id) ?: throw IllegalArgumentException()
+                val latest =
+                    store.get(id) ?: throw IllegalArgumentException("Import session unavailable")
                 when (latest.phase) {
-                    HistoricalImport.Phase.BUILDING -> importer.preview(id, 20)
-                    HistoricalImport.Phase.CONFIRMED -> importer.deliver(id, 20) { running }
+                    HistoricalImport.Phase.BUILDING -> importer.preview(id, IMPORT_STEP_SIZE)
+
+                    HistoricalImport.Phase.CONFIRMED ->
+                        importer.deliver(id, IMPORT_STEP_SIZE) { running }
+
                     else -> latest
                 }
             },
@@ -339,7 +376,7 @@ class HistoricalImportActivity : ComponentActivity() {
             try {
                 SqliteImportStore(applicationContext).use { store ->
                     SqliteLedger(applicationContext).use { ledger ->
-                        ledger.expirePayloads(50)
+                        ledger.expirePayloads(RECEIPT_RETENTION_BATCH_SIZE)
                         val importer =
                             HistoricalImport(
                                 store,
@@ -353,39 +390,11 @@ class HistoricalImportActivity : ComponentActivity() {
                         val result = action.run(importer, store)
                         runOnUiThread {
                             if (isDestroyed || ticket != renderVersion) return@runOnUiThread
-                            busy = false
-                            val previous = session
-                            if (
-                                currentId == null ||
-                                    currentId != result.id ||
-                                    previous == null ||
-                                    result.revision >= previous.revision
-                            ) {
-                                currentId = result.id
-                                session = result
-                                render()
-                            }
-                            if (result.stopped != null) {
-                                running = false
-                                setFeedback(R.string.import_blocked)
-                            } else setFeedback(null)
-                            buttons()
-                            if (
-                                follow &&
-                                    running &&
-                                    (result.phase == HistoricalImport.Phase.BUILDING ||
-                                        result.phase == HistoricalImport.Phase.CONFIRMED)
-                            )
-                                window.decorView.post { step() }
-                            else {
-                                running = false
-                                buttons()
-                                loadHistory(historyCursor)
-                            }
+                            showImportResult(result, follow)
                         }
                     }
                 }
-            } catch (failed: RuntimeException) {
+            } catch (ignored: RuntimeException) {
                 runOnUiThread {
                     if (isDestroyed || ticket != renderVersion) return@runOnUiThread
                     running = false
@@ -397,17 +406,51 @@ class HistoricalImportActivity : ComponentActivity() {
         }
     }
 
+    private fun showImportResult(result: HistoricalImport.Session, follow: Boolean) {
+        busy = false
+        val previous = session
+        if (currentId != result.id || previous == null || result.revision >= previous.revision) {
+            currentId = result.id
+            session = result
+            render()
+        }
+        if (result.stopped != null) {
+            running = false
+            setFeedback(R.string.import_blocked)
+        } else {
+            setFeedback(null)
+        }
+        buttons()
+        if (follow && running && continuing(result.phase)) {
+            window.decorView.post { step() }
+        } else {
+            running = false
+            buttons()
+            loadHistory(historyCursor)
+        }
+    }
+
+    private fun continuing(phase: HistoricalImport.Phase?): Boolean =
+        phase == HistoricalImport.Phase.BUILDING || phase == HistoricalImport.Phase.CONFIRMED
+
     private fun loadSession(id: String?) {
         if (busy) return
         running = false
         currentId = id
         session = null
-        perform({ _, store -> store.get(id) ?: throw IllegalArgumentException() }, false)
+        perform(
+            { _, store ->
+                store.get(id) ?: throw IllegalArgumentException("Import session unavailable")
+            },
+            false,
+        )
     }
 
     private fun dates(s: HistoricalImport.Session): String {
         val z = TimeZone.getTimeZone(s.timezone).toZoneId()
-        return "${Instant.ofEpochMilli(s.from).atZone(z).toLocalDate()} → ${Instant.ofEpochMilli(s.to).atZone(z).toLocalDate()} (${s.timezone})"
+        val from = Instant.ofEpochMilli(s.from).atZone(z).toLocalDate()
+        val to = Instant.ofEpochMilli(s.to).atZone(z).toLocalDate()
+        return "$from → $to (${s.timezone})"
     }
 
     private fun destinationName(value: HistoricalImport.Session): String? {
@@ -487,7 +530,7 @@ class HistoricalImportActivity : ComponentActivity() {
                         buttons()
                     }
                 }
-            } catch (failed: RuntimeException) {
+            } catch (ignored: RuntimeException) {
                 showFailure()
             }
         }
@@ -511,26 +554,16 @@ class HistoricalImportActivity : ComponentActivity() {
         super.onPause()
     }
 
-    public override fun onSaveInstanceState(out: Bundle) {
-        super.onSaveInstanceState(out)
-        out.putString("zone", zone)
-        out.putString("session", currentId)
-        out.putString("from", filters.fromDate)
-        out.putString("to", filters.toDate)
-        out.putLong("calendar", selected)
-        out.putBoolean("incoming", filters.incoming)
-        out.putBoolean("outgoing", filters.outgoing)
-        out.putBoolean("missed", filters.missed)
-    }
-
-    public override fun onRequestPermissionsResult(
-        code: Int,
-        permissions: Array<String>,
-        grants: IntArray,
-    ) {
-        super.onRequestPermissionsResult(code, permissions, grants)
-        loadCalendars(selected)
-        buttons()
+    public override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("zone", zone)
+        outState.putString("session", currentId)
+        outState.putString("from", filters.fromDate)
+        outState.putString("to", filters.toDate)
+        outState.putLong("calendar", selected)
+        outState.putBoolean("incoming", filters.incoming)
+        outState.putBoolean("outgoing", filters.outgoing)
+        outState.putBoolean("missed", filters.missed)
     }
 
     public override fun onDestroy() {
