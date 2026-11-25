@@ -7,6 +7,7 @@
 - [x] Qualify the Navigation 3 stack, system Back, retained tasks and adaptive forms. The launcher recovery check killed and relaunched the process with the receipt ready for confirmation and zero calendar events. Android accessibility checks passed at three native window sizes. The import journey exercised the real keyboard, 2× right-to-left date fields and focus restoration after calendar selection.
 - [x] Move automatic settings, historical import and recovery to entry-owned Hilt ViewModels with immutable StateFlow and structured coroutines. Keep the automatic draft and selected import session. Clear reviews when leaving the screen and refresh import calendars before confirmation. Native checks verify permission loss, keyboard cancellation, missing destinations, queued-approval withdrawal and process recovery.
 - [x] Exercise the screen-state migration on the dedicated Android 17 emulator. Protected delivery runs the hosted accessibility, recovery, migration and security gates on the merged source.
-- [ ] Qualify predictive-back gesture cancellation and adaptive Navigation 3 scenes beyond the responsive single-pane forms.
+- [x] Verify predictive Back on Android 17. An edge swipe showed the manual screen behind Settings. Cancelling restored Settings, and completing the gesture returned to Manual.
+- [ ] Qualify adaptive Navigation 3 scenes beyond the responsive single-pane forms. [Material adaptive scenes](https://developer.android.com/guide/navigation/navigation-3/scenes)
 
 Production signing, physical routes and the controlled observation remain in [Track 5](../release_20261020/verification.md). Real app-call attribution and destination readback remain in [Track 23](../android17_call_routing_20261125/plan.md).
