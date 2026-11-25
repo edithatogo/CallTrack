@@ -672,30 +672,6 @@
       "pom_url": "https://dl.google.com/dl/android/maven2/androidx/versionedparcelable/versionedparcelable/1.1.1/versionedparcelable-1.1.1.pom"
     },
     {
-      "coordinate": "androidx.window:window-core-android:1.5.0",
-      "runtime_sha256": "d0d50db0756194a6d49a66ad8dafd17b24b4c5fbd8379375056e2eb9bdfeaf22",
-      "source_url": "https://dl.google.com/dl/android/maven2/androidx/window/window-core-android/1.5.0/window-core-android-1.5.0-sources.jar",
-      "source_sha256": "df2d830a33d04300574b65d7a87904458a910b879af3d13022def0a627a22df6",
-      "source_file": "androidx.window/window-core-android/1.5.0/window-core-android-1.5.0-sources.jar",
-      "source_entries": 16,
-      "source_code_present": true,
-      "pom_file": "poms/androidx.window/window-core-android/1.5.0/window-core-android-1.5.0.pom",
-      "pom_sha256": "463c50b22a969c6274ebdb7b5f56ba1ea1dde352e9679f0a0ba90f3971dbcd57",
-      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/window/window-core-android/1.5.0/window-core-android-1.5.0.pom"
-    },
-    {
-      "coordinate": "androidx.window:window:1.5.0",
-      "runtime_sha256": "5de2d48aa578402f46deb5294a955cee62f0c7d8c1840ef626fc7afb8abe22f9",
-      "source_url": "https://dl.google.com/dl/android/maven2/androidx/window/window/1.5.0/window-1.5.0-sources.jar",
-      "source_sha256": "37d85fa5e68b3bc28c88b05dc2b0d5d7caf0af3d7692bd0bc0c56a8dc6ca6a33",
-      "source_file": "androidx.window/window/1.5.0/window-1.5.0-sources.jar",
-      "source_entries": 135,
-      "source_code_present": true,
-      "pom_file": "poms/androidx.window/window/1.5.0/window-1.5.0.pom",
-      "pom_sha256": "d4f22b991a69600e2ffc36b42ac199626fd96d5f1648c3beeccd35de06fcc351",
-      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/window/window/1.5.0/window-1.5.0.pom"
-    },
-    {
       "coordinate": "androidx.work:work-runtime:2.12.0",
       "runtime_sha256": "a967c776d2c2ff9a7a541679d2fb51cefdc78d4010fcf68f3fdd4c57c29e89dc",
       "source_url": "https://dl.google.com/dl/android/maven2/androidx/work/work-runtime/2.12.0/work-runtime-2.12.0-sources.jar",
@@ -1220,6 +1196,30 @@
       "pom_file": "poms/androidx.navigationevent/navigationevent-compose-android/1.1.1/navigationevent-compose-android-1.1.1.pom",
       "pom_sha256": "b2abb117d0ef481087a4477d3b9e2ae4ba89e3127238780f8603b57c27acb2c6",
       "pom_url": "https://dl.google.com/dl/android/maven2/androidx/navigationevent/navigationevent-compose-android/1.1.1/navigationevent-compose-android-1.1.1.pom"
+    },
+    {
+      "coordinate": "androidx.window:window-core-android:1.5.1",
+      "runtime_sha256": "b289ce85090f1f976569fa92bbac84011f54ba1b21f0ce883655b34c8f9f9eea",
+      "source_url": "https://dl.google.com/dl/android/maven2/androidx/window/window-core-android/1.5.1/window-core-android-1.5.1-sources.jar",
+      "source_sha256": "df2d830a33d04300574b65d7a87904458a910b879af3d13022def0a627a22df6",
+      "source_file": "androidx.window/window-core-android/1.5.1/window-core-android-1.5.1-sources.jar",
+      "source_entries": 16,
+      "source_code_present": true,
+      "pom_file": "poms/androidx.window/window-core-android/1.5.1/window-core-android-1.5.1.pom",
+      "pom_sha256": "462ae4100a7bc2a0f1ff61f615091fc330d6e67aa0341747270c3d714c90e0cd",
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/window/window-core-android/1.5.1/window-core-android-1.5.1.pom"
+    },
+    {
+      "coordinate": "androidx.window:window:1.5.1",
+      "runtime_sha256": "3c3061966f012fc22f2e99701f683e82e732435ae2f2a1d5b2f99d82bb7b8864",
+      "source_url": "https://dl.google.com/dl/android/maven2/androidx/window/window/1.5.1/window-1.5.1-sources.jar",
+      "source_sha256": "fb0070e8e60328535a868c514f421fdb17d151a2ef6fe4b701922808615b4cd3",
+      "source_file": "androidx.window/window/1.5.1/window-1.5.1-sources.jar",
+      "source_entries": 135,
+      "source_code_present": true,
+      "pom_file": "poms/androidx.window/window/1.5.1/window-1.5.1.pom",
+      "pom_sha256": "0a28fe17feed5c0175fbfbd6722ce78c575a1eeac09d858f08e49353f34707e0",
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/window/window/1.5.1/window-1.5.1.pom"
     }
   ]
 }

@@ -83,6 +83,7 @@ dependencies {
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.foundation:foundation'
     implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.window:window-core:1.5.1'
     implementation "androidx.work:work-runtime:2.12.0"
     constraints {
         implementation('androidx.lifecycle:lifecycle-runtime:2.11.1') {
@@ -90,6 +91,18 @@ dependencies {
         }
         implementation('androidx.tracing:tracing:2.0.5') {
             because 'Keep the qualified Tracing version selected for Activity and WorkManager'
+        }
+        implementation('androidx.window:window:1.5.1') {
+            because 'Window and Window Core share the same patch release'
+        }
+        androidTestImplementation('androidx.test:rules:1.7.0') {
+            because 'Keep instrumentation rules on the current AndroidX Test line'
+        }
+        androidTestImplementation('com.google.android.material:material:1.14.0') {
+            because 'The accessibility checker uses the supported Material Views release'
+        }
+        androidTestImplementation('com.google.guava:guava:33.8.0-android') {
+            because 'Keep the instrumentation accessibility checker on the patched Android variant'
         }
     }
     testImplementation 'junit:junit:4.13.2'
@@ -99,6 +112,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4-accessibility'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
 }
 
