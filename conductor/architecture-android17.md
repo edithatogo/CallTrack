@@ -4,7 +4,7 @@
 
 ## Ponytail decision: native instead of multiplatform
 
-One deployable **Android 17 (API 37)** application. Kotlin + native **Jetpack Compose**, standard Android permission/results/lifecycle patterns and system widgets where feasible. Each Activity uses one lifecycle-bound Compose root. The standard controls replaced the custom buttons, hybrid layouts, and legacy View dependencies after [rendered and accessibility qualification](tracks/compose_app_20261021/implementation-evidence.md#android-17-native-screen-roots-and-durable-delivery). Avoid DI, custom routers, custom preference/state frameworks and new cross-platform scaffolding without a second proved consumer.
+One deployable **Android 17 (API 37)** application. Kotlin and native **Jetpack Compose** use Android permission and lifecycle APIs. The launcher owns a typed Navigation 3 stack, and the fixed entry points reuse the same Compose destinations. Material controls replaced the hybrid layouts after [rendered and accessibility qualification](tracks/compose_app_20261021/implementation-evidence.md#android-17-native-screen-roots-and-durable-delivery).
 
 ```mermaid
 flowchart TD
@@ -28,7 +28,8 @@ Room owns both existing database files. The preserving migrations retain their f
 - Opt-in app-call routes use Android 17's unified call log and the calling app's account attribution. Each calendar uses its own existing receipt keys and scan cursor. [Track 23](tracks/android17_call_routing_20261125/index.md)
 - WorkManager is the single durable scheduler. Keep generation checks, cancellation and explicit user activation.
 - **Room 3.0.3** uses KSP, AndroidSQLiteDriver and suspend DAOs. Receipt, checkpoint and import transactions use Room’s native writer connection. Recovery persists intent before touching the calendar. [Track 22](tracks/room3_android17_20261124/plan.md).
-- Material 3 provides the standard buttons, checkboxes, and date fields. Activities own the platform permission, confirmation, and provider effects, and Compose nodes expose stable accessibility labels.
+- Material 3 Expressive provides the standard controls and shapes. The forms respond to Android window size classes and consume system and keyboard insets. Compose nodes expose stable accessibility labels and keyboard targets.
+- Proto DataStore owns settings and migrates the existing saved choices and logging policy once. Room retains the durable delivery and import records. Hilt injects the manual logging ViewModel, which exposes immutable state through StateFlow. The remaining screen state work is in [Track 24](tracks/android17_standards_20261125/index.md).
 - No Rust, Kotlin Multiplatform production module, cross-platform UI, Swift app or second writer in active builds.
 
 ## Test and build execution order
