@@ -415,14 +415,14 @@ class DurableDelivery(private val store: Store?, private val sink: SliceEngine.C
     companion object {
         @JvmField val DELIVERY_LOCK = Any()
 
-        private fun sameOperation(left: Operation?, right: Operation?): Boolean =
+        internal fun sameOperation(left: Operation?, right: Operation?): Boolean =
             if (left == null) {
                 right == null
             } else {
                 right != null && left.owner == right.owner && left.generation == right.generation
             }
 
-        private fun pending(intent: Intent): Boolean =
+        internal fun pending(intent: Intent): Boolean =
             intent.state == State.READY ||
                 intent.state == State.IN_FLIGHT ||
                 intent.state == State.ATTEMPTED

@@ -1394,3 +1394,11 @@ Compose, platform-provider and durable scheduling stack.
 [Android 17 APIs](https://developer.android.com/about/versions/17/features),
 [large-screen behavior](https://developer.android.com/about/versions/17/behavior-changes-17),
 [AGP backup testing](https://developer.android.com/build/releases/agp-9-5-0-release-notes).
+
+## Compose enforcement, 26 November 2026
+
+Chat `01a217de-544b-7ff3-b45a-8894796b1f11` owns the Gradle catalogue,
+Compose checks, screenshot fixtures and CI changes in the managed worktree
+`~/.codex/worktrees/calltrack-compose-enforcement/calltrack` on
+`codex/strict-compose-enforcement`. Qualification uses local Gradle and JVM
+tests. Existing device sessions retain their current owners.

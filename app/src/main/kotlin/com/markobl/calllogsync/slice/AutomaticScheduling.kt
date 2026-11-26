@@ -80,7 +80,7 @@ class AutomaticScheduling private constructor() {
             control(context).pause()
         }
 
-        private fun control(context: Context?): AutomaticScheduleControl =
+        internal fun control(context: Context?): AutomaticScheduleControl =
             AutomaticScheduleControl(
                 ActivationControl(AndroidActivationStore(context)),
                 { settings -> schedule(context, settings) },
@@ -89,10 +89,8 @@ class AutomaticScheduling private constructor() {
 
         @JvmStatic
         fun reconcile(context: Context?) {
-            requests(context)
+            control(context).reconcile()
         }
-
-        private fun requests(context: Context?): Array<Future<*>>? = control(context).reconcile()
 
         @JvmStatic
         @Throws(ExecutionException::class, InterruptedException::class, TimeoutException::class)
@@ -134,7 +132,7 @@ class AutomaticScheduling private constructor() {
                     .apply { allowCoreThreadTimeOut(true) }
         }
 
-        private fun remainingBudget(deadlineNanos: Long): Long {
+        internal fun remainingBudget(deadlineNanos: Long): Long {
             val remaining = deadlineNanos - System.nanoTime()
             if (remaining <= 0) throw TimeoutException("Wake enqueue unconfirmed")
             return remaining
@@ -152,7 +150,7 @@ class AutomaticScheduling private constructor() {
             }
         }
 
-        private fun input(settings: ActivationControl.Settings?): Data =
+        internal fun input(settings: ActivationControl.Settings?): Data =
             Data.Builder().putLong(AutomaticLogWorker.GENERATION, settings!!.generation).build()
 
         @JvmStatic

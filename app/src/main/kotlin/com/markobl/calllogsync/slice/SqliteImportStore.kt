@@ -205,7 +205,7 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
         }
 
     companion object {
-        private fun validate(
+        internal fun validate(
             old: HistoricalImport.Session?,
             next: HistoricalImport.Session?,
             added: List<HistoricalImport.Candidate?>?,
@@ -359,7 +359,7 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
             }
         }
 
-        private fun encode(s: HistoricalImport.Session): String {
+        internal fun encode(s: HistoricalImport.Session): String {
             try {
                 val j = JSONObject()
                 if (s.calendarBinding == null) {
@@ -395,7 +395,7 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
             }
         }
 
-        private fun decode(body: String?): HistoricalImport.Session {
+        internal fun decode(body: String?): HistoricalImport.Session {
             try {
                 val j = JSONObject(body!!)
                 val version = j.getInt("version")

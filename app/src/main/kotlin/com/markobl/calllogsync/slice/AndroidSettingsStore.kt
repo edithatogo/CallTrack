@@ -30,7 +30,7 @@ internal object SettingsSerializer : Serializer<CallTrackSettings> {
     override suspend fun writeTo(t: CallTrackSettings, output: OutputStream) = t.writeTo(output)
 }
 
-private val Context.callTrackSettings by
+internal val Context.callTrackSettings by
     dataStore(
         fileName = "calltrack_settings.pb",
         serializer = SettingsSerializer,

@@ -19,7 +19,7 @@ class KotlinBuildBinding(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             for relative in ('build.gradle', 'settings.gradle', 'gradle.properties', 'gradlew',
-                             'app/build.gradle', 'app/proguard-rules.pro',
+                             'gradle/libs.versions.toml', 'app/build.gradle.kts', 'app/proguard-rules.pro',
                              'app/src/main/kotlin/Fixture.kt'):
                 path = root / relative
                 path.parent.mkdir(parents=True, exist_ok=True)

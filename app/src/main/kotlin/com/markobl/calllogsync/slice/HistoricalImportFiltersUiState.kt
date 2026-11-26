@@ -42,15 +42,27 @@ internal fun HistoricalImportFiltersPanel(
         ImportDateField(toLabel, "import_to", state.toDate) {
             onStateChange(state.copy(toDate = it))
         }
-        CallTypeOption("import_incoming", incomingLabel, state.incoming, Modifier.fillMaxWidth()) {
-            onStateChange(state.copy(incoming = it))
-        }
-        CallTypeOption("import_outgoing", outgoingLabel, state.outgoing, Modifier.fillMaxWidth()) {
-            onStateChange(state.copy(outgoing = it))
-        }
-        CallTypeOption("import_missed", missedLabel, state.missed, Modifier.fillMaxWidth()) {
-            onStateChange(state.copy(missed = it))
-        }
+        CallTypeOption(
+            "import_incoming",
+            incomingLabel,
+            state.incoming,
+            onCheckedChange = { onStateChange(state.copy(incoming = it)) },
+            modifier = Modifier.fillMaxWidth(),
+        )
+        CallTypeOption(
+            "import_outgoing",
+            outgoingLabel,
+            state.outgoing,
+            onCheckedChange = { onStateChange(state.copy(outgoing = it)) },
+            modifier = Modifier.fillMaxWidth(),
+        )
+        CallTypeOption(
+            "import_missed",
+            missedLabel,
+            state.missed,
+            onCheckedChange = { onStateChange(state.copy(missed = it)) },
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 

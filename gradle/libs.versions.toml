@@ -1,0 +1,101 @@
+[versions]
+agp = "9.5.3"
+kotlin = "2.4.21"
+composeBom = "2026.11.01"
+activity = "1.13.0"
+datastore = "1.3.0"
+hiltCompose = "1.4.0"
+lifecycle = "2.11.1"
+navigation3 = "1.2.2"
+room = "3.0.3"
+sqlite = "2.7.1"
+tracing = "2.0.5"
+window = "1.5.1"
+work = "2.12.0"
+androidxJunit = "1.3.0"
+androidxRules = "1.7.0"
+espresso = "3.7.0"
+coroutines = "1.11.0"
+hilt = "2.60.1"
+protobuf = "4.36.2"
+ksp = "2.3.14"
+protobufPlugin = "0.10.1"
+slackComposeLints = "1.6.1"
+detekt = "1.23.8"
+# Last Compose Rules release for the stable Detekt 1.x API.
+detektCompose = "0.4.23"
+konsist = "0.18.1"
+roborazzi = "1.79.0"
+robolectric = "4.18.1"
+composeMultiplatform = "1.12.2"
+material3Multiplatform = "1.9.0"
+
+[libraries]
+android-gradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-compose-compiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
+kotlin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
+kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+androidx-compose-ui = { module = "androidx.compose.ui:ui" }
+androidx-compose-foundation = { module = "androidx.compose.foundation:foundation" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
+androidx-compose-adaptive-navigation = { module = "androidx.compose.material3.adaptive:adaptive-navigation3" }
+androidx-compose-test-junit = { module = "androidx.compose.ui:ui-test-junit4" }
+androidx-compose-test-accessibility = { module = "androidx.compose.ui:ui-test-junit4-accessibility" }
+androidx-compose-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+androidx-activity = { module = "androidx.activity:activity", version.ref = "activity" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity" }
+androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
+androidx-hilt-compose = { module = "androidx.hilt:hilt-lifecycle-viewmodel-compose", version.ref = "hiltCompose" }
+androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime", version.ref = "lifecycle" }
+androidx-lifecycle-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+androidx-lifecycle-navigation = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
+androidx-navigation-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
+androidx-navigation-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
+androidx-room-runtime = { module = "androidx.room3:room3-runtime", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room3:room3-compiler", version.ref = "room" }
+androidx-sqlite = { module = "androidx.sqlite:sqlite-framework", version.ref = "sqlite" }
+androidx-tracing = { module = "androidx.tracing:tracing", version.ref = "tracing" }
+androidx-window = { module = "androidx.window:window", version.ref = "window" }
+androidx-window-core = { module = "androidx.window:window-core", version.ref = "window" }
+androidx-work = { module = "androidx.work:work-runtime", version.ref = "work" }
+androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
+androidx-test-espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
+androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidxRules" }
+
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
+protobuf-lite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobuf" }
+protoc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
+junit = "junit:junit:4.13.2"
+turbine = "app.cash.turbine:turbine:1.2.1"
+slack-compose-lints = { module = "com.slack.lint.compose:compose-lint-checks", version.ref = "slackComposeLints" }
+# Existing general analysis uses the Detekt 2 CLI. Compose Rules and formatting use stable Detekt 1.
+detekt-core-cli = "dev.detekt:detekt-cli:2.0.0-alpha.6"
+ktfmt = "org.jetbrains.kotlinx:ktfmt:0.65"
+detekt-cli = { module = "io.gitlab.arturbosch.detekt:detekt-cli", version.ref = "detekt" }
+detekt-compose = { module = "io.nlopez.compose.rules:detekt", version.ref = "detektCompose" }
+detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
+konsist = { module = "com.lemonappdev:konsist", version.ref = "konsist" }
+roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi", version.ref = "roborazzi" }
+roborazzi-compose = { module = "io.github.takahirom.roborazzi:roborazzi-compose", version.ref = "roborazzi" }
+# API 37 SDK used by Robolectric 4.18.1. Resolve it through Gradle checksum verification.
+robolectric-sdk = "org.robolectric:android-all-instrumented:17-robolectric-16653203-i7"
+javaparser = "com.github.javaparser:javaparser-core:3.28.2"
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+multiplatform-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3Multiplatform" }
+
+[plugins]
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
+android-multiplatform = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
+android-application = { id = "com.android.application", version.ref = "agp" }

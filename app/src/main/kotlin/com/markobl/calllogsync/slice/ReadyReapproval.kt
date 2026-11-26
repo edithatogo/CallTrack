@@ -61,7 +61,7 @@ class ReadyReapproval(
                 intent.marker == intent.payload.marker &&
                 intent.fingerprint == intent.payload.fingerprint()
 
-        private fun unchanged(a: DurableDelivery.Intent, b: DurableDelivery.Intent): Boolean =
+        internal fun unchanged(a: DurableDelivery.Intent, b: DurableDelivery.Intent): Boolean =
             a.key == b.key &&
                 a.calendar == b.calendar &&
                 a.fingerprint == b.fingerprint &&

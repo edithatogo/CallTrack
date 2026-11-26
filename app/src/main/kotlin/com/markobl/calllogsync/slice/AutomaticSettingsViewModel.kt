@@ -539,7 +539,7 @@ constructor(
     }
 }
 
-private fun workerMessage(code: String?): Int =
+internal fun workerMessage(code: String?): Int =
     when (code) {
         null -> R.string.auto_not_run
 

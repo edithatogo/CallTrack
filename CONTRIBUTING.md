@@ -44,13 +44,29 @@ See [qualification](qualification/README.md) for the separate upstream reproduce
 Use google-java-format 2.0.0 with `--aosp --cleanup=false` for app-owned Java. CI includes the pinned
 formatter URL/checksum and exact command. Preserve the upstream notices; contribute
 only code and assets you have the right to distribute under compatible terms.
-For Kotlin use ktfmt 0.65 with `--kotlinlang-style --dry-run --set-exit-if-changed`.
-CI pins its Maven URL and SHA-256. Follow [Kotlin style](conductor/code_styleguides/kotlin.md).
-Run `./gradlew ktlintCheck detekt` for Kotlin sources and tests in the Android
-app. The Gradle verification metadata pins both command-line tools. The required
-build qualification runs these tasks alongside the existing formatter and
-Android Lint. Detekt counts guarded work and component APIs, with conventions
-for Compose declarations and early guards.
+Use the strict Compose check before opening a pull request.
+
+```sh
+./gradlew detekt lintDebug testDebugUnitTest verifyRoborazziDebug assembleDebug --stacktrace
+```
+
+The build uses JDK 25. Ktlint and the general Detekt CLI use a Gradle-detected
+JDK 21 because their IntelliJ parsers call a JVM API deprecated in JDK 24.
+Set `CALLTRACK_ANALYSIS_JAVA_HOME` to the JDK 21 home if Gradle does not
+discover it. The `detekt` task includes ktfmt, ktlint, general Kotlin rules
+and the Compose and formatting rule sets. See the [Kotlin style guide](conductor/code_styleguides/kotlin.md).
+
+Change AndroidX and Kotlin versions in `gradle/libs.versions.toml`. The Compose
+BOM selects Material 3 and the Android Compose libraries. Renovate groups these
+updates and waits three days. The weekly audit runs
+`./gradlew lintDebug -PstrictVersions=true` to check the published versions.
+
+For an intentional visual change, record the affected screenshot with
+`./gradlew :app:recordRoborazziDebug --tests '*ManualCalendarScreenshotTest'`.
+Review the image in `app/src/test/screenshots`, commit it with the UI change,
+then run `./gradlew verifyRoborazziDebug`. The required GitHub Actions
+`slice` check runs screenshot verification on every pull request.
+
 Describe behaviour changes and their regression evidence in the pull request.
 Keep language/UI migrations separate from synchronization behaviour changes.
 

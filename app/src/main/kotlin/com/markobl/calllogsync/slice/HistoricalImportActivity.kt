@@ -27,19 +27,21 @@ class HistoricalImportActivity : ComponentActivity() {
 }
 
 @Composable
-internal fun HistoricalImportScreen(activity: ComponentActivity) {
-    val model = hiltViewModel<HistoricalImportViewModel>()
+internal fun HistoricalImportScreen(
+    activity: ComponentActivity,
+    model: HistoricalImportViewModel = hiltViewModel(),
+) {
     val permissions =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             model.permissionsChanged()
         }
-    LifecycleResumeEffect(model) {
+    LifecycleResumeEffect(model.uiState) {
         model.setResumed(true)
         onPauseOrDispose { model.setResumed(false) }
     }
     val state by model.uiState.collectAsStateWithLifecycle()
     val form = state.form
-    HistoricalImportForm(form, model) {
+    HistoricalImportForm(form, model::selectOption, model::setFilters) {
         val requested =
             arrayOf(
                 Manifest.permission.READ_CALL_LOG,
@@ -54,7 +56,13 @@ internal fun HistoricalImportScreen(activity: ComponentActivity) {
             permissions.launch(requested)
         }
     }
-    HistoricalImportActions(form, model)
+    HistoricalImportActions(
+        form = form,
+        onCreate = model::startPreview,
+        onSetRunning = model::setRunning,
+        onConfirm = model::requestConfirmation,
+        onCancel = model::requestCancellation,
+    )
     HistoricalImportHistoryPanel(
         state = form.history,
         title = stringResource(R.string.import_history),
@@ -84,7 +92,8 @@ internal fun HistoricalImportScreen(activity: ComponentActivity) {
 @Composable
 private fun HistoricalImportForm(
     form: HistoricalImportFormUiState,
-    model: HistoricalImportViewModel,
+    onSelect: (String) -> Unit,
+    onFiltersChange: (HistoricalImportFiltersUiState) -> Unit,
     onRequestAccess: () -> Unit,
 ) {
     HistoricalImportIntroPanel(stringResource(R.string.import_intro, form.zone))
@@ -99,7 +108,7 @@ private fun HistoricalImportForm(
             state = form.sources,
             tagPrefix = "import_source",
             chooseLabel = stringResource(R.string.import_choose_source),
-            onSelect = model::selectOption,
+            onSelect = onSelect,
         )
     }
     CalendarDestinationPicker(
@@ -107,7 +116,7 @@ private fun HistoricalImportForm(
         tagPrefix = "import_calendar",
         chooseLabel = stringResource(R.string.slice_choose),
         unavailableLabel = form.destinationMessage?.let { stringResource(it) },
-        onSelect = model::selectOption,
+        onSelect = onSelect,
     )
     HistoricalImportFiltersPanel(
         state = form.filters,
@@ -116,14 +125,17 @@ private fun HistoricalImportForm(
         incomingLabel = stringResource(R.string.auto_incoming),
         outgoingLabel = stringResource(R.string.auto_outgoing),
         missedLabel = stringResource(R.string.auto_missed),
-        onStateChange = model::setFilters,
+        onStateChange = onFiltersChange,
     )
 }
 
 @Composable
 private fun HistoricalImportActions(
     form: HistoricalImportFormUiState,
-    model: HistoricalImportViewModel,
+    onCreate: () -> Unit,
+    onSetRunning: (Boolean) -> Unit,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit,
 ) {
     val focus = LocalFocusManager.current
     HistoricalImportCreateActionPanel(
@@ -131,7 +143,7 @@ private fun HistoricalImportActions(
         label = stringResource(R.string.import_create),
         onCreate = {
             focus.clearFocus()
-            model.startPreview()
+            onCreate()
         },
     )
     HistoricalImportSummaryText(form.summary)
@@ -142,10 +154,10 @@ private fun HistoricalImportActions(
             confirmLabel = stringResource(R.string.import_confirm),
             stopLabel = stringResource(R.string.import_stop),
             cancelLabel = stringResource(R.string.import_cancel),
-            onContinue = { model.setRunning(true) },
-            onConfirm = model::requestConfirmation,
-            onStop = { model.setRunning(false) },
-            onCancel = model::requestCancellation,
+            onContinue = { onSetRunning(true) },
+            onConfirm = onConfirm,
+            onStop = { onSetRunning(false) },
+            onCancel = onCancel,
         )
     }
     HistoricalImportFeedbackText(form.feedback)

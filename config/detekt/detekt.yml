@@ -1,0 +1,27 @@
+build:
+  maxIssues: 0
+
+formatting:
+  active: true
+  android: true
+  ImportOrdering:
+    layout: '*'
+  # ktfmtCheck enforces these layout rules with the project's Kotlin formatter.
+  Indentation:
+    active: false
+  Wrapping:
+    active: false
+  AnnotationOnSeparateLine:
+    active: false
+  autoCorrect: false
+
+Compose:
+  active: true
+  Material2:
+    active: true
+  UnstableCollections:
+    active: true
+
+config:
+  validation: true
+  warningsAsErrors: true

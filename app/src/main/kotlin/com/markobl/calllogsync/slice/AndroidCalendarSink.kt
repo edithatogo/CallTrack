@@ -263,10 +263,10 @@ constructor(
                 Calendars.OWNER_ACCOUNT,
             )
 
-        private fun readIdentity(cursor: Cursor, offset: Int): List<String?> =
+        internal fun readIdentity(cursor: Cursor, offset: Int): List<String?> =
             IDENTITY.indices.map { cursor.getString(offset + it) }
 
-        private fun bind(identity: List<String?>): String =
+        internal fun bind(identity: List<String?>): String =
             MessageDigest.getInstance("SHA-256")
                 .digest(JSONArray(identity).toString().toByteArray())
                 .toHexString()

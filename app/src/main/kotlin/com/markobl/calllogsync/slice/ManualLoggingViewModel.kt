@@ -201,7 +201,7 @@ constructor(private val data: ManualLoggingDataSource) : ViewModel() {
 private const val SUBSCRIPTION_GRACE_MILLIS = 5_000L
 
 @StringRes
-private fun manualLoggingMessage(result: SliceEngine.Result): Int =
+internal fun manualLoggingMessage(result: SliceEngine.Result): Int =
     when (result) {
         SliceEngine.Result.SAVED -> R.string.slice_saved
         SliceEngine.Result.ALREADY_LOGGED -> R.string.slice_already

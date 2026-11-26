@@ -32,13 +32,15 @@ class ReceiptRecoveryActivity : ComponentActivity() {
 }
 
 @Composable
-internal fun ReceiptRecoveryScreen(activity: ComponentActivity) {
-    val model = hiltViewModel<ReceiptRecoveryViewModel>()
+internal fun ReceiptRecoveryScreen(
+    activity: ComponentActivity,
+    model: ReceiptRecoveryViewModel = hiltViewModel(),
+) {
     val permissions =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             model.permissionsChanged()
         }
-    LifecycleResumeEffect(model) {
+    LifecycleResumeEffect(model.uiState) {
         model.setResumed(true)
         onPauseOrDispose { model.setResumed(false) }
     }
@@ -59,7 +61,7 @@ internal fun ReceiptRecoveryScreen(activity: ComponentActivity) {
     RecoveryStatusPanel(page.feedback)
     RecoveryEmptyPanel(visible = page.empty, message = stringResource(R.string.recovery_empty))
     RecoveryCardsPanel(
-        cards = page.cards,
+        page = page,
         busy = page.navigation.busy,
         checkLabel = stringResource(R.string.recovery_check),
         suppressLabel = stringResource(R.string.recovery_suppress),
