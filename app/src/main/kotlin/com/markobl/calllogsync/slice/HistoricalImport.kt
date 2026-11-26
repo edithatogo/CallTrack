@@ -4,12 +4,17 @@ import java.util.Collections
 import java.util.UUID
 import java.util.function.BooleanSupplier
 
+private const val CALENDAR_BINDING_LENGTH = 64
+
 /** Frozen historical candidates; every store mutation commits atomically before returning. */
-class HistoricalImport(
+class HistoricalImport
+@JvmOverloads
+constructor(
     private val store: Store?,
     private val source: PagedCalls.Source?,
     private val receipts: DurableDelivery.Store?,
     private val delivery: DurableDelivery?,
+    private val appSource: ((String) -> PagedCalls.Source)? = null,
 ) {
     enum class Phase {
         BUILDING,
@@ -68,7 +73,9 @@ class HistoricalImport(
         }
     }
 
-    class Session(
+    class Session
+    @JvmOverloads
+    constructor(
         id: String?,
         @JvmField val calendar: Long,
         timezone: String?,
@@ -85,6 +92,8 @@ class HistoricalImport(
         @JvmField val saved: Long,
         @JvmField val review: Long,
         @JvmField val stopped: DurableDelivery.Result?,
+        @JvmField val callSource: String = CallRecord.PHONE,
+        @JvmField val calendarBinding: String? = null,
     ) {
         @JvmField val id: String
 
@@ -94,7 +103,25 @@ class HistoricalImport(
 
         @JvmField val checkpoint: PagedCalls.Checkpoint
 
+        private val policy =
+            ScanDelivery.Policy(
+                from,
+                incoming,
+                outgoing,
+                missed,
+                setOf(callSource),
+            )
+
         init {
+            require(callSource == CallRecord.PHONE || CallRecord.isAppSource(callSource)) {
+                "Invalid import call source"
+            }
+            require(
+                calendarBinding?.length == CALENDAR_BINDING_LENGTH ||
+                    (calendarBinding == null && callSource == CallRecord.PHONE),
+            ) {
+                "Invalid import calendar binding"
+            }
             ActivationControl.Settings(
                 1,
                 false,
@@ -155,13 +182,14 @@ class HistoricalImport(
                 saved,
                 review,
                 stopped,
+                callSource,
+                calendarBinding,
             )
 
-        fun includes(call: CallRecord?): Boolean =
-            call!!.start < to &&
-                ScanDelivery.Policy(from, incoming, outgoing, missed).includes(call)
+        fun includes(call: CallRecord?): Boolean = call!!.start < to && policy.includes(call)
     }
 
+    @JvmOverloads
     fun start(
         calendar: Long,
         timezone: String?,
@@ -170,6 +198,8 @@ class HistoricalImport(
         incoming: Boolean,
         outgoing: Boolean,
         missed: Boolean,
+        callSource: String = CallRecord.PHONE,
+        calendarBinding: String? = null,
     ): Session =
         synchronized(DurableDelivery.DELIVERY_LOCK) {
             val session =
@@ -183,13 +213,15 @@ class HistoricalImport(
                     outgoing,
                     missed,
                     Phase.BUILDING,
-                    PagedCalls.capture(source),
+                    PagedCalls.capture(sourceFor(callSource)),
                     0,
                     0,
                     -1,
                     0,
                     0,
                     null,
+                    callSource,
+                    calendarBinding,
                 )
             store!!.create(session)
             session
@@ -201,7 +233,7 @@ class HistoricalImport(
             val session = required(id)
             if (session.phase != Phase.BUILDING) return session
             try {
-                val page = PagedCalls.read(source, session.checkpoint, limit)
+                val page = PagedCalls.read(sourceFor(session.callSource), session.checkpoint, limit)
                 val candidates = ArrayList<Candidate>()
                 var checkpoint = session.checkpoint
                 for (call in page) {
@@ -359,7 +391,10 @@ class HistoricalImport(
             if (intent != null && canResume(intent, session, candidate)) {
                 delivery!!.resume(candidate.key, session.calendar, session.operation(), permitted)
             } else {
-                val call = source!!.at(candidate.sourceId)
+                val call =
+                    sourceFor(session.callSource).at(candidate.sourceId)?.takeIf {
+                        it.source == session.callSource
+                    }
                 if (
                     call == null ||
                         candidate.key != call.key() ||
@@ -426,6 +461,17 @@ class HistoricalImport(
         store!!.save(expected, next, Collections.emptyList())
         return next
     }
+
+    private fun sourceFor(callSource: String): PagedCalls.Source =
+        checkNotNull(
+            if (callSource == CallRecord.PHONE) {
+                source
+            } else {
+                appSource?.invoke(callSource)
+            },
+        ) {
+            "Import call source unavailable"
+        }
 
     private fun required(id: String?): Session =
         store!!.get(id) ?: throw IllegalArgumentException("Unknown import")

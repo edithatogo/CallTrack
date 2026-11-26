@@ -2,4 +2,4 @@
 
 [Specification](spec.md) · [Plan and evidence](plan.md) · [Metadata](metadata.json)
 
-Use Android's unified call history for participating apps. Each selected call source sends entries only to its confirmed writable calendars.
+Use Android's unified call history for participating apps. Automatic logging sends each source to its confirmed writable calendars. Historical import previews one source and one calendar before confirmation.

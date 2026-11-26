@@ -11,9 +11,18 @@ import android.provider.CallLog.Calls
 
 /** Call-only adapter; queries occur only on explicit coordinator requests. */
 class AndroidCallLogSource
-@JvmOverloads
-constructor(context: Context?, includeAppCalls: Boolean = false) :
+private constructor(context: Context?, includeAppCalls: Boolean, app: String?) :
     SliceEngine.CallSource, PagedCalls.Source {
+    @JvmOverloads
+    constructor(
+        context: Context?,
+        includeAppCalls: Boolean = false,
+    ) : this(context, includeAppCalls, null)
+
+    private val appComponentPattern = app?.let {
+        require(CallRecord.isAppSource(it)) { "Invalid import app package" }
+        "$it/*"
+    }
     private val context = context!!.applicationContext
     private val uri = if (includeAppCalls) Calls.CONTENT_URI_WITH_VOIP_CALLS else Calls.CONTENT_URI
     private val projection =
@@ -110,13 +119,25 @@ constructor(context: Context?, includeAppCalls: Boolean = false) :
         limit: Int,
     ): List<CallRecord> {
         permission()
+        val pattern = appComponentPattern
+        val scopedSelection =
+            if (pattern == null) {
+                selection
+            } else {
+                listOfNotNull(
+                        selection,
+                        "${Calls.UUID} IS NOT NULL AND ${Calls.PHONE_ACCOUNT_COMPONENT_NAME} GLOB ?",
+                    )
+                    .joinToString(" AND ")
+            }
+        val scopedArgs = if (pattern == null) args else arrayOf(*args.orEmpty(), pattern)
         context.contentResolver
             .query(
                 uri.buildUpon()
                     .appendQueryParameter(Calls.LIMIT_PARAM_KEY, limit.toString())
                     .build(),
                 projection,
-                pageQuery(selection, args, ascending, limit),
+                pageQuery(scopedSelection, scopedArgs, ascending, limit),
                 null,
             )
             .use { cursor ->
@@ -126,6 +147,9 @@ constructor(context: Context?, includeAppCalls: Boolean = false) :
     }
 
     companion object {
+        internal fun forApp(context: Context, app: String): PagedCalls.Source =
+            AndroidCallLogSource(context, true, app)
+
         @JvmField
         val PROJECTION =
             arrayOf(
