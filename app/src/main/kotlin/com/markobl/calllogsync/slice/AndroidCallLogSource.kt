@@ -16,14 +16,13 @@ private constructor(context: Context?, includeAppCalls: Boolean, app: String?) :
     @JvmOverloads
     constructor(
         context: Context?,
-        includeAppCalls: Boolean = false
+        includeAppCalls: Boolean = false,
     ) : this(context, includeAppCalls, null)
 
-    private val appComponentPattern =
-        app?.let {
-            require(CallRecord.isAppSource(it)) { "Invalid import app package" }
-            "$it/*"
-        }
+    private val appComponentPattern = app?.let {
+        require(CallRecord.isAppSource(it)) { "Invalid import app package" }
+        "$it/*"
+    }
     private val context = context!!.applicationContext
     private val uri = if (includeAppCalls) Calls.CONTENT_URI_WITH_VOIP_CALLS else Calls.CONTENT_URI
     private val projection =
@@ -126,9 +125,10 @@ private constructor(context: Context?, includeAppCalls: Boolean, app: String?) :
                 selection
             } else {
                 listOfNotNull(
-                    selection,
-                    "${Calls.UUID} IS NOT NULL AND ${Calls.PHONE_ACCOUNT_COMPONENT_NAME} GLOB ?",
-                ).joinToString(" AND ")
+                        selection,
+                        "${Calls.UUID} IS NOT NULL AND ${Calls.PHONE_ACCOUNT_COMPONENT_NAME} GLOB ?",
+                    )
+                    .joinToString(" AND ")
             }
         val scopedArgs = if (pattern == null) args else arrayOf(*args.orEmpty(), pattern)
         context.contentResolver

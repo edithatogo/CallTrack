@@ -59,8 +59,9 @@ internal data class HistoricalImportFormUiState(
     val history: HistoricalImportHistoryUiState = HistoricalImportHistoryUiState(),
 ) {
     val showsSourcePicker: Boolean
-        get() = sources.options.size > 1 ||
-            sources.selectedToken?.let { it != CallRecord.PHONE } == true
+        get() =
+            sources.options.size > 1 ||
+                sources.selectedToken?.let { it != CallRecord.PHONE } == true
 }
 
 @Immutable
@@ -173,12 +174,14 @@ constructor(
         if (destination != null && form.destination.enabled && calendarAccess()) {
             selected = destination.id
             selectedBinding = destination.binding
-            form = form.copy(
-                destination = form.destination.copy(selectedToken = token),
-                destinationMessage = null,
-            )
-        } else if (form.sources.enabled && access() &&
-            form.sources.options.any { it.token == token }) {
+            form =
+                form.copy(
+                    destination = form.destination.copy(selectedToken = token),
+                    destinationMessage = null,
+                )
+        } else if (
+            form.sources.enabled && access() && form.sources.options.any { it.token == token }
+        ) {
             callSource = token
             form = form.copy(sources = form.sources.copy(selectedToken = token))
         } else {
@@ -362,8 +365,9 @@ constructor(
                         sessionSelected = phase != null,
                     ),
                 sources =
-                    form.sources.copy(enabled =
-                        canReviewDestination && permitted && form.showsSourcePicker),
+                    form.sources.copy(
+                        enabled = canReviewDestination && permitted && form.showsSourcePicker,
+                    ),
                 destination =
                     form.destination.copy(enabled = canReviewDestination && calendarAccess()),
             )
@@ -399,14 +403,14 @@ constructor(
                     val phone =
                         CalendarDestinationOption(
                             CallRecord.PHONE,
-                            context.getString(R.string.auto_source_phone)
+                            context.getString(R.string.auto_source_phone),
                         )
                     val sourceOptions = listOf(phone) + discovered.map { it.option(context) }
                     withContext(Dispatchers.Main.immediate) {
                         appSources = discovered
                         form =
                             form.copy(
-                                sources = CalendarDestinationUiState(sourceOptions, callSource)
+                                sources = CalendarDestinationUiState(sourceOptions, callSource),
                             )
                         updateDestinations(loaded)
                         if (session != null) renderSession()
@@ -439,23 +443,21 @@ constructor(
             CalendarDestinationOption(token, labels.getValue(choice.id))
         }
         val token =
-            options.firstOrNull {
-                val choice = destinationTargets.getValue(it.token)
-                choice.id == preferred &&
-                    (selectedBinding == null || choice.binding == selectedBinding)
-            }?.token
+            options
+                .firstOrNull {
+                    val choice = destinationTargets.getValue(it.token)
+                    choice.id == preferred &&
+                        (selectedBinding == null || choice.binding == selectedBinding)
+                }
+                ?.token
         val target = token?.let(destinationTargets::get)
         selected = target?.id ?: -1L
         selectedBinding = target?.binding
         val message =
             when {
                 !calendarAccess() -> null
-
-                preferred >= 0 && selected < 0 ->
-                    R.string.auto_destination_unavailable
-
+                preferred >= 0 && selected < 0 -> R.string.auto_destination_unavailable
                 options.isEmpty() -> R.string.slice_no_calendars
-
                 else -> null
             }
         form =
@@ -516,9 +518,11 @@ constructor(
                                 ledger.outbox(),
                                 DurableDelivery(
                                     ledger.outbox(),
-                                    AndroidCalendarSink(context, expectedCalendars)
+                                    AndroidCalendarSink(context, expectedCalendars),
                                 ),
-                            ) { app -> AndroidCallLogSource.forApp(context, app) }
+                            ) { app ->
+                                AndroidCallLogSource.forApp(context, app)
+                            }
                         val result = action.run(importer, store)
                         withContext(Dispatchers.Main.immediate) {
                             if (ticket != renderVersion) return@withContext

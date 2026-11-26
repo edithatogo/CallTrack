@@ -103,13 +103,14 @@ constructor(
 
         @JvmField val checkpoint: PagedCalls.Checkpoint
 
-        private val policy = ScanDelivery.Policy(
-            from,
-            incoming,
-            outgoing,
-            missed,
-            setOf(callSource)
-        )
+        private val policy =
+            ScanDelivery.Policy(
+                from,
+                incoming,
+                outgoing,
+                missed,
+                setOf(callSource),
+            )
 
         init {
             require(callSource == CallRecord.PHONE || CallRecord.isAppSource(callSource)) {
@@ -117,7 +118,7 @@ constructor(
             }
             require(
                 calendarBinding?.length == CALENDAR_BINDING_LENGTH ||
-                    (calendarBinding == null && callSource == CallRecord.PHONE)
+                    (calendarBinding == null && callSource == CallRecord.PHONE),
             ) {
                 "Invalid import calendar binding"
             }
@@ -462,12 +463,13 @@ constructor(
     }
 
     private fun sourceFor(callSource: String): PagedCalls.Source =
-        checkNotNull(if (callSource ==
-            CallRecord.PHONE) {
+        checkNotNull(
+            if (callSource == CallRecord.PHONE) {
                 source
             } else {
                 appSource?.invoke(callSource)
-            }) {
+            },
+        ) {
             "Import call source unavailable"
         }
 

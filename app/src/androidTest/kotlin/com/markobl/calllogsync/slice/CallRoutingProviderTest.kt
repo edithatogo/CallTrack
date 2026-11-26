@@ -112,7 +112,7 @@ class CallRoutingProviderTest {
                 assertEquals(calendar, preview.calendar)
                 assertEquals(
                     AndroidCalendarSink(context).writableBinding(calendar),
-                    preview.calendarBinding
+                    preview.calendarBinding,
                 )
                 assertEquals(1L, preview.count)
                 assertEquals(0, fixture.events(calendar))
@@ -156,6 +156,7 @@ class CallRoutingProviderTest {
         app: String,
         calendarLabel: String,
     ) {
+        ui.revealId("import_source_picker")
         val picker = checkNotNull(ui.shown("import_source_picker", true))
         val bounds = Rect().also(picker::getBoundsInScreen)
         val minimum = (48 * context.resources.displayMetrics.density).toInt()
