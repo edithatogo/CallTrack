@@ -89,7 +89,7 @@ Production acceptance follows Tracks 5 and 6 under the [existing prerequisite de
 - [x] Task: Review and refine sanitized hosted diagnostics for fatal logcat and resumed activity ownership; rerun the hosted matrix and keep API26/API33 acceptance open (see [review](review-20261025-diagnostics.md); commit `0a140e7`).
 - [x] Task: Review the latest merged hosted API26/API33/API36 UI matrix result, reconcile the previously open hosted focus and permission-control findings, and retain separate device/operational gates (see [matrix result review](review-20261025-hosted-matrix-pass.md)).
 - [x] Task: Review manual destination token ownership, explicit selection persistence, permission/provider boundary and test harness; compile Android test sources, run app unit tests/lint, and record hosted API26/API33/API36 acceptance as passed in run 40165971174 attempt 2 (see [review](review-20261025-manual-destination.md)).
-- [ ] Task: Update requirements, decisions, remaining limitations and next-track inputs; retire superseded code/prototypes only after parity.
+- [x] Task: Reconcile the Compose requirements and decisions after rendered parity. The app suite covers the standalone prototype cases, the obsolete Views and duplicate writer are retired, and production acceptance follows the [Track 5 release gates](../release_20261020/verification.md#active-release-gates). [Implementation evidence](implementation-evidence.md#android-17-native-screen-roots-and-durable-delivery).
 - [ ] Task: Final checkpoint and archive only after original acceptance, or explicit justified deferral with documented consequences and reconsideration trigger.
 
 ## Phase: Review Fixes — manual destination runtime acceptance

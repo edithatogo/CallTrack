@@ -1,0 +1,14 @@
+name: Offline AI security
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline-ai-security:
+    uses: edithatogo/repository-standards/.github/workflows/reusable-ai-sec-apple.yml@26e3ce78016a753ea5fb10dfed0950674f026c41
+    permissions:
+      contents: read
+    with:
+      enforce_ai: false

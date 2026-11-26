@@ -252,6 +252,6 @@ if __name__ == '__main__':
                         help='New directory under .local/release-evidence')
     args = parser.parse_args()
     receipt = audit(args.inventory, args.output)
-    print(json.dumps(receipt, indent=2))
     if not receipt['all_repository_bytes_match']:
-        raise SystemExit(1)
+        raise SystemExit('Canonical publication audit failed. See the private receipt.')
+    print('Canonical publication bytes matched. See the private receipt.')

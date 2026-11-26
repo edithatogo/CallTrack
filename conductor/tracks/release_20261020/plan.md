@@ -6,9 +6,9 @@ M3 and the original M4 operational evidence.
 
 The [signed 0.1.0 checkpoint](verification.md#calltrack-community-010-candidate)
 records the completed emulator checks and the physical missed and outgoing
-checks. The next release task is the physical answered incoming case when
-the retest resumes. The [observation protocol](seven-day-observation.md)
-starts after the physical and Google Calendar prerequisites pass.
+checks. The owner deferred the physical answered-incoming retest on
+26 November 2026. The remaining physical and Google Calendar cases precede
+the [seven-day observation](seven-day-observation.md) and publication.
 
 ## Phase 1: Discovery and mapping
 
@@ -29,7 +29,7 @@ starts after the physical and Google Calendar prerequisites pass.
 
 - [x] Task: Prepare contributor, security, lifecycle and release documents plus issue/PR templates; no app behaviour or dependency changes
 - [x] Task: If adopted, write meaningful failing contract/regression tests before changing behaviour — no app change; existing documentation fixture test exposed new root-document dependency and was corrected
-- [ ] Task: Qualify a source-matched release candidate after M3, stable identity/key custody and dependency/artifact provenance audit
+- [x] Task: Freeze, reproduce and sign the source-matched 0.1.0 candidate. Record the owner-held key, runtime audit and corresponding-source bundle in the [candidate evidence](verification.md#calltrack-community-010-candidate).
 - [ ] Task: Verify candidate tests plus device/provider readback, preserving upgrade and recovery; record operational acceptance separately
 - [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
 

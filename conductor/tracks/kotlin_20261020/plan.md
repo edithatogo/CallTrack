@@ -2,9 +2,12 @@
 
 The [active conversion checkpoint](active-migration-handoff.md#implemented-and-reviewed)
 records completion of K06 with the documented nullable-label bridge. K07 remains
-open for supported upgrade, recovery and operational acceptance. Use the
+open for supported upgrade, recovery and operational acceptance. The
+[signed 0.1.0 candidate](../release_20261020/verification.md#calltrack-community-010-candidate)
+is the first-install baseline. Development upgrade and process recovery have
+their own evidence. Close M5 after the remaining
 [Track 5 release gates](../release_20261020/verification.md#active-release-gates)
-for the M4 evidence needed to close M5.
+pass.
 
 ## Phase 1: Discovery and mapping
 
