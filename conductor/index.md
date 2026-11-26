@@ -41,7 +41,7 @@ Use the [Android 17 scope](active-scope.json) and [track registry](tracks.md) to
 | Track | Remaining work |
 |---|---|
 | 14 · Android Compose | Carry the qualified screen roots and durable writer into the production acceptance for Tracks 5 and 6. [Track 14 evidence](tracks/compose_app_20261021/implementation-evidence.md#android-17-native-screen-roots-and-durable-delivery) |
-| 5 · Release | The signed 0.1.0 candidate reproduced across macOS and Linux and passed emulator installation. Complete physical-call and selected calendar readbacks, seven days of observation and GitHub distribution. [Candidate and gates](tracks/release_20261020/verification.md#calltrack-community-010-candidate) |
+| 5 · Release | The signed 0.1.0 candidate reproduced across macOS and Linux. Answered and missed calls passed on the emulator. The physical missed and outgoing cases synced to Google. Complete the remaining physical cases, seven days of observation and GitHub distribution. [Candidate and gates](tracks/release_20261020/verification.md#calltrack-community-010-candidate) |
 | 6 · Kotlin | Close K07 against the same supported upgrade, recovery and operational evidence as Track 5. [Track 6](tracks/kotlin_20261020/plan.md) |
 | 23 · Call routing | Verify controlled calls from the selected third-party apps and read back their approved calendars. Hosted Android 17 and the preserving dev upgrade passed. [Track 23](tracks/android17_call_routing_20261125/index.md) |
 
