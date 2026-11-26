@@ -115,6 +115,9 @@ private constructor(
 
     companion object {
         const val PHONE = "phone"
+        private val APP_PACKAGE = Regex("[A-Za-z][A-Za-z0-9_]*(?:\\.[A-Za-z][A-Za-z0-9_]*)+")
+
+        internal fun isAppSource(source: String): Boolean = APP_PACKAGE.matches(source)
         internal const val INCOMING = 1
         internal const val OUTGOING = 2
         internal const val MISSED = 3

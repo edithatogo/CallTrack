@@ -745,6 +745,8 @@ def qualify(serial, suite="settings", receipt_dir=None):
             check('preparePersistedPartialImport')
             check('renderedExplicitHistoryResumeCompletesPartialWork')
             check('removedDestinationBlocksDeliveryWithoutSwitchingCalendars')
+            check('renderedHistoricalAppImportPersistsItsSourceAndWritesOnlyTheSelectedCall',
+                  'com.markobl.calllogsync.slice.CallRoutingProviderTest')
         else:
             check('busyManagementAndPaginationActionsAreDisabled',
                   'com.markobl.calllogsync.slice.RecoveryCardsPanelTest')

@@ -228,6 +228,8 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
                     old.id == next.id &&
                     next.revision == Math.addExact(old.revision, 1) &&
                     old.calendar == next.calendar &&
+                    old.callSource == next.callSource &&
+                    old.calendarBinding == next.calendarBinding &&
                     old.timezone == next.timezone &&
                     old.from == next.from &&
                     old.to == next.to &&
@@ -360,7 +362,13 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
         private fun encode(s: HistoricalImport.Session): String {
             try {
                 val j = JSONObject()
-                j.put("version", 1)
+                if (s.calendarBinding == null) {
+                    j.put("version", 1)
+                } else {
+                    j.put("version", 2)
+                    j.put("callSource", s.callSource)
+                    j.put("calendarBinding", s.calendarBinding)
+                }
                 j.put("id", s.id)
                 j.put("calendar", s.calendar)
                 j.put("timezone", s.timezone)
@@ -390,7 +398,13 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
         private fun decode(body: String?): HistoricalImport.Session {
             try {
                 val j = JSONObject(body!!)
-                check(j.getInt("version") == 1) { "Import document migration required" }
+                val version = j.getInt("version")
+                val callSource =
+                    when (version) {
+                        1 -> CallRecord.PHONE
+                        2 -> j.getString("callSource")
+                        else -> error("Import document migration required")
+                    }
                 return HistoricalImport.Session(
                     j.getString("id"),
                     j.getLong("calendar"),
@@ -418,6 +432,8 @@ class SqliteImportStore(context: Context?, name: String?) : HistoricalImport.Sto
                     } else {
                         DurableDelivery.Result.valueOf(j.getString("stopped"))
                     },
+                    callSource,
+                    if (version == 2) j.getString("calendarBinding") else null,
                 )
             } catch (invalid: JSONException) {
                 throw IllegalStateException("Import document unavailable", invalid)

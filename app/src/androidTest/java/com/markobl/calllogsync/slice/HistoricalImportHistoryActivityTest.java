@@ -61,7 +61,8 @@ public class HistoricalImportHistoryActivityTest {
                     context.getString(
                             R.string.import_history_item,
                             range,
-                            context.getString(R.string.import_building));
+                            context.getString(R.string.import_building),
+                            context.getString(R.string.auto_source_phone));
             ui.tapText(row);
             String summary =
                     context.getString(
@@ -72,7 +73,8 @@ public class HistoricalImportHistoryActivityTest {
                             context.getString(R.string.auto_incoming),
                             0L,
                             0L,
-                            0L);
+                            0L,
+                            context.getString(R.string.auto_source_phone));
             ui.await(() -> ui.find(summary, false) != null, "History tap did not open the session");
         } finally {
             if (activity != null) {

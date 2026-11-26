@@ -4,11 +4,15 @@ package com.markobl.calllogsync.slice
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
+import android.graphics.Rect
 import android.os.Build
 import android.os.SystemClock
 import android.provider.CallLog.Calls
+import androidx.test.core.app.ActivityScenario
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import com.markobl.calllogsync.R
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
@@ -79,6 +83,92 @@ class CallRoutingProviderTest {
             fixture.cleanupFixture()
         }
     }
+
+    @Test
+    fun renderedHistoricalAppImportPersistsItsSourceAndWritesOnlyTheSelectedCall() {
+        check(Build.HARDWARE == "ranchu") { "Call provider fixture requires an emulator" }
+        val fixture = ParityProviderTest()
+        val context = fixture.context()
+        val account = fixture.account()
+        val calendarLabel = "Shared history fixture"
+        val calendar = fixture.insertCalendar(calendarLabel)
+        val app = "org.calltrack.example_app.calls"
+        val other = "org.calltrack.exampleXapp.calls"
+        val ui = RenderedUi(InstrumentationRegistry.getInstrumentation())
+        try {
+            val now = System.currentTimeMillis() - 60_000
+            val appRow = insertSharedHistory(context, account, now, app, other)
+            assertSharedHistoryScope(context, appRow, app)
+
+            ActivityScenario.launch(HistoricalImportActivity::class.java).use { scenario ->
+                selectHistoricalRoute(ui, context, app, calendarLabel)
+                ui.tapId("import_create")
+                ui.await(
+                    { lastImport(context)?.phase == HistoricalImport.Phase.PREVIEW },
+                    "App history preview did not complete",
+                )
+                val preview = checkNotNull(lastImport(context))
+                assertEquals(app, preview.callSource)
+                assertEquals(calendar, preview.calendar)
+                assertEquals(
+                    AndroidCalendarSink(context).writableBinding(calendar),
+                    preview.calendarBinding
+                )
+                assertEquals(1L, preview.count)
+                assertEquals(0, fixture.events(calendar))
+
+                scenario.recreate()
+                ui.revealId("import_summary_text")
+                ui.await(
+                    { ui.find("import_summary_text", true)?.text?.contains(app) == true },
+                    "Reopened preview did not display its saved source",
+                )
+                ui.capture("import-shared-call-preview")
+                ui.tapId("import_confirm")
+                ui.tapDialogPositive()
+                ui.await(
+                    { lastImport(context)?.phase == HistoricalImport.Phase.COMPLETE },
+                    "Confirmed app history import did not complete",
+                )
+                val complete = checkNotNull(lastImport(context))
+                assertEquals(preview.id, complete.id)
+                assertEquals(app, complete.callSource)
+                assertEquals(1L, complete.saved)
+                assertEquals(0L, complete.review)
+                assertEquals(1, fixture.events(calendar))
+                ui.capture("import-shared-call-complete")
+            }
+        } finally {
+            clearSharedHistory(context, account)
+            fixture.removeCalendar(calendar)
+        }
+    }
+
+    private fun assertSharedHistoryScope(context: Context, appRow: Long, app: String) {
+        val source = AndroidCallLogSource.forApp(context, app)
+        assertEquals(appRow.toString(), checkNotNull(source.upper()).id)
+        assertEquals(listOf(app), source.page(-1, Long.MAX_VALUE, 10)?.map { it?.source })
+    }
+
+    private fun selectHistoricalRoute(
+        ui: RenderedUi,
+        context: Context,
+        app: String,
+        calendarLabel: String,
+    ) {
+        val picker = checkNotNull(ui.shown("import_source_picker", true))
+        val bounds = Rect().also(picker::getBoundsInScreen)
+        val minimum = (48 * context.resources.displayMetrics.density).toInt()
+        assertTrue(picker.isFocusable && picker.isClickable)
+        assertTrue(bounds.width() >= minimum && bounds.height() >= minimum)
+        ui.tapId("import_source_picker")
+        ui.tapText(context.getString(R.string.auto_source_observed, app))
+        ui.tapId("import_calendar_picker")
+        ui.tapText(calendarLabel)
+    }
+
+    private fun lastImport(context: Context): HistoricalImport.Session? =
+        SqliteImportStore(context).use { store -> store.sessions(-1, 1).firstOrNull()?.session }
 
     private fun replaceBoundCalendar(
         fixture: ParityProviderTest,

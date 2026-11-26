@@ -51,12 +51,17 @@ internal data class HistoricalImportFormUiState(
     val zone: String,
     val filters: HistoricalImportFiltersUiState,
     val summary: String,
+    val sources: CalendarDestinationUiState = CalendarDestinationUiState(),
     val destination: CalendarDestinationUiState = CalendarDestinationUiState(),
     @get:StringRes val destinationMessage: Int? = null,
     val actions: HistoricalImportActionState = HistoricalImportActionState(),
     val feedback: String = "",
     val history: HistoricalImportHistoryUiState = HistoricalImportHistoryUiState(),
-)
+) {
+    val showsSourcePicker: Boolean
+        get() = sources.options.size > 1 ||
+            sources.selectedToken?.let { it != CallRecord.PHONE } == true
+}
 
 @Immutable
 internal class HistoricalImportReview(@get:StringRes val actionLabel: Int, val message: String)
@@ -79,8 +84,11 @@ constructor(
     private var calendarRefresh: Job? = null
     private var calendarsReady = false
     private val historyTargets = HashMap<String, String>()
-    private val destinationTargets = HashMap<String, Long>()
+    private val destinationTargets = HashMap<String, AndroidCalendarSink.Choice>()
     private var selected = -1L
+    private var selectedBinding: String? = null
+    private var callSource = CallRecord.PHONE
+    private var appSources = emptyList<AndroidCallSources.App>()
     private var historyCursor = -1L
     private var renderVersion = 0L
     private val historyBack = ArrayList<Long>()
@@ -113,6 +121,8 @@ constructor(
             )
         currentId = saved?.getString("session")
         selected = saved?.getLong("calendar", -1) ?: -1
+        selectedBinding = saved?.getString("calendarBinding")
+        callSource = saved?.getString("callSource") ?: CallRecord.PHONE
         form = HistoricalImportFormUiState(zone, filters, context.getString(R.string.import_none))
         state = MutableStateFlow(HistoricalImportUiState.Editing(form))
         savedState.setSavedStateProvider(DRAFT_KEY) { saveDraft() }
@@ -157,14 +167,23 @@ constructor(
     }
 
     @MainThread
-    fun selectDestination(token: String) {
-        if (!resumed || !form.destination.enabled || !calendarAccess()) return
-        selected = destinationTargets[token] ?: return
-        form =
-            form.copy(
+    fun selectOption(token: String) {
+        if (!resumed) return
+        val destination = destinationTargets[token]
+        if (destination != null && form.destination.enabled && calendarAccess()) {
+            selected = destination.id
+            selectedBinding = destination.binding
+            form = form.copy(
                 destination = form.destination.copy(selectedToken = token),
                 destinationMessage = null,
             )
+        } else if (form.sources.enabled && access() &&
+            form.sources.options.any { it.token == token }) {
+            callSource = token
+            form = form.copy(sources = form.sources.copy(selectedToken = token))
+        } else {
+            return
+        }
         updateControls()
     }
 
@@ -181,6 +200,8 @@ constructor(
                 return
             }
         val calendar = selected
+        val binding = selectedBinding ?: return
+        val source = callSource
         val start = {
             runImport { importer, _ ->
                 importer.start(
@@ -191,6 +212,8 @@ constructor(
                     filters.incoming,
                     filters.outgoing,
                     filters.missed,
+                    source,
+                    binding,
                 )
             }
         }
@@ -218,6 +241,7 @@ constructor(
                 value.count,
                 destinationName(value),
                 dates(value),
+                sourceName(value),
             ),
         ) {
             if (currentId == value.id) {
@@ -319,14 +343,11 @@ constructor(
         val phase = session?.phase
         val permitted = access()
         val canReviewDestination = calendarsReady && !busy
-        val filters = form.filters
-        val hasCallTypes = filters.incoming || filters.outgoing || filters.missed
         form =
             form.copy(
                 actions =
                     HistoricalImportActionState(
-                        createEnabled =
-                            canReviewDestination && selected >= 0 && permitted && hasCallTypes,
+                        createEnabled = canReviewDestination && permitted && previewReady(),
                         continueEnabled = !busy && continuing(phase),
                         confirmEnabled =
                             canReviewDestination && phase == HistoricalImport.Phase.PREVIEW,
@@ -340,10 +361,20 @@ constructor(
                         hasRequiredAccess = permitted,
                         sessionSelected = phase != null,
                     ),
+                sources =
+                    form.sources.copy(enabled =
+                        canReviewDestination && permitted && form.showsSourcePicker),
                 destination =
                     form.destination.copy(enabled = canReviewDestination && calendarAccess()),
             )
         publish()
+    }
+
+    private fun previewReady(): Boolean {
+        val filters = form.filters
+        return selectedBinding != null &&
+            (filters.incoming || filters.outgoing || filters.missed) &&
+            form.sources.options.any { it.token == callSource }
     }
 
     private fun publish() {
@@ -364,42 +395,20 @@ constructor(
                         } else {
                             emptyList()
                         }
+                    val discovered = AndroidCallSources.apps(context)
+                    val phone =
+                        CalendarDestinationOption(
+                            CallRecord.PHONE,
+                            context.getString(R.string.auto_source_phone)
+                        )
+                    val sourceOptions = listOf(phone) + discovered.map { it.option(context) }
                     withContext(Dispatchers.Main.immediate) {
-                        val preferred = selected
-                        destinationTargets.clear()
-                        val labels =
-                            calendarChoiceLabels(
-                                loaded,
-                                context.getString(R.string.slice_unnamed_calendar),
-                            )
-                        val options = loaded.map { choice ->
-                            val token = UUID.randomUUID().toString()
-                            destinationTargets[token] = choice.id
-                            CalendarDestinationOption(token, labels.getValue(choice.id))
-                        }
-                        val token =
-                            options.firstOrNull { destinationTargets[it.token] == preferred }?.token
-                        selected = token?.let(destinationTargets::get) ?: -1L
-                        val message =
-                            when {
-                                !calendarAccess() -> null
-
-                                preferred >= 0 && selected < 0 ->
-                                    R.string.auto_destination_unavailable
-
-                                options.isEmpty() -> R.string.slice_no_calendars
-
-                                else -> null
-                            }
+                        appSources = discovered
                         form =
                             form.copy(
-                                destination =
-                                    CalendarDestinationUiState(
-                                        options = options,
-                                        selectedToken = token,
-                                    ),
-                                destinationMessage = message,
+                                sources = CalendarDestinationUiState(sourceOptions, callSource)
                             )
+                        updateDestinations(loaded)
                         if (session != null) renderSession()
                         calendarRefresh = null
                         calendarsReady = true
@@ -416,9 +425,55 @@ constructor(
             }
     }
 
+    private fun updateDestinations(loaded: List<AndroidCalendarSink.Choice>) {
+        val preferred = selected
+        destinationTargets.clear()
+        val labels =
+            calendarChoiceLabels(
+                loaded,
+                context.getString(R.string.slice_unnamed_calendar),
+            )
+        val options = loaded.map { choice ->
+            val token = UUID.randomUUID().toString()
+            destinationTargets[token] = choice
+            CalendarDestinationOption(token, labels.getValue(choice.id))
+        }
+        val token =
+            options.firstOrNull {
+                val choice = destinationTargets.getValue(it.token)
+                choice.id == preferred &&
+                    (selectedBinding == null || choice.binding == selectedBinding)
+            }?.token
+        val target = token?.let(destinationTargets::get)
+        selected = target?.id ?: -1L
+        selectedBinding = target?.binding
+        val message =
+            when {
+                !calendarAccess() -> null
+
+                preferred >= 0 && selected < 0 ->
+                    R.string.auto_destination_unavailable
+
+                options.isEmpty() -> R.string.slice_no_calendars
+
+                else -> null
+            }
+        form =
+            form.copy(
+                destination =
+                    CalendarDestinationUiState(
+                        options = options,
+                        selectedToken = token,
+                    ),
+                destinationMessage = message,
+            )
+    }
+
     private fun step() {
         if (!running || busy || currentId == null) return
         val id = currentId
+        val saved = session ?: return
+        val expected = saved.calendarBinding?.let { mapOf(saved.calendar to it) }.orEmpty()
         perform(
             { importer, store ->
                 val latest =
@@ -433,6 +488,7 @@ constructor(
                 }
             },
             true,
+            expected,
         )
     }
 
@@ -440,7 +496,11 @@ constructor(
         fun run(importer: HistoricalImport, store: SqliteImportStore): HistoricalImport.Session
     }
 
-    private fun perform(action: Action, follow: Boolean) {
+    private fun perform(
+        action: Action,
+        follow: Boolean,
+        expectedCalendars: Map<Long, String> = emptyMap(),
+    ) {
         val ticket = ++renderVersion
         busy = true
         updateControls()
@@ -454,8 +514,11 @@ constructor(
                                 store,
                                 AndroidCallLogSource(context),
                                 ledger.outbox(),
-                                DurableDelivery(ledger.outbox(), AndroidCalendarSink(context)),
-                            )
+                                DurableDelivery(
+                                    ledger.outbox(),
+                                    AndroidCalendarSink(context, expectedCalendars)
+                                ),
+                            ) { app -> AndroidCallLogSource.forApp(context, app) }
                         val result = action.run(importer, store)
                         withContext(Dispatchers.Main.immediate) {
                             if (ticket != renderVersion) return@withContext
@@ -527,8 +590,20 @@ constructor(
 
     private fun destinationName(session: HistoricalImport.Session): String =
         form.destination.options
-            .firstOrNull { destinationTargets[it.token] == session.calendar }
+            .firstOrNull {
+                val choice = destinationTargets.getValue(it.token)
+                choice.id == session.calendar &&
+                    (session.calendarBinding == null || choice.binding == session.calendarBinding)
+            }
             ?.label ?: context.getString(R.string.auto_destination_unavailable)
+
+    private fun sourceName(session: HistoricalImport.Session): String =
+        if (session.callSource == CallRecord.PHONE) {
+            context.getString(R.string.auto_source_phone)
+        } else {
+            appSources.firstOrNull { it.packageName == session.callSource }?.label
+                ?: session.callSource
+        }
 
     private fun renderSession() {
         val value = session ?: return
@@ -544,6 +619,7 @@ constructor(
                         value.count,
                         value.saved,
                         value.review,
+                        sourceName(value),
                     ),
             )
     }
@@ -579,6 +655,7 @@ constructor(
                                             R.string.import_history_item,
                                             dates(item),
                                             context.getString(phaseLabel(item.phase)),
+                                            sourceName(item),
                                         ),
                                 )
                             }
@@ -608,6 +685,8 @@ constructor(
             putString("from", form.filters.fromDate)
             putString("to", form.filters.toDate)
             putLong("calendar", selected)
+            putString("calendarBinding", selectedBinding)
+            putString("callSource", callSource)
             putBoolean("incoming", form.filters.incoming)
             putBoolean("outgoing", form.filters.outgoing)
             putBoolean("missed", form.filters.missed)

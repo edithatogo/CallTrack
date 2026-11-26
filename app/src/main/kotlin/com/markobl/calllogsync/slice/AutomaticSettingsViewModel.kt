@@ -419,20 +419,7 @@ constructor(
 
     private fun updateRoutingForm() {
         val phone = CalendarDestinationOption(CallRecord.PHONE, sourceLabel(CallRecord.PHONE))
-        val options =
-            listOf(phone) +
-                appSources.map { app ->
-                    val resource =
-                        if (app.observed) {
-                            R.string.auto_source_observed
-                        } else {
-                            R.string.auto_source_unverified
-                        }
-                    CalendarDestinationOption(
-                        app.packageName,
-                        context.getString(resource, app.label),
-                    )
-                }
+        val options = listOf(phone) + appSources.map { it.option(context) }
         if (options.none { it.token == source }) source = CallRecord.PHONE
         form =
             form.copy(
