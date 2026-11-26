@@ -5,7 +5,7 @@
 ## Toolchain and Android dependencies — 2026-11-24
 
 The active app and cold Linux release gate select Temurin JDK 25.0.5.1+2,
-Gradle 9.9.2, AGP 9.5.2 and Kotlin/Compose compiler 2.4.21. AGP supplies the
+Gradle 9.9.2, AGP 9.5.3 and Kotlin/Compose compiler 2.4.21. AGP supplies the
 app's Kotlin plugin and the first-party Kotlin Multiplatform Android library
 plugin was used by a historical shared module (no longer in the active app). The upstream comparison fixtures retain
 their JDK 11 and JDK 17 runtimes.
@@ -18,12 +18,13 @@ UI acceptance is API37. Prior API26/33/36 evidence is archival; the Android 17.2
 and [source inventory](../qualification/release/runtime-sources.json) bind
 77 runtime artifacts to their canonical publications.
 
-Gradle 9.9.2 and AGP 9.5.2 exceed Kotlin 2.4.21's fully supported
+Gradle 9.9.2 and AGP 9.5.3 exceed Kotlin 2.4.21's fully supported
 Gradle and AGP ranges. The selected combination passed strict debug and
 release assembly, JVM tests, Android lint, and the retained Compose
-prototype desktop and Android checks. AGP 9.5.2 requires Lint 9.5.2 or
-newer. Its bundled lint rejected the deliberate Lifecycle misuse against
-the current dependencies, so the older lint override is retired.
+prototype desktop and Android checks. The build uses AGP's bundled lint.
+The prior lint qualification recorded the deliberate Lifecycle misuse check.
+The 9.5.3 verification entries, including Linux AAPT2, were compared with
+the canonical publisher artifacts.
 [Kotlin compatibility](https://kotlinlang.org/docs/gradle-configure-project.html) ·
 [Prior lint qualification](tracks/release_20261020/build-security-20261123.md)
 

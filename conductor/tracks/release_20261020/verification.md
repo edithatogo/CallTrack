@@ -38,9 +38,22 @@ Calendar. The event used a one-minute marker with zero actual call duration.
 Repeating the manual action returned the original event on the phone and on
 Google. The exact call and event identifiers are retained privately.
 
-Complete the remaining physical-call and calendar cases, seven days of
-controlled observation and GitHub distribution. Keep results for any later
-source revision with that revision's artifacts.
+A controlled answered outgoing call produced one event on the phone and one
+matching private event in the dedicated Google Calendar. Independent server
+readback matched the direction, time and actual call duration.
+
+The exact signed APK also passed an answered incoming call and a missed call
+on the dedicated 16 KiB Android 17 emulator on 2026-11-26. The emulator modem
+drove Telecom, the answered call appeared in Phone Recents, and CallTrack
+saved one local calendar event. Repeating the action returned the same event.
+A user edit survived reconciliation, and a separate deleted event stayed
+deleted. The fixture calls, calendar and app installation were removed.
+
+The physical answered incoming case remains open after the retest was
+deferred. Complete the remaining physical-call and Google Calendar cases
+before starting the seven-day controlled observation. Publish the signed APK
+and corresponding source after the release gates pass. Keep results for any
+later source revision with that revision's artifacts.
 
 ## Android 17 unsigned baselines
 

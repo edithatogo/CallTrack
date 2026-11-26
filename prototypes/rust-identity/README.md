@@ -26,7 +26,7 @@ sequentially, after the Rust process exits. These are exploratory host measureme
 not controlled statistically or a Kotlin/Native, Android, FFI, battery, footprint or
 application-throughput benchmark. Different formatting implementations matter.
 
-sha2=0.11.1 is prototype-only; Cargo.lock pins its graph. Observed compiler1.99.1;
+sha2=0.11.2 is prototype-only; Cargo.lock pins its graph. Observed compiler1.99.1;
 sha2 declares minimum1.88, which was not independently tested here. Release/MSRV,
 licence/notice/security and native ABI support must be rechecked before any adoption.
 The project itself follows the root GPLv3 licence; dependency terms remain separate.

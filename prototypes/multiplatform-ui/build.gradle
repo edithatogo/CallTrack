@@ -15,15 +15,16 @@ plugins {
     id 'org.jetbrains.kotlin.multiplatform' version '2.4.21'
     id 'org.jetbrains.kotlin.plugin.compose' version '2.4.21'
     id 'org.jetbrains.compose' version '1.12.2'
-    id 'com.android.kotlin.multiplatform.library' version '9.5.2'
-    id 'com.android.application' version '9.5.2' apply false
+    id 'com.android.kotlin.multiplatform.library' version '9.5.3'
+    id 'com.android.application' version '9.5.3' apply false
 }
 kotlin {
     jvmToolchain(25)
     android {
-        namespace 'org.calltrack.companion.shared'
+        namespace = 'org.calltrack.companion.shared'
         compileSdk 37
         minSdk 26
+        withHostTest {}
         compilerOptions.jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
     jvm('desktop') {
@@ -59,4 +60,8 @@ tasks.withType(Test).configureEach {
     maxParallelForks = 1
     // Offscreen desktop renderer: no window or user desktop interaction is needed.
     systemProperty 'java.awt.headless', 'true'
+}
+
+tasks.named('desktopTest', Test) {
+    jvmArgs '--enable-native-access=ALL-UNNAMED'
 }

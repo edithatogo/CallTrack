@@ -6,4 +6,4 @@ publish = false
 license = "GPL-3.0-only"
 
 [dependencies]
-sha2 = "=0.11.1"
+sha2 = "=0.11.2"

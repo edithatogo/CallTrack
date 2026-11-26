@@ -4,6 +4,12 @@ Track 5 owns the [active release gates](verification.md#active-release-gates).
 Preparation can progress independently of Track 4. Candidate acceptance requires
 M3 and the original M4 operational evidence.
 
+The [signed 0.1.0 checkpoint](verification.md#calltrack-community-010-candidate)
+records the completed emulator checks and the physical missed and outgoing
+checks. The next release task is the physical answered incoming case when
+the retest resumes. The [observation protocol](seven-day-observation.md)
+starts after the physical and Google Calendar prerequisites pass.
+
 ## Phase 1: Discovery and mapping
 
 - [x] Task: Research distribution eligibility, licensing and reproducible release/signing options — findings.md
