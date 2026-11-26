@@ -212,7 +212,7 @@ class SqliteLedger(context: Context?, name: String?, private val clock: LongSupp
         }
     }
 
-    private fun readIntent(key: String?, calendar: Long): DurableDelivery.Intent? =
+    internal fun readIntent(key: String?, calendar: Long): DurableDelivery.Intent? =
         synchronized(DurableDelivery.DELIVERY_LOCK) {
             runBlocking {
                 val row = dao.intent(key, calendar)

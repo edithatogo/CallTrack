@@ -2,6 +2,13 @@ config:
   validation: true
   warningsAsErrors: true
 
+Compose:
+  active: true
+  Material2:
+    active: true
+  UnstableCollections:
+    active: true
+
 naming:
   FunctionNaming:
     ignoreAnnotated: ['Composable']

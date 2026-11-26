@@ -1,6 +1,22 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "local>edithatogo/renovate-config"
+  "extends": ["config:recommended", ":dependencyDashboard", "local>edithatogo/renovate-config"],
+  "gradle-wrapper": { "enabled": true },
+  "ignoreUnstable": true,
+  "minimumReleaseAge": "3 days",
+  "internalChecksFilter": "strict",
+  "automergeType": "pr",
+  "platformAutomerge": true,
+  "packageRules": [
+    {
+      "description": "Keep the Kotlin compiler, AndroidX and Compose BOM in one checked PR",
+      "matchManagers": ["gradle"],
+      "matchPackageNames": ["androidx.**", "org.jetbrains.kotlin**", "org.jetbrains.compose**"],
+      "groupName": "AndroidX & Compose Ecosystem",
+      "separateMajorMinor": false,
+      "separateMinorPatch": false,
+      "dependencyDashboardApproval": false,
+      "automerge": true
+    }
   ]
 }

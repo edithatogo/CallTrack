@@ -12,11 +12,11 @@ buildscript {
     }
 }
 plugins {
-    id 'org.jetbrains.kotlin.multiplatform' version '2.4.21'
-    id 'org.jetbrains.kotlin.plugin.compose' version '2.4.21'
-    id 'org.jetbrains.compose' version '1.12.2'
-    id 'com.android.kotlin.multiplatform.library' version '9.5.3'
-    id 'com.android.application' version '9.5.3' apply false
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.android.multiplatform)
+    alias(libs.plugins.android.application) apply false
 }
 kotlin {
     jvmToolchain(25)
@@ -34,7 +34,7 @@ kotlin {
         commonMain.dependencies {
             api compose.runtime
             api compose.foundation
-            api compose.material
+            api libs.multiplatform.material3
         }
         commonTest.dependencies { implementation kotlin('test') }
         desktopMain.dependencies { implementation compose.desktop.currentOs }

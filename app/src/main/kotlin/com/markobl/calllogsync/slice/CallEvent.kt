@@ -62,7 +62,7 @@ class CallEvent(
             )
         }
 
-        private fun displayName(source: CallRecord): String? =
+        internal fun displayName(source: CallRecord): String? =
             when {
                 !source.identityAllowed && source.presentationSupplied ->
                     when (source.numberPresentation) {
@@ -81,11 +81,11 @@ class CallEvent(
             }
 
         // Java String.trim() semantics are part of the stored fingerprint contract.
-        private fun present(value: String?): Boolean = value?.any { it > ' ' } == true
+        internal fun present(value: String?): Boolean = value?.any { it > ' ' } == true
 
-        private fun field(value: String?): String = value?.let { "${it.length}:$it" } ?: "-1:"
+        internal fun field(value: String?): String = value?.let { "${it.length}:$it" } ?: "-1:"
 
-        private fun hash(text: String): String {
+        internal fun hash(text: String): String {
             try {
                 val bytes =
                     MessageDigest.getInstance("SHA-256")

@@ -2,6 +2,7 @@ package com.markobl.calllogsync.slice
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
@@ -40,7 +41,10 @@ internal fun AutomaticSettingsNavigationPanel(
 }
 
 @Composable
-internal fun SettingsNavigationPane(currentSection: NavKey, onSelect: (CallTrackRoute) -> Unit) {
+internal fun ColumnScope.SettingsNavigationPane(
+    currentSection: NavKey,
+    onSelect: (CallTrackRoute) -> Unit,
+) {
     NavigationDrawerItem(
         label = { Text(stringResource(R.string.auto_title)) },
         selected = currentSection == CallTrackRoute.Automatic,

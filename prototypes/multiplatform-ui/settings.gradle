@@ -1,4 +1,6 @@
 pluginManagement { repositories { gradlePluginPortal(); mavenCentral(); google() } }
-dependencyResolutionManagement { repositories { mavenCentral(); google() } }
+dependencyResolutionManagement {
+    versionCatalogs { libs { from(files('../../gradle/libs.versions.toml')) } }
+    repositories { mavenCentral(); google() } }
 rootProject.name = 'calltrack-companion-ui-experiment'
 include ':android-host'

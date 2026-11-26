@@ -27,9 +27,9 @@ class BuildArtifactScope(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             for name in ('build.gradle', 'settings.gradle', 'gradle.properties', 'gradlew',
-                         'app/build.gradle', 'app/proguard-rules.pro'):
+                         'gradle/libs.versions.toml', 'app/build.gradle.kts', 'app/proguard-rules.pro'):
                 path = root / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_text('fixture')
-            (root / 'gradle/wrapper').mkdir(parents=True)
+            (root / 'gradle/wrapper').mkdir(parents=True, exist_ok=True)
             with patch.object(build, 'ROOT', root):
                 before = build.inputs()
                 policy = root / 'gradle/verification-metadata.xml'
@@ -43,7 +43,7 @@ class BuildArtifactScope(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             paths = ('build.gradle', 'settings.gradle', 'gradle.properties', 'gradlew',
-                     'app/build.gradle', 'app/proguard-rules.pro', 'app/src/main/kotlin/Core.kt')
+                     'gradle/libs.versions.toml', 'app/build.gradle.kts', 'app/proguard-rules.pro', 'app/src/main/kotlin/Core.kt')
             for name in paths:
                 path = root / name
                 path.parent.mkdir(parents=True, exist_ok=True)

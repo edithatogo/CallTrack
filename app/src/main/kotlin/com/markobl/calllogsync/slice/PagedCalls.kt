@@ -135,7 +135,7 @@ class PagedCalls private constructor() {
             }
         }
 
-        private fun same(
+        internal fun same(
             call: CallRecord?,
             expectedId: Long,
             expectedBinding: String?,

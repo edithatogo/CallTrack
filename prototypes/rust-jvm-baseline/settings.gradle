@@ -1,3 +1,5 @@
 pluginManagement { repositories { gradlePluginPortal(); mavenCentral() } }
-dependencyResolutionManagement { repositories { mavenCentral() } }
+dependencyResolutionManagement {
+    versionCatalogs { libs { from(files('../../gradle/libs.versions.toml')) } }
+    repositories { mavenCentral() } }
 rootProject.name = 'calltrack-identity-jvm-baseline'

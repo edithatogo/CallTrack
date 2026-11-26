@@ -3,7 +3,7 @@
   "effective_date": "2026-11-24",
   "decision": "Android 17-only native development",
   "source_of_truth": {
-    "android_sdk": "app/build.gradle",
+    "android_sdk": "app/build.gradle.kts",
     "python": ".python-version",
     "dependency_graph": "Gradle resolution and verification metadata",
     "release_checks": ".github/workflows",

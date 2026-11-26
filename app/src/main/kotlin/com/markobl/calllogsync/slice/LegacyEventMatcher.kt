@@ -66,7 +66,7 @@ class LegacyEventMatcher private constructor() {
             )
         }
 
-        private fun validEvents(events: List<Event?>): Boolean {
+        internal fun validEvents(events: List<Event?>): Boolean {
             val ids = HashSet<Long>()
             return events.all { event ->
                 event != null &&
@@ -78,7 +78,7 @@ class LegacyEventMatcher private constructor() {
             }
         }
 
-        private fun nearbyCollision(
+        internal fun nearbyCollision(
             source: CallRecord,
             tuple: LongArray,
             nearby: List<CallRecord?>,
@@ -99,7 +99,7 @@ class LegacyEventMatcher private constructor() {
             return collision.takeIf { complete && sourcePresent }
         }
 
-        private fun matchEvents(
+        internal fun matchEvents(
             source: CallRecord,
             calendar: Long,
             tuple: LongArray,
@@ -140,7 +140,7 @@ class LegacyEventMatcher private constructor() {
                 event.end == tuple[1] &&
                 event.marker.isNullOrEmpty()
 
-        private fun legacyTimesOrNull(call: CallRecord): LongArray? =
+        internal fun legacyTimesOrNull(call: CallRecord): LongArray? =
             try {
                 require(
                     call.type in CallRecord.INCOMING..CallRecord.MISSED &&
@@ -157,7 +157,7 @@ class LegacyEventMatcher private constructor() {
                 null
             }
 
-        private fun result(confidence: Confidence): Result =
+        internal fun result(confidence: Confidence): Result =
             Result(confidence, Collections.emptyList())
     }
 }

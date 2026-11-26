@@ -26,8 +26,11 @@ class CalendarSliceActivity : ComponentActivity() {
 }
 
 @Composable
-internal fun ManualLoggingScreen(activity: ComponentActivity, onOpenAutomatic: () -> Unit) {
-    val model = hiltViewModel<ManualLoggingViewModel>()
+internal fun ManualLoggingScreen(
+    activity: ComponentActivity,
+    onOpenAutomatic: () -> Unit,
+    model: ManualLoggingViewModel = hiltViewModel(),
+) {
     val calendarPermissions =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             model.refresh(activity.hasCalendarAccess())
@@ -37,7 +40,7 @@ internal fun ManualLoggingScreen(activity: ComponentActivity, onOpenAutomatic: (
             ActivityResultContracts.RequestPermission(),
             model::callPermissionResult,
         )
-    LifecycleResumeEffect(model) {
+    LifecycleResumeEffect(model.uiState) {
         model.resume(activity.hasCalendarAccess())
         onPauseOrDispose {}
     }

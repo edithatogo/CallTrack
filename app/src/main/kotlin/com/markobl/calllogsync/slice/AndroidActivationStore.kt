@@ -20,7 +20,7 @@ class AndroidActivationStore internal constructor(private val storage: AndroidSe
     }
 
     internal companion object {
-        private fun encode(settings: ActivationControl.Settings): AutomaticSettings =
+        internal fun encode(settings: ActivationControl.Settings): AutomaticSettings =
             AutomaticSettings.newBuilder()
                 .setGeneration(settings.generation)
                 .setEnabled(settings.enabled)
@@ -40,7 +40,7 @@ class AndroidActivationStore internal constructor(private val storage: AndroidSe
                 )
                 .build()
 
-        private fun decode(settings: AutomaticSettings): ActivationControl.Settings {
+        internal fun decode(settings: AutomaticSettings): ActivationControl.Settings {
             val entries = settings.destinationsList
             val destinations = entries.associate { it.calendar to it.sourcesList.toSet() }
             require(destinations.size == entries.size) { "Duplicate activation destination" }

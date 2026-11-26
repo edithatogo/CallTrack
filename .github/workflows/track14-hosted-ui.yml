@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/track14-hosted-ui.yml'
       - '.github/workflows/qualification.yml'
+      - '.github/workflows/strict-compose-ci.yml'
       - '.python-version'
       - 'app/**'
       - 'build.gradle'

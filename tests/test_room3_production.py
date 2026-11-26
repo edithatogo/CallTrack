@@ -1,5 +1,5 @@
 """Production persistence must be owned by Room 3 with preserved original file identities."""
-import json
+import tomllib
 from pathlib import Path
 import unittest
 
@@ -9,10 +9,16 @@ SOURCE = ROOT / "app/src/main/kotlin/com/markobl/calllogsync/slice"
 
 class Room3ProductionContract(unittest.TestCase):
     def test_room3_is_the_production_database_owner(self):
-        build = (ROOT / "app/build.gradle").read_text()
-        self.assertIn("com.google.devtools.ksp", build)
-        self.assertIn("androidx.room3:room3-runtime:3.0.3", build)
-        self.assertIn("androidx.room3:room3-compiler:3.0.3", build)
+        build = (ROOT / "app/build.gradle.kts").read_text()
+        catalog = tomllib.loads((ROOT / "gradle/libs.versions.toml").read_text())
+        self.assertEqual(catalog["plugins"]["ksp"]["id"], "com.google.devtools.ksp")
+        self.assertIn("alias(libs.plugins.ksp)", build)
+        for kind, configuration in (("runtime", "implementation"), ("compiler", "ksp")):
+            library = catalog["libraries"][f"androidx-room-{kind}"]
+            self.assertEqual(library["module"], f"androidx.room3:room3-{kind}")
+            self.assertEqual(library["version"]["ref"], "room")
+            self.assertGreaterEqual(tuple(map(int, catalog["versions"]["room"].split("."))), (3, 0, 3))
+            self.assertIn(f"{configuration}(libs.androidx.room.{kind})", build)
         room = (SOURCE / "RoomPersistence.kt").read_text()
         self.assertIn("Room.databaseBuilder", room)
         self.assertIn("AndroidSQLiteDriver", room)

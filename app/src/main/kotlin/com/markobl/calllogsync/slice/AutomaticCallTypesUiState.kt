@@ -53,15 +53,27 @@ internal fun AutomaticCallTypesPanel(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        CallTypeOption("auto_incoming", incomingLabel, state.incoming, enabled = enabled) {
-            onStateChange(state.copy(incoming = it))
-        }
-        CallTypeOption("auto_outgoing", outgoingLabel, state.outgoing, enabled = enabled) {
-            onStateChange(state.copy(outgoing = it))
-        }
-        CallTypeOption("auto_missed", missedLabel, state.missed, enabled = enabled) {
-            onStateChange(state.copy(missed = it))
-        }
+        CallTypeOption(
+            "auto_incoming",
+            incomingLabel,
+            state.incoming,
+            onCheckedChange = { onStateChange(state.copy(incoming = it)) },
+            enabled = enabled,
+        )
+        CallTypeOption(
+            "auto_outgoing",
+            outgoingLabel,
+            state.outgoing,
+            onCheckedChange = { onStateChange(state.copy(outgoing = it)) },
+            enabled = enabled,
+        )
+        CallTypeOption(
+            "auto_missed",
+            missedLabel,
+            state.missed,
+            onCheckedChange = { onStateChange(state.copy(missed = it)) },
+            enabled = enabled,
+        )
     }
 }
 
@@ -70,9 +82,9 @@ internal fun CallTypeOption(
     tag: String,
     label: String,
     checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    onCheckedChange: (Boolean) -> Unit,
 ) {
     Row(
         modifier =

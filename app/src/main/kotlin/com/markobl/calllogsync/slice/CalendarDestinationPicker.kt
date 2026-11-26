@@ -115,10 +115,9 @@ internal fun CalendarDestinationPicker(
             chooseLabel = chooseLabel,
             tag = "${tagPrefix}_picker",
             expanded = expanded,
+            onToggle = { expanded = !expanded },
             modifier = Modifier.focusRequester(pickerFocus),
-        ) {
-            expanded = !expanded
-        }
+        )
         if (expanded) {
             Column(
                 modifier =
@@ -158,8 +157,8 @@ private fun CalendarPickerAnchor(
     chooseLabel: String,
     tag: String,
     expanded: Boolean,
-    modifier: Modifier,
     onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val checkedTokens = state.checkedTokens
     val label =

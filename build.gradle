@@ -15,33 +15,57 @@ buildscript {
             classpath('org.bouncycastle:bcutil-jdk18on:1.87')
             classpath('org.jdom:jdom2:2.0.6.1')
         }
-        classpath 'com.android.tools.build:gradle:9.5.3'
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.4.21'
-        classpath 'org.jetbrains.kotlin:compose-compiler-gradle-plugin:2.4.21'
-        classpath 'org.jetbrains.kotlin:kotlin-serialization:2.4.21'
+        classpath libs.android.gradle
+        classpath libs.kotlin.gradle
+        classpath libs.kotlin.compose.compiler
+        classpath libs.kotlin.serialization
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
 
+plugins {
+    id 'jvm-toolchains'
+    alias(libs.plugins.detekt) apply false
+}
+
 configurations {
-    ktlintCli {
+    ktfmtCli {
         canBeConsumed = false
         transitive = false
     }
-    detektCli {
+    detektCoreCli {
+        canBeConsumed = false
+        transitive = false
+    }
+    detektComposePlugins { canBeConsumed = false }
+    detektCli { canBeConsumed = false }
+    detektPlugins { canBeConsumed = false }
+    ktlintCli {
         canBeConsumed = false
         transitive = false
     }
 }
 
 dependencies {
+    ktfmtCli(variantOf(libs.ktfmt) { classifier('with-dependencies') })
+    detektCoreCli(variantOf(libs.detekt.core.cli) { classifier('all') })
     ktlintCli 'com.pinterest.ktlint:ktlint-cli:1.8.0:all@jar'
-    detektCli 'dev.detekt:detekt-cli:2.0.0-alpha.6:all@jar'
+    detektCli libs.detekt.cli
+    detektComposePlugins(libs.detekt.compose) {
+        // The CLI's all-in-one JAR already provides the analysis engine and Kotlin.
+        exclude group: 'dev.detekt'
+        exclude group: 'org.jetbrains.kotlin'
+    }
+    detektPlugins libs.detekt.formatting
 }
 
+// IntelliJ's parsers in these CLI tools use an Unsafe API deprecated in JDK 24.
+def analysisJava = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+
 tasks.register('ktlintCheck', JavaExec) {
+    javaLauncher.set(analysisJava)
     group = 'verification'
     description = 'Run ktlint against Android Kotlin sources.'
     classpath = configurations.ktlintCli
@@ -49,13 +73,42 @@ tasks.register('ktlintCheck', JavaExec) {
     args '--relative', 'app/src/**/*.kt'
 }
 
-tasks.register('detekt', JavaExec) {
+tasks.register('ktfmtCheck', JavaExec) {
     group = 'verification'
-    description = 'Run detekt against Android Kotlin sources.'
-    classpath = configurations.detektCli
+    classpath = configurations.ktfmtCli
+    mainClass = 'org.jetbrains.kotlinx.ktfmt.cli.Main'
+    args '--kotlinlang-style', '--dry-run', '--set-exit-if-changed'
+    args fileTree('app/src') { include '**/*.kt' }.files.sort()
+}
+
+tasks.register('detektCore', JavaExec) {
+    javaLauncher.set(analysisJava)
+    group = 'verification'
+    classpath = configurations.detektCoreCli
     mainClass = 'dev.detekt.cli.Main'
     args '--input', 'app/src', '--base-path', projectDir.absolutePath,
-        '--config', file('config/detekt.yml').absolutePath, '--build-upon-default-config'
+        '--config', file('config/detekt/core.yml').absolutePath, '--build-upon-default-config',
+        '--fail-on-severity', 'Info'
+    inputs.files(configurations.detektComposePlugins)
+    args '--plugins', configurations.detektComposePlugins.asPath
+}
+
+// The stable plugin's apply() calls deprecated Gradle 9 APIs. Its verification task
+// accepts the same rule sets without registering the obsolete configurations.
+tasks.register('detekt', io.gitlab.arturbosch.detekt.Detekt) {
+    dependsOn 'detektCore', 'ktfmtCheck', 'ktlintCheck'
+    // detektCore owns general and Compose rules. This engine runs detekt-formatting.
+    disableDefaultRuleSets = true
+    detektClasspath.from(configurations.detektCli)
+    pluginClasspath.from(configurations.detektPlugins)
+    setSource(fileTree('app/src') { include '**/*.kt' })
+    inputs.file('.editorconfig')
+    reports.xml.required.set(true)
+    config.setFrom(files('config/detekt/detekt.yml'))
+    buildUponDefaultConfig = true
+    allRules = false
+    autoCorrect = false
+    basePath = rootDir.absolutePath
 }
 
 // AGP resolves the lint engine in detached project configurations, separately
@@ -82,4 +135,10 @@ allprojects {
 
 tasks.register('clean', Delete) {
     delete layout.buildDirectory
+}
+
+// CodeQL's Gradle autobuilder requests the JVM lifecycle task for Kotlin DSL builds.
+tasks.register('testClasses') {
+    group = 'build'
+    dependsOn ':app:assemble', ':app:compileDebugUnitTestJavaWithJavac'
 }

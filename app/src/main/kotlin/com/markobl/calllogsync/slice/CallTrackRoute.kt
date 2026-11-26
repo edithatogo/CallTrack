@@ -82,11 +82,14 @@ private fun CallTrackNavigation(activity: ComponentActivity, root: CallTrackRout
             entryProvider {
                 entry<CallTrackRoute.Manual> {
                     CallTrackScaffold(R.string.calltrack_title, onNavigateUp = null) {
-                        ManualLoggingScreen(activity) {
-                            if (stack.last() == CallTrackRoute.Manual) {
-                                stack.add(CallTrackRoute.Automatic)
-                            }
-                        }
+                        ManualLoggingScreen(
+                            activity,
+                            onOpenAutomatic = {
+                                if (stack.last() == CallTrackRoute.Manual) {
+                                    stack.add(CallTrackRoute.Automatic)
+                                }
+                            },
+                        )
                     }
                 }
                 entry<CallTrackRoute.Automatic>(metadata = ListDetailSceneStrategy.listPane()) {

@@ -123,7 +123,7 @@ private constructor(
         internal const val OUTGOING = 2
         internal const val MISSED = 3
 
-        private fun typeOf(direction: String?): Int =
+        internal fun typeOf(direction: String?): Int =
             when (direction) {
                 "Incoming" -> INCOMING
                 "Outgoing" -> OUTGOING
@@ -131,7 +131,7 @@ private constructor(
                 else -> 0
             }
 
-        private fun directionOf(type: Int): String =
+        internal fun directionOf(type: Int): String =
             when (type) {
                 INCOMING -> "Incoming"
                 OUTGOING -> "Outgoing"

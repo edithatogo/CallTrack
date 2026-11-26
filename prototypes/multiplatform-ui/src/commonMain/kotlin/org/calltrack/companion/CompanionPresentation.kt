@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -37,12 +37,16 @@ fun reduceCompanionUi(state: CompanionUiState, action: CompanionUiAction): Compa
 
 /** Shared rendering only. All actions are explicit callbacks; this composable performs no IO. */
 @Composable
-fun CompanionScreen(state: CompanionUiState, onAction: (CompanionUiAction) -> Unit) {
+fun CompanionScreen(
+    state: CompanionUiState,
+    modifier: Modifier = Modifier,
+    onAction: (CompanionUiAction) -> Unit,
+) {
     Column(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
+        modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Text("CallTrack companion experiment", style = MaterialTheme.typography.h5)
+        Text("CallTrack companion experiment", style = MaterialTheme.typography.headlineSmall)
         Text("Sample data only. No calendar connection or file import.")
         Text("Automatic cellular capture: unavailable in this experiment.")
         Text(

@@ -204,7 +204,7 @@ private constructor(context: Context?, includeAppCalls: Boolean, app: String?) :
         fun first(cursor: Cursor?, namespace: String?): CallRecord? =
             if (!cursor!!.moveToFirst()) null else current(cursor, namespace)
 
-        private fun current(cursor: Cursor, namespace: String?): CallRecord {
+        internal fun current(cursor: Cursor, namespace: String?): CallRecord {
             val appMarker = cursor.getColumnIndex(Calls.UUID)
             val source =
                 if (appMarker < 0 || cursor.isNull(appMarker)) {

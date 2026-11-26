@@ -10,6 +10,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -69,7 +70,7 @@ internal fun AutomaticStatusPanel(state: AutomaticStatusUiState, showDetails: Bo
 }
 
 @Composable
-private fun AutomaticStatusDetails(state: AutomaticStatusUiState) {
+private fun ColumnScope.AutomaticStatusDetails(state: AutomaticStatusUiState) {
     AutomaticStatusLine(state.counts, "auto_counts")
     AutomaticStatusLine(state.feedback, "auto_feedback")
     AutomaticStatusLine(state.lastRun, "auto_last")
@@ -85,17 +86,17 @@ class AutomaticSettingsActivity : ComponentActivity() {
 }
 
 @Composable
-internal fun AutomaticSettingsScreen(
+internal fun ColumnScope.AutomaticSettingsScreen(
     activity: ComponentActivity,
     onOpenImports: () -> Unit,
     onOpenRecovery: () -> Unit,
+    model: AutomaticSettingsViewModel = hiltViewModel(),
 ) {
-    val model = hiltViewModel<AutomaticSettingsViewModel>()
     val permissions =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             model.permissionsChanged()
         }
-    LifecycleResumeEffect(model) {
+    LifecycleResumeEffect(model.uiState) {
         model.setResumed(true)
         onPauseOrDispose { model.setResumed(false) }
     }
@@ -158,7 +159,7 @@ private fun ComponentActivity.openAndroidHistorySettings(onUnavailable: () -> Un
 }
 
 @Composable
-private fun AutomaticSettingsForm(
+private fun ColumnScope.AutomaticSettingsForm(
     state: AutomaticSettingsFormUiState,
     onSelectSource: (String) -> Unit,
     onOpenSystemHistory: () -> Unit,

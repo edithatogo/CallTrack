@@ -51,7 +51,7 @@ class RecoveryCardsPanelTest {
 
         compose.setContent {
             RecoveryCardsPanel(
-                cards = listOf(card),
+                page = RecoveryPageUiState(cards = listOf(card)),
                 busy = false,
                 checkLabel = "Check existing effect only",
                 suppressLabel = "Suppress further retries",
@@ -82,16 +82,19 @@ class RecoveryCardsPanelTest {
     fun busyAndIneligibleActionsStayDisabledOrAbsent() {
         compose.setContent {
             RecoveryCardsPanel(
-                cards =
-                    listOf(
-                        RecoveryCardUiState(
-                            token = 0,
-                            detail = "Suppressed record",
-                            checkEnabled = false,
-                            suppressEnabled = false,
-                            reapproveVisible = false,
-                            openEventVisible = true,
-                        ),
+                page =
+                    RecoveryPageUiState(
+                        cards =
+                            listOf(
+                                RecoveryCardUiState(
+                                    token = 0,
+                                    detail = "Suppressed record",
+                                    checkEnabled = false,
+                                    suppressEnabled = false,
+                                    reapproveVisible = false,
+                                    openEventVisible = true,
+                                ),
+                            ),
                     ),
                 busy = true,
                 checkLabel = "Check existing effect only",

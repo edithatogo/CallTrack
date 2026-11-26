@@ -1,0 +1,66 @@
+name: Strict Compose CI
+on:
+  push:
+    branches: [main]
+    tags: ['**']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  # This job name is required by main branch protection.
+  slice:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          distribution: temurin
+          java-version: |
+            21
+            25.0.5+100000002.0.LTS
+      - name: Verify tooling
+        run: |
+          java -version 2>&1 | grep -F 'Temurin-25.0.5.1+2'
+          test -n "$ANDROID_HOME"
+          sdkmanager_path="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          test -n "$sdkmanager_path"
+          dirname "$sdkmanager_path" >> "$GITHUB_PATH"
+      - name: Install Android 17 SDK
+        run: sdkmanager "platforms;android-37.1" "build-tools;35.0.0" "build-tools;36.0.0"
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '26'
+      - name: Validate Renovate configuration
+        run: npx --yes --package renovate -c renovate-config-validator
+      - name: Verify Compose, architecture and screenshot baselines
+        id: compose
+        run: ./gradlew detekt lintDebug testDebugUnitTest verifyRoborazziDebug assembleDebug --stacktrace
+      - name: Save screenshot differences
+        if: failure() && steps.compose.outcome == 'failure'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: compose-screenshot-differences
+          path: app/build/outputs/roborazzi/*.png
+          if-no-files-found: ignore
+      - name: Check Java format
+        run: |
+          mkdir -p .local/toolchain
+          curl --fail --location --silent --show-error https://repo.maven.apache.org/maven2/com/google/googlejavaformat/google-java-format/2.0.0/google-java-format-2.0.0-all-deps.jar -o .local/toolchain/google-java-format-2.0.0.jar
+          echo "c78feb48c549fa7114b7ea11db3b456808f7b371ffe84e6643a44dd2f9588639  .local/toolchain/google-java-format-2.0.0.jar" | sha256sum --check
+          java -jar .local/toolchain/google-java-format-2.0.0.jar --aosp --cleanup=false --dry-run --set-exit-if-changed app/src/*/java/com/markobl/calllogsync/slice/*.java
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version-file: .python-version
+      - name: Build native Android 17 app, tests and lint
+        run: |
+          python -m venv .venv
+          .venv/bin/python scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"
+          sh gradlew --no-daemon --console=plain :app:testReleaseUnitTest :app:assembleRelease

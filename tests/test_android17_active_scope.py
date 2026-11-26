@@ -18,11 +18,11 @@ class Android17Scope(unittest.TestCase):
             {"min_sdk": 37, "target_sdk": 37, "compile_sdk_minor": "37.1"},
             scope["required_android"],
         )
-        gradle = (ROOT / "app/build.gradle").read_text()
-        self.assertRegex(gradle, r"(?m)^\s*minSdk 37\s*$")
-        self.assertRegex(gradle, r"(?m)^\s*targetSdk 37\s*$")
+        gradle = (ROOT / "app/build.gradle.kts").read_text()
+        self.assertRegex(gradle, r"(?m)^\s*minSdk = 37\s*$")
+        self.assertRegex(gradle, r"(?m)^\s*targetSdk = 37\s*$")
         self.assertRegex(gradle, r"(?s)compileSdk\s*\{\s*version = release\(37\)\s*\{\s*minorApiLevel = 1")
-        self.assertNotIn("implementation project(':shared-core')", gradle)
+        self.assertNotIn('project(":shared-core")', gradle)
         settings = (ROOT / "settings.gradle").read_text()
         self.assertNotIn("include ':shared-core'", settings)
 

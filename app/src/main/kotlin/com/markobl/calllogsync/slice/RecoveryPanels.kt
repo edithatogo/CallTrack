@@ -98,7 +98,7 @@ internal fun RecoveryRetentionPanel(busy: Boolean, label: String, onExpire: () -
 
 @Composable
 internal fun RecoveryCardsPanel(
-    cards: List<RecoveryCardUiState>,
+    page: RecoveryPageUiState,
     busy: Boolean,
     checkLabel: String,
     suppressLabel: String,
@@ -113,7 +113,7 @@ internal fun RecoveryCardsPanel(
         modifier = Modifier.fillMaxWidth().semantics { testTagsAsResourceId = true },
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        cards.forEach { card ->
+        page.cards.forEach { card ->
             OutlinedCard(
                 modifier = Modifier.fillMaxWidth().testTag("recovery_card_${card.token}"),
             ) {
