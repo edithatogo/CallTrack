@@ -91,10 +91,11 @@ full matrix below before supported release acceptance.
 The output must be new. The audit downloads each unique runtime artifact and POM
 from canonical Google Maven/Maven Central HTTPS endpoints, resolves renamed files
 through hash-bound published module metadata, compares bytes, and hashes embedded
-notices (including classes.jar). A mismatch/error retains the receipt and exits
-nonzero. Repository agreement is not independently signed provenance, verification
-of build plugins/SDK/tools, a complete SBOM or legal clearance. Current results and
-remaining licence/asset gates are in the Track5 local qualification handoff.
+notices (including classes.jar). Detailed results stay in the private
+`receipt.json`. The command prints a fixed status and exits nonzero if
+bytes differ or an artifact check fails. Independent provenance, build tool
+verification, a complete SBOM and legal clearance require separate evidence. See
+the Track 5 local qualification handoff for current results and remaining gates.
 
 ## Qualified local trust and schema/provider upgrade continuation
 
