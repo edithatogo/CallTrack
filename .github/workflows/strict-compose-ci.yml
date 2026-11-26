@@ -58,4 +58,4 @@ jobs:
         run: |
           python -m venv .venv
           .venv/bin/python scripts/run_slice_build.py --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"
-          sh gradlew --no-daemon --console=plain :app:assembleRelease
+          sh gradlew --no-daemon --console=plain :app:testReleaseUnitTest :app:assembleRelease
