@@ -13,6 +13,11 @@ jobs:
       github.event.pull_request.head.ref != 'main'
     runs-on: ubuntu-latest
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
+        with:
+          egress-policy: audit
+
       - name: Remove only the merged branch tip
         env:
           GH_TOKEN: ${{ github.token }}
