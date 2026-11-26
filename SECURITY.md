@@ -43,6 +43,17 @@ and describe the Gitleaks and Presidio scan scopes. The shared action runs
 the pinned Presidio 2.2.366 compatibility build on isolated Python 3.15.2.
 [Jazzer runner](fuzz/README.md) · [Shared privacy checks](https://github.com/edithatogo/repository-standards/blob/23fe1fb4f99021b1a721f63dea09a2369ba8845d/docs/privacy-secrets-standard.md)
 
+## Offline scanner
+
+The [offline workflow](.github/workflows/offline-ai-security.yml) uses the
+[published Apple Container profile](https://github.com/edithatogo/repository-standards/pull/191).
+The Linux x64 scanner runs against the exact commit and event base with its
+network disabled and a read-only policy and checkout. A single-use official
+GitHub runner verifies the result for the same run attempt, policy and image.
+Use a runner only for the verified job identified by the run and attempt
+labels. The regular GitHub security, Android accessibility and recovery checks
+continue to run on their existing triggers.
+
 ## Optional staged private-key check
 
 With `pre-commit` 4.7.0 installed in the repository's `.venv`, run the SHA-pinned

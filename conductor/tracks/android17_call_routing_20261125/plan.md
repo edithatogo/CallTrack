@@ -4,7 +4,7 @@
 - [x] Exercise source matching, preserved activation, and independent recovery. Implement opt-in routing in the existing automatic settings screen.
 - [x] Run source-matched host and API 37 emulator acceptance, including rendered controls, migration and process recovery. Complete protected hosted checks.
 - [x] Verify an in-place upgrade of the authorised dev package on the attached phone.
-- [ ] Verify a controlled call from each selected third-party app and a readback from each nominated calendar before claiming that physical route.
+- [ ] Verify a controlled call from each selected third-party app and a readback from each nominated calendar before claiming that physical route. The emulator's attributed call fixtures and multi-calendar checks provide development evidence. Physical app-route verification remains deferred with the device work.
 
 Historical import remains bound to its saved phone-call snapshot. An app-call backfill needs an explicit source selection that persists with each confirmed import so recovery can replay the same scope.
 
