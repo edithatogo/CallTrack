@@ -1418,7 +1418,8 @@ Ktlint and the Detekt 2 CLI use a JDK 21 toolchain for their IntelliJ parsers.
 Temporary fixtures caused distinct failures for Material 2, a qualified XML
 layout, Kotlin ViewGroup and Java Fragment inheritance, public composable naming
 and default modifiers, whitespace, deprecated Kotlin calls and changed pixels.
-A JUnit 4.12 test pin produced a fatal `NewerVersionAvailable` finding.
-All 224 new app-build and 67 prototype SHA-256 entries were compared with fresh
+An AndroidX Activity 1.7.0 test pin produced a fatal `GradleDependency` finding.
+JUnit 4.12 produced a fatal `NewerVersionAvailable` finding in the same audit.
+All 230 new app-build and 67 prototype SHA-256 entries were compared with fresh
 canonical repository bytes. The selected ktfmt 0.65 stays in place during the
 three-day release hold for the 0.65.1 patch published on 25 November.
