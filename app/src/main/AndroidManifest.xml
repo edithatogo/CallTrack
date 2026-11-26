@@ -11,6 +11,7 @@
         <intent>
             <action android:name="android.telecom.action.CALL_BACK" />
         </intent>
+        <package android:name="com.facebook.orca" />
         <package android:name="com.microsoft.teams" />
         <package android:name="com.whatsapp" />
         <package android:name="com.whatsapp.w4b" />

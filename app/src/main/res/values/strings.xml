@@ -71,6 +71,7 @@
 
     <string name="import_open">Historical imports</string>
     <string name="import_intro">Preview earlier calls before adding them to a calendar. Dates use %1$s and YYYY-MM-DD format. You can resume a saved session after closing or stopping it.</string>
+    <string name="import_choose_source">Choose a call source</string>
     <string name="import_from">Start date (included)</string>
     <string name="import_to">End date (excluded)</string>
     <string name="import_create">Create read-only preview</string>
@@ -78,8 +79,8 @@
     <string name="import_continue">Continue selected preview / import</string>
     <string name="import_confirm">Confirm historical import</string>
     <plurals name="import_confirm_text">
-        <item quantity="one">Import the frozen set of %1$d call into %2$s? Date range %3$s. Current call data is checked before writing. Existing edited or deleted events are not recreated automatically. This item may require review.</item>
-        <item quantity="other">Import the frozen set of %1$d calls into %2$s? Date range %3$s. Current call data is checked before writing. Existing edited or deleted events are not recreated automatically. Some items may require review.</item>
+        <item quantity="one">Import the frozen set of %1$d call into %2$s? Date range %3$s. Source %4$s. Current call data is checked before writing. Existing edited or deleted events are not recreated automatically. This item may require review.</item>
+        <item quantity="other">Import the frozen set of %1$d calls into %2$s? Date range %3$s. Source %4$s. Current call data is checked before writing. Existing edited or deleted events are not recreated automatically. Some items may require review.</item>
     </plurals>
     <string name="import_stop">Stop this run; keep session</string>
     <string name="import_stopping">Stopping at the next safe boundary. The session remains available to resume.</string>
@@ -91,7 +92,7 @@
     <string name="import_invalid_range">Enter valid YYYY-MM-DD dates with an exclusive end after the start. Dates must exist in the selected timezone and be on or after the supported epoch.</string>
     <string name="import_another">Create another preview? The previous session stays saved and stopped. You can select it from the saved sessions list.</string>
     <string name="import_blocked">The run stopped and its result was saved. Check permissions, destination availability and review items before continuing. Progress was not guessed.</string>
-    <string name="import_progress">%1$s\n%2$s\nDestination: %3$s\nCall types: %4$s\nCandidates: %5$d; verified: %6$d; review: %7$d. Verified includes existing events checked during this import.</string>
+    <string name="import_progress">%1$s\n%2$s\nCall source: %8$s\nDestination: %3$s\nCall types: %4$s\nCandidates: %5$d; verified: %6$d; review: %7$d. Verified includes existing events checked during this import.</string>
     <string name="import_building">Building preview — no calendar writes</string>
     <string name="import_preview">Preview ready — confirmation required</string>
     <string name="import_confirmed">Confirmed — resumable work remains</string>
@@ -102,7 +103,7 @@
     <string name="import_failed">This action could not be verified. Saved session progress and delivery receipts remain available. Refresh by selecting the saved session before retrying.</string>
 
     <string name="auto_status_summary">%1$s\n%2$s</string>
-    <string name="import_history_item">%1$s — %2$s</string>
+    <string name="import_history_item">%1$s — %2$s — %3$s</string>
     <string name="recovery_open">Delivery review and recovery</string>
     <string name="recovery_title">Delivery review</string>
     <string name="recovery_records_heading">Delivery records</string>

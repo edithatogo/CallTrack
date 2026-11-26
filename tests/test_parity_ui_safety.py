@@ -760,8 +760,12 @@ class UiSafety(unittest.TestCase):
             '#controlsRemainAccessibleWithLargeFontAndRightToLeftLayout',
         ], selectors[:5])
         self.assertTrue(all(method.startswith('com.markobl.calllogsync.slice.ImportUiTest#')
-                            for method in selectors[5:]))
-        self.assertEqual('com.markobl.calllogsync.slice.ImportUiTest#cleanupFixture', selectors[-1])
+                            for method in selectors[5:-2]))
+        self.assertEqual([
+            'com.markobl.calllogsync.slice.CallRoutingProviderTest'
+            '#renderedHistoricalAppImportPersistsItsSourceAndWritesOnlyTheSelectedCall',
+            'com.markobl.calllogsync.slice.ImportUiTest#cleanupFixture',
+        ], selectors[-2:])
         self.assertTrue(any('latestCallUsesNewestDateAndHighestIdOnTies' in method for method in methods))
         self.assertTrue(any('renderedDestinationAndFiltersSurviveProcessDeathWithoutPreview' in method
                             and 'ProcessRecoveryRunner' in method for method in methods))

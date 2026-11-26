@@ -411,7 +411,8 @@ public class ImportUiTest {
                             .getString(
                                     R.string.import_history_item,
                                     dates,
-                                    context().getString(R.string.import_confirmed)));
+                                    context().getString(R.string.import_confirmed),
+                                    context().getString(R.string.auto_source_phone)));
             assertEquals(
                     "The selected history row must resolve to the prepared session",
                     state().getString("partial", null),
@@ -444,7 +445,8 @@ public class ImportUiTest {
                             .getString(
                                     R.string.import_history_item,
                                     dates,
-                                    context().getString(R.string.import_confirmed)));
+                                    context().getString(R.string.import_confirmed),
+                                    context().getString(R.string.auto_source_phone)));
             assertEquals(stopped.saved, latest().saved);
             ui.tapId("import_continue");
             ui.await(
@@ -529,6 +531,17 @@ public class ImportUiTest {
             assertEquals(removed, latest().calendar);
             assertEquals(0, latest().saved);
             assertEquals(0, fixture.events(removed));
+            assertEquals(remainingEvents, fixture.events(calendar()));
+
+            long replacement = fixture.insertCalendar(removedLabel + " replacement");
+            assertEquals("Calendar provider must reuse the removed ID", removed, replacement);
+            long revision = latest().revision;
+            ui.tapId("import_continue");
+            ui.await(
+                    () -> latest().revision > revision,
+                    "Retry did not read the persisted destination identity");
+            assertEquals(DurableDelivery.Result.DESTINATION_UNAVAILABLE, latest().stopped);
+            assertEquals(0, fixture.events(replacement));
             assertEquals(remainingEvents, fixture.events(calendar()));
             ui.revealId("import_summary_text");
             ui.capture("import-destination-removed");

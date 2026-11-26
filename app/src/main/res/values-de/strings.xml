@@ -48,6 +48,7 @@
 
     <string name="import_open">Historische Importe</string>
     <string name="import_intro">Prüfe frühere Anrufe, bevor du sie einem Kalender hinzufügst. Datumsangaben verwenden %1$s und das Format YYYY-MM-DD. Eine gespeicherte Sitzung lässt sich nach dem Schließen oder Anhalten fortsetzen.</string>
+    <string name="import_choose_source">Anrufquelle auswählen</string>
     <string name="import_from">Startdatum (einschließlich)</string>
     <string name="import_to">Enddatum (ausschließlich)</string>
     <string name="import_create">Schreibgeschützte Vorschau erstellen</string>
@@ -55,8 +56,8 @@
     <string name="import_continue">Ausgewählte Vorschau / Import fortsetzen</string>
     <string name="import_confirm">Historischen Import bestätigen</string>
     <plurals name="import_confirm_text">
-        <item quantity="one">Den festgelegten Datensatz mit %1$d Anruf in %2$s importieren? Zeitraum %3$s. Aktuelle Anrufdaten werden vor dem Schreiben geprüft. Geänderte oder gelöschte Termine werden nicht automatisch neu erstellt. Dieser Eintrag muss möglicherweise geprüft werden.</item>
-        <item quantity="other">Die festgelegte Menge von %1$d Anrufen in %2$s importieren? Zeitraum %3$s. Aktuelle Anrufdaten werden vor dem Schreiben geprüft. Geänderte oder gelöschte Termine werden nicht automatisch neu erstellt. Einige Einträge müssen möglicherweise geprüft werden.</item>
+        <item quantity="one">Den festgelegten Datensatz mit %1$d Anruf in %2$s importieren? Zeitraum %3$s. Quelle %4$s. Aktuelle Anrufdaten werden vor dem Schreiben geprüft. Geänderte oder gelöschte Termine werden nicht automatisch neu erstellt. Dieser Eintrag muss möglicherweise geprüft werden.</item>
+        <item quantity="other">Die festgelegte Menge von %1$d Anrufen in %2$s importieren? Zeitraum %3$s. Quelle %4$s. Aktuelle Anrufdaten werden vor dem Schreiben geprüft. Geänderte oder gelöschte Termine werden nicht automatisch neu erstellt. Einige Einträge müssen möglicherweise geprüft werden.</item>
     </plurals>
     <string name="import_stop">Diesen Lauf anhalten; Sitzung behalten</string>
     <string name="import_stopping">Der Lauf wird am nächsten sicheren Punkt angehalten. Die Sitzung kann später fortgesetzt werden.</string>
@@ -68,7 +69,7 @@
     <string name="import_invalid_range">Gib gültige Datumsangaben im Format YYYY-MM-DD ein. Das ausgeschlossene Enddatum muss nach dem Start liegen. Die Daten müssen in der ausgewählten Zeitzone existieren und innerhalb des unterstützten Zeitraums liegen.</string>
     <string name="import_another">Eine weitere Vorschau erstellen? Die vorherige Sitzung bleibt gespeichert und angehalten. Du kannst sie aus der Liste gespeicherter Sitzungen auswählen.</string>
     <string name="import_blocked">Der Lauf wurde angehalten und das Ergebnis gespeichert. Prüfe vor dem Fortsetzen Berechtigungen, Zielkalender und zu prüfende Einträge. Der Fortschritt wurde nicht geschätzt.</string>
-    <string name="import_progress">%1$s\n%2$s\nZielkalender: %3$s\nAnrufarten: %4$s\nKandidaten: %5$d; geprüft: %6$d; zu prüfen: %7$d. Geprüft umfasst bestehende Termine, die in diesem Import kontrolliert wurden.</string>
+    <string name="import_progress">%1$s\n%2$s\nAnrufquelle: %8$s\nZielkalender: %3$s\nAnrufarten: %4$s\nKandidaten: %5$d; geprüft: %6$d; zu prüfen: %7$d. Geprüft umfasst bestehende Termine, die in diesem Import kontrolliert wurden.</string>
     <string name="import_building">Vorschau wird erstellt — keine Kalenderänderungen</string>
     <string name="import_preview">Vorschau bereit — Bestätigung erforderlich</string>
     <string name="import_confirmed">Bestätigt — fortsetzbare Vorgänge vorhanden</string>
@@ -79,7 +80,7 @@
     <string name="import_failed">Diese Aktion konnte nicht bestätigt werden. Gespeicherter Sitzungsfortschritt und Übertragungsnachweise bleiben verfügbar. Wähle vor einem erneuten Versuch die gespeicherte Sitzung zum Aktualisieren aus.</string>
 
     <string name="auto_status_summary">%1$s\n%2$s</string>
-    <string name="import_history_item">%1$s — %2$s</string>
+    <string name="import_history_item">%1$s — %2$s — %3$s</string>
     <string name="recovery_open">Übertragungen prüfen und wiederherstellen</string>
     <string name="recovery_title">Übertragungen prüfen</string>
     <string name="recovery_records_heading">Übertragungsnachweise</string>

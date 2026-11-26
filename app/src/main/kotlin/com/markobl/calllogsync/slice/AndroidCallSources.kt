@@ -5,13 +5,21 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.telecom.TelecomManager
+import com.markobl.calllogsync.R
 
 /** Package visibility finds candidates. An attributed Android row is evidence of shared history. */
 internal object AndroidCallSources {
-    data class App(val packageName: String, val label: String, val observed: Boolean)
+    data class App(val packageName: String, val label: String, val observed: Boolean) {
+        fun option(context: Context): CalendarDestinationOption {
+            val status =
+                if (observed) R.string.auto_source_observed else R.string.auto_source_unverified
+            return CalendarDestinationOption(packageName, context.getString(status, label))
+        }
+    }
 
     private val common =
         setOf(
+            "com.facebook.orca",
             "com.microsoft.teams",
             "com.whatsapp",
             "com.whatsapp.w4b",

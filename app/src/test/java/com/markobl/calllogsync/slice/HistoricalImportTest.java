@@ -82,6 +82,68 @@ public class HistoricalImportTest {
     }
 
     @Test
+    public void sharedPreviewRecoversItsSourceAndDeliversOnlyApprovedRows() {
+        String app = "com.whatsapp";
+        String other = "org.example.calls";
+        Store store = new Store();
+        PagedCallsTest.Source phone = new PagedCallsTest.Source();
+        PagedCallsTest.Source shared = new PagedCallsTest.Source();
+        phone.rows.put(1L, PagedCallsTest.row(1, 1));
+        shared.rows.put(1L, PagedCallsTest.row(1, 1));
+        shared.rows.put(2L, appRow(2, app));
+        shared.rows.put(3L, appRow(3, other));
+        shared.rows.put(4L, appRow(4, app));
+        SliceTest.Sink sink = new SliceTest.Sink();
+        DurableDeliveryTest.Store receipts = new DurableDeliveryTest.Store();
+        DurableDelivery writer = new DurableDelivery(receipts, sink);
+        HistoricalImport first =
+                new HistoricalImport(
+                        store,
+                        phone,
+                        receipts,
+                        writer,
+                        source -> {
+                            assertEquals(app, source);
+                            return shared;
+                        });
+
+        String id = first.start(7, "UTC", 0, 2000, true, true, true, app, "0".repeat(64)).id;
+        assertEquals(HistoricalImport.Phase.BUILDING, first.preview(id, 2).phase);
+        HistoricalImport reopened =
+                new HistoricalImport(
+                        store,
+                        phone,
+                        receipts,
+                        writer,
+                        source -> {
+                            assertEquals(app, source);
+                            return shared;
+                        });
+        HistoricalImport.Session preview = reopened.preview(id, 2);
+        assertEquals(app, preview.callSource);
+        assertEquals(HistoricalImport.Phase.PREVIEW, preview.phase);
+        assertEquals(2, store.rows.size());
+        assertEquals(2L, store.rows.get(0).sourceId);
+        assertEquals(4L, store.rows.get(1).sourceId);
+        assertEquals(0, sink.inserts);
+
+        reopened.confirm(id);
+        reopened.deliver(id, 1);
+        shared.rows.put(4L, appRow(4, other));
+        HistoricalImport.Session done = reopened.deliver(id, 1);
+        assertEquals(app, done.callSource);
+        assertEquals(HistoricalImport.Phase.COMPLETE, done.phase);
+        assertEquals(1, done.saved);
+        assertEquals(1, done.review);
+        assertEquals(1, sink.inserts);
+    }
+
+    private static CallRecord appRow(long id, String app) {
+        return new CallRecord(
+                "fixture", Long.toString(id), 1000 + id, 3, 1, null, null, 1, null, app);
+    }
+
+    @Test
     public void cancellationAndSourceMutationCannotCauseUnconfirmedOrChangedInsert() {
         Store store = new Store();
         PagedCallsTest.Source source = new PagedCallsTest.Source();

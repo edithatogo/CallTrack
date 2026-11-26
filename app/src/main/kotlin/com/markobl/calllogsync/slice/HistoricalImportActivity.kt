@@ -93,12 +93,21 @@ private fun HistoricalImportForm(
         hasRequiredAccess = form.actions.hasRequiredAccess,
         onRequestAccess = onRequestAccess,
     )
+    if (form.showsSourcePicker) {
+        SectionHeading(stringResource(R.string.auto_source_heading))
+        CalendarDestinationPicker(
+            state = form.sources,
+            tagPrefix = "import_source",
+            chooseLabel = stringResource(R.string.import_choose_source),
+            onSelect = model::selectOption,
+        )
+    }
     CalendarDestinationPicker(
         state = form.destination,
         tagPrefix = "import_calendar",
         chooseLabel = stringResource(R.string.slice_choose),
         unavailableLabel = form.destinationMessage?.let { stringResource(it) },
-        onSelect = model::selectDestination,
+        onSelect = model::selectOption,
     )
     HistoricalImportFiltersPanel(
         state = form.filters,
