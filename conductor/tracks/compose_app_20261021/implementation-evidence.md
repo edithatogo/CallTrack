@@ -1402,3 +1402,23 @@ Compose checks, screenshot fixtures and CI changes in the managed worktree
 `~/.codex/worktrees/calltrack-compose-enforcement/calltrack` on
 `codex/strict-compose-enforcement`. Qualification uses local Gradle and JVM
 tests. Existing device sessions retain their current owners.
+
+[Pull request 146](https://github.com/edithatogo/CallTrack/pull/146) records the
+candidate revision and its local and hosted checks. Main already requires the
+GitHub Actions `slice` job. That job now compares reviewed images on Android 17
+and blocks the ecosystem update if the comparison, static analysis or tests fail.
+GitHub repository readback confirmed platform automerge enabled and all 13
+existing required checks retained.
+
+The Compose BOM selects Android Material 3. Detekt Compose Rules 0.6.8 runs with
+the repository's Detekt 2 CLI, matching its published engine dependency.
+Detekt 1.23.8 runs the formatting rules. The app and screenshot tests use JDK 25.
+Ktlint and the Detekt 2 CLI use a JDK 21 toolchain for their IntelliJ parsers.
+
+Temporary fixtures caused distinct failures for Material 2, a qualified XML
+layout, Kotlin ViewGroup and Java Fragment inheritance, public composable naming
+and default modifiers, whitespace, deprecated Kotlin calls and changed pixels.
+A JUnit 4.12 test pin produced a fatal `NewerVersionAvailable` finding.
+All 224 new app-build and 67 prototype SHA-256 entries were compared with fresh
+canonical repository bytes. The selected ktfmt 0.65 stays in place during the
+three-day release hold for the 0.65.1 patch published on 25 November.

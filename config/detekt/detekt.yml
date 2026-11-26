@@ -15,13 +15,6 @@ formatting:
     active: false
   autoCorrect: false
 
-Compose:
-  active: true
-  Material2:
-    active: true
-  UnstableCollections:
-    active: true
-
 config:
   validation: true
   warningsAsErrors: true

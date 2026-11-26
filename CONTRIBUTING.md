@@ -61,8 +61,9 @@ BOM selects Material 3 and the Android Compose libraries. Renovate groups these
 updates and waits three days. The weekly audit runs
 `./gradlew lintDebug -PstrictVersions=true` to check the published versions.
 
-For an intentional visual change, record the affected screenshot with
-`./gradlew :app:recordRoborazziDebug --tests '*ManualCalendarScreenshotTest'`.
+The reference images cover manual logging, settings navigation, import filters and recovery.
+For an intentional change, record the affected test, for example
+`./gradlew :app:recordRoborazziDebug --tests '*CoreScreensScreenshotTest.manualCalendarBeforeAccess'`.
 Review the image in `app/src/test/screenshots`, commit it with the UI change,
 then run `./gradlew verifyRoborazziDebug`. The required GitHub Actions
 `slice` check runs screenshot verification on every pull request.

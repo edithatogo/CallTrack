@@ -22,8 +22,7 @@ ksp = "2.3.14"
 protobufPlugin = "0.10.1"
 slackComposeLints = "1.6.1"
 detekt = "1.23.8"
-# Last Compose Rules release for the stable Detekt 1.x API.
-detektCompose = "0.4.23"
+detektCompose = "0.6.8"
 konsist = "0.18.1"
 roborazzi = "1.79.0"
 robolectric = "4.18.1"
@@ -72,7 +71,7 @@ protoc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
 junit = "junit:junit:4.13.2"
 turbine = "app.cash.turbine:turbine:1.2.1"
 slack-compose-lints = { module = "com.slack.lint.compose:compose-lint-checks", version.ref = "slackComposeLints" }
-# Existing general analysis uses the Detekt 2 CLI. Compose Rules and formatting use stable Detekt 1.
+# Compose Rules targets this Detekt 2 API. The stable Detekt Gradle task runs detekt-formatting.
 detekt-core-cli = "dev.detekt:detekt-cli:2.0.0-alpha.6"
 ktfmt = "org.jetbrains.kotlinx:ktfmt:0.65"
 detekt-cli = { module = "io.gitlab.arturbosch.detekt:detekt-cli", version.ref = "detekt" }

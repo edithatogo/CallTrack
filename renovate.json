@@ -17,11 +17,6 @@
       "separateMinorPatch": false,
       "dependencyDashboardApproval": false,
       "automerge": true
-    },
-    {
-      "description": "Compose Rules 0.4.x supports the stable Detekt 1.x plugin",
-      "matchPackageNames": ["io.nlopez.compose.rules:detekt"],
-      "allowedVersions": "<0.5.0"
     }
   ]
 }

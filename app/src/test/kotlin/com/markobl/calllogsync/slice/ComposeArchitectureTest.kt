@@ -49,7 +49,7 @@ class ComposeArchitectureTest {
                 .classesAndObjects()
                 .filter { declaration ->
                     declaration.parents().any { parent ->
-                        declaration.containingFile.candidates(parent.name).any(::isLegacyType)
+                        declaration.containingFile.hasLegacyParent(parent.name)
                     }
                 }
                 .map { it.location }
@@ -174,14 +174,22 @@ class ComposeArchitectureTest {
         private val javaSources by lazy {
             files.filter { it.extension == "java" }.associateWith { StaticJavaParser.parse(it) }
         }
+        private val aliases by lazy { scope.typeAliases.associateBy { it.fullyQualifiedName } }
+
+        private fun KoFileDeclaration.hasLegacyParent(name: String): Boolean =
+            candidates(name.substringBefore('<')).any { candidate ->
+                isLegacyType(candidate) ||
+                    aliases[candidate]?.let { it.containingFile.hasLegacyParent(it.type.text) } ==
+                        true
+            }
 
         private fun KoFileDeclaration.candidates(name: String): List<String> =
-            listOf(name) +
-                imports.mapNotNull {
+            listOfNotNull(name, packagee?.let { "${it.name}.$name" }) +
+                imports.mapNotNull { import ->
                     when {
-                        it.alias?.name == name -> it.name
-                        it.isWildcard -> it.name.removeSuffix("*") + name
-                        it.name.substringAfterLast('.') == name -> it.name
+                        import.alias != null -> import.name.takeIf { import.alias?.name == name }
+                        import.isWildcard -> import.name.removeSuffix("*") + name
+                        import.name.substringAfterLast('.') == name -> import.name
                         else -> null
                     }
                 }

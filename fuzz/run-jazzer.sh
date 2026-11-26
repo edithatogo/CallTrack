@@ -10,7 +10,7 @@ repo_dir=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 cd "$repo_dir"
 sh gradlew --no-daemon --console=plain :app:compileDebugKotlin
 
-kotlin_version=$(sed -n "s/.*org.jetbrains.kotlin:kotlin-gradle-plugin:\([^']*\).*/\1/p" build.gradle)
+kotlin_version=$(sed -n 's/^kotlin[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' gradle/libs.versions.toml)
 test -n "$kotlin_version"
 gradle_home=${GRADLE_USER_HOME:-"$HOME/.gradle"}
 stdlib=$(find "$gradle_home/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/$kotlin_version" \
