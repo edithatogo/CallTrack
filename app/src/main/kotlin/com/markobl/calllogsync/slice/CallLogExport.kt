@@ -15,7 +15,13 @@ object CallLogExport {
     const val MAX_BYTES = 5 * 1024 * 1024
 
     private const val ID_DOMAIN = "org.calltrack.export.v1\u0000"
-    private const val HEX = "0123456789abcdef"
+    private const val UUID_BYTES = 16
+    private const val VERSION_BYTE = 6
+    private const val VARIANT_BYTE = 8
+    private const val VERSION_DATA_MASK = 0x0f
+    private const val VARIANT_DATA_MASK = 0x3f
+    private const val UUID_VERSION_8 = 0x80
+    private const val RFC_VARIANT = 0x80
 
     /** The optional ID parameter exists for deterministic golden-contract tests. */
     @JvmStatic
@@ -47,7 +53,8 @@ object CallLogExport {
                     ExportRecord(id, direction, source.start, source.seconds)
                 }
                 .sortedWith(
-                    compareBy<ExportRecord> { it.startedAtMilliseconds }.thenBy { it.id.toString() }
+                    compareBy<ExportRecord> { it.startedAtMilliseconds }
+                        .thenBy { it.id.toString() },
                 )
 
         val callsJson =
@@ -71,24 +78,18 @@ object CallLogExport {
 
     private fun portableId(call: CallRecord): UUID {
         val input = (ID_DOMAIN + call.key()).toByteArray(StandardCharsets.UTF_8)
-        val first128 = MessageDigest.getInstance("SHA-256").digest(input).copyOf(16)
+        val first128 = MessageDigest.getInstance("SHA-256").digest(input).copyOf(UUID_BYTES)
         // UUIDv8 with RFC variant bits; SHA-256 gives deterministic, opaque source IDs.
-        first128[6] = ((first128[6].toInt() and 0x0f) or 0x80).toByte()
-        first128[8] = ((first128[8].toInt() and 0x3f) or 0x80).toByte()
+        first128[VERSION_BYTE] =
+            ((first128[VERSION_BYTE].toInt() and VERSION_DATA_MASK) or UUID_VERSION_8).toByte()
+        first128[VARIANT_BYTE] =
+            ((first128[VARIANT_BYTE].toInt() and VARIANT_DATA_MASK) or RFC_VARIANT).toByte()
         val buffer = ByteBuffer.wrap(first128)
         return UUID(buffer.long, buffer.long)
     }
 
-    private fun sha256(bytes: ByteArray): String {
-        val digest = MessageDigest.getInstance("SHA-256").digest(bytes)
-        return buildString(digest.size * 2) {
-            for (byte in digest) {
-                val value = byte.toInt() and 0xff
-                append(HEX[value ushr 4])
-                append(HEX[value and 0x0f])
-            }
-        }
-    }
+    private fun sha256(bytes: ByteArray): String =
+        MessageDigest.getInstance("SHA-256").digest(bytes).toHexString()
 
     private data class ExportRecord(
         val id: UUID,

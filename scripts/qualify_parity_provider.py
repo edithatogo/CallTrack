@@ -79,6 +79,7 @@ def qualify(serial):
             command('shell', 'pm', 'grant', PACKAGE, 'android.permission.' + permission)
         fixture_possible = True
         check('durableCommitFailuresRecoverRealEffectsWithoutReinsertion')
+        check('overlappingDeliveryPathsCommitOneCalendarEvent')
         check('durableDeliveryPreservesRealEditsDeletionAndUnavailableDestination')
         check('historicalImportPreviewResumeRepeatAndCancelMatchRealEffects')
         check('prepareInterruptedEffectForReadOnlyRecovery')

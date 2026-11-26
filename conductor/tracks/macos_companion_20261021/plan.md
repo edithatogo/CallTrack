@@ -21,7 +21,7 @@
 - [x] Task: Add an isolated AppKit JSON file picker and aggregate-only preview using a bounded security-scoped reader; keep delivery disabled and add synthetic regular-file, directory, and oversized-file checks (see [file-preview prototype evidence](file-preview-prototype-20261025.md)).
 - [x] Task: Specify the one-writer EventKit delivery contract and implement an isolated durable-intent/SQLite ledger prototype with fake-provider recovery tests (see [delivery contract](eventkit-delivery-contract-20261025.md)).
 - [x] Task: Add an isolated EventKit adapter and coordinator prototype that requires explicit confirmation, exact selected-calendar readback and fail-closed uncertain-write recovery; do not wire it to UI or request native access.
-- [ ] Task: Implement native file selection and explicit approval UI with no write during preview; imported foreign receipts remain inactive and never confer replay authority.
+- [ ] Task: Use one selected file format for the first packaged AppKit journey. Implement native file selection, read-only preview and explicit approval. Keep foreign receipts inactive and qualify the first delivery through the existing EventKit adapter and ledger.
 - [ ] Task: Integrate and qualify the adapter in the packaged host: usage-description metadata, native permission, list/select, controlled calendar insert/exact-readback and recovery. Denial/write-only cannot be called reconciled.
 - [ ] Task: Qualify interruption/restart/uncertain insert, edited/deleted events, missing/recreated calendar, scoped cleanup, native accessibility and packaged upgrade/recovery using synthetic data.
 - [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md).

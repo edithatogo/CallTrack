@@ -180,7 +180,7 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
     public void importMigrationPreservesProgressAndCancelledSession() {
         try (SqliteImportStore imports =
                 new SqliteImportStore(context(), account() + "-imports.db")) {
-            assertEquals(2, imports.getReadableDatabase().getVersion());
+            assertEquals(3, RoomFixtures.version(imports));
             for (String phase : new String[] {"CONFIRMED", "CANCELLED"}) {
                 String id = importId(phase);
                 HistoricalImport.Session saved = imports.get(id);
@@ -281,10 +281,10 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
                     "CREATE TRIGGER release_migration_fault BEFORE UPDATE ON outbox "
                             + "BEGIN SELECT RAISE(ABORT,'synthetic migration fault'); END");
         }
-        try (SQLiteDatabase db = context().openOrCreateDatabase(database(7), 0, null)) {
+        try (SQLiteDatabase db = context().openOrCreateDatabase(database(8), 0, null)) {
             db.execSQL("CREATE TABLE sentinel (value TEXT)");
             db.execSQL("INSERT INTO sentinel VALUES ('must survive unsupported downgrade')");
-            db.setVersion(7);
+            db.setVersion(8);
         }
         seedHistoricalImport();
         assertEquals(14, events(destination));
@@ -297,7 +297,7 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
         assertEquals(14, events(destination));
         for (int version = 1; version <= 5; version++) {
             try (SqliteLedger ledger = new SqliteLedger(context(), database(version))) {
-                assertEquals(6, ledger.getWritableDatabase().getVersion());
+                assertEquals(7, RoomFixtures.version(ledger));
                 ReceiptRecovery recovery = recovery(ledger, sink);
                 for (int id = 0; id < 3; id++) {
                     long eventId = preferences().getLong(version + "/" + id, -1);
@@ -356,9 +356,10 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
         String name = database(2) + "-fault";
         try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
             try {
-                ledger.getWritableDatabase();
+                RoomFixtures.version(ledger);
                 fail("Fault must abort migration");
             } catch (SQLiteException expected) {
+                assertTrue(expected.getMessage().contains("synthetic migration fault"));
             }
         }
         try (SQLiteDatabase db = context().openOrCreateDatabase(name, 0, null)) {
@@ -370,23 +371,24 @@ public class ReleaseUpgradeProviderTest extends ParityProviderTest {
             db.execSQL("DROP TRIGGER release_migration_fault");
         }
         try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
-            assertEquals(6, ledger.getWritableDatabase().getVersion());
+            assertEquals(7, RoomFixtures.version(ledger));
             assertNotNull(ledger.outbox().get(record(2, 4).key(), calendar()).payload);
         }
     }
 
     @Test
     public void unsupportedNewerSchemaIsPreserved() {
-        try (SqliteLedger ledger = new SqliteLedger(context(), database(7))) {
+        try (SqliteLedger ledger = new SqliteLedger(context(), database(8))) {
             try {
-                ledger.getWritableDatabase();
+                RoomFixtures.version(ledger);
                 fail("No blind schema downgrade");
-            } catch (SQLiteException expected) {
+            } catch (IllegalStateException expected) {
+                assertTrue(expected.getMessage().contains("A migration from 8 to 7 was required"));
             }
         }
-        try (SQLiteDatabase db = context().openOrCreateDatabase(database(7), 0, null);
+        try (SQLiteDatabase db = context().openOrCreateDatabase(database(8), 0, null);
                 Cursor row = db.rawQuery("SELECT value FROM sentinel", null)) {
-            assertEquals(7, db.getVersion());
+            assertEquals(8, db.getVersion());
             assertTrue(row.moveToFirst());
             assertEquals("must survive unsupported downgrade", row.getString(0));
         }

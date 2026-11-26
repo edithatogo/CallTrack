@@ -81,7 +81,7 @@ public class ParityStoreTest {
                 assertEquals(42, migrated.eventId);
                 assertEquals("old-fingerprint", migrated.fingerprint);
                 assertNull(migrated.sourceSignature);
-                assertEquals(6, ledger.getReadableDatabase().getVersion());
+                assertEquals(7, RoomFixtures.version(ledger));
             }
         } finally {
             context().deleteDatabase(name);
@@ -128,10 +128,10 @@ public class ParityStoreTest {
                 assertEquals(42, receipt.eventId);
                 assertNull(receipt.payload);
                 try (Cursor cursor =
-                        ledger.getReadableDatabase()
-                                .rawQuery(
-                                        "SELECT payload_title,payload_description FROM outbox",
-                                        null)) {
+                        RoomFixtures.query(
+                                ledger,
+                                "SELECT payload_title,payload_description FROM outbox",
+                                null)) {
                     assertTrue(cursor.moveToFirst());
                     assertTrue(cursor.isNull(0));
                     assertTrue(cursor.isNull(1));
@@ -149,26 +149,24 @@ public class ParityStoreTest {
         try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
             CallRecord call = new CallRecord("fixture", "1", 1, 0, "Missed", null, null, false);
             CallEvent event = CallEvent.from(call, "UTC");
-            ledger.transaction(
-                    () -> {
-                        try {
-                            ledger.outbox()
-                                    .put(
-                                            new DurableDelivery.Intent(
-                                                    DurableDelivery.State.READY,
-                                                    call.key(),
-                                                    7,
-                                                    CallIdentity.signature(call),
-                                                    event.marker,
-                                                    event.fingerprint(),
-                                                    -1,
-                                                    event));
-                            fail("Outbox boundary must not hide an uncommitted intent");
-                        } catch (IllegalStateException expected) {
-                            /* Required guard. */
-                        }
-                        return SliceEngine.Result.NO_CALL;
-                    });
+            DurableDelivery.Intent intent =
+                    new DurableDelivery.Intent(
+                            DurableDelivery.State.READY,
+                            call.key(),
+                            7,
+                            CallIdentity.signature(call),
+                            event.marker,
+                            event.fingerprint(),
+                            -1,
+                            event);
+            try {
+                RoomFixtures.writeIntentInReceiptTransaction(ledger, intent);
+                fail("Outbox boundary must not hide an uncommitted intent");
+            } catch (IllegalStateException expected) {
+                assertEquals(
+                        "Outbox intent must commit before provider access", expected.getMessage());
+            }
+            assertNull(ledger.outbox().get(call.key(), 7));
         } finally {
             context().deleteDatabase(name);
         }
@@ -222,7 +220,11 @@ public class ParityStoreTest {
             try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
                 assertEquals(
                         SliceEngine.Result.ALREADY_LOGGED,
-                        new SliceEngine(() -> call, sink, ledger, "UTC").run(7));
+                        new ManualDelivery(
+                                        () -> call,
+                                        new DurableDelivery(ledger.outbox(), sink),
+                                        "UTC")
+                                .run(7));
                 assertEquals(javaFingerprint, ledger.get(call.key(), 7).fingerprint);
             }
             observed[0] =
@@ -236,9 +238,13 @@ public class ParityStoreTest {
             try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
                 assertEquals(
                         SliceEngine.Result.REVIEW_REQUIRED,
-                        new SliceEngine(() -> call, sink, ledger, "UTC").run(7));
+                        new ManualDelivery(
+                                        () -> call,
+                                        new DurableDelivery(ledger.outbox(), sink),
+                                        "UTC")
+                                .run(7));
                 assertEquals(javaFingerprint, ledger.get(call.key(), 7).fingerprint);
-                assertEquals(6, ledger.getReadableDatabase().getVersion());
+                assertEquals(7, RoomFixtures.version(ledger));
             }
         } finally {
             context().deleteDatabase(name);
@@ -271,7 +277,7 @@ public class ParityStoreTest {
             }
             try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
                 DurableDelivery.Intent intent = ledger.outbox().get("source", 7);
-                assertEquals(6, ledger.getReadableDatabase().getVersion());
+                assertEquals(7, RoomFixtures.version(ledger));
                 assertNull(intent.operation);
                 assertEquals(DurableDelivery.State.READY, intent.state);
                 assertEquals("Synthetic title", intent.payload.title);
@@ -349,7 +355,7 @@ public class ParityStoreTest {
             }
             try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
                 DurableDelivery.Intent intent = ledger.outbox().get("source", 7);
-                assertEquals(6, ledger.getReadableDatabase().getVersion());
+                assertEquals(7, RoomFixtures.version(ledger));
                 assertNull(intent.facts);
                 assertEquals("import-1", intent.operation.owner);
                 assertEquals(42, intent.operation.generation);
@@ -469,13 +475,18 @@ public class ParityStoreTest {
                                         null,
                                         new DurableDelivery.Operation("automatic", 42),
                                         new DurableDelivery.SourceFacts(123, 0, 3, null, true)));
-                SQLiteDatabase db = ledger.getWritableDatabase();
+            }
+            try (SQLiteDatabase db =
+                    SQLiteDatabase.openDatabase(
+                            context().getDatabasePath(name).getPath(),
+                            null,
+                            SQLiteDatabase.OPEN_READWRITE)) {
                 db.execSQL("DROP TABLE scan_cursors");
                 restorePreRetentionOutbox(db);
                 db.setVersion(4);
             }
             try (SqliteLedger ledger = new SqliteLedger(context(), name)) {
-                assertEquals(6, ledger.getReadableDatabase().getVersion());
+                assertEquals(7, RoomFixtures.version(ledger));
                 DurableDelivery.Intent saved = ledger.outbox().get("source", 7);
                 assertEquals(123, saved.eventId);
                 assertEquals(123, saved.facts.start);
@@ -643,7 +654,7 @@ public class ParityStoreTest {
             assertEquals(1, counts.verified);
             assertEquals(3, counts.review);
             assertEquals(1, counts.suppressed);
-            ledger.put("late-manual", 7, new SliceEngine.Entry(123, "fingerprint"));
+            RoomFixtures.seedLegacyReceipt(ledger, "late-manual", 7, 123, "fingerprint");
             assertEquals(4, ledger.counts().review);
             assertEquals(DurableDelivery.State.LEGACY, ledger.outbox().get("late-manual", 7).state);
             ledger.outbox()
@@ -689,7 +700,7 @@ public class ParityStoreTest {
                                                 Integer.valueOf(1),
                                                 true)));
             for (int i = 0; i < 3; i++)
-                ledger.put("legacy-" + i, 7, new SliceEngine.Entry(100 + i, "f"));
+                RoomFixtures.seedLegacyReceipt(ledger, "legacy-" + i, 7, 100 + i, "f");
             java.util.Set<String> seen = new java.util.HashSet<>();
             SqliteLedger.RecoveryCursor after = null;
             ReceiptRecovery recovery =
@@ -853,10 +864,10 @@ public class ParityStoreTest {
                 assertNotNull(current.payload);
                 ledger.outbox().put(current);
                 try (Cursor cursor =
-                        ledger.getReadableDatabase()
-                                .rawQuery(
-                                        "SELECT payload_saved_at FROM outbox WHERE source=?",
-                                        new String[] {call.key()})) {
+                        RoomFixtures.query(
+                                ledger,
+                                "SELECT payload_saved_at FROM outbox WHERE source=?",
+                                new String[] {call.key()})) {
                     assertTrue(cursor.moveToFirst());
                     assertEquals(base, cursor.getLong(0));
                 }
@@ -877,13 +888,13 @@ public class ParityStoreTest {
                 assertEquals(42, known.eventId);
                 assertEquals(other.marker, known.marker);
                 try (Cursor cursor =
-                        ledger.getReadableDatabase()
-                                .rawQuery(
-                                        "SELECT COUNT(*) FROM outbox WHERE payload_title IS NOT"
-                                                + " NULL OR payload_description IS NOT NULL OR"
-                                                + " payload_start IS NOT NULL OR payload_end IS NOT"
-                                                + " NULL OR payload_timezone IS NOT NULL",
-                                        null)) {
+                        RoomFixtures.query(
+                                ledger,
+                                "SELECT COUNT(*) FROM outbox WHERE payload_title IS NOT"
+                                        + " NULL OR payload_description IS NOT NULL OR"
+                                        + " payload_start IS NOT NULL OR payload_end IS NOT"
+                                        + " NULL OR payload_timezone IS NOT NULL",
+                                null)) {
                     assertTrue(cursor.moveToFirst());
                     assertEquals(0, cursor.getLong(0));
                 }
@@ -919,16 +930,22 @@ public class ParityStoreTest {
                                         event,
                                         operation,
                                         DurableDelivery.SourceFacts.from(call)));
-                ledger.put("legacy", 7, new SliceEngine.Entry(99, "old-fingerprint"));
+                RoomFixtures.seedLegacyReceipt(ledger, "legacy", 7, 99, "old-fingerprint");
                 ledger.checkpoint(
                         operation, new PagedCalls.Checkpoint("fixture", 2, "upper", 1, "last"));
-                restorePreRetentionOutbox(ledger.getWritableDatabase());
-                ledger.getWritableDatabase().setVersion(5);
+            }
+            try (SQLiteDatabase db =
+                    SQLiteDatabase.openDatabase(
+                            context().getDatabasePath(name).getPath(),
+                            null,
+                            SQLiteDatabase.OPEN_READWRITE)) {
+                restorePreRetentionOutbox(db);
+                db.setVersion(5);
             }
             long migrated = base + 100 * PayloadRetention.WINDOW_MILLIS;
             time.set(migrated);
             try (SqliteLedger ledger = new SqliteLedger(context(), name, time::get)) {
-                assertEquals(6, ledger.getReadableDatabase().getVersion());
+                assertEquals(7, RoomFixtures.version(ledger));
                 assertNotNull(ledger.outbox().get(call.key(), 7).payload);
                 assertEquals(1, ledger.checkpoint(operation).lastId);
                 assertEquals(99, ledger.get("legacy", 7).id);

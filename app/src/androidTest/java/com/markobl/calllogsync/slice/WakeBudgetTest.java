@@ -21,19 +21,17 @@ public class WakeBudgetTest {
         try {
             synchronized (DurableDelivery.DELIVERY_LOCK) {
                 result =
-                        caller.submit(
-                                () -> {
-                                    entered.countDown();
-                                    try {
-                                        AutomaticScheduling.reconcileCommitted(
-                                                context,
-                                                System.nanoTime()
-                                                        + TimeUnit.MILLISECONDS.toNanos(100));
-                                        return null;
-                                    } catch (Throwable outcome) {
-                                        return outcome;
-                                    }
-                                });
+                        caller.submit(() -> {
+                            entered.countDown();
+                            try {
+                                AutomaticScheduling.reconcileCommitted(
+                                        context,
+                                        System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(100));
+                                return null;
+                            } catch (Throwable outcome) {
+                                return outcome;
+                            }
+                        });
                 assertTrue(entered.await(1, TimeUnit.SECONDS));
                 // The monitor stays held while the caller must return a deadline failure.
                 Throwable outcome = result.get(1, TimeUnit.SECONDS);

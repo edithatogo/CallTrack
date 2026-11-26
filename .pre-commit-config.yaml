@@ -1,0 +1,28 @@
+default_language_version:
+  python: python3.15
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # v6.0.0
+    hooks:
+      - id: detect-private-key
+      - id: check-merge-conflict
+      - id: check-json
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-added-large-files
+        args: ['--maxkb=512']
+  - repo: local
+    hooks:
+      - id: calltrack-host-regressions
+        name: Native Android host regressions
+        entry: .venv/bin/python -m unittest discover -s tests -q
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+      - id: calltrack-conductor
+        name: Conductor integrity
+        entry: .venv/bin/python scripts/verify_conductor.py
+        language: system
+        pass_filenames: false
+        stages: [pre-push]

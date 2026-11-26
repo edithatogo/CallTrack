@@ -1,0 +1,82 @@
+{
+  "scope": "Compare runtime inventory with fresh canonical HTTPS repository downloads.\n\nRepository byte agreement and POM declarations are evidence, not legal clearance,\nindependent signatures, build-plugin verification or a complete SBOM.\n",
+  "inventory_sha256": "718b91b9642efa856c9632b0b7c5826b0248df9e9c038634c9a634f0a90f300b",
+  "resolved_rows": 2,
+  "unique_artifacts": 2,
+  "artifacts": [
+    {
+      "coordinate": "androidx.window:window-core-android:1.5.1",
+      "name": "window-core.aar",
+      "sha256": "b289ce85090f1f976569fa92bbac84011f54ba1b21f0ce883655b34c8f9f9eea",
+      "module_url": "https://dl.google.com/dl/android/maven2/androidx/window/window-core-android/1.5.1/window-core-android-1.5.1.module",
+      "module_sha256": "4e7c4bfb1f0e36ac16e089ee7f64023f04d8980cfa299eae822eabe19224c06a",
+      "artifact_url": "https://dl.google.com/dl/android/maven2/androidx/window/window-core-android/1.5.1/window-core-android-1.5.1.aar",
+      "artifact_sha256": "b289ce85090f1f976569fa92bbac84011f54ba1b21f0ce883655b34c8f9f9eea",
+      "repository_bytes_match": true,
+      "embedded_notices": [
+        {
+          "path": "META-INF/androidx/window/window-core/LICENSE.txt",
+          "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+          "size": 10175
+        }
+      ],
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/window/window-core-android/1.5.1/window-core-android-1.5.1.pom",
+      "pom_sha256": "462ae4100a7bc2a0f1ff61f615091fc330d6e67aa0341747270c3d714c90e0cd",
+      "declared_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.window:window:1.5.1",
+      "name": "window-1.5.1.aar",
+      "sha256": "3c3061966f012fc22f2e99701f683e82e732435ae2f2a1d5b2f99d82bb7b8864",
+      "artifact_url": "https://dl.google.com/dl/android/maven2/androidx/window/window/1.5.1/window-1.5.1.aar",
+      "artifact_sha256": "3c3061966f012fc22f2e99701f683e82e732435ae2f2a1d5b2f99d82bb7b8864",
+      "repository_bytes_match": true,
+      "embedded_notices": [
+        {
+          "path": "META-INF/androidx/window/window/LICENSE.txt",
+          "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+          "size": 10175
+        }
+      ],
+      "pom_url": "https://dl.google.com/dl/android/maven2/androidx/window/window/1.5.1/window-1.5.1.pom",
+      "pom_sha256": "0a28fe17feed5c0175fbfbd6722ce78c575a1eeac09d858f08e49353f34707e0",
+      "declared_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ],
+      "parent_pom_evidence": [],
+      "effective_licences": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    }
+  ],
+  "all_repository_bytes_match": true,
+  "licence_clearance": false,
+  "build_tool_trust": false,
+  "release_ready": false,
+  "superseded_coordinates": [
+    "androidx.window:window-core-android:1.5.0",
+    "androidx.window:window:1.5.0"
+  ]
+}

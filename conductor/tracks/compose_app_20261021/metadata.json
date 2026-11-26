@@ -4,7 +4,7 @@
   "status": "in_progress",
   "milestone": "M6",
   "created_at": "2026-10-21",
-  "updated_at": "2026-10-25",
+  "updated_at": "2026-11-24",
   "depends_on": [
     "kotlin_20261020",
     "release_20261020"
@@ -13,6 +13,6 @@
   "track_number": 14,
   "execution_stage": 3,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
-  "implementation_status": "PR77, PR78 and PR84 merged; hosted source-bound API26/API33/API36 matrix run 40151946667 attempt 2 passed settings, imports, recovery and accessibility on all three platforms with fixture cleanup and test-package removal. Manual launcher calendar-access/destination controls are now implemented in Compose with explicit token-bound selection; hosted API26/API33/API36 acceptance passed on run 40165971174 attempt 2 with fixture cleanup, package removal and screenshot evidence. Track14 remains active for remaining historical-import/recovery migration, process/lifecycle restoration, manual assistive technology, native provider/destination acceptance and operational gates",
+  "implementation_status": "Android 17 native Compose roots, Material 3 controls, and the sole durable writer qualified for development. Production acceptance follows the scoped Track 5 and Track 6 prerequisites. See implementation-evidence.md.",
   "production_adopted": false
 }

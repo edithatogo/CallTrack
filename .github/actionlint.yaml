@@ -1,0 +1,4 @@
+# The runner is provisioned on the user's Mac; this declares the label to actionlint.
+self-hosted-runner:
+  labels:
+    - calltrack-android17

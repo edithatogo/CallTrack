@@ -38,3 +38,21 @@ class BuildArtifactScope(unittest.TestCase):
                 self.assertNotEqual(before, added)
                 policy.write_text('different trust policy')
                 self.assertNotEqual(added, build.inputs())
+
+    def test_native_app_sources_and_configuration_bind_the_receipt(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            paths = ('build.gradle', 'settings.gradle', 'gradle.properties', 'gradlew',
+                     'app/build.gradle', 'app/proguard-rules.pro', 'app/src/main/kotlin/Core.kt')
+            for name in paths:
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text('initial')
+            with patch.object(build, 'ROOT', root):
+                initial = build.inputs()
+                (root / paths[-2]).write_text('updated build configuration')
+                config_changed = build.inputs()
+                (root / paths[-1]).write_text('updated native source')
+                sources_changed = build.inputs()
+            self.assertNotEqual(initial[paths[-2]], config_changed[paths[-2]])
+            self.assertNotEqual(config_changed[paths[-1]], sources_changed[paths[-1]])

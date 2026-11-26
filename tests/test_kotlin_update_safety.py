@@ -28,6 +28,14 @@ class UpdateSafetyTest(unittest.TestCase):
                 update.require_successful_receipt(receipt)
         update.require_successful_receipt({'exit_code': 0, 'inputs_unchanged': True})
 
+    def test_unqualified_jdk_stops_before_baseline_or_native_access(self):
+        with patch.object(update, 'qualified_local_jdk', side_effect=RuntimeError('unqualified JDK')):
+            with patch.object(update.subprocess, 'check_output') as read, patch.object(update.subprocess, 'run') as run:
+                with self.assertRaisesRegex(RuntimeError, 'unqualified JDK'):
+                    update.qualify('emulator-5582')
+                read.assert_not_called()
+                run.assert_not_called()
+
 
 class UpdateFaultTest(unittest.TestCase):
     def fixture(self, existing=False, replace_failure=False, cleanup_failure=False):
@@ -93,7 +101,8 @@ class UpdateFaultTest(unittest.TestCase):
                 raise AssertionError(args)
             return subprocess.CompletedProcess(command, 0, output, '')
 
-        with patch.object(update, 'ROOT', root), patch.object(update, 'inputs', return_value=source_inputs), patch.object(update.subprocess, 'check_output', side_effect=read), patch.object(update.subprocess, 'run', side_effect=run):
+        jdk_evidence = {'archive_sha256': 'publisher-pinned-test'}
+        with patch.object(update, 'ROOT', root), patch.object(update, 'inputs', return_value=source_inputs), patch.object(update, 'qualified_local_jdk', return_value=(root / 'qualified-jdk', jdk_evidence)), patch.object(update.subprocess, 'check_output', side_effect=read), patch.object(update.subprocess, 'run', side_effect=run):
             if existing or replace_failure or cleanup_failure:
                 with self.assertRaises(RuntimeError):
                     update.qualify('emulator-5582')
@@ -101,7 +110,10 @@ class UpdateFaultTest(unittest.TestCase):
                 update.qualify('emulator-5582')
         files = list((root / '.local/kotlin-evidence').glob('package-update-*.json'))
         self.assertEqual(1, len(files))
-        return commands, json.loads(files[0].read_text()), installed
+        result = json.loads(files[0].read_text())
+        self.assertEqual(jdk_evidence, result['jdk'])
+        self.assertEqual(update.BASELINE_COMMIT, result['baseline_commit'])
+        return commands, result, installed
 
     def test_existing_installation_is_never_replaced_or_removed(self):
         commands, receipt, installed = self.fixture(existing=True)

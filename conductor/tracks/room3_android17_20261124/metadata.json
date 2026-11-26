@@ -1,0 +1,17 @@
+{
+  "track_id": "room3_android17_20261124",
+  "type": "research-led-development",
+  "status": "completed",
+  "created_at": "2026-11-24",
+  "updated_at": "2026-11-24",
+  "milestone": "Android17 persistence",
+  "track_number": 22,
+  "depends_on": [
+    "kotlin_20261020"
+  ],
+  "requirements": "Preserving import, receipt, recovery and no-duplicate authority",
+  "implementation_status": "suspend-daos-qualified",
+  "production_adopted": true,
+  "reference": "../../architecture-android17.md",
+  "github_issue": "https://github.com/edithatogo/CallTrack/issues/115"
+}

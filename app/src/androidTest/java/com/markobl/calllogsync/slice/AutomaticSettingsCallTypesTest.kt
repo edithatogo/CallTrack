@@ -1,9 +1,8 @@
 package com.markobl.calllogsync.slice
 
-import android.content.Context
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import org.junit.Assert.assertFalse
@@ -26,9 +25,7 @@ class AutomaticSettingsCallTypesTest {
         compose.onNodeWithTag("auto_missed").assertIsOn()
         compose.activityRule.scenario.onActivity { activity ->
             assertFalse(
-                activity
-                    .getSharedPreferences("slice", Context.MODE_PRIVATE)
-                    .contains("automaticActivation")
+                SettingsTestFixture.snapshot(activity).hasAutomatic(),
             )
         }
     }

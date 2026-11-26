@@ -29,9 +29,10 @@ removed. Replacement development artwork is original geometric vector source
 under GPLv3. This does not select a permanent production trademark or release name.
 Publication, signing and channel acceptance remain pending.
 
-The checked-in Gradle wrapper bootstrap is a build tool under Apache2.0. Its
-licence and conservative distribution notice are retained in
-`qualification/release/licences/Gradle-wrapper-LICENSE.txt` and
-`qualification/release/licences/Gradle-wrapper-NOTICE.txt`; it is not an APK runtime
-library. These texts are pinned to the Gradle7.0.2 reference associated with the
-audited shared bootstrap hash; no precise bootstrap version is inferred from it.
+The checked-in Gradle wrapper bootstrap is a build tool under Apache-2.0; its
+JAR matches the published Gradle 9.7.0 wrapper checksum and contains its licence.
+Conservative 9.7.0 distribution licence and notice copies are retained in
+`qualification/release/licences/Gradle-9.7.0-LICENSE.txt` and
+`qualification/release/licences/Gradle-9.7.0-NOTICE.txt`. The older
+`Gradle-wrapper-*` files remain as Gradle 7.0.2 reference evidence. The wrapper
+is not an APK runtime library.

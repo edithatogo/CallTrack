@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from parity_targets import AVD, RECOVERY_AVD, MATRIX_AVDS, TRACK14_UI_AVD, is_dedicated_avd, is_dedicated_ui_avd
+from parity_targets import AVD, RECOVERY_AVD, MATRIX_AVDS, TRACK14_UI_AVD, ANDROID17_LOCAL_AVD, is_dedicated_avd, is_dedicated_ui_avd
 
 
 class DedicatedTargets(unittest.TestCase):
@@ -12,8 +12,18 @@ class DedicatedTargets(unittest.TestCase):
             self.assertTrue(is_dedicated_avd(name + '\nOK\n'))
 
     def test_unrelated_prefix_suffix_or_embedded_identity_is_refused(self):
-        for name in ('', 'unrelated', RECOVERY_AVD + '-other', 'unrelated\n' + AVD, 'x' + AVD):
+        for name in ('', 'unrelated', RECOVERY_AVD + '-other', 'unrelated\n' + AVD, 'x' + AVD,
+                     'CallTrack_Accounts_API37', 'calltrack-qualification-api37-other',
+                     'unrelated\ncalltrack-qualification-api37'):
             self.assertFalse(is_dedicated_avd(name))
+            self.assertFalse(is_dedicated_ui_avd(name))
+
+    def test_android17_local_guest_is_rendered_ui_only_and_exact(self):
+        self.assertTrue(is_dedicated_ui_avd(ANDROID17_LOCAL_AVD + '\nOK'))
+        self.assertFalse(is_dedicated_avd(ANDROID17_LOCAL_AVD + '\nOK'))
+        for name in (ANDROID17_LOCAL_AVD + '-other', 'x' + ANDROID17_LOCAL_AVD,
+                     'unrelated\n' + ANDROID17_LOCAL_AVD):
+            self.assertFalse(is_dedicated_ui_avd(name))
 
     def test_track14_guest_is_ui_only_and_exact(self):
         self.assertTrue(is_dedicated_ui_avd(TRACK14_UI_AVD + '\nOK'))

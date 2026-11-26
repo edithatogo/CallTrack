@@ -9,7 +9,9 @@ from parity_health import require_healthy_boot
 import argparse
 import hashlib
 import json
+import os
 import re
+import stat
 from parity_environment import EmulatorDisplayEnvironment as EmulatorEnvironment
 from pathlib import Path
 import subprocess
@@ -20,19 +22,87 @@ ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = 'org.calltrack.community.dev'
 TEST_PACKAGE = PACKAGE + '.test'
 TEST_CLASS = 'com.markobl.calllogsync.slice.PositiveUiTest'
+RECEIPT_NAMES = {
+    'settings': 'parity-ui-receipt.json',
+    'imports': 'parity-ui-imports-receipt.json',
+    'recovery': 'parity-ui-recovery-receipt.json',
+    'accessibility': 'parity-ui-accessibility-receipt.json',
+}
+
+
+def check_adaptive_windows(command, check):
+    # Resize the dedicated display itself so ATF measures the same device pixels
+    # as Compose. A virtual Compose density can shrink a 48 dp target in Android.
+    original = command('shell', 'wm', 'size')
+    size = re.fullmatch(r'Physical size: \d+x\d+(?:\nOverride size: (\d+x\d+))?', original)
+    density = re.fullmatch(
+        r'Physical density: (\d+)(?:\nOverride density: (\d+))?', command('shell', 'wm', 'density'))
+    if not size or not density:
+        raise RuntimeError('Unqualified emulator dimensions')
+    scale = int(density[2] or density[1]) / 160
+    try:
+        for profile, width, height in (('compact', 360, 720), ('medium', 720, 900),
+                                       ('expanded', 1200, 1260)):
+            pixels = f'{round(width * scale)}x{round(height * scale)}'
+            command('shell', 'wm', 'size', pixels)
+            if f'Override size: {pixels}' not in command('shell', 'wm', 'size').splitlines():
+                raise RuntimeError(f'Emulator {profile} dimensions not confirmed')
+            check(f'{profile}WindowKeepsPrimaryActionAccessible',
+                  'com.markobl.calllogsync.slice.AdaptiveCallTrackScreenTest')
+            if profile == 'expanded':
+                check('expandedSettingsShowsOneActiveDetailWithAccessibleNavigation',
+                      'com.markobl.calllogsync.slice.AdaptiveCallTrackNavigationTest')
+    finally:
+        command('shell', 'wm', 'size', size[1] or 'reset')
+        if command('shell', 'wm', 'size') != original:
+            raise RuntimeError('Emulator dimensions were not restored')
+
+
+def write_receipt(directory, expected, suite, receipt, replace):
+    """Write only a regular receipt in the directory selected for this run."""
+    filename = RECEIPT_NAMES[suite]
+    directory_fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        def require_same_directory():
+            try:
+                current = directory.stat(follow_symlinks=False)
+            except OSError as error:
+                raise RuntimeError('Receipt directory changed during the run') from error
+            opened = os.fstat(directory_fd)
+            identity = (expected.st_dev, expected.st_ino)
+            if ((current.st_dev, current.st_ino) != identity or
+                    (opened.st_dev, opened.st_ino) != identity):
+                raise RuntimeError('Receipt directory changed during the run')
+
+        require_same_directory()
+        flags = os.O_WRONLY | os.O_CREAT | os.O_NOFOLLOW | os.O_NONBLOCK
+        if not replace:
+            flags |= os.O_EXCL
+        descriptor = os.open(filename, flags, 0o600, dir_fd=directory_fd)
+        with os.fdopen(descriptor, 'w') as stream:
+            info = os.fstat(stream.fileno())
+            if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+                raise RuntimeError('Unsafe receipt file')
+            os.fchmod(stream.fileno(), 0o600)
+            stream.truncate(0)
+            stream.write(json.dumps(receipt, indent=2) + '\n')
+        require_same_directory()
+    finally:
+        os.close(directory_fd)
 
 
 def native_failure_summary(method, output, declared_permissions=None):
     """Return source locations and allowlisted numeric/platform diagnostics."""
+    source_frame = re.compile(
+        r'at com\.markobl\.calllogsync\.slice\.[A-Za-z0-9_.$<>-]+\('
+        r'(?:(?:PositiveUiTest|ImportUiTest|RecoveryUiTest|ParityProviderTest|RenderedUi)\.java|'
+        r'(?:ManualCalendarScreenTest|AdaptiveCallTrack(?:Screen|Navigation)Test|'
+        r'HistoricalImport(?:Destination|Filters)PanelTest)\.kt):\d+\)'
+    )
     frames = []
     for line in output.splitlines():
-        frame = line.strip()
-        if (frame.startswith('at com.markobl.calllogsync.slice.')
-                and re.search(
-                    r'(?:(?:PositiveUiTest|ImportUiTest|RecoveryUiTest|ParityProviderTest|RenderedUi)\.java|ManualCalendarScreenTest\.kt):\d+',
-                    frame,
-                )):
-            frames.append(frame)
+        if match := source_frame.match(line.strip()):
+            frames.append(match.group())
     detail = '; '.join(frames[:6])
     if not output.strip():
         detail = (detail + '; ' if detail else '') + 'instrumentation-output-empty'
@@ -63,10 +133,17 @@ def native_failure_summary(method, output, declared_permissions=None):
     )
     if status_codes:
         detail += '; instrumentation-status-codes=' + ','.join(status_codes[:12])
+    exception = re.search(
+        r'^INSTRUMENTATION_STATUS: stack=((?:java|android|androidx)\.[A-Za-z0-9_.$]+'
+        r'(?:Exception|Error))(?::|$)', output, re.MULTILINE
+    )
+    if exception:
+        detail += '; instrumentation-exception=' + exception.group(1)
     for diagnostic in (
         'runtime-fatal-exception', 'runtime-anr', 'runtime-test-process-died',
         'runtime-app-process-died', 'runtime-permission-denial',
-        'runtime-permission-controller',
+        'runtime-permission-controller', 'runtime-shell-pipe-failure',
+        'runtime-background-start-blocked',
     ):
         if diagnostic + '=true' in output:
             detail += '; ' + diagnostic
@@ -76,6 +153,18 @@ def native_failure_summary(method, output, declared_permissions=None):
     )
     if runtime_exception:
         detail += '; runtime-exception=' + runtime_exception.group(1)
+    for name, allowed in (
+        ('runtime-fatal-process', 'app|driver|test|permission-controller|input-method|platform|other'),
+        ('runtime-fatal-source', 'app|test|project|permission-controller|input-method|platform'),
+    ):
+        category = re.search(r'\b' + name + r'=(' + allowed + r')(?![a-z-])', output)
+        if category:
+            detail += '; ' + category.group(0)
+    project_frame = re.search(
+        r'\bruntime-project-frame=((?:HistoricalImportActivity|ReceiptRecoveryActivity|'
+        r'ImportUiTest|RecoveryUiTest|RenderedUi)(?:\$[A-Za-z0-9_$]+)?\.[A-Za-z0-9_$]+)', output)
+    if project_frame:
+        detail += '; ' + project_frame.group(0)
     # The rendered accessibility gate may fail on an unlabeled control. Retain
     # only its resource ID and widget class; suppress its visible text/label.
     control = re.search(
@@ -91,12 +180,35 @@ def native_failure_summary(method, output, declared_permissions=None):
         detail = (detail + '; ' if detail else '') + (
             'non-focusable anchor id=' + anchor.group(1) +
             ' enabled=' + anchor.group(2))
+    initial_focus = re.search(
+        r'(?:The initial keyboard target must accept focus|Initial keyboard focus was not applied) ([a-z0-9_]+)',
+        output)
+    if initial_focus:
+        detail += '; keyboard-initial-focus-missing anchor id=' + initial_focus.group(1)
+    window_focus = re.search(
+        r'Screen window did not receive keyboard input focus ([a-z0-9_]+)', output)
+    if window_focus:
+        detail += '; keyboard-window-focus-missing anchor id=' + window_focus.group(1)
+    rejected_tab = re.search(r'Android did not accept the Tab key (down|up)', output)
+    if rejected_tab:
+        detail += '; keyboard-tab-injection-rejected phase=' + rejected_tab.group(1)
     keyboard_anchor = re.search(
         r'Keyboard Tab did not expose visible application focus ([a-z0-9_]+)',
         output)
     if keyboard_anchor:
         detail = (detail + '; ' if detail else '') + (
             'keyboard-focus-missing anchor id=' + keyboard_anchor.group(1))
+        focus_state = re.search(
+            r'focus-state=(no-root|none|stale|initial|not-focused|not-focusable|not-visible|foreign|not-in-tree)(?![a-z-])',
+            output)
+        if focus_state:
+            detail += '; keyboard-focus-state=' + focus_state.group(1)
+        focus_node = re.search(
+            r'focus-node=(none|view|group|scroll|text|button|other):'
+            r'(none|app|foreign):(true|false):(true|false):(true|false) '
+            r'focus-tree-moved=(true|false)(?![a-z])', output)
+        if focus_node:
+            detail += '; ' + focus_node.group(0)
     # Keep only numeric geometry from the system-bars assertion; screenshot or
     # arbitrary rendered strings remain private in the ignored local receipt.
     geometry = re.search(
@@ -117,22 +229,23 @@ def native_failure_summary(method, output, declared_permissions=None):
         detail = (detail + '; ' if detail else '') + 'synthetic-calllog-provider-not-empty'
     if 'java.lang.AssertionError: expected non-null' in output:
         detail = (detail + '; ' if detail else '') + 'expected-provider-result-was-null'
-    if 'Visible enabled control missing: button1' in output:
+    if 'Visible enabled dialog action missing: calltrack_dialog_confirm' in output:
         detail = (detail + '; ' if detail else '') + 'import-confirmation-dialog-action-missing'
     if 'Refusing a control in an unexpected package:' in output:
         detail = (detail + '; ' if detail else '') + 'dialog-action-owned-by-unexpected-window'
     dialog_active = re.search(
-        r'dialog-active=(app|permission|system-ui|input-method|other|unavailable)', output)
+        r'dialog-active=(app|permission|system-ui|launcher|input-method|other|unavailable)', output)
     if dialog_active:
         detail = (detail + '; ' if detail else '') + 'dialog-active=' + dialog_active.group(1)
     dialog_windows = re.findall(
-        r'(app|permission|system-ui|input-method|other|unavailable):'
+        r'(app|permission|system-ui|launcher|input-method|other|unavailable):'
         r'(application|input-method|other):', output)
     if dialog_windows:
         detail = (detail + '; ' if detail else '') + 'dialog-windows=' + ','.join(
             owner + ':' + kind for owner, kind in dialog_windows[:8])
     dialog_controls = re.findall(
-        r'(button[1-3]|permission_(?:allow|allow_one_time|allow_foreground_only|deny|deny_and_dont_ask_again)_button|other):'
+        r'(button[1-3]|calltrack_dialog_(?:confirm|cancel)|'
+        r'permission_(?:allow|allow_one_time|allow_foreground_only|deny|deny_and_dont_ask_again)_button|other):'
         r'(android\.widget\.Button|other):enabled=(true|false):'
         r'clickable=true', output)
     if dialog_controls:
@@ -195,11 +308,15 @@ def native_failure_summary(method, output, declared_permissions=None):
         detail = (detail + '; ' if detail else '') + (
             'permission-launcher=' + permission_launcher.group(1))
     activity_top = re.search(
-        r'activity-top=(app|test|permission-controller|input-method|system-ui|other|unavailable)',
+        r'activity-top=(app|test|permission-controller|input-method|system-ui|launcher|other|unavailable)',
         output,
     )
     if activity_top:
         detail = (detail + '; ' if detail else '') + activity_top.group(0)
+    activity_records = re.search(
+        r'activity-records=(none|import|recovery|import,recovery|unavailable)(?![a-z,-])', output)
+    if activity_records:
+        detail = (detail + '; ' if detail else '') + activity_records.group(0)
     system_controls = re.findall(
         r':id/([a-z0-9_]+):(android\.[A-Za-z0-9_.$]+):enabled=(true|false)', output)
     if system_controls:
@@ -283,10 +400,25 @@ def activity_top_summary(activity_dump):
             category = 'input-method'
         elif package == 'com.android.systemui':
             category = 'system-ui'
+        elif package in ('com.android.launcher3', 'com.google.android.apps.nexuslauncher'):
+            category = 'launcher'
         else:
             category = 'other'
         return 'activity-top=' + category
     return 'activity-top=unavailable'
+
+
+def activity_record_summary(activity_dump):
+    """Report only whether either of the two fixed test activities has a record."""
+    if not activity_dump.strip():
+        return 'activity-records=unavailable'
+    records = []
+    for name, activity in (('import', 'HistoricalImportActivity'),
+                           ('recovery', 'ReceiptRecoveryActivity')):
+        if any('* Hist #' in line and PACKAGE + '/com.markobl.calllogsync.slice.' + activity in line
+               for line in activity_dump.splitlines()):
+            records.append(name)
+    return 'activity-records=' + (','.join(records) or 'none')
 
 
 def runtime_failure_summary(logcat):
@@ -301,32 +433,41 @@ def runtime_failure_summary(logcat):
         categories.append('runtime-permission-denial=true')
     if 'grantpermissionsactivity' in lowered:
         categories.append('runtime-permission-controller=true')
+    if re.search(r'Background activity start \[callingPackage: '
+                 + re.escape(PACKAGE) + r'(?:;|\])', logcat):
+        categories.append('runtime-background-start-blocked=true')
     if re.search(r'Process:\s*' + re.escape(TEST_PACKAGE) + r'(?:\s|,)', logcat):
         categories.append('runtime-test-process-died=true')
     if re.search(r'Process:\s*' + re.escape(PACKAGE) + r'(?:\s|,)', logcat):
         categories.append('runtime-app-process-died=true')
-    exception = re.search(
-        r'\b((?:java|android|androidx)\.[A-Za-z0-9_.$]+(?:Exception|Error))\b',
-        logcat,
-    )
-    if exception:
-        categories.append('runtime-exception=' + exception.group(1))
     fatal = re.search(
-        r'FATAL EXCEPTION:[^\n]*\n(?P<body>.*?)(?:\n\s*\n|\Z)',
+        r'FATAL EXCEPTION(?P<system> IN SYSTEM PROCESS)?:[^\n]*\n(?P<body>.*?)(?:\n\s*\n|\Z)',
         logcat,
         re.DOTALL,
     )
+    exception = re.search(
+        r'\b((?:java|android|androidx)\.[A-Za-z0-9_.$]+(?:Exception|Error))\b',
+        fatal.group('body'),
+    ) if fatal else None
+    if exception:
+        categories.append('runtime-exception=' + exception.group(1))
     if fatal:
         body = fatal.group('body')
+        if fatal.group('system'):
+            categories.append('runtime-fatal-process=platform')
+        if 'UiAutomationConnection' in body and re.search(r'\bEPIPE\b|broken pipe', body, re.I):
+            categories.append('runtime-shell-pipe-failure=true')
         process = re.search(
-            r'^[^\n]*\bProcess:\s*([A-Za-z0-9_.]+)(?:,|\s|$)', body, re.MULTILINE
+            r'^[^\n]*\bProcess:\s*([A-Za-z0-9_.:]+)(?:,|\s|$)', body, re.MULTILINE
         )
-        if process:
+        if process and not fatal.group('system'):
             package = process.group(1)
             if package == TEST_PACKAGE:
                 categories.append('runtime-fatal-process=test')
             elif package == PACKAGE:
                 categories.append('runtime-fatal-process=app')
+            elif package == PACKAGE + ':recovery_driver':
+                categories.append('runtime-fatal-process=driver')
             elif package in ('com.android.permissioncontroller',
                              'com.google.android.permissioncontroller'):
                 categories.append('runtime-fatal-process=permission-controller')
@@ -335,6 +476,8 @@ def runtime_failure_summary(logcat):
                 categories.append('runtime-fatal-process=input-method')
             elif package.startswith(('android.', 'com.android.')):
                 categories.append('runtime-fatal-process=platform')
+            else:
+                categories.append('runtime-fatal-process=other')
         frame = re.search(r'^[^\n]*\bat\s+([A-Za-z0-9_.$]+)\(', body, re.MULTILINE)
         if frame:
             owner = frame.group(1)
@@ -342,6 +485,8 @@ def runtime_failure_summary(logcat):
                 categories.append('runtime-fatal-source=test')
             elif owner.startswith(PACKAGE + '.'):
                 categories.append('runtime-fatal-source=app')
+            elif owner.startswith('com.markobl.calllogsync.slice.'):
+                categories.append('runtime-fatal-source=project')
             elif owner.startswith(('com.android.permissioncontroller.',
                                    'com.google.android.permissioncontroller.')):
                 categories.append('runtime-fatal-source=permission-controller')
@@ -350,6 +495,12 @@ def runtime_failure_summary(logcat):
                 categories.append('runtime-fatal-source=input-method')
             elif owner.startswith(('android.', 'com.android.')):
                 categories.append('runtime-fatal-source=platform')
+        project_frame = re.search(
+            r'\bat\s+com\.markobl\.calllogsync\.slice\.'
+            r'((?:HistoricalImportActivity|ReceiptRecoveryActivity|ImportUiTest|RecoveryUiTest|'
+            r'RenderedUi)(?:\$[A-Za-z0-9_$]+)?\.[A-Za-z0-9_$]+)\(', body)
+        if project_frame:
+            categories.append('runtime-project-frame=' + project_frame.group(1))
     return ' '.join(categories)
 
 
@@ -358,6 +509,7 @@ def instrumentation_failure_summary(method, output, activity_dump='', logcat='',
     """Combine raw local output with only bounded platform diagnostics."""
     augmented = (output + '\n' + permission_activity_launcher_summary(activity_dump)
                  + '\n' + activity_top_summary(activity_dump)
+                 + '\n' + activity_record_summary(activity_dump)
                  + '\n' + runtime_failure_summary(logcat))
     return native_failure_summary(method, augmented, declared_permissions)
 
@@ -370,6 +522,9 @@ def qualify(serial, suite="settings", receipt_dir=None):
     if not re.fullmatch(r'emulator-\d+', serial):
         raise RuntimeError('Provider harness refuses a physical-device serial')
     evidence = ROOT / '.local/slice-evidence'
+    evidence_stat = evidence.stat(follow_symlinks=False)
+    if not stat.S_ISDIR(evidence_stat.st_mode):
+        raise RuntimeError('Receipt directory changed during the run')
     build = json.loads((evidence / 'build-receipt.json').read_text())
     if build['exit_code'] != 0 or not build['inputs_unchanged'] or build['inputs'] != inputs():
         raise RuntimeError('Successful build receipt does not match current source')
@@ -382,9 +537,25 @@ def qualify(serial, suite="settings", receipt_dir=None):
         identity = subprocess.check_output([str(aapt), 'dump', 'badging', str(apk)], text=True)
         if "package: name='" + package + "'" not in identity:
             raise RuntimeError('Unexpected APK identity')
+        declared = set(re.findall(
+            r"uses-permission(?:-sdk-23)?: name='android\.permission\.([A-Z_]+)'", identity))
+        if declared & {'WRITE_CALL_LOG', 'READ_CONTACTS', 'RECORD_AUDIO', 'INTERNET'}:
+            raise RuntimeError('APK requests a permission outside the UI fixture scope')
     if receipt_dir is not None:
-        receipt_dir = Path(receipt_dir)
-        receipt_dir.mkdir(parents=True, exist_ok=False)
+        location = os.path.realpath(receipt_dir)
+        if not location.startswith(str(ROOT / '.local') + os.sep):
+            raise ValueError('Receipt directory must be under the repository .local directory')
+        receipt_directory = Path(location)
+        receipt_directory.mkdir(mode=0o700, parents=True, exist_ok=False)
+        receipt_directory_stat = receipt_directory.stat(follow_symlinks=False)
+        if not stat.S_ISDIR(receipt_directory_stat.st_mode):
+            raise RuntimeError('Receipt directory changed during the run')
+    else:
+        receipt_directory = evidence
+        receipt_directory_stat = evidence.stat(follow_symlinks=False)
+        if ((receipt_directory_stat.st_dev, receipt_directory_stat.st_ino)
+                != (evidence_stat.st_dev, evidence_stat.st_ino)):
+            raise RuntimeError('Receipt directory changed during the run')
     receipt = {'suite': suite, 'fixture_token': uuid.uuid4().hex, 'steps': [], 'artifacts': build['artifacts'], 'inputs': build['inputs']}
     installed = []
     fixture_possible = False
@@ -413,12 +584,29 @@ def qualify(serial, suite="settings", receipt_dir=None):
             raise RuntimeError('ADB command failed: ' + ' '.join(args))
         return result.stdout.strip()
 
-    def check(method, class_name=None):
+    def failure_summary(method, output):
+        try:
+            activity_dump = command('shell', 'dumpsys', 'activity', 'activities')
+        except Exception:
+            activity_dump = ''
+        try:
+            logcat = command('logcat', '-d', '-t', '800')
+        except Exception:
+            logcat = ''
+        try:
+            logcat += '\n' + command('logcat', '-d', '-s', 'ActivityTaskManager:I', 'AndroidRuntime:E')
+        except Exception:
+            pass
+        apk_permissions = apk_runtime_permission_summary(apks[0], apks[1], aapt)
+        return instrumentation_failure_summary(
+            method, output, activity_dump, logcat, apk_permissions)
+
+    def check(method, class_name=None, runner='androidx.test.runner.AndroidJUnitRunner'):
         selected_class = class_name or test_class
         instrument_args = (
             'shell', 'am', 'instrument', '-w', '-r', '-e', 'fixtureToken',
             receipt['fixture_token'], '-e', 'class', selected_class + '#' + method,
-            TEST_PACKAGE + '/androidx.test.runner.AndroidJUnitRunner',
+            TEST_PACKAGE + '/' + runner,
         )
         try:
             output = command(*instrument_args)
@@ -430,25 +618,11 @@ def qualify(serial, suite="settings", receipt_dir=None):
             # Nonzero instrumentation exits can still contain a useful JUnit
             # failure. Keep raw output in the ignored receipt; only emit the
             # same allowlisted summary used for normal assertion failures.
-            try:
-                activity_dump = command('shell', 'dumpsys', 'activity', 'activities')
-            except Exception:
-                activity_dump = ''
-            try:
-                logcat = command('logcat', '-d', '-t', '800')
-            except Exception:
-                logcat = ''
-            apk_permissions = apk_runtime_permission_summary(apks[0], apks[1], aapt)
-            raise RuntimeError(instrumentation_failure_summary(
-                method, step.get('output', ''), activity_dump, logcat, apk_permissions
-            )) from failure
+            raise RuntimeError(failure_summary(method, step.get('output', ''))) from failure
         if 'OK (1 test)' not in output or 'FAILURES' in output or 'INSTRUMENTATION_FAILED' in output:
             # The full output stays in the ignored receipt; public CI only gets
             # source locations, never rendered labels or fixture values.
-            apk_permissions = apk_runtime_permission_summary(
-                apks[0], apks[1], aapt)
-            raise RuntimeError(native_failure_summary(
-                method, output, declared_permissions=apk_permissions))
+            raise RuntimeError(failure_summary(method, output))
 
     def capture_ui():
         directory = evidence / ('ui-' + receipt['fixture_token'])
@@ -509,26 +683,76 @@ def qualify(serial, suite="settings", receipt_dir=None):
             check('renderedAccessibilityLabelsTargetsAndKeyboardFocus')
         elif suite == 'settings':
             check('prepareCalendarWithoutCallAccess')
+            ui_attempted = True
             check('screenRendersWithoutEffectsAndDispatchesOnlyExplicitActions',
                   'com.markobl.calllogsync.slice.ManualCalendarScreenTest')
             check('renderedManualCalendarChoiceRequiresAnExplicitTap')
+            check('largeTextAndRtlKeepManualActionReachable',
+                  'com.markobl.calllogsync.slice.ManualCalendarScreenTest')
+            command('shell', 'pm', 'grant', PACKAGE, 'android.permission.READ_CALL_LOG')
+            check('renderedManualDeliverySurvivesRecreationWithoutRepeating')
+            command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.READ_CALL_LOG')
+            # The automatic-settings journey starts on an empty fixture calendar.
+            check('prepareCalendarWithoutCallAccess')
             for permission in ('READ_CALENDAR', 'WRITE_CALENDAR'):
                 command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.' + permission)
-            ui_attempted = True
+            check_adaptive_windows(command, check)
+            check('systemBackReturnsThroughLauncherNavigationStack',
+                  'com.markobl.calllogsync.slice.AutomaticSettingsTest')
             check('renderedActivitiesRespectSystemBars')
             check('renderedPermissionsFiltersConfirmPauseAndReopen')
             command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.READ_CALENDAR')
             check('revokedCalendarAndVisibleRestoreDoNotEnableLogging')
+            # Synthetic Room3 preserving upgrades, no provider/calendar write authority.
+            check('preservesLedgerSixAndImportTwoOnRoomUpgradeWithoutProviderEffects',
+                  'com.markobl.calllogsync.slice.Room3MigrationTest')
+            check('kotlinMappingRecognisesPreservedJavaReceiptWithoutReinsert',
+                  'com.markobl.calllogsync.slice.ParityStoreTest')
+            check('schemaOneMigrationPreservesAggregateProgressWithoutInventingOutcomes',
+                  'com.markobl.calllogsync.slice.HistoricalImportStoreTest')
+            # All historical ledger schema migrations, with canonical source-bound fixtures.
+            for migration in ('preservesV1ReceiptsAndCreatesLegacyBindings',
+                              'preservesV2PendingRowsWithoutInventingOperationOwnership',
+                              'preservesV3OwnershipWithoutInferringSourceFactsFromPayload',
+                              'preservesV4FactsAndCreatesEmptyCheckpointStore',
+                              'preservesV5PendingPayloadAndCheckpointWithExplicitMigrationGrace'):
+                check(migration, 'com.markobl.calllogsync.slice.ParityStoreTest')
+            for permission in ('READ_CALENDAR', 'WRITE_CALENDAR', 'READ_CALL_LOG'):
+                command('shell', 'pm', 'grant', PACKAGE, 'android.permission.' + permission)
+            check('nativeSharedHistoryRoutesIndependentlyAndRetriesWithoutDuplicates',
+                  'com.markobl.calllogsync.slice.CallRoutingProviderTest')
+            check('movesRoutesNamespaceAndWorkerStatusTogether',
+                  'com.markobl.calllogsync.slice.SettingsMigrationTest')
         elif suite == 'imports':
+            check('runActionsRequireEnabledStateAndExplicitTaps',
+                  'com.markobl.calllogsync.slice.HistoricalImportActionsPanelTest')
+            check('destinationListIsPresentedAndOnlyExplicitSelectionReturnsOpaqueToken',
+                  'com.markobl.calllogsync.slice.HistoricalImportDestinationPanelTest')
+            check('keyboardSelectionRestoresPickerFocusWhenSaveFinishes',
+                  'com.markobl.calllogsync.slice.HistoricalImportDestinationPanelTest')
+            check('dateAndCallTypeFiltersEmitOnlyExplicitUserChanges',
+                  'com.markobl.calllogsync.slice.HistoricalImportFiltersPanelTest')
+            check('controlsRemainAccessibleWithLargeFontAndRightToLeftLayout',
+                  'com.markobl.calllogsync.slice.HistoricalImportFiltersPanelTest')
             check('prepareCalendarAndTaggedHistory')
             command('shell', 'pm', 'grant', PACKAGE, 'android.permission.READ_CALL_LOG')
+            check('latestCallUsesNewestDateAndHighestIdOnTies')
             ui_attempted = True
+            check('renderedDestinationAndFiltersSurviveProcessDeathWithoutPreview',
+                  runner='com.markobl.calllogsync.slice.ProcessRecoveryRunner')
+            check('renderedDestinationAndFiltersSurviveRecreationBeforePreview')
             check('renderedRangePreviewCancelConfirmAndRepeat')
             check('preparePersistedPartialImport')
             check('renderedExplicitHistoryResumeCompletesPartialWork')
+            check('removedDestinationBlocksDeliveryWithoutSwitchingCalendars')
         else:
+            check('busyManagementAndPaginationActionsAreDisabled',
+                  'com.markobl.calllogsync.slice.RecoveryCardsPanelTest')
             check('preparePendingWithoutCallAccess')
             ui_attempted = True
+            check('renderedPendingRecoverySurvivesProcessDeathWithoutApproval',
+                  runner='com.markobl.calllogsync.slice.ProcessRecoveryRunner')
+            check('renderedPendingRecoverySurvivesRecreationWithoutApproval')
             check('leavingAndReturningWithdrawsQueuedApproval')
             command('shell', 'pm', 'revoke', PACKAGE, 'android.permission.WRITE_CALENDAR')
             ui_attempted = True
@@ -585,7 +809,7 @@ def qualify(serial, suite="settings", receipt_dir=None):
         if (not receipt['fixture_cleanup_verified'] or not receipt['packages_removed']
                 or not receipt.get('emulator_restored', {'verified': True})['verified']):
             receipt['result'] = 'failed'
-        ((receipt_dir or evidence) / ('parity-ui-receipt.json' if suite == 'settings' else 'parity-ui-' + suite + '-receipt.json')).write_text(json.dumps(receipt, indent=2) + '\n')
+        write_receipt(receipt_directory, receipt_directory_stat, suite, receipt, receipt_dir is None)
     print(json.dumps({k: receipt.get(k) for k in ('result', 'fixture_cleanup_verified', 'packages_removed', 'error')}))
     return 0 if receipt.get('result') == 'passed' else 1
 
@@ -594,6 +818,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--serial', required=True)
     parser.add_argument('--suite', choices=('settings', 'imports', 'recovery', 'accessibility'), default='settings')
-    parser.add_argument('--receipt-dir', type=Path, help='New per-run directory; refuse reuse to retain matrix evidence')
+    parser.add_argument('--receipt-dir', type=Path,
+                        help='New per-run directory under repository .local; refuse reuse')
     args = parser.parse_args()
     raise SystemExit(qualify(args.serial, args.suite, args.receipt_dir))

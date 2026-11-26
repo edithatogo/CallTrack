@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -25,7 +25,7 @@ class ManualLogPanelTest {
                     logLabel = "Log latest call",
                     status = "Choose a calendar before logging a call.",
                     actionEnabled = false,
-                )
+                ),
             )
         var actions = 0
 
@@ -39,7 +39,14 @@ class ManualLogPanelTest {
         }
 
         compose.onNodeWithTag("slice_log_latest").assertIsEnabled().performClick()
-        compose.runOnIdle { assertEquals("Only the explicit tap delivers", 1, actions) }
+        compose.runOnIdle {
+            assertEquals("Only the explicit tap delivers", 1, actions)
+            state.value = state.value.copy(actionEnabled = false)
+        }
+        compose.onNodeWithTag("slice_log_latest").assertIsNotEnabled()
+        compose.runOnIdle {
+            assertEquals("Disabling the action must not deliver again", 1, actions)
+        }
     }
 
     @Test
@@ -48,11 +55,11 @@ class ManualLogPanelTest {
         val currentToken = "current-load-token"
         var state by
             mutableStateOf(
-                ManualCalendarControlsState(
-                    options = listOf(ManualCalendarOption(currentToken, "Work calendar")),
+                CalendarDestinationUiState(
+                    options = listOf(CalendarDestinationOption(currentToken, "Work calendar")),
                     selectedToken = staleToken,
                     enabled = true,
-                )
+                ),
             )
         var selectedToken: String? = null
         var accessRequests = 0

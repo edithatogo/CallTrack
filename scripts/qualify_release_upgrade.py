@@ -6,7 +6,6 @@ provider fixtures. No production key, permanent identity or release approval.
 """
 import argparse
 import json
-import os
 from pathlib import Path
 import re
 import subprocess
@@ -14,18 +13,27 @@ import uuid
 import tempfile
 import zipfile
 
+from audit_release_toolchain import qualified_java_environment, qualified_local_jdk
 from parity_health import require_healthy_boot
 from parity_targets import is_dedicated_avd
 from qualify_kotlin_update import PACKAGE, TEST_PACKAGE, require_successful_receipt, sha
 from run_slice_build import inputs
 
 ROOT = Path(__file__).resolve().parents[1]
-JDK = Path(os.environ.get('JAVA_HOME', '/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home'))
 
 
 def require_rejection(result, reason):
     if result.returncode == 0 or reason not in result.stdout + result.stderr:
         raise RuntimeError('Expected controlled rejection: ' + reason)
+
+
+def apk_version(apk, package, sdk):
+    badge = subprocess.check_output(
+        [str(sdk / 'build-tools/35.0.0/aapt'), 'dump', 'badging', str(apk)], text=True)
+    match = re.match(r"package: name='" + re.escape(package) + r"' versionCode='([0-9]*)'", badge)
+    if match is None or (not match[1] and package != TEST_PACKAGE):
+        raise RuntimeError('Unexpected package or missing APK version')
+    return int(match[1]) if match[1] else None
 
 
 def cleanup_owned_packages(adb, attempted, provider_cleanup_verified=True):
@@ -57,18 +65,29 @@ def frozen_release_apk(receipt_path, revision, sdk, env):
             build.get('revision') != revision or len(records) != 2):
         raise RuntimeError('Matching frozen unsigned build receipt required')
     from qualify_release_build import verify_unsigned
+    output = receipt_path.resolve(strict=True).parent
     hashes = []
-    for record in records:
-        apk = Path(record['apk'])
+    apks = []
+    for number, record in enumerate(records, 1):
+        # qualify_release_build creates two separate checkouts beside the receipt.
+        # Do not let a changed receipt make this probe read an unrelated file.
+        apk = output / f'checkout-{number}/app/build/outputs/apk/release/app-release-unsigned.apk'
+        try:
+            declared = Path(record['apk']).resolve(strict=True)
+        except (KeyError, TypeError, ValueError, OSError, RuntimeError) as error:
+            raise RuntimeError('Frozen artifact path invalid') from error
+        if declared != apk or not apk.is_file():
+            raise RuntimeError('Frozen artifact path outside expected build output')
         if (record.get('exit_code') != 0 or
                 record.get('signature_check', {}).get('unsigned_verified') is not True or
                 sha(apk) != record.get('apk_sha256')):
             raise RuntimeError('Frozen unsigned artifact changed or failed')
         verify_unsigned(apk, sdk, env)
         hashes.append(sha(apk))
+        apks.append(apk)
     if hashes[0] != hashes[1]:
         raise RuntimeError('Frozen unsigned artifacts differ')
-    return Path(records[0]['apk'])
+    return apks[0]
 
 
 def require_identical_payload(unsigned, signed):
@@ -88,6 +107,7 @@ def require_identical_payload(unsigned, signed):
 def qualify(serial, output, provider_schema=False, release_build_receipt=None):
     if not re.fullmatch(r'emulator-\d+', serial):
         raise RuntimeError('Release upgrade probe refuses physical-device serials')
+    jdk, jdk_evidence = qualified_local_jdk()
     if subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT).strip():
         raise RuntimeError('Commit source before release upgrade probe')
     key = Path.home() / '.android/debug.keystore'
@@ -107,11 +127,16 @@ def qualify(serial, output, provider_schema=False, release_build_receipt=None):
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     output.mkdir(parents=True, exist_ok=False)
     sdk = (ROOT / '.local/android-sdk').resolve()
-    env = dict(os.environ, JAVA_HOME=str(JDK), ANDROID_HOME=str(sdk),
-               CALLTRACK_RELEASE_QUALIFICATION=str(qualification))
+    baseline_version = apk_version(original, PACKAGE, sdk)
+    if not 0 < baseline_version < 2_147_483_647:
+        raise RuntimeError('Baseline APK version does not permit a version increase')
+    next_version = baseline_version + 1
+    env = qualified_java_environment(jdk)
+    env.update(ANDROID_HOME=str(sdk), CALLTRACK_RELEASE_QUALIFICATION=str(qualification))
     receipt = dict(scope='development-key-release-mode-version-increase-private-state-only',
                    revision=revision, inputs=current['inputs'], token=uuid.uuid4().hex,
                    production_signed=False, release_ready=False, result='failed', steps=[])
+    receipt['jdk'] = jdk_evidence
     receipt['qualification_inputs'] = fixture_inputs
     if provider_schema:
         receipt['scope'] = 'development-key-release-mode-historical-schema-provider-upgrade'
@@ -119,6 +144,8 @@ def qualify(serial, output, provider_schema=False, release_build_receipt=None):
     provider_attempted = False
     if release_build_receipt is not None:
         unsigned = frozen_release_apk(release_build_receipt, revision, sdk, env)
+        if apk_version(unsigned, PACKAGE, sdk) != baseline_version:
+            raise RuntimeError('Build the frozen upgrade input with --development-fixture')
         original = output / 'exact-release-development-signed.apk'
         signing_env = dict(env, CALLTRACK_DEBUG_PASSWORD='android')
         subprocess.run([str(sdk / 'build-tools/35.0.0/apksigner'), 'sign',
@@ -169,12 +196,12 @@ def qualify(serial, output, provider_schema=False, release_build_receipt=None):
         overlay.write_text("""gradle.beforeProject { project ->
     project.plugins.withId('com.android.application') {
         project.androidComponents.finalizeDsl { android ->
-            android.defaultConfig.versionCode = 11
+            android.defaultConfig.versionCode = CALLTRACK_NEXT_VERSION
             android.buildTypes.release.signingConfig = android.signingConfigs.debug
         }
     }
 }
-""")
+""".replace('CALLTRACK_NEXT_VERSION', str(next_version)))
         if provider_schema:
             overlay.write_text(overlay.read_text() + """
 gradle.beforeProject { project ->
@@ -189,7 +216,8 @@ gradle.beforeProject { project ->
 """)
         receipt['overlay_sha256'] = sha(overlay)
         with (output / 'build.log').open('w') as log:
-            subprocess.run(['sh', 'gradlew', '--no-daemon', '--console=plain', '-I', str(overlay),
+            subprocess.run(['sh', 'gradlew', '--no-daemon', '--console=plain',
+                            '-PcalltrackDevelopmentRelease=true', '-I', str(overlay),
                             *([':app:assembleRelease', ':app:assembleDebugAndroidTest'] if provider_schema else [':app:assembleRelease'])], cwd=checkout, env=env, stdout=log,
                            stderr=subprocess.STDOUT, check=True)
         if subprocess.check_output(['git', 'status', '--porcelain'], cwd=checkout).strip():
@@ -200,9 +228,10 @@ gradle.beforeProject { project ->
             tests = checkout / 'app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk'
         candidate = checkout / 'app/build/outputs/apk/release/app-release.apk'
         certs = []
-        for apk, package, version in ((original, PACKAGE, 10), (candidate, PACKAGE, 11), (tests, TEST_PACKAGE, None)):
-            badge = subprocess.check_output([str(sdk / 'build-tools/35.0.0/aapt'), 'dump', 'badging', str(apk)], text=True)
-            if "package: name='" + package + "'" not in badge or (version and "versionCode='" + str(version) + "'" not in badge):
+        for apk, package, version in ((original, PACKAGE, baseline_version),
+                                      (candidate, PACKAGE, next_version), (tests, TEST_PACKAGE, None)):
+            actual_version = apk_version(apk, package, sdk)
+            if version is not None and actual_version != version:
                 raise RuntimeError('Unexpected package/version')
             signature = subprocess.check_output([str(sdk / 'build-tools/35.0.0/apksigner'), 'verify', '--print-certs', str(apk)], env=env, text=True)
             found = re.findall(r'Signer #\d+ certificate SHA-256 digest: ([a-f0-9]{64})', signature)
@@ -212,7 +241,8 @@ gradle.beforeProject { project ->
         if len(set(certs)) != 1:
             raise RuntimeError('Development/instrumentation certificate mismatch')
         receipt.update(artifacts={str(p): sha(p) for p in (original, candidate, tests)},
-                       signer_sha256=certs[0], versions=[10, 11], build_log_sha256=sha(output / 'build.log'))
+                       signer_sha256=certs[0], versions=[baseline_version, next_version],
+                       build_log_sha256=sha(output / 'build.log'))
         # Building can take minutes: recheck ownership and guest health before mutation.
         if adb('shell', 'getprop', 'ro.kernel.qemu') != '1' or not is_dedicated_avd(adb('emu', 'avd', 'name')):
             raise RuntimeError('Dedicated emulator changed during build')
@@ -224,14 +254,15 @@ gradle.beforeProject { project ->
             attempted.append(package)
             if 'Success' not in adb('install', str(apk)):
                 raise RuntimeError('Install unconfirmed')
+        native('freshInstallIsUnconfiguredAndDenied')
+        launch = adb('shell', 'am', 'start', '-W', '-n',
+                     PACKAGE + '/com.markobl.calllogsync.slice.CalendarSliceActivity')
+        if 'Status: ok' not in launch:
+            raise RuntimeError('Fresh candidate launcher failed')
+        adb('shell', 'am', 'force-stop', PACKAGE)
+        native('freshInstallIsUnconfiguredAndDenied')
+        receipt['development_fresh_install_qualified'] = True
         if release_build_receipt is not None:
-            native('freshInstallIsUnconfiguredAndDenied')
-            launch = adb('shell', 'am', 'start', '-W', '-n',
-                         PACKAGE + '/com.markobl.calllogsync.slice.CalendarSliceActivity')
-            if 'Status: ok' not in launch:
-                raise RuntimeError('Fresh candidate launcher failed')
-            adb('shell', 'am', 'force-stop', PACKAGE)
-            native('freshInstallIsUnconfiguredAndDenied')
             receipt['exact_release_fresh_install_qualified'] = True
         native('seedJavaEraState')
         if provider_schema:
@@ -242,7 +273,7 @@ gradle.beforeProject { project ->
         adb('shell', 'am', 'force-stop', PACKAGE)
         if 'Success' not in adb('install', '-r', str(candidate)):
             raise RuntimeError('Upgrade unconfirmed')
-        if not re.search(r'\bversionCode=11\b', adb('shell', 'dumpsys', 'package', PACKAGE)):
+        if not re.search(rf'\bversionCode={next_version}\b', adb('shell', 'dumpsys', 'package', PACKAGE)):
             raise RuntimeError('Installed increasing version unverified')
         native('verifyPersistedState')
         if provider_schema:
@@ -254,10 +285,11 @@ gradle.beforeProject { project ->
         native('verifyPersistedState')
         # A one-day disposable fixture certificate tests rejection, never production custody.
         with tempfile.TemporaryDirectory(prefix='calltrack-test-key-', dir=output) as temporary:
+            qualified_local_jdk()
             fixture_key = Path(temporary) / 'fixture.keystore'
             fixture_apk = Path(temporary) / 'wrong-certificate.apk'
             fixture_env = dict(env, CALLTRACK_FIXTURE_PASSWORD='disposable-fixture-only')
-            subprocess.run([str(JDK / 'bin/keytool'), '-genkeypair', '-alias', 'fixture',
+            subprocess.run([str(jdk / 'bin/keytool'), '-genkeypair', '-alias', 'fixture',
                             '-dname', 'CN=Disposable Calltrack Test Only', '-keyalg', 'RSA',
                             '-validity', '1', '-keystore', str(fixture_key),
                             '-storepass:env', 'CALLTRACK_FIXTURE_PASSWORD',
@@ -321,6 +353,7 @@ if __name__ == '__main__':
     parser.add_argument('--serial', required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--provider-schema', action='store_true', help='Use synthetic source-pinned schemas and LOCAL provider fixtures')
-    parser.add_argument('--release-build-receipt', type=Path, help='Qualify an exact unsigned release payload using the existing development key only')
+    parser.add_argument('--release-build-receipt', type=Path,
+                        help='Use a frozen --development-fixture payload with the existing development key')
     args = parser.parse_args()
     print(json.dumps(qualify(args.serial, args.output.resolve(), args.provider_schema, args.release_build_receipt), indent=2))

@@ -39,7 +39,7 @@ public class KotlinPackageUpdateTest {
     @Test
     public void freshInstallIsUnconfiguredAndDenied() {
         SharedPreferences prefs = context().getSharedPreferences("slice", Context.MODE_PRIVATE);
-        assertFalse(prefs.contains("calendar"));
+        assertFalse(SettingsTestFixture.snapshot(context()).hasSelectedCalendar());
         assertFalse(prefs.contains("kotlinUpdateFixture"));
         assertNull(new AndroidActivationStore(context()).get());
         for (String permission :
@@ -58,20 +58,14 @@ public class KotlinPackageUpdateTest {
         if (context().getDatabasePath("calltrack-ledger.db").exists()) {
             try (SqliteLedger ledger = new SqliteLedger(context())) {
                 for (String table : new String[] {"receipts", "outbox", "scan_cursors"}) {
-                    assertEquals(
-                            0,
-                            android.database.DatabaseUtils.queryNumEntries(
-                                    ledger.getReadableDatabase(), table));
+                    assertEquals(0, RoomFixtures.countRows(ledger, table));
                 }
             }
         }
         if (context().getDatabasePath("calltrack-imports.db").exists()) {
             try (SqliteImportStore imports = new SqliteImportStore(context())) {
                 for (String table : new String[] {"sessions", "candidates"}) {
-                    assertEquals(
-                            0,
-                            android.database.DatabaseUtils.queryNumEntries(
-                                    imports.getReadableDatabase(), table));
+                    assertEquals(0, RoomFixtures.countRows(imports, table));
                 }
             }
         }
@@ -81,12 +75,9 @@ public class KotlinPackageUpdateTest {
     public void seedJavaEraState() {
         SharedPreferences prefs = context().getSharedPreferences("slice", Context.MODE_PRIVATE);
         assertFalse(prefs.contains("kotlinUpdateFixture"));
-        assertTrue(
-                prefs.edit()
-                        .putString("kotlinUpdateFixture", token())
-                        .putString("sourceNamespace", "package-update/" + token())
-                        .putLong("calendar", 7)
-                        .commit());
+        assertTrue(prefs.edit().putString("kotlinUpdateFixture", token()).commit());
+        SettingsTestFixture.namespace(context(), "package-update/" + token());
+        SettingsTestFixture.select(context(), 7);
         new AndroidActivationStore(context())
                 .put(new ActivationControl.Settings(7, false, 7, "UTC", 0, true, false, true));
         try (SqliteLedger ledger = new SqliteLedger(context())) {
@@ -122,8 +113,10 @@ public class KotlinPackageUpdateTest {
     public void verifyPersistedState() {
         SharedPreferences prefs = context().getSharedPreferences("slice", Context.MODE_PRIVATE);
         assertEquals(token(), prefs.getString("kotlinUpdateFixture", null));
-        assertEquals("package-update/" + token(), prefs.getString("sourceNamespace", null));
-        assertEquals(7, prefs.getLong("calendar", -1));
+        assertEquals(
+                "package-update/" + token(),
+                SettingsTestFixture.snapshot(context()).getSourceNamespace());
+        assertEquals(7, SettingsTestFixture.calendar(context()));
         ActivationControl.Settings settings = new AndroidActivationStore(context()).get();
         assertNotNull(settings);
         assertFalse(settings.enabled);
@@ -132,7 +125,7 @@ public class KotlinPackageUpdateTest {
         assertFalse(settings.outgoing);
         assertTrue(settings.missed);
         try (SqliteLedger ledger = new SqliteLedger(context())) {
-            assertEquals(6, ledger.getReadableDatabase().getVersion());
+            assertEquals(7, RoomFixtures.version(ledger));
             for (int id = 0; id < 4; id++) {
                 CallRecord call = call(id);
                 DurableDelivery.Intent saved = ledger.outbox().get(call.key(), 7);

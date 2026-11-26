@@ -5,20 +5,30 @@ on:
       candidate_sha:
         description: Exact reviewed candidate commit (40 hex characters)
         required: true
-        default: 94644086159137bab27767b6a1a46727409695b5
       expected_apk_sha256:
         description: Expected unsigned macOS APK SHA256
         required: true
-        default: 0f672916f06afbc2ec4b0730c1df167d44dcb094b41385cb8a0bfc6b234f48df
+      expected_jvm_test_count:
+        description: Release JVM test count observed in both macOS builds
+        type: number
+        required: true
 permissions:
   contents: read
+cache-mode: none
 jobs:
   cold-linux:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 45
     container:
-      image: eclipse-temurin@sha256:67d52fac68c483f8a91dda88d4d0518ca2375d4c8260a9114d37aa49cf11cfac
+      image: eclipse-temurin:25.0.5.1_2-jdk@sha256:ce2ef9d2d67a68de5e196d4de9d743327c44a10b57fe02ec39f572c652cacfd3
     steps:
+      - name: Verify Actions cache is disabled
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const mode = process.env.ACTIONS_CACHE_MODE;
+            core.info(`Effective Actions cache mode: ${mode ?? '<missing>'}`);
+            if (mode !== 'none') core.setFailed('Cold reproduction requires cache-mode none.');
       - name: Install Linux prerequisites
         run: |
           apt-get update
@@ -29,16 +39,27 @@ jobs:
           path: qualification-tools
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version-file: qualification-tools/.python-version
-      - name: Checkout exact candidate separately
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          path: candidate
-          ref: ${{ inputs.candidate_sha }}
-          fetch-depth: 1
-          persist-credentials: false
+      - name: Check out the candidate from the selected workflow history
+        shell: bash
+        env:
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+        run: |
+          set -euo pipefail
+          if ! [[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo '::error::Candidate must be a full Git commit SHA.'
+            exit 1
+          fi
+          if ! git -C qualification-tools merge-base --is-ancestor "$CANDIDATE_SHA" HEAD; then
+            echo '::error::Dispatch from a repository branch containing the reviewed candidate.'
+            exit 1
+          fi
+          # AGP reads the candidate's Git directory to embed the built revision.
+          git init --quiet "$GITHUB_WORKSPACE/candidate"
+          git -C candidate fetch --no-tags "$GITHUB_WORKSPACE/qualification-tools" "$CANDIDATE_SHA"
+          git -C candidate checkout --quiet --detach "$CANDIDATE_SHA"
       - name: Select repository Python runtime
         working-directory: qualification-tools
         run: |
@@ -54,12 +75,14 @@ jobs:
         env:
           CANDIDATE_SHA: ${{ inputs.candidate_sha }}
           EXPECTED_APK_SHA256: ${{ inputs.expected_apk_sha256 }}
+          EXPECTED_JVM_TEST_COUNT: ${{ inputs.expected_jvm_test_count }}
         run: |
           "$CALLTRACK_PYTHON" qualification-tools/scripts/qualify_linux_build.py \
             --source "$GITHUB_WORKSPACE/candidate" \
             --output "$RUNNER_TEMP/calltrack-cold-linux" \
             --expected-revision "$CANDIDATE_SHA" \
-            --expected-apk-sha256 "$EXPECTED_APK_SHA256"
+            --expected-apk-sha256 "$EXPECTED_APK_SHA256" \
+            --expected-jvm-test-count "$EXPECTED_JVM_TEST_COUNT"
       - name: Retain unsigned artifact and evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

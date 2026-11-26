@@ -8,26 +8,41 @@ class ManualDelivery(
 ) {
     fun run(calendar: Long): SliceEngine.Result =
         try {
-            val call = source!!.latest()
-            if (call == null) SliceEngine.Result.NO_CALL
-            else
-                when (delivery!!.deliver(call, calendar, timezone) { true }) {
-                    DurableDelivery.Result.SOURCE_CHANGED,
-                    DurableDelivery.Result.PAUSED,
-                    DurableDelivery.Result.REVIEW_REQUIRED -> SliceEngine.Result.REVIEW_REQUIRED
-                    DurableDelivery.Result.SAVED -> SliceEngine.Result.SAVED
-                    DurableDelivery.Result.RECOVERED -> SliceEngine.Result.RECOVERED
-                    DurableDelivery.Result.ALREADY_LOGGED -> SliceEngine.Result.ALREADY_LOGGED
-                    DurableDelivery.Result.PERMISSION_REQUIRED ->
-                        SliceEngine.Result.PERMISSION_REQUIRED
-                    DurableDelivery.Result.DESTINATION_UNAVAILABLE ->
-                        SliceEngine.Result.DESTINATION_UNAVAILABLE
-                    DurableDelivery.Result.INVALID_CALL -> SliceEngine.Result.INVALID_CALL
-                    else -> SliceEngine.Result.FAILED
+            if (delivery!!.writableDestination(calendar)) {
+                val call = source!!.latest()
+                if (call == null) {
+                    SliceEngine.Result.NO_CALL
+                } else {
+                    resultFor(delivery.deliver(call, calendar, timezone) { true })
                 }
-        } catch (denied: SecurityException) {
+            } else {
+                SliceEngine.Result.DESTINATION_UNAVAILABLE
+            }
+        } catch (ignored: SecurityException) {
             SliceEngine.Result.PERMISSION_REQUIRED
-        } catch (failed: RuntimeException) {
+        } catch (ignored: RuntimeException) {
             SliceEngine.Result.FAILED
+        }
+
+    private fun resultFor(result: DurableDelivery.Result): SliceEngine.Result =
+        when (result) {
+            DurableDelivery.Result.SOURCE_CHANGED,
+            DurableDelivery.Result.PAUSED,
+            DurableDelivery.Result.REVIEW_REQUIRED -> SliceEngine.Result.REVIEW_REQUIRED
+
+            DurableDelivery.Result.SAVED -> SliceEngine.Result.SAVED
+
+            DurableDelivery.Result.RECOVERED -> SliceEngine.Result.RECOVERED
+
+            DurableDelivery.Result.ALREADY_LOGGED -> SliceEngine.Result.ALREADY_LOGGED
+
+            DurableDelivery.Result.PERMISSION_REQUIRED -> SliceEngine.Result.PERMISSION_REQUIRED
+
+            DurableDelivery.Result.DESTINATION_UNAVAILABLE ->
+                SliceEngine.Result.DESTINATION_UNAVAILABLE
+
+            DurableDelivery.Result.INVALID_CALL -> SliceEngine.Result.INVALID_CALL
+
+            else -> SliceEngine.Result.FAILED
         }
 }

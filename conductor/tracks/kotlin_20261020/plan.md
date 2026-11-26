@@ -1,8 +1,10 @@
 # Plan: Kotlin migration and dependency reassessment
 
-Track start4e8148a. Independent discovery and a three-component migration proceed;
-M4 prerequisite, full Java migration and original upgrade/acceptance gates remain.
-No archive/completion from the bounded slice alone.
+The [active conversion checkpoint](active-migration-handoff.md#implemented-and-reviewed)
+records completion of K06 with the documented nullable-label bridge. K07 remains
+open for supported upgrade, recovery and operational acceptance. Use the
+[Track 5 release gates](../release_20261020/verification.md#active-release-gates)
+for the M4 evidence needed to close M5.
 
 ## Phase 1: Discovery and mapping
 
@@ -25,21 +27,21 @@ No archive/completion from the bounded slice alone.
 - [x] Task: Translate CallSelection/CallIdentity/CallEvent; preserve Java fields/static entry points/null, hash and exact arithmetic
 - [x] Task: Add Kotlin-aware stale-receipt host regression; compiler targets/style tooling and CI
 - [x] Task: Qualify mixed-language build, dependency graph, native SQLite regression and recovery at source-bound APK — 7cdd8d4, pilot-evidence.json
-- [ ] Task: Finish stabilized active Java conversions and justified legacy removal/exceptions after M3/M4; preserve persisted data and same acceptance suite
-- [ ] Task: Verify supported upgrade/operational gates and remaining exceptions for whole M5
+- [x] Task: Finish active Java conversion and document legacy removal and the nullable-label bridge. Preserve persisted data and run the same acceptance suite (see [migration evidence](active-migration-handoff.md)).
+- [ ] Task: Verify supported upgrade, recovery, operational gates and remaining exceptions for full M5 (K07), using the [Track 5 release evidence](../release_20261020/verification.md#active-release-gates).
 - [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md)
 
 ## Phase 4: Handoff
 
 - [x] Task: Update consolidated requirements, stack and dependency decisions with actual bounded outcomes — 7cdd8d4
-- [x] Task: Document residual gaps, next-track inputs and checkpoint evidence — K06/K07 remain open
+- [x] Task: Document residual gaps, next-track inputs and checkpoint evidence. K07 remains open.
 - [ ] Task: Final full-track checkpoint; review/fix/archive when original acceptance passes
 
 ## Phase: Review Fixes
 
 - [x] Task: Review bounded migration, apply findings, record evidence/commit and remaining gates — 491f936
 
-## Resume checkpoint
+## Historical pilot checkpoint
 
 Implementation7cdd8d4. Pilot qualification passes36 JVM/20 host/five native tests,
 debug/test and unsigned release packaging. Both emulator packages are removed.

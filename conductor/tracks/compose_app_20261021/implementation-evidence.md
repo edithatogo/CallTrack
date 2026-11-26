@@ -1,5 +1,89 @@
 # Track 14 implementation checkpoint — 2026-10-23
 
+## Android 17 native screen roots and durable delivery
+
+The manual launcher, automatic settings, historical imports, and recovery each
+use one lifecycle-bound Compose root with shared safe drawing insets and
+scrolling. Material 3 supplies buttons, checkboxes, and date fields. The
+Activities own permission prompts, destination selection, confirmation, and
+delivery effects. Enabled and disabled controls keep their accessible roles
+and labels. The rendered harness checks each button's touch point against
+the visible scroll viewport before tapping it.
+
+The four rendered suites passed with the replacement roots before the legacy
+View libraries and writer were removed. Their app APK SHA-256 was
+`bf0d3ac234457c8a84e34d78cb3faa980f6a9ffc36320351ecf0be8b16bc5eac`.
+After retirement, the same suites passed against
+[source 76cc0c4](https://github.com/edithatogo/CallTrack/commit/76cc0c4d380bc5478187fe637eb839d7629cd816)
+on Android 17 API 37 arm64, build CP41.260831.015, with 16 KiB pages. The
+final debug APK SHA-256 is
+`4e19b6d797f217cc6c09bb538261c56a8c9e8366c14b5cb35274f0f6faba9f67`.
+
+- `qualify_parity_ui.py` passed settings (18), historical imports (11),
+  recovery (9), and accessibility (2). The suites checked accessible roles
+  and labels, keyboard focus, large text and RTL, permission revocation,
+  destination removal, import cancellation, and process death back into the
+  same task. The checks verified cleanup and package removal. A first
+  final-build run timed out during Activity teardown while a second
+  emulator was booting. The complete rerun used one emulator.
+- On the same APK, TalkBack touch exploration and Switch Access hardware
+  scanning each highlighted and opened Automatic logging settings, Historical
+  imports, and Delivery review and recovery. The synthetic guest's service
+  settings were restored and the app was removed.
+- `qualify_slice_device.py` (5), the Room store suite (39),
+  `qualify_parity_provider.py` (9), and
+  `qualify_parity_lifecycle.py` (11) passed. These checks exercised the actual
+  durable writer, existing receipts, uncertain writes, concurrent delivery,
+  permission revocation, edits and deletions, offline and Doze operation,
+  and guest reboot. The provider fixtures and test packages were removed.
+- The development-key package upgrade passed 15 instrumentation checks with
+  synthetic historical schemas, including rollback, retry, newer-schema
+  preservation, recovery, and rejection of wrong-signer and downgrade
+  attempts. The `qualify_release_upgrade.py --provider-schema` receipt
+  SHA-256 is `a5ae725eb8dabadea97db10f3d01e30212d83c87b13449f92d49087fc9e8aec1`.
+  Production signing, account-calendar readback, and observation follow
+  [Track 5](../release_20261020/verification.md#active-release-gates),
+  [Track 6](../kotlin_20261020/plan.md) and the [prerequisite deferral](prerequisite-deferral.md).
+
+`DurableDelivery` is the sole production path to creating a calendar event.
+Manual logging, automatic logging, and approved imports share its outbox.
+The old `SliceEngine.run/save` algorithm and receipt writer were retired
+after the replacement was qualified. The existing contract types and
+legacy receipt reads remain in use. The moved regression verifies that
+manual delivery rejects an unavailable calendar before reading the call log.
+It failed before the destination guard was restored and passed afterward.
+
+The Ponytail review reused Material 3 1.5.0 from the existing Compose BOM.
+The resolved runtime graph shrank from 94 to 77 artifacts with the removal
+of AppCompat, Fragments, Material Views, and their unused dependencies.
+The diff removes a net 515 production Kotlin lines. Lifecycle and tracing
+retain their qualified versions through constraints. All 15 added
+verification checksums matched canonical Google Maven bytes, and the
+runtime notices follow the resolved graph. Strict Gradle verification,
+119 JVM tests, APK assembly, Android lint, and the 256 host regressions
+passed.
+
+[GitHub issue #116](https://github.com/edithatogo/CallTrack/issues/116) ·
+[Hosted Android 17 acceptance](https://github.com/edithatogo/CallTrack/actions/workflows/track14-hosted-ui.yml)
+
+### Hosted recovery follow-up
+
+The first main run timed out waiting for the recovery receipt to become
+confirmed after the fixture restored an edited event title. The tap helper
+could start a new scroll after its final idle wait. It now settles after
+revealing a control, then resolves its enabled, reachable node without
+scrolling before sending one physical tap. The existing test still checks
+the receipt state, event content, user deletion, and explicit suppression.
+All nine recovery checks and fixture cleanup passed locally on the same
+Android 17 arm64 app APK. [First main run](https://github.com/edithatogo/CallTrack/actions/runs/45354909299/attempts/1).
+
+A separate hosted run reached the queued approval check before Android's
+dialog callback published the Activity state. The test now waits for that
+state on the UI thread while the executor remains held. The same journey
+then backgrounds and resumes the Activity, releases the executor, and
+checks that the receipt is still pending and no event was created.
+[Queued approval failure](https://github.com/edithatogo/CallTrack/actions/runs/45360102878/attempts/2).
+
 ## Historical import date and call-type filters — 2026-10-24
 
 Historical import's date range and incoming/outgoing/missed controls now render
@@ -936,3 +1020,377 @@ include both the pure manual-screen callback test and the rendered explicit
 calendar-selection journey. All PR checks passed at `b334a8e`; the result closes
 the manual-screen hosted acceptance task only. Broader Track14 and device/
 operational gates remain open.
+
+## Standalone Compose retirement — 2026-11-22
+
+At the pre-rebase checkpoint `bae2cad`, the source-bound app and
+instrumentation APKs passed 119 JVM tests,
+debug lint and the local API 36 ARM64 settings suite. The nine instrumentation
+invocations verified fixture cleanup and package removal. The same APKs passed
+the API 36 import and accessibility suites with five and two invocations
+respectively, including cleanup and package removal. An unsigned release build
+passed on the same app sources.
+
+- The manual launcher checks verify a missing saved destination, explicit
+  selection, revoked calendar access, and exactly one synthetic calendar event
+  after an explicit logging tap and Activity recreation.
+- The app component check verifies an actual foreground tap at 2× text size and
+  RTL, with the app suite's automated label, focus and touch-target assertions.
+- The active runner verifies source and APK identity, dedicated guest ownership,
+  manifest scope and cleanup after uncertain installation. The first local suite
+  run found a manual fixture event in the automatic-settings calendar. The
+  successful run recreated the empty calendar before that journey.
+
+The [research archive](../../archive/compose_20261020/index.md) retains the
+standalone sources and results. The app's hosted API 26/33/36 settings suite now
+owns the replacement checks. That hosted matrix and the broader Track 14 device,
+accessibility and operational gates remain open on this branch.
+
+
+## API 26 keyboard focus investigation — 2026-11-22
+
+The post-merge [run 44995748589](https://github.com/edithatogo/CallTrack/actions/runs/44995748589)
+passed API 33 and 36. API 26 passed settings, import and recovery, then failed
+the visible keyboard-focus assertion at `auto_access_action`. Its fixture,
+packages and emulator were cleaned up. The local API 26 ARM64 baseline passed,
+so the hosted failure was not reproduced in that run.
+
+A local diagnostic showed that the probe first forced focus onto the
+`auto_intro_panel` Compose host while its chosen focus target was the
+`auto_access_action` in the separate `auto_permissions` host. The target's
+focus action returned success locally. The prior test also closed the shell
+command descriptor without waiting for the Tab command's output to reach EOF.
+Android 8 runs that command directly in a separate process. [Android 8
+UiAutomation source](https://android.googlesource.com/platform/frameworks/base/+/android-8.0.0_r36/core/java/android/app/UiAutomationConnection.java)
+
+The probe now requests the selected control's focus, verifies it became focused,
+waits for the device Tab command to finish, and requires focus to move to a
+different visible, focusable app-owned node. Existing screen, label, touch-target,
+permission and cleanup checks remain. Accessibility evidence records each
+node's focused state, and the host summary reports initial-focus failures using
+only the permitted anchor identifier.
+
+On a dedicated API 26 ARM64 emulator, a source-bound local acceptance run passed
+all four screens with verified fixture cleanup, package removal and emulator
+restoration. A deliberate no-op key in the same check failed the
+`auto_access_action` focus-movement assertion, with cleanup verified. A first
+candidate using shell operators failed on Android 8's direct command execution;
+the final probe invokes `input` directly. The precise cause of the historical
+hosted failure remains unconfirmed. API 26, 33 and 36 hosted acceptance must
+still run on the final source.
+
+
+## Import and recovery screen completion — 2026-11-22
+
+The reviewed import and recovery slices already place their visible text and
+controls in lifecycle-disposed Compose hosts. The current Activity audit found
+only native scrolling/layout containers and system confirmation dialogs around
+those hosts. They preserve existing Android host IDs and inset handling; the
+Activities retain destination, permission, import, ledger and calendar effects.
+The feedback hosts and recovery row container are local construction variables
+rather than unused Activity fields. No provider or recovery behavior changed.
+
+The accessibility journey now verifies the existing named Compose hosts and
+rejects legacy content widgets in the two screen trees while retaining the label,
+touch-target and keyboard-focus checks. The import suite additionally checks
+destination and filter restoration across Activity recreation, no implicit
+preview or calendar event, and a subsequent explicit preview bound to the
+selected calendar. The recovery suite checks that recreating a pending record
+does not approve it or create an event. Existing explicit-approval, withdrawal,
+read-only, edit/deletion, suppression and retention journeys remain in place.
+
+The source-bound local API36 ARM64 build, JVM tests and lint passed. The import,
+recovery and accessibility suites passed with respectively 12, 11 and 12
+screenshots; each verified fixture cleanup, package removal and emulator
+restoration. The 38 focused host safety tests and Conductor verification also
+passed. A prior local build failed after the filesystem filled; its log was
+retained and the successful build followed after free space returned.
+
+At this local checkpoint the hosted API26/API33/API36 matrix had not yet run on
+this source. Manual TalkBack/Switch Access, physical-device, cloud-calendar,
+full process recovery and operational acceptance remain open; this checkpoint
+does not complete Track14 or promote a release.
+
+The first hosted matrix for this checkpoint, run `45019695465`, passed all
+four suites on API33 and API36. API26 passed settings, import and recovery,
+then failed the keyboard-focus movement assertion at `recovery_refresh_action`;
+fixture cleanup and package removal passed. The failed job did not publish its
+private UI captures, so the exact cause remains unconfirmed.
+
+The focus probe now waits for the Activity window and selected node to hold input
+focus, then injects the same keyboard-source Tab down/up events synchronously
+through `UiAutomation` and checks Android's return values before requiring
+focus to move. The [Android 8 `input` command](https://android.googlesource.com/platform/frameworks/base/+/android-8.0.0_r36/cmds/input/src/com/android/commands/input/Input.java)
+does not report the injection result through its stdout. The failure summary retains only an allowlisted focus-state
+category, not rendered text. These changes remove an unobserved injection path
+and improve diagnostics; they do not establish why the earlier hosted focus
+transition failed. The existing movement, visibility and ownership gates remain.
+
+On the dedicated API26 ARM64 emulator, the updated accessibility suite passed
+with 12 screenshots and verified fixture cleanup, package removal and emulator
+restoration. A deliberate no-op key failed at the initial focused control, as
+expected, with the same cleanup verified. The restored Tab candidate was rebuilt;
+its source-input and APK hashes exactly matched the locally passing candidate.
+The hosted API26/API33/API36 matrix remains required for this updated probe.
+
+After PR #97 merged, main run `45023149403` passed all four suites on API33
+and API36. API26 passed settings, import and recovery, then failed the keyboard
+movement assertion at `auto_access_action`: Android accepted both key events,
+but `findFocus` returned a node reported as not focusable. Fixture cleanup,
+package removal and emulator shutdown passed. The job did not publish its
+private UI tree, so this observation does not establish whether another valid
+focused control existed elsewhere in the tree.
+
+The follow-up checks the refreshed accessibility tree for a different node
+that is actually focused, focusable, visible and app-owned. This retains the
+focus-movement gate without relying solely on a potentially non-focusable
+`findFocus` result. Failure diagnostics expose only fixed node categories and
+booleans, not labels or content. The updated source still requires its own
+API26/API33/API36 acceptance; a no-op key must continue to fail.
+
+The refreshed-tree candidate passed the local API26 ARM64 accessibility suite.
+A deliberate no-op key failed with `focus-tree-moved=false`, and fixture cleanup,
+package removal and emulator restoration passed for both outcomes. Rebuilding
+the restored Tab candidate produced the same source-input and APK hashes as the
+passing run. This does not retrospectively establish the cause of the main run.
+
+The final tree check also excludes the starting control's entire subtree, so a
+focused descendant of that control cannot count as a transition. On the dedicated
+API26 ARM64 emulator the no-op control again failed with `focus-tree-moved=false`
+and the restored Tab candidate passed with 12 screenshots. Both outcomes
+verified fixture cleanup, package removal and emulator restoration. Hosted
+qualification remains separate from this local evidence.
+
+## Latest-call and process-recovery continuation — 2026-11-23
+
+On a user-selected Android 17 phone and dedicated Google test calendar, the
+manual latest-call action saved an older call rather than the controlled call.
+The exact unintended event was removed from the phone; bounded Google Calendar
+readbacks found no matching remote event. This does not prove the event was never
+transiently uploaded. Call-log permission was revoked while the defect is fixed,
+and automatic logging was not enabled. The original ignored local journal was
+lost during worktree cleanup; a private replacement identifies itself as
+reconstructed from retained conversation tool results.
+
+The Android framework's synthesized multi-column sort can append the descending
+direction only after the final column. The observed old event matched the first
+row under that ordering on the phone. A synthetic real-provider regression failed
+against the earlier query; the candidate specifies descending date and ID
+explicitly. The phone test, current-source hosted matrix and process-recovery
+qualification remain pending. The process test returns to the retained task
+after killing the stopped app process, rather than starting a new activity.
+
+The first hosted matrix on this candidate, run `45080074184`, failed the
+new import process-restoration check on API26, API33 and API36; fixture cleanup
+and package removal passed. The initial driver could kill the cached process
+before Android had saved its activity state. The revised driver waits for the
+target activity to be stopped with saved state before killing it. The import
+journey also dismisses the keyboard after verifying cancellation so its next
+explicit preview control can be reached; the cancellation assertion remains.
+The separate first build run `45080052659` encountered HTTP 429 while fetching
+the pinned formatter. These failures remain part of the qualification history.
+
+On the dedicated API36 emulator, the revised source-bound build, unit tests and
+lint passed, as did the import, recovery and accessibility suites. Each suite
+verified fixture cleanup, package removal and emulator restoration. The 38
+focused host safety tests passed. The corrected candidate still needs its own
+hosted API26/API33/API36 matrix and controlled phone/Google Calendar retest.
+
+The next hosted matrix, run `45081560752` on `c7d66de`, passed all four
+suites on API36. API26 failed while waiting for the saved-state diagnostic;
+[Android 8's activity dump](https://android.googlesource.com/platform/frameworks/base/+/android-8.0.0_r1/services/core/java/com/android/server/am/ActivityRecord.java)
+uses `haveState` where the probe expected `mHaveState`. The probe now accepts
+either spelling while still requiring saved state and a stopped activity.
+API33 passed settings and imports, then failed waiting for the restored
+recovery action; the available hosted summary did not establish why. The
+recovery test now checks the pending ledger and event count immediately after
+restart and records an allowlisted window/control diagnostic if the action
+does not return. Cleanup and package removal passed for both failed jobs.
+
+The local API36 lifecycle qualification passed on `c7d66de`, including a
+process killed after provider insertion, reboot, offline delivery and Doze
+deferral, with fixture cleanup and environment restoration. Two clean
+same-host release builds on that revision produced identical unsigned APKs;
+they used a shared dependency cache and are not independent-host reproduction.
+The current test-only refinements and the controlled Google retest still need
+their own applicable qualification.
+
+Hosted run `45092254258` passed API36 and failed API26 and API33. API26
+progressed beyond the saved-state wait but the instrumentation terminated with
+an `IllegalStateException`; its cause was not available in the sanitized log.
+The same source passed both the import and recovery suites on a dedicated
+API26 ARM emulator, with cleanup and environment restoration verified. API33
+passed the immediate pending-record and zero-event checks, but its active
+window was not the app when the recovery action was sought.
+
+Android 13's [task-return implementation](https://android.googlesource.com/platform/frameworks/base/+/android-13.0.0_r1/services/core/java/com/android/server/wm/AppTaskImpl.java)
+can reject a background caller's `moveToFront`. The test driver now briefly
+adopts only the system permission for that task-return operation on API29+
+to emulate selecting the retained task from Recents, drops it immediately,
+and checks the original task ID. It does not grant an app permission or change
+the recovery assertions. The hosted API26 crash's cause and the effect of this
+task-return change still require verification; the physical user journey
+remains a separate gate. Sanitized failure diagnostics now also classify the
+driver and known project frames without emitting rendered or call data.
+
+On a later local API26 run the instrumentation again terminated without a
+result. Its retained emulator log showed Android 8's `UiAutomation` shell
+writer failing with `EPIPE`: the saved-state probe had closed the pipe as soon
+as it found the record. The probe now reads the complete dump before returning,
+while still requiring both stopped and saved state for the target activity.
+This establishes the local failure mechanism; the hosted run did not retain
+enough detail to prove its termination had the same cause. The candidate needs
+fresh local and hosted qualification.
+
+In hosted run `45094878459`, API33 subsequently failed before the first
+recovery screen appeared, with another application active; fixture cleanup
+passed but no screenshot was available, so the harness did not verify package
+removal before the disposable emulator was stopped. The process-death driver's
+initial screen launch is also a background task start. The same narrowly
+scoped system permission now surrounds that launch as well as returning the
+retained task. This is a test-driver change; it does not establish that the
+background-start restriction caused the hosted failure. Diagnostics classify
+that specific platform denial without retaining its account or call details.
+
+Hosted run `45096297934` on `b96018b` passed API26 and API36, but API33
+again failed before the initial recovery action appeared. Fixture cleanup
+passed; package removal was not verified because no screenshot had been
+captured. The cause remains unconfirmed. The test now captures the initial
+failure as well as a failed return, and the harness reports only fixed
+launcher/activity-record categories and bounded runtime diagnostics. It no
+longer labels unrelated nonfatal log entries as the failure's exception.
+These diagnostics retain the existing screen, cleanup and recovery gates.
+
+Hosted run `45098167798` on `a4a5a87` passed API26 and API36, but API33
+failed after process death: the pending record and zero-event checks passed,
+while the launcher remained active. The failure screenshot, fixture cleanup
+and package removal were verified. The same recovery suite passed on a local
+API33 ARM emulator. On that isolated emulator a physical touch on the centered
+Recents card returned the test app to the foreground. The API33 driver now
+waits for a focused app window and, when needed, uses that explicit system UI
+interaction with a unique centered, launcher-owned card. It still checks the
+original task ID and restored content. After correcting focus and transition
+races, the local API33 ARM import and recovery suites passed with fixture
+cleanup, package removal and emulator restoration verified. The hosted API33
+failure's underlying platform cause remains unconfirmed, and the candidate
+still requires the full hosted matrix.
+
+Hosted run `45101787725` passed settings, imports, recovery and accessibility
+on API26, API33 and API36 at `6a01121`. The recorded methods include latest-call
+ordering, both process-death journeys, the recovery approval check and keyboard
+focus. Every suite reported fixture cleanup, package removal and screenshot
+hashes. The two build qualifications and privacy check passed on that head.
+The local API33 ARM settings and accessibility suites also passed after the
+import and recovery runs. The Google Calendar phone retest, manual assistive
+technology checks and broader operational acceptance remain open.
+
+## Google sync precision and recovery follow-up — 2026-11-23
+
+A user-confirmed outgoing test call produced one event in the dedicated Google
+calendar. The phone provider and Google readback agreed on the event title,
+description, duration, private visibility and free availability. The synchronized
+provider record retained the app marker and the device timezone, but both event
+times were rounded down by 644 ms. The original fingerprint retained the precise
+call time, so the unchanged synced event would otherwise require review on retry.
+
+A focused regression reproduced that outcome. The candidate recovery change
+accepts only the exact whole-second representation derived from the stored source
+facts, then verifies the complete original fingerprint. Changed titles or times
+and older receipts without source facts still require review; no insertion path is
+added. The existing exact call-time tests remain in place. Physical recovery
+readback, identified-event cleanup and the affected hosted gates remain open until
+verified on the revised candidate. Private identifiers and call content remain in
+the local test journal, not this repository.
+
+The subsequent API 37 phone retest logged one user-confirmed outgoing call to
+that dedicated calendar. The latest-call candidate was source-equivalent to
+`b402aa8a92e3781ef312ad7a7a58c012c7043aa7` and had SHA-256
+`acfb084a0536dc2dfd7732b44a4560c4ef065336f2bd26d75e22e103ee54597e`.
+After sync, local and Google title, description, start/end and duration matched
+at the provider's whole-second resolution. Private visibility and free
+availability matched; the local app marker and device timezone remained present.
+
+A non-debuggable release test candidate built from
+`3129fd6fce0cfefbcfd0f5db02b3f8b461b13829` had SHA-256
+`4203d868e701c738107fa86364806100881e594e991eae391bc642517bcbddcf`.
+It used the same development signer and was installed as a preserving update.
+Its recovery screen identified the existing receipt and verified the existing
+effect without creating another event; both providers still showed exactly one
+matching event. The identified unedited test event was deleted once, and its
+absence was verified locally and on Google. The previous call-log permission
+state was restored. Private identifiers and call content remain in the local
+journal, not this repository.
+
+The local release build, lint and 119 release JVM tests passed without errors
+or skips, and the shared-core JVM suite passed. Hosted API 26/33/36 acceptance
+is recorded separately. This one controlled outgoing case does not close the
+broader physical-release, operational, accessibility or observation gates.
+
+## Android 17 emulator qualification — 2026-11-24
+
+The app targets API 37, compiles against SDK 37.1 and retains API 26 as
+its minimum. The isolated Android 17.2 ARM64 Google APIs emulator used
+image revision 7, build `CP41.260831.015`, 16 KB pages and the default
+Android app memory limits. SDK Build Tools 37.0 verified 16 KB ZIP alignment.
+Every packaged native library had 16 KB load-segment alignment across the
+four ABIs. [Android 17 behavior changes](https://developer.android.com/about/versions/17/behavior-changes-all),
+[16 KB compatibility guidance](https://developer.android.com/guide/practices/page-sizes).
+
+At source `8bcfec1c0195a1ad98130902122153cbd99253f8`, the settings,
+historical import, recovery and accessibility suites passed on Android
+17.2 with verified fixture cleanup and package removal. These runs
+included user-facing permission revocation, keyboard focus, font scale,
+RTL and process death returning to the same task. The new import test
+removed only its selected LOCAL calendar after preview. The confirmation
+reported the unavailable destination, delivery stopped, and the second
+calendar kept its event count. Provider, worker, simulated incoming
+telephony, offline, Doze and actual guest reboot acceptance passed.
+
+The same revision passed hosted API 26/33/36. Two macOS release builds
+and a fresh Linux build produced unsigned APK SHA-256
+`120052433e9765da1e39efcc1cc5f24fb394f2150beec38a3944606e64cfbf3c`.
+Using an existing development key, the exact release payload launched
+fresh and upgraded from version code 10 to 11 with synthetic historical
+schemas. Recovery preserved existing events and import progress, and
+downgrade and wrong-signer checks rejected the replacements. The
+qualification removed its fixtures and packages. [Hosted UI matrix](https://github.com/edithatogo/CallTrack/actions/runs/45226419047),
+[cold Linux reproduction](https://github.com/edithatogo/CallTrack/actions/runs/45227544562).
+
+On the separate assistive guest, TalkBack 17.0 read the action label three
+times. The shared Compose button now exposes one text value. With native
+emulator touch input, TalkBack displayed one label for both the disabled
+calendar picker and the disabled latest-call button. Native gestures
+opened Automatic logging settings, Historical imports and Delivery review
+and recovery. The hosted import suite now asserts
+the exact single label and explicit action behavior.
+
+Switch Access 1.17 used a disposable USB HID through the emulator's
+native `hid` command. Next moved the visible scan highlight through
+enabled controls. Select opened Automatic logging settings, Historical
+imports, and Delivery review and recovery. The fixture input device
+was removed and the app and inspection packages were uninstalled.
+
+A landscape run reported a 960 dp smallest width and passed rendered
+accessibility. The first import run located the Cancel action under
+the keyboard and failed to open the dialog. The test now scrolls the
+real content until the enabled action is outside the visible keyboard
+bounds. Cancellation still requires the visible keyboard, the app's
+confirmation and zero calendar effects. The full landscape import suite
+then passed, including process recovery and destination disappearance.
+
+One hosted API 26 run failed at the retention test's preference lookup.
+The fixture now binds its selected calendar before the SQLite update.
+The report records the platform exception class from instrumentation so
+a repeated failure can be diagnosed without displaying fixture contents.
+[API 26 failure in the retention journey](https://github.com/edithatogo/CallTrack/actions/runs/45229927663/job/137886385960).
+
+The native Contacts Picker and device handoff APIs are outside the
+current call-log and calendar flow. The app does not request contacts and
+binds durable receipts to provider and device state. AGP's experimental
+backup tests cover a different restoration path from the project's
+preserving upgrade and its app-data backup opt-out. Android 17's
+large-screen behavior and the observed runtime checks fit the current
+Compose, platform-provider and durable scheduling stack.
+[Android 17 APIs](https://developer.android.com/about/versions/17/features),
+[large-screen behavior](https://developer.android.com/about/versions/17/behavior-changes-17),
+[AGP backup testing](https://developer.android.com/build/releases/agp-9-5-0-release-notes).

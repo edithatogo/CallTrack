@@ -25,30 +25,35 @@ class ReceiptRecovery(
         validate(key, calendar)
         return synchronized(DurableDelivery.DELIVERY_LOCK) {
             try {
-                var intent = store!!.get(key, calendar) ?: return Result.NOT_FOUND
-                if (intent.state == DurableDelivery.State.SUPPRESSED) return Result.SUPPRESSED
+                var intent = store!!.get(key, calendar) ?: return@synchronized Result.NOT_FOUND
+                if (intent.state == DurableDelivery.State.SUPPRESSED) {
+                    return@synchronized Result.SUPPRESSED
+                }
                 if (intent.eventId < 0) {
                     if (
                         intent.state == DurableDelivery.State.READY ||
                             intent.state == DurableDelivery.State.EXPIRED_READY
-                    )
-                        return Result.NEVER_ATTEMPTED
-                    if (intent.marker.isNullOrEmpty()) return review(intent)
+                    ) {
+                        return@synchronized Result.NEVER_ATTEMPTED
+                    }
+                    if (intent.marker.isNullOrEmpty()) return@synchronized review(intent)
                     val found = events!!.find(calendar, intent.marker)
-                    if (found == null || found.size != 1 || !matches(found[0], intent))
-                        return review(intent)
+                    if (found == null || found.size != 1 || !matches(found[0], intent)) {
+                        return@synchronized review(intent)
+                    }
                     // Persist discovered identity before the second provider read.
                     intent = intent.state(DurableDelivery.State.ATTEMPTED, found[0]!!.id)
                     store.put(intent)
                 }
                 val existing = events!!.read(intent.eventId)
-                if (!matches(existing, intent) || existing!!.id != intent.eventId)
-                    return review(intent)
+                if (!matches(existing, intent) || existing!!.id != intent.eventId) {
+                    return@synchronized review(intent)
+                }
                 store.put(intent.state(DurableDelivery.State.CONFIRMED, intent.eventId))
                 Result.VERIFIED
-            } catch (denied: SecurityException) {
+            } catch (ignored: SecurityException) {
                 Result.PERMISSION_REQUIRED
-            } catch (failed: RuntimeException) {
+            } catch (ignored: RuntimeException) {
                 Result.FAILED
             }
         }
@@ -61,7 +66,7 @@ class ReceiptRecovery(
                 val intent = store!!.get(key, calendar) ?: return Result.NOT_FOUND
                 store.put(intent.state(DurableDelivery.State.SUPPRESSED, intent.eventId))
                 Result.SUPPRESSED
-            } catch (failed: RuntimeException) {
+            } catch (ignored: RuntimeException) {
                 Result.FAILED
             }
         }
@@ -77,7 +82,7 @@ class ReceiptRecovery(
             event.id >= 0 &&
             event.calendar == intent.calendar &&
             event.event != null &&
-            intent.fingerprint == event.event.fingerprint()
+            intent.matchesEvent(event.event)
 
     private fun validate(key: String?, calendar: Long) {
         require(!key.isNullOrEmpty() && calendar >= 0) { "Invalid recovery key" }

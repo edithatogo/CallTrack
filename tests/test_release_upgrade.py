@@ -9,6 +9,7 @@ import zipfile
 from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import qualify_release_upgrade as upgrade
+import qualify_release_build as release_build
 
 
 class UpgradeSafetyTest(unittest.TestCase):
@@ -17,6 +18,13 @@ class UpgradeSafetyTest(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, 'refuses physical'):
                 upgrade.qualify('phone', Path('/unused'))
             read.assert_not_called()
+
+    def test_unqualified_jdk_stops_before_any_subprocess_or_native_action(self):
+        with patch.object(upgrade, 'qualified_local_jdk', side_effect=RuntimeError('unqualified JDK')):
+            with patch.object(upgrade.subprocess, 'check_output') as read:
+                with self.assertRaisesRegex(RuntimeError, 'unqualified JDK'):
+                    upgrade.qualify('emulator-1234', Path('/unused'))
+                read.assert_not_called()
 
     def test_rejection_requires_failure_and_exact_android_reason(self):
         for code, error in ((0, 'INSTALL_FAILED_VERSION_DOWNGRADE'), (1, 'device offline'), (1, 'INSTALL_FAILED_UPDATE_INCOMPATIBLE')):
@@ -29,6 +37,15 @@ class UpgradeSafetyTest(unittest.TestCase):
         upgrade.require_rejection(result, 'INSTALL_FAILED_UPDATE_INCOMPATIBLE')
         with self.assertRaises(RuntimeError):
             upgrade.require_rejection(result, 'INSTALL_FAILED_VERSION_DOWNGRADE')
+
+    def test_version_comes_from_exact_apk_identity(self):
+        for package, version in ((upgrade.PACKAGE, 11), (upgrade.TEST_PACKAGE, None)):
+            code = version if version is not None else ''
+            badge = f"package: name='{package}' versionCode='{code}' versionName='fixture'\n"
+            with patch.object(upgrade.subprocess, 'check_output', return_value=badge):
+                self.assertEqual(version, upgrade.apk_version(Path('fixture.apk'), package, Path('/sdk')))
+                with self.assertRaisesRegex(RuntimeError, 'Unexpected package'):
+                    upgrade.apk_version(Path('fixture.apk'), 'different.package', Path('/sdk'))
 
     def test_cleanup_does_not_touch_unowned_packages(self):
         command = unittest.mock.Mock()
@@ -66,21 +83,92 @@ class UpgradeSafetyTest(unittest.TestCase):
     def test_frozen_release_rejects_wrong_revision_and_modified_artifact(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            apk = root / 'candidate.apk'
-            apk.write_bytes(b'unsigned')
-            record = dict(apk=str(apk), apk_sha256=upgrade.sha(apk), exit_code=0,
-                          signature_check=dict(unsigned_verified=True))
+            apks = [root / f'checkout-{number}/app/build/outputs/apk/release/app-release-unsigned.apk'
+                    for number in (1, 2)]
+            for apk in apks:
+                apk.parent.mkdir(parents=True)
+                apk.write_bytes(b'unsigned')
+            records = [dict(apk=str(apk), apk_sha256=upgrade.sha(apk), exit_code=0,
+                            signature_check=dict(unsigned_verified=True)) for apk in apks]
             receipt = root / 'receipt.json'
-            data = dict(success=True, signed=False, revision='frozen', builds=[record, record])
+            data = dict(success=True, signed=False, revision='frozen', builds=records)
             receipt.write_text(json.dumps(data))
             with self.assertRaisesRegex(RuntimeError, 'Matching frozen'):
                 upgrade.frozen_release_apk(receipt, 'different', root, {})
             with patch('qualify_release_build.verify_unsigned') as verify:
-                self.assertEqual(apk, upgrade.frozen_release_apk(receipt, 'frozen', root, {}))
+                self.assertEqual(apks[0].resolve(), upgrade.frozen_release_apk(receipt, 'frozen', root, {}))
                 self.assertEqual(2, verify.call_count)
-                apk.write_bytes(b'changed')
+                apks[0].write_bytes(b'changed')
                 with self.assertRaisesRegex(RuntimeError, 'artifact changed'):
                     upgrade.frozen_release_apk(receipt, 'frozen', root, {})
+
+    def test_frozen_release_does_not_read_artifacts_outside_receipt_output(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            output = root / 'selected output'
+            output.mkdir()
+            other = root / 'unrelated.apk'
+            other.write_bytes(b'unsigned')
+            record = dict(apk=str(other), apk_sha256=upgrade.sha(other), exit_code=0,
+                          signature_check=dict(unsigned_verified=True))
+            receipt = output / 'receipt.json'
+            receipt.write_text(json.dumps(dict(success=True, signed=False, revision='frozen',
+                                               builds=[record, record])))
+            with patch('qualify_release_build.verify_unsigned') as verify, patch.object(upgrade, 'sha', wraps=upgrade.sha) as digest:
+                with self.assertRaisesRegex(RuntimeError, 'Frozen artifact path'):
+                    upgrade.frozen_release_apk(receipt, 'frozen', root, {})
+                verify.assert_not_called()
+                digest.assert_not_called()
+
+    def test_frozen_release_rejects_artifact_symlink_outside_output(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            output = root / 'selected output'
+            apk = output / 'checkout-1/app/build/outputs/apk/release/app-release-unsigned.apk'
+            apk.parent.mkdir(parents=True)
+            other = root / 'unrelated.apk'
+            other.write_bytes(b'unsigned')
+            apk.symlink_to(other)
+            record = dict(apk=str(apk), apk_sha256=upgrade.sha(other), exit_code=0,
+                          signature_check=dict(unsigned_verified=True))
+            receipt = output / 'receipt.json'
+            receipt.write_text(json.dumps(dict(success=True, signed=False, revision='frozen',
+                                               builds=[record, record])))
+            with patch('qualify_release_build.verify_unsigned') as verify:
+                with self.assertRaisesRegex(RuntimeError, 'Frozen artifact path'):
+                    upgrade.frozen_release_apk(receipt, 'frozen', root, {})
+                verify.assert_not_called()
+
+    def test_frozen_release_accepts_actual_build_receipt_layout(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            output = root / 'chosen build output'
+
+            def check_output(args, **_kwargs):
+                if args[:2] == ['git', 'status']:
+                    return b''
+                if args[:2] == ['git', 'rev-parse']:
+                    return 'frozen\n'
+                if args[-1] == '-version':
+                    return 'openjdk version "25.0.5.1"'
+                return 'synthetic badging'
+
+            def run(args, **kwargs):
+                if args[:2] == ['git', 'clone']:
+                    Path(args[-1]).mkdir(parents=True)
+                elif args[0] == 'sh':
+                    apk = Path(kwargs['cwd']) / 'app/build/outputs/apk/release/app-release-unsigned.apk'
+                    apk.parent.mkdir(parents=True)
+                    apk.write_bytes(b'unsigned')
+                return subprocess.CompletedProcess(args, 0)
+
+            with patch.object(release_build.subprocess, 'check_output', side_effect=check_output), \
+                 patch.object(release_build.subprocess, 'run', side_effect=run), \
+                 patch.object(release_build, 'verify_unsigned', return_value={'unsigned_verified': True}):
+                produced = release_build.run(output, root, root)
+                self.assertTrue(produced['success'])
+                apk = upgrade.frozen_release_apk(output / 'receipt.json', 'frozen', root, {})
+                self.assertEqual(output / 'checkout-1/app/build/outputs/apk/release/app-release-unsigned.apk', apk)
 
     def test_signing_cannot_change_or_remove_payload_or_add_unexpected_entries(self):
         with tempfile.TemporaryDirectory() as directory:

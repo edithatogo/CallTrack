@@ -4,7 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import org.junit.Assert.assertEquals
@@ -20,15 +20,15 @@ class AutomaticDestinationPanelTest {
         val opaqueToken = "load-token-1"
         var state by
             mutableStateOf(
-                AutomaticDestinationUiState(
-                    options = listOf(AutomaticDestinationOption(opaqueToken, "Work calendar")),
+                CalendarDestinationUiState(
+                    options = listOf(CalendarDestinationOption(opaqueToken, "Work calendar")),
                     enabled = true,
-                )
+                ),
             )
         var selectedToken: String? = null
 
         compose.setContent {
-            AutomaticDestinationPanel(state, "Choose calendar") { token ->
+            CalendarDestinationPicker(state, "Choose calendar", "auto_calendar") { token ->
                 selectedToken = token
                 state = state.copy(selectedToken = token)
             }

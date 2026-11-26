@@ -1,17 +1,17 @@
 {
   "track_id": "shared_ui_20261021",
   "type": "research-led-development",
-  "status": "in_progress",
+  "status": "new",
   "milestone": "M8",
   "created_at": "2026-10-21",
-  "updated_at": "2026-10-24",
+  "updated_at": "2026-11-24",
   "depends_on": [
     "macos_companion_20261021"
   ],
   "requirements": "R17, R24, R26",
   "track_number": 17,
   "execution_stage": 6,
-  "implementation_status": "bounded-common-ui-prototype; Android KMP target and synthetic Android host compile/package; desktop and Android dependency graphs byte-matched with effective licence metadata; legal-clearance-build-tool-trust-emulator-rendering-and-native-macOS-acceptance-pending",
+  "implementation_status": "deferred",
   "production_adopted": false,
   "prerequisite_deferral_document": "prerequisite-deferral.md",
   "android_target_accepted": false,
@@ -59,5 +59,10 @@
   ],
   "pull_request": "https://github.com/edithatogo/CallTrack/pull/58",
   "pull_request_state": "merged-hosted-checks-passed-native-acceptance-pending",
-  "pull_request_merge_commit": "e450229105ff63c658a01ecfeefce4d94336d7ce"
+  "pull_request_merge_commit": "e450229105ff63c658a01ecfeefce4d94336d7ce",
+  "deferral": {
+    "reason": "No active second platform remains, so sharing Compose presentation now adds tooling and maintenance.",
+    "consequences": "Synthetic JVM desktop/Android-host prototypes are retained as historical experiments; no production UI adoption.",
+    "reconsideration_trigger": "Accepted second platform requiring the same tested screen."
+  }
 }

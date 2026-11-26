@@ -21,8 +21,9 @@ class ReadyReapproval(
                 if (!eligible(current)) return DurableDelivery.Result.REVIEW_REQUIRED
                 val saved = current!!
                 if (!unchanged(saved, initial)) return DurableDelivery.Result.SOURCE_CHANGED
-                if (!sink!!.writable(saved.calendar))
+                if (!sink!!.writable(saved.calendar)) {
                     return DurableDelivery.Result.DESTINATION_UNAVAILABLE
+                }
                 if (!confirmed.asBoolean) return DurableDelivery.Result.PAUSED
                 val approval =
                     DurableDelivery.Operation("manual-reapproval/" + UUID.randomUUID(), 1)
@@ -38,12 +39,12 @@ class ReadyReapproval(
                         saved.payload,
                         approval,
                         saved.facts,
-                    )
+                    ),
                 )
                 DurableDelivery(store, sink).resume(saved.key, saved.calendar, approval, confirmed)
-            } catch (denied: SecurityException) {
+            } catch (ignored: SecurityException) {
                 DurableDelivery.Result.PERMISSION_REQUIRED
-            } catch (failed: RuntimeException) {
+            } catch (ignored: RuntimeException) {
                 DurableDelivery.Result.FAILED
             }
         }
@@ -73,20 +74,25 @@ class ReadyReapproval(
             a: DurableDelivery.Operation?,
             b: DurableDelivery.Operation?,
         ): Boolean =
-            if (a == null) b == null
-            else b != null && a.owner == b.owner && a.generation == b.generation
+            if (a == null) {
+                b == null
+            } else {
+                b != null && a.owner == b.owner && a.generation == b.generation
+            }
 
         private fun sameFacts(
             a: DurableDelivery.SourceFacts?,
             b: DurableDelivery.SourceFacts?,
         ): Boolean =
-            if (a == null) b == null
-            else
+            if (a == null) {
+                b == null
+            } else {
                 b != null &&
                     a.start == b.start &&
                     a.seconds == b.seconds &&
                     a.type == b.type &&
                     a.presentationSupplied == b.presentationSupplied &&
                     a.presentation == b.presentation
+            }
     }
 }

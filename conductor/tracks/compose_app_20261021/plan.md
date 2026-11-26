@@ -1,5 +1,13 @@
 # Plan: Jetpack Compose Android implementation
 
+## Current Android 17 work
+
+PR #118 removed the pre-API-30 insets fallback. The API 37 settings, imports, process recovery, accessibility and cleanup gates passed. [PR #118](https://github.com/edithatogo/CallTrack/pull/118) · [hosted evidence](https://github.com/edithatogo/CallTrack/actions/runs/45302537925)
+
+The four native Compose roots, Material 3 controls, and sole durable writer are qualified for Android 17 development. Rendered accessibility, process recovery, permission revocation, cleanup, and the verified runtime graph are recorded in the [current evidence](implementation-evidence.md#android-17-native-screen-roots-and-durable-delivery). [GitHub issue #116](https://github.com/edithatogo/CallTrack/issues/116).
+
+Production acceptance follows Tracks 5 and 6 under the [existing prerequisite deferral](prerequisite-deferral.md).
+
 ## Phase 1: Refresh mapping and requirements
 
 - [x] Task: Read prerequisite evidence and archived research; map behaviour, native APIs, dependencies and code ownership.
@@ -30,9 +38,13 @@
 - [x] Task: Run hosted rendered acceptance for the manual provider selection/reopen flow on API26/API33/API36, including API-specific accessibility and permission coverage. Run 40165971174 attempt 2 passed settings/imports/recovery/accessibility on all three APIs; every suite verified fixture cleanup, package removal and screenshot hashes, and each settings suite exercised explicit manual calendar selection. Attempt 1's API26 focus failure remains recorded; retry passed on exact app/test source.
 - [x] Task: Move the manual launcher's remaining intro, panel layout and automatic-settings navigation into a lifecycle-disposed Compose screen; retain Activity-owned permissions, provider reads, destination IDs and delivery (D14-13; `97a7739`, see [review](review-20261025-manual-screen.md)).
 - [x] Task: Run the new pure Compose manual-screen callback test and the rendered manual-provider journey on API26/API33/API36; verify Compose identifiers, scroll/insets and fixture cleanup (PR #86 hosted matrix run 40170407847; see [review](review-20261025-manual-screen.md)).
-- [ ] Task: Migrate historical import and recovery screen by screen; preserve IDs, destination binding, operation ownership and saved-state semantics.
-- [ ] Task: Qualify real permission/revocation, destination disappearance, cancellation/recreation/process restore, font/RTL, TalkBack/Switch Access and no synchronization regression; remove replaced Views only after parity.
-- [ ] Task: Phase Verification & Checkpoint (refer to ../../workflow.md).
+- [x] Task: Complete the Compose presentation for historical import and recovery, preserving host IDs, destination binding, Activity-owned operations and saved-state semantics. Existing reviewed panels cover all visible content; the current API36 host, recreation, import, recovery and accessibility checks pass (see [evidence](implementation-evidence.md#import-and-recovery-screen-completion--2026-11-22)). Native layout containers and system dialogs remain as compatibility boundaries. Hosted API26/33/36 and broader acceptance remain separate.
+- [x] Verify native permission revocation, destination disappearance, cancellation, recreation, process recovery, font scale, RTL, TalkBack, and Switch Access. Retire the replaced Views and verify local Calendar provider parity on the resulting build. [Source-bound evidence](implementation-evidence.md#android-17-native-screen-roots-and-durable-delivery).
+- [x] Task: Verify import and recovery after actual background process death, returning to the retained task; keep explicit approval and no-implicit-write checks. Hosted run 45101787725 passed on API26/33/36 at `6a01121`, with the original task, restored state, no implicit approval or event, fixture cleanup and package removal verified. Physical-device and cloud-calendar acceptance remain separate.
+- [x] Task: Qualify latest-call ordering and the selected Google calendar route on the controlled phone, including exact local and remote readback and cleanup of the identified test event. The controlled outgoing case passed with the provider's whole-second normalization; the broader physical-release matrix remains open (see [evidence](implementation-evidence.md#google-sync-precision-and-recovery-follow-up--2026-11-23)).
+- [x] Task: Qualify Target SDK 37 on the 16 KB Android 17.2 emulator, including process recovery and a destination removed after preview. Verify that TalkBack announces the shared action label once while retaining the button role and disabled state. See [Android 17 emulator evidence](implementation-evidence.md#android-17-emulator-qualification--2026-11-24).
+- [x] Task: Qualify the standalone Compose experiment's launcher cases in the app suite and retire the standalone job. See [API 36 retirement evidence](implementation-evidence.md#standalone-compose-retirement--2026-11-22).
+- [x] Record the Android 17 implementation and runtime qualification. [Source-bound evidence](implementation-evidence.md#android-17-native-screen-roots-and-durable-delivery).
 
 ## Phase: Hosted API36 UI acceptance fallback (2026-10-24)
 - [x] Task: Reconcile the reattached SSD, verify the current source-bound build receipt and diagnose a fresh isolated ARM64 emulator boot failure without touching the retained process.
@@ -43,7 +55,7 @@
 
 ## Phase 4: Review, acceptance and handoff
 
-- [ ] Task: Run applicable shared/rendered/native/cloud/package/operational acceptance with exact source/artifact evidence; verify cleanup and preserving upgrade/recovery.
+- [ ] Complete the applicable cloud, package, and operational acceptance for the production candidate with exact source and artifact evidence. The Android 17 development checkpoint covers rendering, native provider parity, cleanup, and preserving upgrade and recovery with a development key. [Current evidence](implementation-evidence.md#android-17-native-screen-roots-and-durable-delivery) · [Release gates](../release_20261020/verification.md#active-release-gates).
 - [x] Task: Review and fix the automatic-settings status slice and scoped-deferral gate; rerun rendered/host API36 checks and Conductor fault tests (see [review](review-20261023.md)). (19bb361)
 - [x] Task: Review the manual logging presentation slice; remove the initially tried Material 3 dependency to comply with D14-1, retain Activity-owned delivery, and document the unavailable rendered-test runtime in [review](review-20261024-manual-logging.md).
 - [x] Task: Review the historical import status slice; keep the existing dependency set, preserve the status host IDs and transaction callbacks, and document the pending emulator result in [review](review-20261024-import-status.md).

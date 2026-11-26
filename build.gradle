@@ -5,15 +5,81 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.13.2'
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.21'
-        classpath 'org.jetbrains.kotlin:compose-compiler-gradle-plugin:2.3.21'
+        // Minimum patched versions for build-time transitives; newer selections remain allowed.
+        constraints {
+            classpath('com.google.guava:guava:33.8.0-jre')
+            classpath('org.apache.commons:commons-compress:1.28.0')
+            classpath('org.bitbucket.b_c:jose4j:0.9.7')
+            classpath('org.bouncycastle:bcprov-jdk18on:1.87')
+            classpath('org.bouncycastle:bcpkix-jdk18on:1.87')
+            classpath('org.bouncycastle:bcutil-jdk18on:1.87')
+            classpath('org.jdom:jdom2:2.0.6.1')
+        }
+        classpath 'com.android.tools.build:gradle:9.5.3'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.4.21'
+        classpath 'org.jetbrains.kotlin:compose-compiler-gradle-plugin:2.4.21'
+        classpath 'org.jetbrains.kotlin:kotlin-serialization:2.4.21'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+configurations {
+    ktlintCli {
+        canBeConsumed = false
+        transitive = false
+    }
+    detektCli {
+        canBeConsumed = false
+        transitive = false
+    }
+}
+
+dependencies {
+    ktlintCli 'com.pinterest.ktlint:ktlint-cli:1.8.0:all@jar'
+    detektCli 'dev.detekt:detekt-cli:2.0.0-alpha.6:all@jar'
+}
+
+tasks.register('ktlintCheck', JavaExec) {
+    group = 'verification'
+    description = 'Run ktlint against Android Kotlin sources.'
+    classpath = configurations.ktlintCli
+    mainClass = 'com.pinterest.ktlint.Main'
+    args '--relative', 'app/src/**/*.kt'
+}
+
+tasks.register('detekt', JavaExec) {
+    group = 'verification'
+    description = 'Run detekt against Android Kotlin sources.'
+    classpath = configurations.detektCli
+    mainClass = 'dev.detekt.cli.Main'
+    args '--input', 'app/src', '--base-path', projectDir.absolutePath,
+        '--config', file('config/detekt.yml').absolutePath, '--build-upon-default-config'
+}
+
+// AGP resolves the lint engine in detached project configurations, separately
+// from the buildscript classpath. Keep its vulnerable transitives patched too.
+allprojects {
+    dependencies {
+        components {
+            withModule('com.android.tools.lint:lint-gradle') {
+                allVariants {
+                    withDependencyConstraints {
+                        add('com.google.guava:guava:33.8.0-jre')
+                        add('org.apache.commons:commons-lang3:3.22.0')
+                        add('org.apache.httpcomponents:httpclient:4.5.14')
+                        add('org.apache.httpcomponents:httpmime:4.5.14')
+                        add('org.bouncycastle:bcprov-jdk18on:1.87')
+                        add('org.bouncycastle:bcpkix-jdk18on:1.87')
+                        add('org.bouncycastle:bcutil-jdk18on:1.87')
+                    }
+                }
+            }
+        }
+    }
+}
+
+tasks.register('clean', Delete) {
+    delete layout.buildDirectory
 }

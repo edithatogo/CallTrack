@@ -3,9 +3,12 @@ package com.markobl.calllogsync.slice;
 import static org.junit.Assert.*;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Instrumentation;
 import android.app.UiAutomation;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -14,7 +17,12 @@ import android.os.ParcelFileDescriptor;
 import android.os.SystemClock;
 import android.view.InputDevice;
 import android.view.MotionEvent;
+import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityNodeInfo;
+
+import androidx.activity.ComponentActivity;
+import androidx.compose.ui.platform.ComposeView;
+import androidx.lifecycle.Lifecycle;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,6 +51,29 @@ final class RenderedUi {
         automation.setServiceInfo(info);
     }
 
+    static void assertComposeRoot(Instrumentation instrumentation, Activity activity) {
+        instrumentation.runOnMainSync(() -> {
+            ViewGroup content = activity.findViewById(android.R.id.content);
+            assertEquals("Activity must have one screen root", 1, content.getChildCount());
+            assertTrue(
+                    "Screen root must be a ComposeView",
+                    content.getChildAt(0) instanceof ComposeView);
+        });
+    }
+
+    static boolean isResumed(Instrumentation instrumentation, ComponentActivity activity) {
+        boolean[] resumed = new boolean[1];
+        instrumentation.runOnMainSync(() ->
+                resumed[0] = activity.getLifecycle().getCurrentState() == Lifecycle.State.RESUMED);
+        return resumed[0];
+    }
+
+    void openFromLauncher(String destination) {
+        startActivity(CalendarSliceActivity.class);
+        tapId("open_automatic");
+        tapId(destination);
+    }
+
     void await(BooleanSupplier condition, String message) {
         await(condition, message, 20000);
     }
@@ -54,6 +85,206 @@ final class RenderedUi {
             SystemClock.sleep(100);
         } while (SystemClock.elapsedRealtime() < end);
         fail(message);
+    }
+
+    private ActivityManager.RunningAppProcessInfo mainProcess() {
+        ActivityManager manager =
+                (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        java.util.List<ActivityManager.RunningAppProcessInfo> processes =
+                manager.getRunningAppProcesses();
+        if (processes == null) return null;
+        for (ActivityManager.RunningAppProcessInfo process : processes)
+            if (context.getPackageName().equals(process.processName)) return process;
+        return null;
+    }
+
+    void startActivity(Class<? extends Activity> activity) {
+        withSystemTaskStart(() ->
+                context.startActivity(
+                        new Intent(context, activity)
+                                .addFlags(
+                                        Intent.FLAG_ACTIVITY_NEW_TASK
+                                                | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)));
+        if (android.os.Build.VERSION.SDK_INT == 33) {
+            await(() -> activityTask(activity) != null, "Initial activity task was not retained");
+            if (!waitForAppWindow(10000)) returnFromRecents();
+        }
+    }
+
+    private void withSystemTaskStart(Runnable action) {
+        // Emulate an explicit system task selection while the test driver is backgrounded.
+        if (android.os.Build.VERSION.SDK_INT >= 29)
+            automation.adoptShellPermissionIdentity(
+                    "android.permission.START_ACTIVITIES_FROM_BACKGROUND");
+        try {
+            action.run();
+        } finally {
+            if (android.os.Build.VERSION.SDK_INT >= 29) automation.dropShellPermissionIdentity();
+        }
+    }
+
+    private ActivityManager.AppTask activityTask(Class<? extends Activity> activity) {
+        ActivityManager manager =
+                (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.AppTask task : manager.getAppTasks()) {
+            ActivityManager.RecentTaskInfo info = task.getTaskInfo();
+            if (info.baseIntent.getComponent() != null
+                    && activity.getName().equals(info.baseIntent.getComponent().getClassName()))
+                return task;
+        }
+        return null;
+    }
+
+    private boolean stoppedWithSavedState(Class<? extends Activity> activity) {
+        boolean target = false;
+        boolean saved = false;
+        boolean stopped = false;
+        boolean found = false;
+        try (ParcelFileDescriptor descriptor =
+                        automation.executeShellCommand("dumpsys activity activities");
+                BufferedReader reader =
+                        new BufferedReader(
+                                new InputStreamReader(
+                                        new FileInputStream(descriptor.getFileDescriptor()),
+                                        StandardCharsets.UTF_8))) {
+            String line;
+            // Drain the pipe even after finding the record: Android 8's writer can crash on EPIPE.
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().matches("\\* Hist\\s+#.*")) {
+                    target = line.contains(context.getPackageName() + "/" + activity.getName());
+                    saved = false;
+                    stopped = false;
+                } else if (target) {
+                    if (line.contains("mHaveState=true") || line.contains("haveState=true"))
+                        saved = true;
+                    if (line.contains("state=STOPPED")) stopped = true;
+                    if (saved && stopped) found = true;
+                }
+            }
+        } catch (java.io.IOException failure) {
+            throw new AssertionError("Could not inspect stopped activity state", failure);
+        }
+        return found;
+    }
+
+    void killStoppedProcessAndReturn(Class<? extends Activity> activity) {
+        ActivityManager.RunningAppProcessInfo before = mainProcess();
+        assertNotNull("App main process was not running", before);
+        int pid = before.pid;
+        assertNotEquals(
+                "The driver must run in a separate process", android.os.Process.myPid(), pid);
+        ActivityManager.AppTask savedTask = activityTask(activity);
+        assertNotNull("The original activity task was not retained", savedTask);
+        int taskId = savedTask.getTaskInfo().taskId;
+        assertTrue(
+                automation.performGlobalAction(
+                        android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME));
+        await(
+                () -> {
+                    ActivityManager.RunningAppProcessInfo process = mainProcess();
+                    return process != null
+                            && process.pid == pid
+                            && process.importance
+                                    >= ActivityManager.RunningAppProcessInfo.IMPORTANCE_CACHED;
+                },
+                "App process did not become stopped and eligible for background death");
+        await(
+                () -> stoppedWithSavedState(activity),
+                "Android did not retain the stopped activity state");
+        android.os.Process.killProcess(pid);
+        await(() -> mainProcess() == null, "App process survived the background kill");
+        ActivityManager.AppTask task = savedTask;
+        if (android.os.Build.VERSION.SDK_INT == 33) returnFromRecents();
+        else withSystemTaskStart(task::moveToFront);
+        await(
+                () -> mainProcess() != null && mainProcess().pid != pid,
+                "App did not restart in a new process");
+        assertEquals(
+                "Returning must keep the original task", taskId, savedTask.getTaskInfo().taskId);
+    }
+
+    private void returnFromRecents() {
+        if (appWindowFocused()) return;
+        assertTrue(
+                automation.performGlobalAction(
+                        android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_RECENTS));
+        settle();
+        final AccessibilityNodeInfo[] card = new AccessibilityNodeInfo[1];
+        await(
+                () -> {
+                    if (appWindowFocused()) return true;
+                    card[0] = centeredRecentsCard();
+                    return card[0] != null;
+                },
+                "Could not identify the centered Recents task");
+        if (!appWindowFocused()) {
+            assertNotNull("Recents task disappeared before touch", card[0]);
+            injectTouch(card[0]);
+        }
+        await(this::appWindowFocused, "Recents selection did not foreground the app");
+        settle();
+        assertTrue("App lost focus after leaving Recents", appWindowFocused());
+    }
+
+    private boolean waitForAppWindow(long timeoutMillis) {
+        long end = SystemClock.elapsedRealtime() + timeoutMillis;
+        do {
+            if (appWindowFocused()) return true;
+            SystemClock.sleep(100);
+        } while (SystemClock.elapsedRealtime() < end);
+        return false;
+    }
+
+    private boolean appWindowFocused() {
+        for (android.view.accessibility.AccessibilityWindowInfo window : automation.getWindows()) {
+            AccessibilityNodeInfo root = window.getRoot();
+            if (window.isActive()
+                    && window.isFocused()
+                    && root != null
+                    && root.getPackageName() != null
+                    && context.getPackageName().contentEquals(root.getPackageName())) return true;
+        }
+        return false;
+    }
+
+    private AccessibilityNodeInfo centeredRecentsCard() {
+        CharSequence label = context.getApplicationInfo().loadLabel(context.getPackageManager());
+        if (label == null || label.length() == 0) return null;
+        for (android.view.accessibility.AccessibilityWindowInfo window : automation.getWindows()) {
+            AccessibilityNodeInfo root = window.getRoot();
+            CharSequence owner = root == null ? null : root.getPackageName();
+            if (owner == null
+                    || !("com.android.launcher3".contentEquals(owner)
+                            || "com.google.android.apps.nexuslauncher".contentEquals(owner)))
+                continue;
+            Rect viewport = new Rect();
+            root.getBoundsInScreen(viewport);
+            java.util.List<AccessibilityNodeInfo> cards = new java.util.ArrayList<>();
+            collectCenteredRecentsCards(root, owner, label, viewport, cards);
+            if (cards.size() == 1) return cards.get(0);
+        }
+        return null;
+    }
+
+    private void collectCenteredRecentsCards(
+            AccessibilityNodeInfo node,
+            CharSequence owner,
+            CharSequence label,
+            Rect viewport,
+            java.util.List<AccessibilityNodeInfo> cards) {
+        if (node == null) return;
+        CharSequence description = node.getContentDescription();
+        Rect bounds = new Rect();
+        node.getBoundsInScreen(bounds);
+        if (node.isVisibleToUser()
+                && node.isClickable()
+                && node.getPackageName() != null
+                && owner.toString().contentEquals(node.getPackageName())
+                && description != null
+                && description.toString().contains(label)
+                && bounds.contains(viewport.centerX(), viewport.centerY())) cards.add(node);
+        for (int i = 0; i < node.getChildCount(); i++)
+            collectCenteredRecentsCards(node.getChild(i), owner, label, viewport, cards);
     }
 
     AccessibilityNodeInfo find(String value, boolean id) {
@@ -96,13 +327,24 @@ final class RenderedUi {
                 }) {
             for (int i = 0; i < 8; i++) {
                 AccessibilityNodeInfo node = find(value, id);
-                if (node != null) return node;
+                if (node != null && touchPointIsVisible(node)) return node;
                 AccessibilityNodeInfo scroll = scrollable(automation.getRootInActiveWindow());
                 if (scroll == null || !scroll.performAction(direction)) break;
                 SystemClock.sleep(150);
             }
         }
         return null;
+    }
+
+    private boolean touchPointIsVisible(AccessibilityNodeInfo node) {
+        if (!node.isClickable()) return true;
+        AccessibilityNodeInfo viewport = find("calltrack_screen", true);
+        if (viewport == null) return true;
+        Rect visible = new Rect();
+        Rect target = new Rect();
+        viewport.getBoundsInScreen(visible);
+        node.getBoundsInScreen(target);
+        return visible.contains(target.centerX(), target.centerY());
     }
 
     void setTextId(String id, String value) {
@@ -147,12 +389,51 @@ final class RenderedUi {
         return true;
     }
 
-    boolean keyboardVisible() {
-        for (android.view.accessibility.AccessibilityWindowInfo window : automation.getWindows())
+    private Rect keyboardBounds() {
+        for (android.view.accessibility.AccessibilityWindowInfo window : automation.getWindows()) {
             if (window.getType()
-                    == android.view.accessibility.AccessibilityWindowInfo.TYPE_INPUT_METHOD)
-                return true;
-        return false;
+                    == android.view.accessibility.AccessibilityWindowInfo.TYPE_INPUT_METHOD) {
+                Rect bounds = new Rect();
+                window.getBoundsInScreen(bounds);
+                return bounds;
+            }
+        }
+        return null;
+    }
+
+    boolean keyboardVisible() {
+        return keyboardBounds() != null;
+    }
+
+    void tapAboveKeyboard(String id) {
+        final AccessibilityNodeInfo[] reachable = new AccessibilityNodeInfo[1];
+        await(
+                () -> {
+                    if (!keyboardVisible()) return false;
+                    if (controlAboveKeyboard(id) != null) {
+                        settle();
+                        reachable[0] = controlAboveKeyboard(id);
+                        if (reachable[0] != null) return true;
+                    }
+                    AccessibilityNodeInfo scroll = scrollable(automation.getRootInActiveWindow());
+                    if (scroll != null
+                            && scroll.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD)) {
+                        settle();
+                    }
+                    return false;
+                },
+                "Control not reachable above the visible keyboard: " + id);
+        touch(reachable[0], id);
+    }
+
+    private AccessibilityNodeInfo controlAboveKeyboard(String id) {
+        Rect keyboard = keyboardBounds();
+        if (keyboard == null) return null;
+        AccessibilityNodeInfo node = find(id, true);
+        if (node == null || !node.isEnabled() || !touchPointIsVisible(node)) return null;
+        Rect control = new Rect();
+        node.getBoundsInScreen(control);
+        return !control.isEmpty() && !Rect.intersects(control, keyboard) ? node : null;
     }
 
     void dismissKeyboard() {
@@ -171,6 +452,10 @@ final class RenderedUi {
     }
 
     void tapId(String id) {
+        if (id.equals("calltrack_dialog_confirm") || id.equals("calltrack_dialog_cancel")) {
+            tapDialogAction(id);
+            return;
+        }
         tap(id, true);
     }
 
@@ -180,15 +465,19 @@ final class RenderedUi {
 
     /** Tap the app-owned positive dialog action across interactive windows. */
     void tapDialogPositive() {
+        tapDialogAction("calltrack_dialog_confirm");
+    }
+
+    private void tapDialogAction(String tag) {
         dismissKeyboardContactsPromptIfVisible();
         final AccessibilityNodeInfo[] found = new AccessibilityNodeInfo[1];
         try {
             await(
                     () -> {
-                        found[0] = findDialogPositive(automation.getWindows());
+                        found[0] = findDialogAction(automation.getWindows(), tag);
                         return found[0] != null;
                     },
-                    "Visible enabled positive dialog action missing");
+                    "Visible enabled dialog action missing: " + tag);
         } catch (AssertionError missing) {
             throw new AssertionError(
                     missing.getMessage()
@@ -199,14 +488,14 @@ final class RenderedUi {
                     missing);
         }
         settle();
-        found[0] = findDialogPositive(automation.getWindows());
+        found[0] = findDialogAction(automation.getWindows(), tag);
         if (found[0] == null)
             throw new AssertionError(
                     "Dialog action disappeared before touch; "
                             + permissionControlSummary()
                             + "; "
                             + dialogActionSummary());
-        touch(found[0], "dialog_positive");
+        touch(found[0], tag);
     }
 
     /** Select a visible permission-controller action using only known resource IDs. */
@@ -281,8 +570,6 @@ final class RenderedUi {
     }
 
     private void tap(String value, boolean id, boolean waitForIdle) {
-        if (id && (value.equals("button1") || value.equals("button2")))
-            dismissKeyboardContactsPromptIfVisible();
         if (id && value.equals("import_confirm")) {
             dismissKeyboardContactsPromptIfVisible();
             dismissKeyboard();
@@ -291,50 +578,56 @@ final class RenderedUi {
         try {
             await(
                     () -> {
-                        found[0] = waitForIdle ? shown(value, id) : find(value, id);
-                        return found[0] != null && found[0].isEnabled();
+                        AccessibilityNodeInfo candidate =
+                                waitForIdle ? shown(value, id) : find(value, id);
+                        if (candidate == null || !candidate.isEnabled()) return false;
+                        // Revealing can start a scroll animation. Resolve the touch after it
+                        // settles.
+                        if (waitForIdle) settle();
+                        else SystemClock.sleep(50);
+                        found[0] = find(value, id);
+                        return found[0] != null
+                                && found[0].isEnabled()
+                                && (!waitForIdle || touchPointIsVisible(found[0]));
                     },
                     "Visible enabled control missing: " + value);
         } catch (AssertionError missing) {
             if (!value.startsWith("permission_")) throw missing;
             throw new AssertionError(missing.getMessage() + "; " + permissionControlSummary());
         }
-        if (waitForIdle) settle();
-        else SystemClock.sleep(50); // A user can stop work while its progress keeps changing.
-        found[0] = waitForIdle ? shown(value, id) : find(value, id);
-        assertNotNull("Control disappeared before touch", found[0]);
         touch(found[0], value);
         if (id && (value.equals("import_from") || value.equals("import_to")))
             dismissKeyboardContactsPromptIfVisible();
     }
 
-    private AccessibilityNodeInfo findDialogPositive(
-            java.util.List<android.view.accessibility.AccessibilityWindowInfo> windows) {
+    private AccessibilityNodeInfo findDialogAction(
+            java.util.List<android.view.accessibility.AccessibilityWindowInfo> windows,
+            String tag) {
         for (android.view.accessibility.AccessibilityWindowInfo window : windows) {
-            AccessibilityNodeInfo found = findDialogPositive(window.getRoot());
+            AccessibilityNodeInfo found = findDialogAction(window.getRoot(), tag);
             if (found != null) return found;
         }
         return null;
     }
 
-    private AccessibilityNodeInfo findDialogPositive(AccessibilityNodeInfo node) {
+    private AccessibilityNodeInfo findDialogAction(AccessibilityNodeInfo node, String tag) {
         if (node == null || !node.refresh() || !node.isVisibleToUser()) return null;
         CharSequence owner = node.getPackageName();
         CharSequence resourceId = node.getViewIdResourceName();
         if (owner != null
                 && context.getPackageName().contentEquals(owner)
                 && resourceId != null
-                && resourceId.toString().endsWith(":id/button1")
+                && tag.contentEquals(resourceId)
                 && node.isClickable()
                 && node.isEnabled()) return node;
         for (int i = 0; i < node.getChildCount(); i++) {
-            AccessibilityNodeInfo found = findDialogPositive(node.getChild(i));
+            AccessibilityNodeInfo found = findDialogAction(node.getChild(i), tag);
             if (found != null) return found;
         }
         return null;
     }
 
-    private String dialogActionSummary() {
+    String dialogActionSummary() {
         AccessibilityNodeInfo root = automation.getRootInActiveWindow();
         String activeOwner = packageCategory(root == null ? null : root.getPackageName());
         java.util.List<String> windows = new java.util.ArrayList<>();
@@ -486,6 +779,8 @@ final class RenderedUi {
         if (context.getPackageName().contentEquals(owner)) return "app";
         if (permissionPackage(owner.toString())) return "permission";
         if ("com.android.systemui".contentEquals(owner)) return "system-ui";
+        if ("com.android.launcher3".contentEquals(owner)
+                || "com.google.android.apps.nexuslauncher".contentEquals(owner)) return "launcher";
         if (owner.toString().contains("inputmethod")) return "input-method";
         return "other";
     }
@@ -497,13 +792,15 @@ final class RenderedUi {
         CharSequence resourceId = node.getViewIdResourceName();
         String id = resourceId == null ? "" : resourceId.toString();
         String control =
-                id.endsWith(":id/button1")
-                        ? "button1"
-                        : id.endsWith(":id/button2")
-                                ? "button2"
-                                : id.endsWith(":id/button3")
-                                        ? "button3"
-                                        : knownPermissionControl(id);
+                id.equals("calltrack_dialog_confirm") || id.equals("calltrack_dialog_cancel")
+                        ? id
+                        : id.endsWith(":id/button1")
+                                ? "button1"
+                                : id.endsWith(":id/button2")
+                                        ? "button2"
+                                        : id.endsWith(":id/button3")
+                                                ? "button3"
+                                                : knownPermissionControl(id);
         boolean appOwner =
                 packageName != null && context.getPackageName().contentEquals(packageName);
         boolean permissionOwner = packageName != null && permissionPackage(packageName.toString());
@@ -540,24 +837,47 @@ final class RenderedUi {
                 "Refusing a control in an unexpected package: " + packageName,
                 packageName.equals(context.getPackageName())
                         || selector.startsWith("permission_") && permissionPackage(packageName));
+        injectTouch(node);
+    }
+
+    private void injectTouch(AccessibilityNodeInfo node) {
         Rect bounds = new Rect();
         node.getBoundsInScreen(bounds);
         assertFalse(bounds.isEmpty());
+        MotionEvent.PointerProperties finger = new MotionEvent.PointerProperties();
+        finger.id = 0;
+        finger.toolType = MotionEvent.TOOL_TYPE_FINGER;
+        MotionEvent.PointerCoords point = new MotionEvent.PointerCoords();
+        point.x = bounds.centerX();
+        point.y = bounds.centerY();
+        point.size = 1;
+        MotionEvent.PointerProperties[] properties = {finger};
+        MotionEvent.PointerCoords[] coordinates = {point};
         long at = SystemClock.uptimeMillis();
-        MotionEvent down =
-                MotionEvent.obtain(
-                        at, at, MotionEvent.ACTION_DOWN, bounds.centerX(), bounds.centerY(), 0);
-        MotionEvent up =
-                MotionEvent.obtain(
-                        at, at + 40, MotionEvent.ACTION_UP, bounds.centerX(), bounds.centerY(), 0);
-        down.setSource(InputDevice.SOURCE_TOUCHSCREEN);
-        up.setSource(InputDevice.SOURCE_TOUCHSCREEN);
-        try {
-            assertTrue(automation.injectInputEvent(down, true));
-            assertTrue(automation.injectInputEvent(up, true));
-        } finally {
-            down.recycle();
-            up.recycle();
+        for (int action : new int[] {MotionEvent.ACTION_DOWN, MotionEvent.ACTION_UP}) {
+            point.pressure = action == MotionEvent.ACTION_DOWN ? 1 : 0;
+            MotionEvent event =
+                    MotionEvent.obtain(
+                            at,
+                            SystemClock.uptimeMillis(),
+                            action,
+                            1,
+                            properties,
+                            coordinates,
+                            0,
+                            0,
+                            1,
+                            1,
+                            0,
+                            0,
+                            InputDevice.SOURCE_TOUCHSCREEN,
+                            0);
+            try {
+                assertTrue(automation.injectInputEvent(event, true));
+            } finally {
+                event.recycle();
+            }
+            if (action == MotionEvent.ACTION_DOWN) SystemClock.sleep(40);
         }
         SystemClock.sleep(250);
     }
@@ -763,8 +1083,10 @@ final class RenderedUi {
                 .append(node.isClickable())
                 .append(" focusable=")
                 .append(node.isFocusable())
+                .append(" focused=")
+                .append(node.isFocused())
                 .append(" checked=")
-                .append(node.isChecked())
+                .append(node.getChecked())
                 .append(' ')
                 .append(bounds)
                 .append(' ')

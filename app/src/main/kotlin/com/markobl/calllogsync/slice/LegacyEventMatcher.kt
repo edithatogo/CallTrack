@@ -28,6 +28,10 @@ class LegacyEventMatcher private constructor() {
     }
 
     companion object {
+        private const val MAX_LEGACY_BATCH_SIZE = 500
+        private const val MIN_IDENTIFIABLE_DIGITS = 3
+        private const val MILLIS_PER_SECOND = 1_000
+
         @JvmStatic
         fun match(
             source: CallRecord?,
@@ -39,97 +43,119 @@ class LegacyEventMatcher private constructor() {
             nearby: List<CallRecord?>?,
             nearbyComplete: Boolean,
         ): Result {
-            if (source == null || calendar < 0 || expectedTitle.isNullOrEmpty())
+            if (source == null || calendar < 0 || expectedTitle.isNullOrEmpty()) {
                 return result(Confidence.UNSUPPORTED_SOURCE)
-            val tuple =
-                try {
-                    legacyTimes(source)
-                } catch (invalid: ArithmeticException) {
-                    return result(Confidence.UNSUPPORTED_SOURCE)
-                } catch (invalid: IllegalArgumentException) {
-                    return result(Confidence.UNSUPPORTED_SOURCE)
-                }
-            if (
-                !eventsComplete ||
-                    !nearbyComplete ||
-                    events == null ||
-                    nearby == null ||
-                    events.size > 500 ||
-                    nearby.size > 500
-            )
+            }
+            val tuple = legacyTimesOrNull(source) ?: return result(Confidence.UNSUPPORTED_SOURCE)
+            if (!eventsComplete || !nearbyComplete) return result(Confidence.INCOMPLETE)
+            if (events == null || nearby == null) return result(Confidence.INCOMPLETE)
+            if (events.size > MAX_LEGACY_BATCH_SIZE || nearby.size > MAX_LEGACY_BATCH_SIZE) {
                 return result(Confidence.INCOMPLETE)
-            val eventIds = HashSet<Long>()
-            for (event in events) if (
-                event == null ||
-                    event.id < 0 ||
-                    event.calendar < 0 ||
-                    event.start < 0 ||
-                    event.end < event.start ||
-                    !eventIds.add(event.id)
+            }
+            if (!validEvents(events)) return result(Confidence.INCOMPLETE)
+            val collision =
+                nearbyCollision(source, tuple, nearby) ?: return result(Confidence.INCOMPLETE)
+            return matchEvents(
+                source,
+                calendar,
+                tuple,
+                expectedTitle,
+                expectedDescription,
+                events,
+                collision,
             )
-                return result(Confidence.INCOMPLETE)
+        }
+
+        private fun validEvents(events: List<Event?>): Boolean {
+            val ids = HashSet<Long>()
+            return events.all { event ->
+                event != null &&
+                    event.id >= 0 &&
+                    event.calendar >= 0 &&
+                    event.start >= 0 &&
+                    event.end >= event.start &&
+                    ids.add(event.id)
+            }
+        }
+
+        private fun nearbyCollision(
+            source: CallRecord,
+            tuple: LongArray,
+            nearby: List<CallRecord?>,
+        ): Boolean? {
             var sourcePresent = false
             var collision = false
             val sourceKeys = HashSet<String>()
-            for (neighbor in nearby) {
-                if (neighbor == null || !sourceKeys.add(neighbor.key()))
-                    return result(Confidence.INCOMPLETE)
+            val complete = nearby.all { neighbor ->
+                if (neighbor == null || !sourceKeys.add(neighbor.key())) return@all false
                 if (neighbor.key() == source.key()) {
-                    if (PagedCalls.binding(neighbor) != PagedCalls.binding(source))
-                        return result(Confidence.INCOMPLETE)
-                    sourcePresent = true
-                    continue
+                    sourcePresent = PagedCalls.binding(neighbor) == PagedCalls.binding(source)
+                    return@all sourcePresent
                 }
-                try {
-                    val other = legacyTimes(neighbor)
-                    if (tuple[0] == other[0] && tuple[1] == other[1]) collision = true
-                } catch (invalid: ArithmeticException) {
-                    return result(Confidence.INCOMPLETE)
-                } catch (invalid: IllegalArgumentException) {
-                    return result(Confidence.INCOMPLETE)
-                }
+                val other = legacyTimesOrNull(neighbor) ?: return@all false
+                if (tuple.contentEquals(other)) collision = true
+                true
             }
-            if (!sourcePresent) return result(Confidence.INCOMPLETE)
+            return collision.takeIf { complete && sourcePresent }
+        }
+
+        private fun matchEvents(
+            source: CallRecord,
+            calendar: Long,
+            tuple: LongArray,
+            expectedTitle: String,
+            expectedDescription: String?,
+            events: List<Event?>,
+            collision: Boolean,
+        ): Result {
             val matches = ArrayList<Long>()
             var exact = false
             for (candidate in events) {
                 val event = candidate!!
-                if (
-                    event.calendar != calendar ||
-                        event.start != tuple[0] ||
-                        event.end != tuple[1] ||
-                        !event.marker.isNullOrEmpty()
-                )
-                    continue
+                if (!inCalendarSlot(event, calendar, tuple)) continue
                 val title = expectedTitle == event.title
                 val description =
                     !expectedDescription.isNullOrEmpty() && expectedDescription == event.description
-                if (!title && !description) continue
-                matches.add(event.id)
-                exact = title && description
+                if (title || description) {
+                    matches.add(event.id)
+                    exact = title && description
+                }
             }
-            Collections.sort(matches)
+            matches.sort()
             if (matches.isEmpty()) return result(Confidence.NONE)
+            val identifiable =
+                source.identityAllowed && (source.number?.length ?: 0) >= MIN_IDENTIFIABLE_DIGITS
             val confidence =
-                if (matches.size > 1 || collision) Confidence.AMBIGUOUS
-                else if (
-                    exact &&
-                        source.identityAllowed &&
-                        source.number != null &&
-                        source.number.length >= 3
-                )
-                    Confidence.STRONG_CANDIDATE
-                else Confidence.POSSIBLE
+                when {
+                    matches.size > 1 || collision -> Confidence.AMBIGUOUS
+                    exact && identifiable -> Confidence.STRONG_CANDIDATE
+                    else -> Confidence.POSSIBLE
+                }
             return Result(confidence, matches)
         }
 
-        private fun legacyTimes(call: CallRecord): LongArray {
-            require(call.type in 1..3 && call.seconds <= Int.MAX_VALUE / 1000) {
-                "Unsupported legacy source"
+        private fun inCalendarSlot(event: Event, calendar: Long, tuple: LongArray): Boolean =
+            event.calendar == calendar &&
+                event.start == tuple[0] &&
+                event.end == tuple[1] &&
+                event.marker.isNullOrEmpty()
+
+        private fun legacyTimesOrNull(call: CallRecord): LongArray? =
+            try {
+                require(
+                    call.type in CallRecord.INCOMING..CallRecord.MISSED &&
+                        call.seconds <= Int.MAX_VALUE / MILLIS_PER_SECOND,
+                ) {
+                    "Unsupported legacy source"
+                }
+                val millis = MILLIS_PER_SECOND.toLong()
+                val start = Math.multiplyExact(Math.round(call.start.toDouble() / millis), millis)
+                longArrayOf(start, Math.addExact(start, Math.multiplyExact(call.seconds, millis)))
+            } catch (ignored: ArithmeticException) {
+                null
+            } catch (ignored: IllegalArgumentException) {
+                null
             }
-            val start = Math.multiplyExact(Math.round(call.start.toDouble() / 1000.0), 1000L)
-            return longArrayOf(start, Math.addExact(start, Math.multiplyExact(call.seconds, 1000L)))
-        }
 
         private fun result(confidence: Confidence): Result =
             Result(confidence, Collections.emptyList())

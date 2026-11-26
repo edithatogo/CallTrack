@@ -1,3 +1,20 @@
+// Use a newer D8/R8 where the documented Kotlin 2.4 minimum and bundled version differ.
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    buildscript {
+        repositories {
+            google()
+            mavenCentral()
+        }
+        dependencies {
+            classpath 'com.android.tools:r8:9.5.33'
+        }
+    }
+}
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -7,4 +24,3 @@ dependencyResolutionManagement {
 }
 rootProject.name = "CallLogSync"
 include ':app'
-include ':shared-core'

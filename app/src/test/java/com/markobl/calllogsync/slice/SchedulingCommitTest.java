@@ -16,17 +16,16 @@ public class SchedulingCommitTest {
         CountDownLatch entered = new CountDownLatch(1);
         try {
             Future<?> result =
-                    executor.submit(
-                            () -> {
-                                entered.countDown();
-                                try {
-                                    AutomaticScheduling.awaitCommitted(
-                                            new Future<?>[] {periodic, prompt},
-                                            System.nanoTime() + TimeUnit.SECONDS.toNanos(3));
-                                } catch (Exception error) {
-                                    throw new AssertionError(error);
-                                }
-                            });
+                    executor.submit(() -> {
+                        entered.countDown();
+                        try {
+                            AutomaticScheduling.awaitCommitted(
+                                    new Future<?>[] {periodic, prompt},
+                                    System.nanoTime() + TimeUnit.SECONDS.toNanos(3));
+                        } catch (Exception error) {
+                            throw new AssertionError(error);
+                        }
+                    });
             assertTrue(entered.await(1, TimeUnit.SECONDS));
             periodic.complete(null);
             assertThrows(TimeoutException.class, () -> result.get(50, TimeUnit.MILLISECONDS));

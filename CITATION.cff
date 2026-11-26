@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: If you use this work, please cite it using these metadata and identify the
+  commit or release used.
+title: CallTrack community development
+authors:
+- name: CallTrack contributors
+- name: Android Call Log Sync project
+repository-code: https://github.com/edithatogo/CallTrack
+url: https://github.com/edithatogo/CallTrack
+references:
+- type: software
+  title: Android Call Log Sync
+  authors:
+  - name: Android Call Log Sync project
+  repository-code: https://github.com/MarkoBL/AndroidCallLogSync
+  url: https://github.com/MarkoBL/AndroidCallLogSync

@@ -47,15 +47,15 @@ fun CompanionScreen(state: CompanionUiState, onAction: (CompanionUiAction) -> Un
         Text("Automatic cellular capture: unavailable in this experiment.")
         Text(
             if (state.destinationSelected) "Destination: sample calendar"
-            else "Choose a destination"
+            else "Choose a destination",
         )
         Button(
             onClick = {
                 onAction(
                     if (state.destinationSelected) CompanionUiAction.CLEAR_DESTINATION
-                    else CompanionUiAction.SELECT_SAMPLE_DESTINATION
+                    else CompanionUiAction.SELECT_SAMPLE_DESTINATION,
                 )
-            }
+            },
         ) {
             Text(if (state.destinationSelected) "Clear selection" else "Use sample calendar")
         }

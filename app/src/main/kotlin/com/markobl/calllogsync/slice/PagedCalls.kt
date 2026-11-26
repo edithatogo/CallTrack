@@ -33,7 +33,7 @@ class PagedCalls private constructor() {
                     lastId >= -1 &&
                     lastId <= upperId &&
                     (upperId == -1L) == (upperBinding == null) &&
-                    (lastId == -1L) == (lastBinding == null)
+                    (lastId == -1L) == (lastBinding == null),
             ) {
                 "Invalid source checkpoint"
             }
@@ -48,6 +48,8 @@ class PagedCalls private constructor() {
     }
 
     companion object {
+        internal const val MAX_PAGE_SIZE = 500
+
         @JvmStatic
         fun capture(source: Source?): Checkpoint {
             val namespace = source!!.namespace()
@@ -63,10 +65,12 @@ class PagedCalls private constructor() {
             validate(source, prior)
             val captured = capture(source)
             validate(source, prior)
-            if (prior.namespace != captured.namespace || captured.upperId < prior.upperId)
+            if (prior.namespace != captured.namespace || captured.upperId < prior.upperId) {
                 throw SourceChanged()
-            if (captured.upperId == prior.upperId && captured.upperBinding != prior.upperBinding)
+            }
+            if (captured.upperId == prior.upperId && captured.upperBinding != prior.upperBinding) {
                 throw SourceChanged()
+            }
             return Checkpoint(
                 prior.namespace,
                 captured.upperId,
@@ -88,7 +92,7 @@ class PagedCalls private constructor() {
 
         @JvmStatic
         fun read(source: Source?, checkpoint: Checkpoint?, limit: Int): List<CallRecord> {
-            require(limit in 1..500) { "Invalid page limit" }
+            require(limit in 1..MAX_PAGE_SIZE) { "Invalid page limit" }
             validate(source, checkpoint)
             val saved = checkpoint!!
             if (saved.lastId == saved.upperId) return Collections.emptyList()
@@ -97,8 +101,9 @@ class PagedCalls private constructor() {
             var previous = saved.lastId
             for (call in rows) {
                 val id = id(call)
-                if (saved.namespace != call!!.namespace || id <= previous || id > saved.upperId)
+                if (saved.namespace != call!!.namespace || id <= previous || id > saved.upperId) {
                     throw SourceChanged()
+                }
                 previous = id
             }
             validate(source, saved)
@@ -119,13 +124,15 @@ class PagedCalls private constructor() {
                         saved.upperBinding,
                         saved.namespace,
                     )
-            )
+            ) {
                 throw SourceChanged()
+            }
             if (
                 saved.lastId >= 0 &&
                     !same(source.at(saved.lastId), saved.lastId, saved.lastBinding, saved.namespace)
-            )
+            ) {
                 throw SourceChanged()
+            }
         }
 
         private fun same(

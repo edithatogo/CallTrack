@@ -1,7 +1,7 @@
 # Dependency verification qualification
 
-The canonical policy is `gradle/verification-metadata.xml`; the prototype copy was
-retired after qualification. Gradle enforces artifact and repository-metadata
+The app policy is `gradle/verification-metadata.xml`. The independent shared UI
+and JVM benchmark builds pin their own resolved dependencies. Gradle enforces artifact and repository-metadata
 SHA256 checks in ordinary builds. The original736 entries were compared against fresh official
 repository bytes or the completed239-artifact canonical binary audit before
 promotion. Generation from a cache was only a candidate, never the trust decision.
@@ -44,3 +44,14 @@ remains enabled, without trust exceptions or automatic checksum generation.
 These are metadata for already resolved build dependencies, not new app libraries.
 Initial failure and diagnostic overlay results remain distinct from final clean
 source/cold-cache acceptance. The subsequent Track5 Linux evidence owns the result.
+
+## Cold reproduction cache scope — 2026-11-23
+
+The manually dispatched cold reproduction runs with GitHub Actions cache access
+set to `none` and checks the effective mode before candidate checkout. Its
+successful hosted qualification verified the same historical candidate and APK
+hash with fresh SDK and Gradle directories. GitHub enforces the cache isolation for the entire job.
+Dispatch from a repository branch containing the reviewed candidate. The workflow
+checks the full commit SHA against that branch's history before creating the
+candidate worktree. The reviewed Track 5 snapshot remains available by its
+recorded immutable commit. APK comparison still applies to the selected commit.

@@ -54,13 +54,23 @@ class RunnerSafetyTest(unittest.TestCase):
     def test_failed_checkout_leaves_failed_receipt(self):
         with tempfile.TemporaryDirectory() as folder:
             output = Path(folder) / 'evidence'
-            with patch.object(release.subprocess, 'check_output', side_effect=[b'', 'abc123']), patch.object(release.subprocess, 'run', side_effect=RuntimeError('clone fault')):
+            with patch.object(release.subprocess, 'check_output', side_effect=[b'', 'abc123', 'openjdk version "25.0.5.1"']), patch.object(release.subprocess, 'run', side_effect=RuntimeError('clone fault')):
                 with self.assertRaisesRegex(RuntimeError, 'clone fault'):
                     release.run(output, Path(folder), Path(folder))
             receipt = json.loads((output / 'receipt.json').read_text())
             self.assertFalse(receipt['success'])
             self.assertFalse(receipt['release_ready'])
             self.assertEqual('clone fault', receipt['error'])
+
+    def test_older_jdk_fails_and_retains_receipt(self):
+        with tempfile.TemporaryDirectory() as folder:
+            output = Path(folder) / 'evidence'
+            with patch.object(release.subprocess, 'check_output', side_effect=[b'', 'abc123', 'openjdk version "17.0.21"']):
+                with self.assertRaisesRegex(ValueError, 'JDK25 required'):
+                    release.run(output, Path(folder), Path(folder))
+            receipt = json.loads((output / 'receipt.json').read_text())
+            self.assertFalse(receipt['success'])
+            self.assertEqual('JDK25 required', receipt['error'])
 
 
 class UnsignedSignatureTest(unittest.TestCase):

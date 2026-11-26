@@ -12,6 +12,22 @@ from parity_targets import RECOVERY_AVD, TRACK14_UI_AVD
 
 
 class UiSafety(unittest.TestCase):
+    def test_adaptive_windows_restore_original_override_after_failed_accessibility_check(self):
+        physical = 'Physical size: 1080x2400'
+        original = physical + '\nOverride size: 1200x2500'
+        command = Mock(side_effect=[
+            original, 'Physical density: 420',
+            '', physical + '\nOverride size: 945x1890',
+            '', physical + '\nOverride size: 1890x2362',
+            '', original,
+        ])
+        check = Mock(side_effect=[None, RuntimeError('Accessibility check failed')])
+        with self.assertRaisesRegex(RuntimeError, 'Accessibility check failed'):
+            device.check_adaptive_windows(command, check)
+        self.assertEqual(check.call_count, 2)
+        self.assertEqual(command.call_args_list[-2].args, ('shell', 'wm', 'size', '1200x2500'))
+        self.assertEqual(command.call_args.args, ('shell', 'wm', 'size'))
+
     def test_instrumentation_failures_keep_only_protocol_state_categories(self):
         cases = (
             ('', 'instrumentation-output-empty', 'instrumentation-protocol=none'),
@@ -112,6 +128,31 @@ class UiSafety(unittest.TestCase):
         self.assertEqual(device.activity_top_summary(dump), 'activity-top=input-method')
         self.assertNotIn('com.example.private', device.activity_top_summary(dump))
 
+    def test_activity_diagnostics_classify_launcher_and_known_records_only(self):
+        dump = (
+            '* Hist #0: ActivityRecord{abc u0 org.calltrack.community.dev/'
+            'com.markobl.calllogsync.slice.ReceiptRecoveryActivity t42}\n'
+            'mResumedActivity: ActivityRecord{def u0 '
+            'com.google.android.apps.nexuslauncher/.Launcher t1}\n'
+            'private account and call details\n'
+        )
+        summary = device.instrumentation_failure_summary('restore', '', activity_dump=dump)
+        self.assertIn('activity-top=launcher', summary)
+        self.assertIn('activity-records=recovery', summary)
+        self.assertNotIn('private', summary)
+        windows = device.native_failure_summary(
+            'restore', 'dialog-active=launcher dialog-windows=[launcher:application:[]] private')
+        self.assertIn('dialog-active=launcher', windows)
+        self.assertIn('dialog-windows=launcher:application', windows)
+        self.assertNotIn('private', windows)
+        self.assertEqual('activity-records=unavailable', device.activity_record_summary(''))
+
+    def test_unrelated_nonfatal_exception_is_not_reported(self):
+        summary = device.runtime_failure_summary(
+            'java.lang.ArrayIndexOutOfBoundsException: unrelated private detail\n')
+        self.assertNotIn('runtime-exception', summary)
+        self.assertNotIn('private', summary)
+
     def test_runtime_diagnostic_keeps_only_failure_categories_and_exception_class(self):
         logcat = (
             'E AndroidRuntime: FATAL EXCEPTION: main\n'
@@ -145,6 +186,45 @@ class UiSafety(unittest.TestCase):
         self.assertIn('runtime-fatal-source=input-method', diagnostic)
         self.assertNotIn('SomeClass', diagnostic)
         self.assertNotIn('private text', diagnostic)
+
+    def test_runtime_diagnostic_keeps_driver_and_known_frame_without_private_text(self):
+        logcat = (
+            'E AndroidRuntime: FATAL EXCEPTION: main\n'
+            'E AndroidRuntime: Process: org.calltrack.community.dev:recovery_driver, PID: 4321\n'
+            'E AndroidRuntime: java.lang.IllegalStateException: private call details\n'
+            'E AndroidRuntime: \tat com.markobl.calllogsync.slice.RenderedUi.killStoppedProcessAndReturn(RenderedUi.java:141)\n'
+        )
+        summary = device.instrumentation_failure_summary('restore', '', logcat=logcat)
+        self.assertIn('runtime-fatal-process=driver', summary)
+        self.assertIn('runtime-fatal-source=project', summary)
+        self.assertIn('runtime-project-frame=RenderedUi.killStoppedProcessAndReturn', summary)
+        self.assertNotIn('private call details', summary)
+        self.assertNotIn('4321', summary)
+
+    def test_runtime_diagnostic_identifies_system_shell_pipe_failure(self):
+        logcat = (
+            'android.apps.gsa.shared.exception.GsaIOException: unrelated private detail\n'
+            'FATAL EXCEPTION IN SYSTEM PROCESS: Thread-1\n'
+            'java.lang.RuntimeException: private shell output\n'
+            '\tat android.app.UiAutomationConnection$1.run(UiAutomationConnection.java:300)\n'
+            'Caused by: java.io.IOException: write failed: EPIPE (Broken pipe)\n'
+        )
+        summary = device.instrumentation_failure_summary('restore', '', logcat=logcat)
+        self.assertIn('runtime-exception=java.lang.RuntimeException', summary)
+        self.assertIn('runtime-fatal-process=platform', summary)
+        self.assertIn('runtime-shell-pipe-failure', summary)
+        self.assertNotIn('GsaIOException', summary)
+        self.assertNotIn('private', summary)
+
+    def test_runtime_diagnostic_classifies_only_our_blocked_background_start(self):
+        logcat = ('Background activity start [callingPackage: org.calltrack.community.dev; '
+                  'private account and call details]\n')
+        summary = device.instrumentation_failure_summary('restore', '', logcat=logcat)
+        self.assertIn('runtime-background-start-blocked', summary)
+        self.assertNotIn('private', summary)
+        other = device.runtime_failure_summary(
+            'Background activity start [callingPackage: com.example.other; private]\n')
+        self.assertNotIn('runtime-background-start-blocked', other)
 
     def test_nonzero_instrumentation_failure_uses_bounded_host_diagnostics(self):
         activity_dump = (
@@ -196,14 +276,53 @@ class UiSafety(unittest.TestCase):
         )
         self.assertIn('non-focusable anchor id=auto_access_action enabled=true', anchor_summary)
 
+        for message in (
+            'The initial keyboard target must accept focus',
+            'Initial keyboard focus was not applied',
+        ):
+            initial_summary = device.native_failure_summary(
+                'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
+                f'java.lang.AssertionError: {message} auto_access_action\n'
+                'private visible label must remain hidden\n',
+            )
+            self.assertIn('keyboard-initial-focus-missing anchor id=auto_access_action', initial_summary)
+            self.assertNotIn('private visible label', initial_summary)
+
         keyboard_summary = device.native_failure_summary(
             'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
-            'java.lang.AssertionError: Keyboard Tab did not expose visible application focus slice_calendar_picker\n'
+            'java.lang.AssertionError: Keyboard Tab did not expose visible application focus slice_calendar_picker focus-state=initial\n'
             '    at com.markobl.calllogsync.slice.PositiveUiTest.renderedAccessibilityLabelsTargetsAndKeyboardFocus(PositiveUiTest.java:306)\n'
             'private visible label must remain hidden\n',
         )
         self.assertIn('keyboard-focus-missing anchor id=slice_calendar_picker', keyboard_summary)
+        self.assertIn('keyboard-focus-state=initial', keyboard_summary)
         self.assertNotIn('private visible label', keyboard_summary)
+
+        tree_summary = device.native_failure_summary(
+            'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
+            'Keyboard Tab did not expose visible application focus auto_access_action '
+            'focus-state=not-focusable focus-node=view:app:true:false:true '
+            'focus-tree-moved=true private visible label must remain hidden\n',
+        )
+        self.assertIn('keyboard-focus-state=not-focusable', tree_summary)
+        self.assertIn('focus-node=view:app:true:false:true focus-tree-moved=true', tree_summary)
+        self.assertNotIn('private visible label', tree_summary)
+
+        injection_summary = device.native_failure_summary(
+            'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
+            'java.lang.AssertionError: Android did not accept the Tab key down\n'
+            'private visible label must remain hidden\n',
+        )
+        self.assertIn('keyboard-tab-injection-rejected phase=down', injection_summary)
+        self.assertNotIn('private visible label', injection_summary)
+
+        window_summary = device.native_failure_summary(
+            'renderedAccessibilityLabelsTargetsAndKeyboardFocus',
+            'Screen window did not receive keyboard input focus recovery_refresh_action\n'
+            'private visible label must remain hidden\n',
+        )
+        self.assertIn('keyboard-window-focus-missing anchor id=recovery_refresh_action', window_summary)
+        self.assertNotIn('private visible label', window_summary)
 
     def test_failure_summary_retains_safe_system_inset_measurements(self):
         summary = device.native_failure_summary(
@@ -214,6 +333,15 @@ class UiSafety(unittest.TestCase):
         )
         self.assertIn('system-inset screen=manual content_top=17 required_top=24', summary)
         self.assertNotIn('private rendered label', summary)
+
+    def test_failure_summary_reports_instrumentation_exception_class_only(self):
+        summary = device.native_failure_summary(
+            'renderedExplicitRetentionClearsOnlyExpiredPayload',
+            'INSTRUMENTATION_STATUS: stack=java.lang.IllegalStateException: private fixture\n'
+            'INSTRUMENTATION_STATUS_CODE: -2\n',
+        )
+        self.assertIn('instrumentation-exception=java.lang.IllegalStateException', summary)
+        self.assertNotIn('private fixture', summary)
 
     def test_failure_summary_exposes_fixture_source_frame_without_call_details(self):
         summary = device.native_failure_summary(
@@ -226,10 +354,23 @@ class UiSafety(unittest.TestCase):
         self.assertIn('ParityProviderTest.java:109', summary)
         self.assertNotIn('private fixture detail', summary)
 
+    def test_adaptive_navigation_failure_reports_only_the_source_frame(self):
+        summary = device.native_failure_summary(
+            'expandedSettingsShowsOneActiveDetailWithAccessibleNavigation',
+            'INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: private fixture content\n'
+            '    at com.markobl.calllogsync.slice.AdaptiveCallTrackNavigationTest.'
+            'expandedSettingsShowsOneActiveDetailWithAccessibleNavigation('
+            'AdaptiveCallTrackNavigationTest.kt:46) private fixture content\n'
+            '    at com.markobl.calllogsync.slice.OtherTest.other(OtherTest.kt:1)\n',
+        )
+        self.assertIn('AdaptiveCallTrackNavigationTest.kt:46', summary)
+        self.assertNotIn('private fixture content', summary)
+        self.assertNotIn('OtherTest.kt', summary)
+
     def test_failure_summary_uses_fixed_import_dialog_category(self):
         summary = device.native_failure_summary(
             'renderedRangePreviewCancelConfirmAndRepeat',
-            'java.lang.AssertionError: Visible enabled control missing: button1\n'
+            'java.lang.AssertionError: Visible enabled dialog action missing: calltrack_dialog_confirm\n'
             '    at com.markobl.calllogsync.slice.RenderedUi.tap(RenderedUi.java:154)\n'
             '    at com.markobl.calllogsync.slice.ImportUiTest.confirm(ImportUiTest.java:104)\n',
         )
@@ -239,8 +380,8 @@ class UiSafety(unittest.TestCase):
     def test_failure_summary_retains_only_allowlisted_dialog_action_metadata(self):
         summary = device.native_failure_summary(
             'renderedRangePreviewCancelConfirmAndRepeat',
-            'Visible enabled positive dialog action missing; dialog-active=input-method '
-            'dialog-windows=[app:application:[button1:android.widget.Button:'
+            'Visible enabled dialog action missing: calltrack_dialog_confirm; dialog-active=input-method '
+            'dialog-windows=[app:application:[calltrack_dialog_confirm:android.widget.Button:'
             'enabled=false:clickable=true], permission:application:'
             '[permission_allow_button:android.widget.Button:enabled=true:clickable=true], '
             'input-method:input-method:[]] app-permissions=[calendar-read=granted,'
@@ -257,7 +398,7 @@ class UiSafety(unittest.TestCase):
             'dialog-windows=app:application,permission:application,input-method:input-method',
             summary,
         )
-        self.assertIn('dialog-controls=button1:android.widget.Button:false', summary)
+        self.assertIn('dialog-controls=calltrack_dialog_confirm:android.widget.Button:false', summary)
         self.assertIn(
             'permission_allow_button:android.widget.Button:true', summary)
         self.assertIn('app-permissions=calendar-read:granted,calendar-write:granted,'
@@ -323,7 +464,7 @@ class UiSafety(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.root = Path(self.temp.name)
+        self.root = Path(self.temp.name).resolve()
         evidence = self.root / '.local/slice-evidence'
         evidence.mkdir(parents=True)
         artifacts = {}
@@ -338,7 +479,11 @@ class UiSafety(unittest.TestCase):
         self.systemui_anr = False
         self.files = 'screen.png\nscreen.txt'
         self.fail_cleanup = False
+        self.fail_ui = False
+        self.install_timeout = False
+        self.app_permission = ''
         self.avd = RECOVERY_AVD
+        self.display_override = None
 
     def command(self, command, **kwargs):
         args = command[3:]
@@ -350,14 +495,33 @@ class UiSafety(unittest.TestCase):
             output = 'Service phone: found' if self.phone_available else 'Service phone: not found'
         elif args == ['emu', 'avd', 'name']:
             output = self.avd + '\nOK'
+        elif args == ['shell', 'wm', 'size']:
+            output = 'Physical size: 1080x2400'
+            if self.display_override:
+                output += '\nOverride size: ' + self.display_override
+        elif args[:3] == ['shell', 'wm', 'size']:
+            self.display_override = None if args[3] == 'reset' else args[3]
+        elif args == ['shell', 'wm', 'density']:
+            output = 'Physical density: 420'
         elif args == ['shell', 'dumpsys', 'window']:
             output = 'mCurrentFocus=Window{Application Not Responding: com.android.systemui}' if self.systemui_anr else 'mCurrentFocus=Window{Launcher}'
+        elif args[0] == 'install' and self.install_timeout:
+            raise subprocess.TimeoutExpired(command, kwargs['timeout'])
         elif args[0] in ('install', 'uninstall'):
             output = 'Success'
         elif args[:4] == ['shell', 'cmd', 'package', 'compile']:
             output = 'Success'
         elif args[:3] == ['shell', 'am', 'instrument']:
-            output = 'FAILURES' if self.fail_cleanup and ('renderedPermissions' in ' '.join(args) or 'cleanupFixture' in ' '.join(args)) else 'OK (1 test)'
+            if self.fail_ui and 'renderedAccessibilityLabelsTargetsAndKeyboardFocus' in ' '.join(args):
+                output = 'FAILURES!!!\nINSTRUMENTATION_STATUS_CODE: -1\nprivate display text'
+            else:
+                output = 'FAILURES' if self.fail_cleanup and ('renderedPermissions' in ' '.join(args) or 'cleanupFixture' in ' '.join(args)) else 'OK (1 test)'
+        elif args == ['shell', 'dumpsys', 'activity', 'activities']:
+            output = 'mResumedActivity: ActivityRecord{abc u0 com.example.launcher/.Home t4}'
+        elif args == ['logcat', '-d', '-t', '800']:
+            output = ('FATAL EXCEPTION: main\n'
+                      'Process: org.calltrack.community.dev:recovery_driver, PID: 4321\n'
+                      'java.lang.IllegalStateException: private call details\n')
         elif args[:3] == ['shell', 'run-as', device.PACKAGE]:
             output = self.files
         elif args[0] == 'exec-out':
@@ -366,10 +530,12 @@ class UiSafety(unittest.TestCase):
 
     def run_fixture(self, suite="settings", receipt_dir=None):
         identities = ["package: name='" + p + "'" for p in (device.PACKAGE, device.TEST_PACKAGE)]
+        if self.app_permission:
+            identities[0] += "\nuses-permission: name='android.permission." + self.app_permission + "'"
         environment = Mock()
         environment.snapshot.return_value = {'awake': 'Awake'}
         environment.restore.return_value = {'verified': True}
-        with patch.object(device, 'ROOT', self.root), patch.object(device, 'inputs', return_value={}), patch.object(device.subprocess, 'check_output', side_effect=identities), patch.object(device.subprocess, 'run', side_effect=self.command), patch.object(device, 'EmulatorEnvironment', return_value=environment):
+        with patch.object(device, 'ROOT', self.root), patch.object(device, 'inputs', return_value={}), patch.object(device.subprocess, 'check_output', side_effect=identities + [''] * 20), patch.object(device.subprocess, 'run', side_effect=self.command), patch.object(device, 'EmulatorEnvironment', return_value=environment):
             return device.qualify('emulator-5582', suite, receipt_dir)
 
     def test_guest_anr_refuses_ui_acceptance_before_install(self):
@@ -381,7 +547,7 @@ class UiSafety(unittest.TestCase):
         self.assertTrue(receipt['packages_removed'])
 
     def test_matrix_receipt_isolated_and_cannot_overwrite_a_prior_run(self):
-        output = self.root / 'matrix' / 'first'
+        output = self.root / '.local/matrix/first'
         self.assertEqual(0, self.run_fixture('accessibility', output))
         receipt = output / 'parity-ui-accessibility-receipt.json'
         original = receipt.read_bytes()
@@ -401,6 +567,131 @@ class UiSafety(unittest.TestCase):
         self.assertTrue(receipt['packages_removed'])
         self.assertTrue(receipt['fixture_cleanup_verified'])
 
+    def test_failed_instrumentation_collects_only_bounded_diagnostics(self):
+        self.fail_ui = True
+        self.assertEqual(1, self.run_fixture('accessibility'))
+        receipt = json.loads((self.root / '.local/slice-evidence/parity-ui-accessibility-receipt.json').read_text())
+        self.assertIn('activity-top=other', receipt['error'])
+        self.assertIn('runtime-fatal-process=driver', receipt['error'])
+        self.assertNotIn('private', receipt['error'])
+        self.assertTrue(receipt['fixture_cleanup_verified'])
+        self.assertTrue(receipt['packages_removed'])
+
+    def test_default_receipt_does_not_follow_a_link(self):
+        sentinel = self.root / 'retain.txt'
+        sentinel.write_text('keep')
+        output = self.root / '.local/slice-evidence/parity-ui-receipt.json'
+        output.symlink_to(sentinel)
+        with self.assertRaises(OSError):
+            self.run_fixture()
+        self.assertEqual('keep', sentinel.read_text())
+        self.assertTrue(any(c[0] == 'uninstall' for c in self.calls))
+
+    def test_default_receipt_does_not_modify_a_hard_link(self):
+        sentinel = self.root / 'retain.txt'
+        sentinel.write_text('keep')
+        output = self.root / '.local/slice-evidence/parity-ui-receipt.json'
+        output.hardlink_to(sentinel)
+        with self.assertRaisesRegex(RuntimeError, 'Unsafe receipt file'):
+            self.run_fixture()
+        self.assertEqual('keep', sentinel.read_text())
+        self.assertTrue(any(c[0] == 'uninstall' for c in self.calls))
+
+    def test_default_regular_receipt_remains_replaceable(self):
+        output = self.root / '.local/slice-evidence/parity-ui-receipt.json'
+        output.write_text('previous receipt')
+        self.assertEqual(0, self.run_fixture())
+        self.assertEqual('passed', json.loads(output.read_text())['result'])
+        self.assertEqual(0o600, output.stat().st_mode & 0o777)
+
+    def test_matrix_receipt_refuses_outside_and_linked_directories(self):
+        sibling = self.root / '.local-other'
+        sibling.mkdir()
+        link = self.root / '.local/link'
+        link.symlink_to(sibling, target_is_directory=True)
+        for output in (sibling / 'receipt', link / 'receipt',
+                       self.root / '.local/../.local-other/receipt'):
+            with self.subTest(output=output), self.assertRaisesRegex(ValueError, 'under the repository'):
+                self.run_fixture('accessibility', output)
+        self.assertEqual([], self.calls)
+        self.assertEqual([], list(sibling.iterdir()))
+
+    def test_new_matrix_receipt_rejects_a_link_created_during_the_run(self):
+        output = self.root / '.local/selected output'
+        sentinel = self.root / 'retain.txt'
+        sentinel.write_text('keep')
+        original = self.command
+
+        def command(args, **kwargs):
+            if any('cleanupFixture' in str(arg) for arg in args):
+                (output / 'parity-ui-accessibility-receipt.json').symlink_to(sentinel)
+            return original(args, **kwargs)
+
+        self.command = command
+        with self.assertRaises(FileExistsError):
+            self.run_fixture('accessibility', output)
+        self.assertEqual('keep', sentinel.read_text())
+        self.assertTrue(any(c[0] == 'uninstall' for c in self.calls))
+
+    def test_changed_matrix_receipt_directory_is_refused(self):
+        output = self.root / '.local/selected output'
+        moved = self.root / 'moved'
+        replacement = self.root / 'replacement'
+        replacement.mkdir()
+        original = self.command
+
+        def command(args, **kwargs):
+            if any('cleanupFixture' in str(arg) for arg in args):
+                output.rename(moved)
+                output.symlink_to(replacement, target_is_directory=True)
+            return original(args, **kwargs)
+
+        self.command = command
+        with self.assertRaises(OSError):
+            self.run_fixture('accessibility', output)
+        self.assertEqual([], list(replacement.iterdir()))
+        self.assertTrue(any(c[0] == 'uninstall' for c in self.calls))
+
+    def test_new_matrix_directory_replaced_before_use_is_refused(self):
+        output = self.root / '.local/selected output'
+        replacement = self.root / 'replacement'
+        replacement.mkdir()
+        original_mkdir = Path.mkdir
+
+        def mkdir(path, *args, **kwargs):
+            result = original_mkdir(path, *args, **kwargs)
+            if path == output:
+                output.rmdir()
+                output.symlink_to(replacement, target_is_directory=True)
+            return result
+
+        with patch.object(Path, 'mkdir', new=mkdir):
+            with self.assertRaisesRegex(RuntimeError, 'Receipt directory changed'):
+                self.run_fixture('accessibility', output)
+        self.assertFalse(self.calls)
+        self.assertEqual([], list(replacement.iterdir()))
+
+    def test_default_receipt_directory_replaced_after_build_read_is_refused(self):
+        evidence = self.root / '.local/slice-evidence'
+        moved = self.root / '.local/moved-evidence'
+        replacement = self.root / '.local/replacement'
+        replacement.mkdir()
+        identities = iter("package: name='" + p + "'" for p in (device.PACKAGE, device.TEST_PACKAGE))
+
+        def identity(_args, **_kwargs):
+            if not evidence.is_symlink():
+                evidence.rename(moved)
+                evidence.symlink_to(replacement, target_is_directory=True)
+            return next(identities)
+
+        with patch.object(device, 'ROOT', self.root), patch.object(device, 'inputs', return_value={}), \
+             patch.object(device.subprocess, 'check_output', side_effect=identity), \
+             patch.object(device.subprocess, 'run') as run:
+            with self.assertRaisesRegex(RuntimeError, 'Receipt directory changed'):
+                device.qualify('emulator-5582')
+            run.assert_not_called()
+        self.assertEqual([], list(replacement.iterdir()))
+
     def test_physical_target_refused_before_tools(self):
         with patch.object(device.subprocess, 'run') as run:
             with self.assertRaisesRegex(RuntimeError, 'physical-device'):
@@ -412,6 +703,28 @@ class UiSafety(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'dedicated'):
             self.run_fixture()
         self.assertFalse(any(c[0] == 'install' for c in self.calls))
+
+    def test_stale_build_inputs_refuse_device_access(self):
+        with patch.object(device, 'ROOT', self.root), patch.object(
+            device, 'inputs', return_value={'app/src/changed.kt': 'different'}
+        ), patch.object(device.subprocess, 'run') as run:
+            with self.assertRaisesRegex(RuntimeError, 'build receipt does not match current source'):
+                device.qualify('emulator-5582')
+            run.assert_not_called()
+
+    def test_sensitive_permission_refuses_device_access(self):
+        self.app_permission = 'INTERNET'
+        with self.assertRaisesRegex(RuntimeError, 'outside the UI fixture scope'):
+            self.run_fixture()
+        self.assertFalse(self.calls)
+
+    def test_uncertain_install_uninstalls_and_checks_absence(self):
+        self.install_timeout = True
+        self.assertEqual(1, self.run_fixture())
+        self.assertIn(['uninstall', device.PACKAGE], self.calls)
+        self.assertIn(['shell', 'pm', 'list', 'packages', device.PACKAGE], self.calls)
+        receipt = json.loads((self.root / '.local/slice-evidence/parity-ui-receipt.json').read_text())
+        self.assertTrue(receipt['packages_removed'])
 
     def test_no_screenshot_preserves_installed_evidence_and_cleanup_code(self):
         self.files = ''
@@ -432,7 +745,27 @@ class UiSafety(unittest.TestCase):
     def test_import_suite_uses_its_own_class_and_receipt(self):
         self.assertEqual(0, self.run_fixture('imports'))
         methods = [' '.join(c) for c in self.calls if c[:3] == ['shell', 'am', 'instrument']]
-        self.assertTrue(all('ImportUiTest#' in method for method in methods))
+        selectors = [c[c.index('class') + 1] for c in self.calls
+                     if c[:3] == ['shell', 'am', 'instrument']]
+        self.assertEqual([
+            'com.markobl.calllogsync.slice.HistoricalImportActionsPanelTest'
+            '#runActionsRequireEnabledStateAndExplicitTaps',
+            'com.markobl.calllogsync.slice.HistoricalImportDestinationPanelTest'
+            '#destinationListIsPresentedAndOnlyExplicitSelectionReturnsOpaqueToken',
+            'com.markobl.calllogsync.slice.HistoricalImportDestinationPanelTest'
+            '#keyboardSelectionRestoresPickerFocusWhenSaveFinishes',
+            'com.markobl.calllogsync.slice.HistoricalImportFiltersPanelTest'
+            '#dateAndCallTypeFiltersEmitOnlyExplicitUserChanges',
+            'com.markobl.calllogsync.slice.HistoricalImportFiltersPanelTest'
+            '#controlsRemainAccessibleWithLargeFontAndRightToLeftLayout',
+        ], selectors[:5])
+        self.assertTrue(all(method.startswith('com.markobl.calllogsync.slice.ImportUiTest#')
+                            for method in selectors[5:]))
+        self.assertEqual('com.markobl.calllogsync.slice.ImportUiTest#cleanupFixture', selectors[-1])
+        self.assertTrue(any('latestCallUsesNewestDateAndHighestIdOnTies' in method for method in methods))
+        self.assertTrue(any('renderedDestinationAndFiltersSurviveProcessDeathWithoutPreview' in method
+                            and 'ProcessRecoveryRunner' in method for method in methods))
+        self.assertTrue(any('renderedDestinationAndFiltersSurviveRecreationBeforePreview' in method for method in methods))
         receipt = json.loads((self.root / '.local/slice-evidence/parity-ui-imports-receipt.json').read_text())
         self.assertEqual('imports', receipt['suite'])
         self.assertTrue(receipt['fixture_cleanup_verified'])
@@ -440,7 +773,11 @@ class UiSafety(unittest.TestCase):
     def test_recovery_suite_keeps_read_only_permission_boundary(self):
         self.assertEqual(0, self.run_fixture('recovery'))
         methods = [' '.join(c) for c in self.calls if c[:3] == ['shell', 'am', 'instrument']]
-        self.assertTrue(all('RecoveryUiTest#' in method for method in methods))
+        self.assertIn('RecoveryCardsPanelTest#busyManagementAndPaginationActionsAreDisabled', methods[0])
+        self.assertTrue(all('RecoveryUiTest#' in method for method in methods[1:]))
+        self.assertTrue(any('renderedPendingRecoverySurvivesProcessDeathWithoutApproval' in method
+                            and 'ProcessRecoveryRunner' in method for method in methods))
+        self.assertTrue(any('renderedPendingRecoverySurvivesRecreationWithoutApproval' in method for method in methods))
         check_index = next(i for i,c in enumerate(self.calls) if 'renderedExistingCheckWithoutWriteAccess' in ' '.join(c))
         self.assertEqual(['shell', 'pm', 'revoke', device.PACKAGE, 'android.permission.WRITE_CALENDAR'], self.calls[check_index-1])
         self.assertEqual(['shell', 'pm', 'grant', device.PACKAGE, 'android.permission.WRITE_CALENDAR'], self.calls[check_index+1])

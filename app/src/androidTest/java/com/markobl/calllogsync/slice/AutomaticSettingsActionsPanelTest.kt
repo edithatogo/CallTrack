@@ -1,9 +1,10 @@
 package com.markobl.calllogsync.slice
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import org.junit.Assert.assertEquals
@@ -19,20 +20,17 @@ class AutomaticSettingsActionsPanelTest {
         var pauseRequests = 0
         var refreshRequests = 0
         compose.setContent {
-            AutomaticSettingsActionsPanel(
-                state =
-                    AutomaticSettingsActionsUiState(
-                        enableEnabled = false,
-                        pauseEnabled = true,
-                        refreshEnabled = true,
-                    ),
-                enableLabel = "Enable",
-                pauseLabel = "Pause",
-                refreshLabel = "Refresh",
-                onEnable = { enabledRequests++ },
-                onPause = { pauseRequests++ },
-                onRefresh = { refreshRequests++ },
-            )
+            val state = AutomaticSettingsActionsUiState(enableEnabled = false)
+            Column {
+                AutomaticStatusActions(
+                    state = state,
+                    pauseLabel = "Pause",
+                    refreshLabel = "Refresh",
+                    onPause = { pauseRequests++ },
+                    onRefresh = { refreshRequests++ },
+                )
+                AutomaticApplyButton(state, "Enable") { enabledRequests++ }
+            }
         }
 
         compose.onNodeWithTag("auto_enable").assertIsDisplayed().assertIsNotEnabled()
@@ -49,15 +47,9 @@ class AutomaticSettingsActionsPanelTest {
     fun enabledActionDispatchesOnlyWhenClicked() {
         var enableRequests = 0
         compose.setContent {
-            AutomaticSettingsActionsPanel(
-                state = AutomaticSettingsActionsUiState(enableEnabled = true),
-                enableLabel = "Enable",
-                pauseLabel = "Pause",
-                refreshLabel = "Refresh",
-                onEnable = { enableRequests++ },
-                onPause = {},
-                onRefresh = {},
-            )
+            AutomaticApplyButton(AutomaticSettingsActionsUiState(enableEnabled = true), "Enable") {
+                enableRequests++
+            }
         }
 
         compose.runOnIdle { assertEquals(0, enableRequests) }

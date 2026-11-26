@@ -1,0 +1,44 @@
+name: OpenSSF Scorecard
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '37 4 * * 3'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scorecard:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    steps:
+      - name: Install verified Scorecard
+        run: |
+          curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
+            https://github.com/ossf/scorecard/releases/download/v5.7.0/scorecard_5.7.0_linux_amd64.tar.gz \
+            -o "$RUNNER_TEMP/scorecard.tar.gz"
+          echo '3b08ec0a8681806c3e744ec9210742a502c7d66f06f25523b70f7128738235d3  '"$RUNNER_TEMP/scorecard.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/scorecard.tar.gz" -C "$RUNNER_TEMP" scorecard
+      - name: Evaluate repository security practices
+        env:
+          GITHUB_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if "$RUNNER_TEMP/scorecard" --repo="$GITHUB_REPOSITORY" --format=json --show-details \
+              --output="$RUNNER_TEMP/scorecard.json" 2> "$RUNNER_TEMP/scorecard-errors.log"; then
+            cat "$RUNNER_TEMP/scorecard-errors.log"
+          elif grep -Fq "some github tokens can't read classic branch protection rules" "$RUNNER_TEMP/scorecard-errors.log" && \
+              [ "$(grep -c '^Check .* failed for ' "$RUNNER_TEMP/scorecard-errors.log" || true)" = 1 ]; then
+            cat "$RUNNER_TEMP/scorecard-errors.log"
+            echo '::warning::Scorecard could not read classic branch protection with the Actions token. The remaining results are retained; verify branch protection separately.'
+          else
+            cat "$RUNNER_TEMP/scorecard-errors.log"
+            exit 1
+          fi
+      - name: Retain Scorecard results
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: openssf-scorecard
+          path: ${{ runner.temp }}/scorecard.json
+          if-no-files-found: error
+          retention-days: 14

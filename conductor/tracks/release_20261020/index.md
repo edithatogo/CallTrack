@@ -11,6 +11,7 @@
 - [Review](review.md)
 - [Hosted CI refresh review](review-hosted-ci-refresh-20261024.md)
 - [Preparation evidence](preparation-evidence.json)
+- [Build dependency security qualification](build-security-20261123.md)
 - [Resolved dependency report](dependency-report.json)
 
 ## Current unsigned candidate — 2026-10-24

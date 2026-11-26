@@ -9,20 +9,33 @@ from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import io
 import json
+import os
 import re
+import stat
 from pathlib import Path
 import urllib.request
 from urllib.parse import urljoin, urlsplit
-import xml.etree.ElementTree as ET
 import zipfile
+from redirect_validation import ValidatingRedirectHandler
+from xml_safety import parse_xml
 
 LIMIT = 64 * 1024 * 1024
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+OUTPUT_ROOT = REPOSITORY_ROOT / '.local' / 'release-evidence'
+
+
+def validate_publication_redirect(url):
+    if urlsplit(url).scheme != 'https':
+        raise ValueError('Insecure publication redirect')
+
+
+PUBLICATION_OPENER = urllib.request.build_opener(ValidatingRedirectHandler(validate_publication_redirect))
 
 
 def read_publication(url):
     if not url.startswith('https://'):
         raise ValueError('HTTPS publication required')
-    with urllib.request.urlopen(url, timeout=60) as response:
+    with PUBLICATION_OPENER.open(url, timeout=60) as response:
         if not getattr(response, 'url', url).startswith('https://'):
             raise ValueError('Insecure publication redirect')
         data = response.read(LIMIT + 1)
@@ -57,7 +70,7 @@ def module_artifact_url(row, metadata):
 
 
 def declarations(data):
-    root = ET.fromstring(data)
+    root = parse_xml(data)
     ns = {'m': 'http://maven.apache.org/POM/4.0.0'}
     return [{key: node.findtext('m:' + key, default='', namespaces=ns)
              for key in ('name', 'url', 'distribution')}
@@ -70,7 +83,7 @@ def inherited_licences(data, evidence, depth=0):
         return direct
     if depth >= 8:
         raise ValueError('POM parent chain exceeds audit limit')
-    root = ET.fromstring(data)
+    root = parse_xml(data)
     ns = {'m': 'http://maven.apache.org/POM/4.0.0'}
     parent = root.find('m:parent', ns)
     if parent is None:
@@ -105,11 +118,80 @@ def embedded_notices(data, depth=0):
     return rows
 
 
+def open_directory(root, parts, create=False):
+    flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+    parent = os.open(root, flags)
+    try:
+        for part in parts:
+            if create:
+                try:
+                    os.mkdir(part, mode=0o700, dir_fd=parent)
+                except FileExistsError:
+                    pass
+            child = os.open(part, flags, dir_fd=parent)
+            os.close(parent)
+            parent = child
+        return parent
+    except BaseException:
+        os.close(parent)
+        raise
+
+
+def read_inventory(inventory):
+    root = os.path.realpath(REPOSITORY_ROOT)
+    resolved = os.path.realpath(inventory)
+    if not resolved.startswith(root + os.sep):
+        raise ValueError('Inventory must be inside the repository root')
+    parts = Path(os.path.relpath(resolved, root)).parts
+    parent = open_directory(root, parts[:-1])
+    try:
+        descriptor = os.open(parts[-1], os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK,
+                             dir_fd=parent)
+        with os.fdopen(descriptor, 'rb') as stream:
+            if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+                raise ValueError('Inventory must be a regular file')
+            return stream.read()
+    finally:
+        os.close(parent)
+
+
+def create_output_directory(output):
+    """Create a fresh output below the local evidence root without following links."""
+    root = os.path.realpath(OUTPUT_ROOT)
+    resolved = os.path.realpath(output)
+    if not resolved.startswith(root + os.sep):
+        raise ValueError('Audit output must be inside the evidence root')
+    if resolved != os.path.join(os.path.realpath(output.parent), output.name):
+        raise FileExistsError('Audit output already exists as a link')
+
+    OUTPUT_ROOT.mkdir(mode=0o700, parents=True, exist_ok=True)
+    parts = Path(os.path.relpath(resolved, root)).parts
+    flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+    parent = open_directory(root, parts[:-1], create=True)
+    try:
+        os.mkdir(parts[-1], mode=0o700, dir_fd=parent)
+        return os.open(parts[-1], flags, dir_fd=parent)
+    finally:
+        os.close(parent)
+
+
 def audit(inventory, output):
-    source = inventory.read_bytes()
+    source = read_inventory(inventory)
     rows = json.loads(source)['artifacts']
     unique = {(r['coordinate'], r['name'], r['sha256']): r for r in rows}
-    output.mkdir(parents=True, exist_ok=False)
+    directory = create_output_directory(output)
+    try:
+        return _audit_output(source, rows, unique, output, directory)
+    finally:
+        os.close(directory)
+
+
+def _audit_output(source, rows, unique, output, directory):
+    def write_new(name, data):
+        descriptor = os.open(name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
+                             0o600, dir_fd=directory)
+        with os.fdopen(descriptor, 'wb') as stream:
+            stream.write(data)
 
     def check(item):
         number, row = item
@@ -120,14 +202,14 @@ def audit(inventory, output):
             if not row['name'].startswith(module + '-' + version):
                 module_url = repository_url(row, pom=True)[:-4] + '.module'
                 metadata = read_publication(module_url)
-                (output / (str(number) + '-module')).write_bytes(metadata)
+                write_new(str(number) + '-module', metadata)
                 result['module_url'] = module_url
                 result['module_sha256'] = digest(metadata)
                 artifact_url = module_artifact_url(row, json.loads(metadata))
             for kind in ('artifact', 'pom'):
                 url = artifact_url if kind == 'artifact' else repository_url(row, pom=True)
                 data = read_publication(url)
-                (output / (str(number) + '-' + kind)).write_bytes(data)
+                write_new(str(number) + '-' + kind, data)
                 result[kind + '_url'] = url
                 result[kind + '_sha256'] = digest(data)
                 if kind == 'artifact':
@@ -147,14 +229,27 @@ def audit(inventory, output):
                    unique_artifacts=len(unique), artifacts=results,
                    all_repository_bytes_match=all(r.get('repository_bytes_match') is True and 'error' not in r for r in results),
                    licence_clearance=False, build_tool_trust=False, release_ready=False)
-    (output / 'receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
+    def require_same_directory():
+        try:
+            current = output.stat(follow_symlinks=False)
+        except OSError as error:
+            raise RuntimeError('Audit output directory changed during the run') from error
+        opened = os.fstat(directory)
+        if (current.st_dev, current.st_ino) != (opened.st_dev, opened.st_ino):
+            raise RuntimeError('Audit output directory changed during the run')
+
+    require_same_directory()
+    write_new('receipt.json', (json.dumps(receipt, indent=2) + '\n').encode())
+    require_same_directory()
     return receipt
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--inventory', type=Path, required=True)
-    parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--inventory', type=Path, required=True,
+                        help='Inventory file under the repository root')
+    parser.add_argument('--output', type=Path, required=True,
+                        help='New directory under .local/release-evidence')
     args = parser.parse_args()
     receipt = audit(args.inventory, args.output)
     print(json.dumps(receipt, indent=2))

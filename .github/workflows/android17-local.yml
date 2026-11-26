@@ -1,0 +1,27 @@
+name: Android 17 official local self-hosted runner
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: android17-owned-local-avd
+  cancel-in-progress: false
+jobs:
+  android17-local:
+    if: github.ref == 'refs/heads/main' && github.ref_protected
+    runs-on: [self-hosted, macOS, ARM64, calltrack-android17]
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Verify owner-provisioned toolchain and run Android 17 checks
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = arm64
+          test -n "$ANDROID_HOME"
+          test -n "$JAVA_HOME"
+          test "$(python3 --version)" = "Python $(cat .python-version)"
+          "$JAVA_HOME/bin/java" --version | grep -F 'Temurin-25.0.5.1+2'
+          python3 -m venv .venv
+          bash scripts/qualify_android17_local.sh emulator-5554

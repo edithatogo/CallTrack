@@ -11,9 +11,12 @@ zero-row permission tests. See the build track's findings and decisions through 
 | Variant | JDK | Gradle | AGP | compile/target | Build tools |
 |---|---|---|---|---|---|
 | Upstream reference | 11 | 7.3.3 | 7.2.2 | 32/32 | 30.0.3 |
-| Modern development candidate | 17 | 8.13 | 8.13.2 | 36/36 | 35.0.0 |
+| Modern upstream comparison fixture | 17 | 8.13 | 8.13.2 | 36/36 | 35.0.0 |
 
-SDK command-line tools19.0 were used with JDK17 to install these packages. Set
+These rows describe the upstream comparison fixtures, not the current root app.
+For the root app's JDK 25, Gradle 9.9.2, AGP 9.5.3 and SDK 37.1 setup,
+see [contributor instructions](../CONTRIBUTING.md). SDK command-line tools 19.0
+were used with JDK 17 to install the fixture packages. Set
 `ANDROID_HOME` to an SDK you maintain, and `JAVA_HOME` to the required JDK. The
 local SDK currently lives on PortableSSD with a symlink under `.local/android-sdk`;
 this storage layout is not required by the project. If the volume is disconnected,
@@ -23,7 +26,7 @@ prerequisite; tools and keys are not committed.
 ## Build
 
 Run from repository root with the Python version in `.python-version` and Git
-installed. Python3.15.1 is the current preferred selection; a different version
+installed. Python 3.15.2 is the current preferred selection; a different version
 may be selected when compatibility requires it, with the reason and scope
 recorded under the [runtime policy](../conductor/python-runtime-policy.md).
 Create and verify the repo-local environment first:
@@ -152,7 +155,7 @@ The old `scripts/run_parity_local.py` now fails closed with an actionable messag
 Expanded Kotlin migration cannot be qualified by compiling only remaining Java
 sources against retained implementation classes. Historical local receipts remain
 evidence of their original subset, never current Android acceptance. Use
-`scripts/run_slice_build.py` with the qualified JDK17 and SDK. If PortableSSD is
+`scripts/run_slice_build.py` with the qualified JDK 25 and SDK. If PortableSSD is
 unavailable, reconnect it or explicitly qualify another SDK/cache route; do not
 claim current tests from old compiled classes. No symlink/cache replacement is
 performed by the retired command.
@@ -235,8 +238,8 @@ older-platform/night-mode runtime parity.
 uses the exact additional AVDs `calltrack-release-api26-20261022` (5578) and
 `calltrack-release-api33-20261022` (5584), official Google APIs ARM64 images. The
 shared allowlist accepts exact owned names; an emulator prefix alone is insufficient.
-Set JAVA_HOME to a qualified JDK17 before building; this run uses the isolated
-Temurin17.0.20.1+1 recorded in the receipts, with PortableSSD's SDK available.
+The recorded run used the isolated Temurin 17.0.20.1+1 in its receipts. For a
+new root-app build, select the currently qualified JDK 25 and SDK instead.
 
 Build source-bound debug/test APKs once, keep them stable while native cases run,
 and retain build and per-version receipts before another invocation overwrites a

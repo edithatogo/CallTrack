@@ -1,20 +1,35 @@
 package com.markobl.calllogsync.slice
 
 import android.Manifest
+import android.content.ContentProviderOperation
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
+import android.content.OperationApplicationException
 import android.content.pm.PackageManager
 import android.database.Cursor
+import android.os.RemoteException
+import android.provider.CalendarContract
 import android.provider.CalendarContract.Calendars
 import android.provider.CalendarContract.Events
+import java.security.MessageDigest
+import org.json.JSONArray
 
 /** Public provider fields only; never creates an account, attendee or reminder. */
-class AndroidCalendarSink(suppliedContext: Context?) : SliceEngine.CalendarSink {
-    class Choice(
+class AndroidCalendarSink
+@JvmOverloads
+constructor(
+    suppliedContext: Context?,
+    private val expectedCalendars: Map<Long, String> = emptyMap(),
+) : SliceEngine.CalendarSink {
+    class Choice
+    @JvmOverloads
+    constructor(
         @JvmField val id: Long,
         @JvmField val name: String?,
         @JvmField val accountType: String?,
+        @JvmField val accountName: String? = null,
+        internal val binding: String? = null,
     ) : NullableCalendarLabel() {
         protected override fun nullableLabel(): String? = name
     }
@@ -26,8 +41,9 @@ class AndroidCalendarSink(suppliedContext: Context?) : SliceEngine.CalendarSink 
         if (
             context.checkSelfPermission(Manifest.permission.READ_CALENDAR) !=
                 PackageManager.PERMISSION_GRANTED
-        )
+        ) {
             throw SecurityException("Calendar read permission required")
+        }
     }
 
     private fun permission() {
@@ -36,8 +52,9 @@ class AndroidCalendarSink(suppliedContext: Context?) : SliceEngine.CalendarSink 
                 PackageManager.PERMISSION_GRANTED ||
                 context.checkSelfPermission(Manifest.permission.WRITE_CALENDAR) !=
                     PackageManager.PERMISSION_GRANTED
-        )
+        ) {
             throw SecurityException("Calendar permissions required")
+        }
     }
 
     fun choices(): List<Choice> {
@@ -46,21 +63,25 @@ class AndroidCalendarSink(suppliedContext: Context?) : SliceEngine.CalendarSink 
         resolver
             .query(
                 Calendars.CONTENT_URI,
-                arrayOf(Calendars._ID, Calendars.CALENDAR_DISPLAY_NAME, Calendars.ACCOUNT_TYPE),
-                Calendars.VISIBLE +
-                    "=1 AND " +
-                    Calendars.SYNC_EVENTS +
-                    "=1 AND " +
-                    Calendars.CALENDAR_ACCESS_LEVEL +
-                    ">=?",
-                arrayOf(Calendars.CAL_ACCESS_CONTRIBUTOR.toString()),
+                arrayOf(Calendars._ID, Calendars.CALENDAR_DISPLAY_NAME) + IDENTITY,
+                WRITABLE,
+                WRITABLE_ARGS,
                 Calendars.CALENDAR_DISPLAY_NAME + " ASC",
             )
             .use { cursor ->
                 checkNotNull(cursor) { "Calendar provider unavailable" }
-                while (cursor.moveToNext()) result.add(
-                    Choice(cursor.getLong(0), cursor.getString(1), cursor.getString(2))
-                )
+                while (cursor.moveToNext()) {
+                    val identity = readIdentity(cursor, 2)
+                    result.add(
+                        Choice(
+                            cursor.getLong(0),
+                            cursor.getString(1),
+                            identity[1],
+                            identity[0],
+                            bind(identity),
+                        ),
+                    )
+                }
             }
         return result
     }
@@ -81,27 +102,33 @@ class AndroidCalendarSink(suppliedContext: Context?) : SliceEngine.CalendarSink 
             }
     }
 
-    override fun writable(calendar: Long): Boolean {
+    private fun writableIdentity(calendar: Long): List<String?>? {
         permission()
-        resolver
+        return resolver
             .query(
                 ContentUris.withAppendedId(Calendars.CONTENT_URI, calendar),
-                arrayOf(Calendars.CALENDAR_ACCESS_LEVEL, Calendars.VISIBLE, Calendars.SYNC_EVENTS),
-                null,
-                null,
+                IDENTITY,
+                WRITABLE,
+                WRITABLE_ARGS,
                 null,
             )
             .use { cursor ->
                 checkNotNull(cursor) { "Calendar provider unavailable" }
-                return cursor.moveToFirst() &&
-                    cursor.getInt(0) >= Calendars.CAL_ACCESS_CONTRIBUTOR &&
-                    cursor.getInt(1) == 1 &&
-                    cursor.getInt(2) == 1
+                if (cursor.moveToFirst()) readIdentity(cursor, 0) else null
             }
     }
 
+    internal fun writableBinding(calendar: Long): String? = writableIdentity(calendar)?.let(::bind)
+
+    override fun writable(calendar: Long): Boolean {
+        val identity = writableIdentity(calendar) ?: return false
+        return expectedCalendars[calendar]?.let { it == bind(identity) } ?: true
+    }
+
     override fun insert(calendar: Long, event: CallEvent?): Long {
-        check(writable(calendar)) { "Destination unavailable" }
+        val identity = checkNotNull(writableIdentity(calendar)) { "Destination unavailable" }
+        val expected = expectedCalendars[calendar]
+        check(expected == null || expected == bind(identity)) { "Destination changed" }
         val values = ContentValues()
         values.put(Events.CALENDAR_ID, calendar)
         values.put(Events.TITLE, event!!.title)
@@ -115,29 +142,70 @@ class AndroidCalendarSink(suppliedContext: Context?) : SliceEngine.CalendarSink 
         values.put(Events.CUSTOM_APP_PACKAGE, context.packageName)
         values.put(Events.CUSTOM_APP_URI, event.marker)
         val uri =
-            resolver.insert(Events.CONTENT_URI, values)
-                ?: throw IllegalStateException("Event not inserted")
+            if (expected == null) {
+                resolver.insert(Events.CONTENT_URI, values)
+            } else {
+                insertBound(calendar, identity, values)
+            }
+        checkNotNull(uri) { "Event not inserted" }
         return ContentUris.parseId(uri)
     }
 
+    private fun insertBound(
+        calendar: Long,
+        identity: List<String?>,
+        values: ContentValues,
+    ): android.net.Uri? {
+        // The provider checks the writable identity and inserts in the same batch.
+        val matches =
+            IDENTITY.zip(identity).map { (field, value) ->
+                if (value == null) "$field IS NULL" else "$field=?"
+            }
+        val assertCalendar =
+            ContentProviderOperation.newAssertQuery(
+                    ContentUris.withAppendedId(Calendars.CONTENT_URI, calendar),
+                )
+                .withSelection(
+                    (listOf(WRITABLE) + matches).joinToString(" AND "),
+                    WRITABLE_ARGS + identity.filterNotNull(),
+                )
+                .withExpectedCount(1)
+                .build()
+        val insertEvent =
+            ContentProviderOperation.newInsert(Events.CONTENT_URI).withValues(values).build()
+        return try {
+            resolver
+                .applyBatch(CalendarContract.AUTHORITY, arrayListOf(assertCalendar, insertEvent))[1]
+                .uri
+        } catch (changed: OperationApplicationException) {
+            throw IllegalStateException("Calendar batch could not be confirmed", changed)
+        } catch (unavailable: RemoteException) {
+            throw IllegalStateException("Calendar provider unavailable", unavailable)
+        }
+    }
+
     private fun stored(cursor: Cursor): SliceEngine.StoredEvent? {
+        val packageColumn = cursor.getColumnIndexOrThrow(Events.CUSTOM_APP_PACKAGE)
+        if (context.packageName != cursor.getString(packageColumn)) return null
         if (
-            context.packageName != cursor.getString(8) ||
-                cursor.getInt(9) != Events.ACCESS_PRIVATE ||
-                cursor.getInt(10) != Events.AVAILABILITY_FREE ||
-                cursor.getInt(11) != 0
-        )
+            cursor.getInt(cursor.getColumnIndexOrThrow(Events.ACCESS_LEVEL)) !=
+                Events.ACCESS_PRIVATE ||
+                cursor.getInt(cursor.getColumnIndexOrThrow(Events.AVAILABILITY)) !=
+                    Events.AVAILABILITY_FREE ||
+                cursor.getInt(cursor.getColumnIndexOrThrow(Events.HAS_ALARM)) != 0
+        ) {
             return null
+        }
         return SliceEngine.StoredEvent(
-            cursor.getLong(0),
-            cursor.getLong(1),
+            cursor.getLong(cursor.getColumnIndexOrThrow(Events._ID)),
+            cursor.getLong(cursor.getColumnIndexOrThrow(Events.CALENDAR_ID)),
             CallEvent(
-                cursor.getString(2),
-                cursor.getString(3),
-                cursor.getLong(4),
-                cursor.getLong(5),
-                cursor.getString(6),
-                cursor.getString(7),
+                cursor.getString(cursor.getColumnIndexOrThrow(Events.TITLE)),
+                cursor.getString(cursor.getColumnIndexOrThrow(Events.DESCRIPTION)),
+                cursor.getLong(cursor.getColumnIndexOrThrow(Events.DTSTART)),
+                cursor.getLong(cursor.getColumnIndexOrThrow(Events.DTEND)),
+                cursor.getString(cursor.getColumnIndexOrThrow(Events.EVENT_TIMEZONE)),
+                cursor.getString(cursor.getColumnIndexOrThrow(Events.CUSTOM_APP_URI)),
             ),
         )
     }
@@ -184,6 +252,25 @@ class AndroidCalendarSink(suppliedContext: Context?) : SliceEngine.CalendarSink 
     }
 
     companion object {
+        private const val WRITABLE =
+            "${Calendars.VISIBLE}=1 AND ${Calendars.SYNC_EVENTS}=1 AND ${Calendars.CALENDAR_ACCESS_LEVEL}>=?"
+        private val WRITABLE_ARGS = arrayOf(Calendars.CAL_ACCESS_CONTRIBUTOR.toString())
+        private val IDENTITY =
+            arrayOf(
+                Calendars.ACCOUNT_NAME,
+                Calendars.ACCOUNT_TYPE,
+                Calendars.NAME,
+                Calendars.OWNER_ACCOUNT,
+            )
+
+        private fun readIdentity(cursor: Cursor, offset: Int): List<String?> =
+            IDENTITY.indices.map { cursor.getString(offset + it) }
+
+        private fun bind(identity: List<String?>): String =
+            MessageDigest.getInstance("SHA-256")
+                .digest(JSONArray(identity).toString().toByteArray())
+                .toHexString()
+
         private val FIELDS =
             arrayOf(
                 Events._ID,

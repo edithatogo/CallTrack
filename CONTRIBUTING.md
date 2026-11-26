@@ -2,27 +2,28 @@
 
 This is a development fork with manual/automatic logging, historical import and
 recovery controls. Native acceptance is scoped to recorded emulator evidence. Check [Conductor](conductor/index.md) before proposing changes.
-The current package is disposable; there is no supported public release yet.
+Debug builds use the disposable development package. See the [release gates](RELEASING.md)
+for the distribution variant.
 
 ## Reproduce the development build
 
-Use a fresh checkout of the exact commit being reviewed. Install the qualified Temurin17.0.21+9
-runtime, the Python version selected by `.python-version` and Android SDK platform36/build-tools35.0.0.
-The wrapper pins Gradle8.13 and its distribution checksum; AGP is 8.13.2.
+Use a fresh checkout of the exact commit being reviewed and the versions in the
+[build guide](README.md#build-and-qualification). Install Build Tools 36.0.0 and
+35.0.0 for native qualification. Use the checked-in Gradle wrapper.
 The Kotlin implementation retains one Java nullable-label bridge and Java interop
-tests, pins Kotlin/KGP2.3.21 and targets Java8 bytecode.
+tests. The app uses JVM 11 bytecode with minimum Android API 37.
 Read the selection with `python_version="$(cat .python-version)"`, install it
 with `uv python install "$python_version"`, then create `.venv` using
 `uv venv --python "$python_version" .venv`. Verify `.venv/bin/python -V` and run
-`uv run scripts/verify_python_runtime.py`.
+`.venv/bin/python scripts/verify_python_runtime.py`.
 No third-party Python packages are needed for the helper/test suite. All active
 qualification workflows, including cold Linux reproduction, read `.python-version`
-and create a local virtual environment. Python3.15.1 is the currently qualified
+and create a local virtual environment. Python 3.15.2 is the currently qualified
 default; another stable version may be selected for a specific compatibility or
 task need and must be qualified against the relevant behavior. Historical receipts retain their original
 interpreter. See the [runtime policy](conductor/python-runtime-policy.md) and
 [dependency refresh](qualification/dependency-refresh-20261023.md)
-for isolated Android upgrade blockers; the qualified APK remains unchanged.
+for historical isolated Android upgrade evidence.
 
 Set JAVA_HOME and ANDROID_HOME to those installations. SDK licences must be accepted
 by the person operating the build environment. Run from the repository root:
@@ -40,11 +41,16 @@ status, input hashes, test results and artifact hashes together. A successful de
 build establishes neither a production signature nor bit-for-bit reproducibility.
 See [qualification](qualification/README.md) for the separate upstream reproducer.
 
-Use google-java-format1.24.0 with `--aosp` for app-owned Java. CI includes the pinned
+Use google-java-format 2.0.0 with `--aosp --cleanup=false` for app-owned Java. CI includes the pinned
 formatter URL/checksum and exact command. Preserve the upstream notices; contribute
 only code and assets you have the right to distribute under compatible terms.
-For Kotlin use ktfmt0.59 with `--kotlinlang-style --dry-run --set-exit-if-changed`;
-CI pins its Maven URL and SHA256. Follow [Kotlin style](conductor/code_styleguides/kotlin.md).
+For Kotlin use ktfmt 0.65 with `--kotlinlang-style --dry-run --set-exit-if-changed`.
+CI pins its Maven URL and SHA-256. Follow [Kotlin style](conductor/code_styleguides/kotlin.md).
+Run `./gradlew ktlintCheck detekt` for Kotlin sources and tests in the Android
+app. The Gradle verification metadata pins both command-line tools. The required
+build qualification runs these tasks alongside the existing formatter and
+Android Lint. Detekt counts guarded work and component APIs, with conventions
+for Compose declarations and early guards.
 Describe behaviour changes and their regression evidence in the pull request.
 Keep language/UI migrations separate from synchronization behaviour changes.
 
@@ -55,7 +61,7 @@ exercise public Kotlin fields/static entry points. Meaningful behaviour changes 
 failing contract/regression test before implementation. Documentation needs link,
 source and consistency checks. Test the failure path as well as success: lost
 provider readback, interrupted writes, changed events, permissions and migrations.
-The CI workflow is configured, but no hosted run has been observed in this project.
+Link the relevant hosted CI runs and exact candidate revision with the change.
 
 For the dedicated parity emulator, use the source-bound build followed by:
 
@@ -74,8 +80,7 @@ personal calendar or use real call history as a test fixture.
 ## Issues and reviews
 
 Use the [bug template](.github/ISSUE_TEMPLATE/bug_report.md) or
-[research proposal](.github/ISSUE_TEMPLATE/research_proposal.md). No remote hosting
-is currently configured; these templates are preparation for a future repository.
+[research proposal](.github/ISSUE_TEMPLATE/research_proposal.md).
 Include commit/version, OS/API, device or emulator category, synthetic reproduction,
 expected/actual behaviour and redacted result counts. Separate local persistence,
 cloud synchronization and operational acceptance. Never attach call logs,
@@ -85,15 +90,10 @@ For a suspected vulnerability, follow [security reporting](SECURITY.md). Source
 publication, issue submission and messaging other maintainers are separate actions;
 these instructions do not submit anything automatically.
 
-## Isolated Compose research
+## Compose UI tests
 
-The [standalone synthetic prototype](prototypes/compose/README.md) is not part of
-the root app dependency graph. Its optional build uses
-`.venv/bin/python scripts/qualify_compose_prototype.py build --jdk "$JAVA_HOME" --sdk "$ANDROID_HOME"`.
-Device mode accepts only the dedicated emulator; it installs a separate no-data
-fixture app and verifies cleanup. It is not a way to try Compose against personal
-calls/calendars. Production UI adoption remains a separate behavioural/accessibility
-gate; research archive status must not be read as a migrated working screen.
+Compose coverage lives in the app suites. Run the affected source-bound tests and
+retain the applicable device, accessibility and recovery acceptance gates.
 
 ## Dependency trust changes
 

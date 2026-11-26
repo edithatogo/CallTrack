@@ -1,0 +1,15 @@
+# Android 17 engineering standards plan
+
+- [x] Enforce Kotlin, Java and Gradle warnings as errors. Run ktlint and Detekt in the required build qualification. [PR #136](https://github.com/edithatogo/CallTrack/pull/136)
+- [x] Move active settings to Proto DataStore. Preserve the selected calendar, call source identity, paused policy, worker status and existing Room recovery data during upgrade.
+- [x] Refine the four Compose screens with Material 3 Expressive, edge-to-edge insets and labelled controls. The integrated settings, imports, process recovery and accessibility journeys passed on the dedicated Android 17 emulator.
+- [x] Wire compile-time Hilt injection into the manual logging data source and ViewModel. Keep the verified dependency graph and corresponding source with the candidate.
+- [x] Qualify the Navigation 3 stack, system Back, retained tasks and adaptive forms. The launcher recovery check killed and relaunched the process with the receipt ready for confirmation and zero calendar events. Android accessibility checks passed at three native window sizes. The import journey exercised the real keyboard, 2× right-to-left date fields and focus restoration after calendar selection.
+- [x] Move automatic settings, historical import and recovery to entry-owned Hilt ViewModels with immutable StateFlow and structured coroutines. Keep the automatic draft and selected import session. Clear reviews when leaving the screen and refresh import calendars before confirmation. Native checks verify permission loss, keyboard cancellation, missing destinations, queued-approval withdrawal and process recovery.
+- [x] Exercise the screen-state migration on the dedicated Android 17 emulator. Protected delivery runs the hosted accessibility, recovery, migration and security gates on the merged source.
+- [x] Verify predictive Back on Android 17. An edge swipe showed the manual screen behind Settings. Cancelling restored Settings, and completing the gesture returned to Manual.
+- [x] Qualify adaptive Navigation 3 scenes. Material 3 Adaptive 1.3.0 shows Settings beside one active Import or Recovery form on wide windows. The native launcher test checks 48 dp targets, selected states, Back, the keyboard appearing on a date-field tap, and no session or automatic policy created by navigation. A Pixel Fold emulator retained the import draft across the cover and inner displays. [Source](https://github.com/edithatogo/CallTrack/commit/dd565ef71e8fdce227c5093878ed3abfaaa3d83f) · [Material adaptive scenes](https://developer.android.com/guide/navigation/navigation-3/scenes)
+
+- [x] Prevent late Settings actions from replacing Manual and verify that each back-stack entry stays scoped to its form. The release inventory matches 104 published source and POM records. [Runtime audit](../release_20261020/material-adaptive-runtime-audit-20261125.json)
+
+Production signing, physical routes and the controlled observation remain in [Track 5](../release_20261020/verification.md). Real app-call attribution and destination readback remain in [Track 23](../android17_call_routing_20261125/plan.md).

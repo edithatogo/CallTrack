@@ -83,22 +83,17 @@ public class CalendarSliceTest {
                 context().checkSelfPermission(Manifest.permission.READ_CALENDAR));
         assertEquals(
                 SliceEngine.Result.PERMISSION_REQUIRED,
-                new SliceEngine(
+                new ManualDelivery(
                                 () -> {
                                     throw new AssertionError("Source must not be read");
                                 },
-                                new AndroidCalendarSink(context()),
-                                new MemoryLedger(),
+                                new DurableDelivery(null, new AndroidCalendarSink(context())),
                                 "UTC")
                         .run(1));
     }
 
     private void verifyPicker(long savedCalendar, boolean expectChoice) {
-        context()
-                .getSharedPreferences("slice", Context.MODE_PRIVATE)
-                .edit()
-                .putLong("calendar", savedCalendar)
-                .commit();
+        SettingsTestFixture.select(context(), savedCalendar);
         android.app.Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         RenderedUi ui = new RenderedUi(instrumentation);
         android.app.Activity activity =
@@ -115,10 +110,7 @@ public class CalendarSliceTest {
                     "Compose picker did not restore explicit choice / missing-destination"
                             + " placeholder");
             assertEquals(
-                    expectChoice ? savedCalendar : -1,
-                    context()
-                            .getSharedPreferences("slice", Context.MODE_PRIVATE)
-                            .getLong("calendar", -1));
+                    expectChoice ? savedCalendar : -1, SettingsTestFixture.calendar(context()));
             String expectedLabel =
                     expectChoice
                             ? calendarDisplayName()
@@ -126,14 +118,8 @@ public class CalendarSliceTest {
             ui.await(
                     () -> ui.find(expectedLabel, false) != null,
                     "Compose picker did not show the saved choice / placeholder label");
-            instrumentation.runOnMainSync(
-                    () -> {
-                        long actual =
-                                context()
-                                        .getSharedPreferences("slice", Context.MODE_PRIVATE)
-                                        .getLong("calendar", -1);
-                        assertEquals(expectChoice ? savedCalendar : -1, actual);
-                    });
+            assertEquals(
+                    expectChoice ? savedCalendar : -1, SettingsTestFixture.calendar(context()));
         } finally {
             instrumentation.runOnMainSync(activity::finish);
         }
@@ -156,12 +142,13 @@ public class CalendarSliceTest {
                     "Manual Compose destination picker did not load provider choices");
             ui.tapVisibleId("slice_calendar_picker");
             ui.tapVisibleText(calendarDisplayName());
+            ui.await(
+                    () -> SettingsTestFixture.calendar(context()) == expectedId,
+                    "Calendar selection did not commit");
             assertEquals(
                     "Only the explicit provider option tap persists its calendar ID",
                     expectedId,
-                    context()
-                            .getSharedPreferences("slice", Context.MODE_PRIVATE)
-                            .getLong("calendar", -1));
+                    SettingsTestFixture.calendar(context()));
             ui.await(
                     () -> ui.find(calendarDisplayName(), false) != null,
                     "Manual Compose picker did not show the explicitly selected calendar");
@@ -232,12 +219,20 @@ public class CalendarSliceTest {
             try (SqliteLedger ledger = new SqliteLedger(context(), db)) {
                 assertEquals(
                         SliceEngine.Result.SAVED,
-                        new SliceEngine(() -> call, sink, ledger, "UTC").run(calendar));
+                        new ManualDelivery(
+                                        () -> call,
+                                        new DurableDelivery(ledger.outbox(), sink),
+                                        "UTC")
+                                .run(calendar));
             }
             try (SqliteLedger ledger = new SqliteLedger(context(), db)) {
                 assertEquals(
                         SliceEngine.Result.ALREADY_LOGGED,
-                        new SliceEngine(() -> call, sink, ledger, "UTC").run(calendar));
+                        new ManualDelivery(
+                                        () -> call,
+                                        new DurableDelivery(ledger.outbox(), sink),
+                                        "UTC")
+                                .run(calendar));
             }
             java.util.List<SliceEngine.StoredEvent> rows =
                     sink.find(calendar, CallEvent.from(call, "UTC").marker);
@@ -246,7 +241,8 @@ public class CalendarSliceTest {
                     CallEvent.from(call, "UTC").fingerprint(), rows.get(0).event.fingerprint());
             assertEquals(1700000000123L, rows.get(0).event.start);
             assertEquals(1700000065123L, rows.get(0).event.end);
-            // Prove marker recovery through the real provider after insertion without a receipt.
+            // Prove marker recovery through the real provider after insertion before publication of
+            // the event ID.
             CallRecord gap =
                     new CallRecord(
                             "synthetic-" + account(),
@@ -257,27 +253,32 @@ public class CalendarSliceTest {
                             null,
                             null,
                             true);
-            SliceEngine.Ledger crashLedger =
-                    new SliceEngine.Ledger() {
-                        public SliceEngine.Result transaction(SliceEngine.Work w) {
-                            return w.run();
-                        }
-
-                        public SliceEngine.Entry get(String key, long destination) {
-                            return null;
-                        }
-
-                        public void put(String key, long destination, SliceEngine.Entry entry) {
-                            throw new IllegalStateException("simulated interruption");
-                        }
-                    };
-            assertEquals(
-                    SliceEngine.Result.FAILED,
-                    new SliceEngine(() -> gap, sink, crashLedger, "UTC").run(calendar));
+            try (SqliteLedger ledger = new SqliteLedger(context(), db)) {
+                RoomFixtures.execute(
+                        ledger,
+                        "CREATE TRIGGER interrupted_fixture BEFORE INSERT ON outbox WHEN"
+                            + " NEW.state='ATTEMPTED' BEGIN SELECT RAISE(ABORT,'fixture'); END");
+                assertEquals(
+                        SliceEngine.Result.FAILED,
+                        new ManualDelivery(
+                                        () -> gap,
+                                        new DurableDelivery(ledger.outbox(), sink),
+                                        "UTC")
+                                .run(calendar));
+                assertEquals(
+                        DurableDelivery.State.IN_FLIGHT,
+                        ledger.outbox().get(gap.key(), calendar).state);
+                assertEquals(1, sink.find(calendar, CallEvent.from(gap, "UTC").marker).size());
+                RoomFixtures.execute(ledger, "DROP TRIGGER interrupted_fixture");
+            }
             try (SqliteLedger ledger = new SqliteLedger(context(), db)) {
                 assertEquals(
                         SliceEngine.Result.RECOVERED,
-                        new SliceEngine(() -> gap, sink, ledger, "UTC").run(calendar));
+                        new ManualDelivery(
+                                        () -> gap,
+                                        new DurableDelivery(ledger.outbox(), sink),
+                                        "UTC")
+                                .run(calendar));
             }
             assertEquals(1, sink.find(calendar, CallEvent.from(gap, "UTC").marker).size());
             long eventId = rows.get(0).id;
@@ -294,7 +295,11 @@ public class CalendarSliceTest {
             try (SqliteLedger ledger = new SqliteLedger(context(), db)) {
                 assertEquals(
                         SliceEngine.Result.REVIEW_REQUIRED,
-                        new SliceEngine(() -> call, sink, ledger, "UTC").run(calendar));
+                        new ManualDelivery(
+                                        () -> call,
+                                        new DurableDelivery(ledger.outbox(), sink),
+                                        "UTC")
+                                .run(calendar));
             }
             assertEquals("Human edit", sink.read(eventId).event.title);
             for (Uri table :
@@ -427,19 +432,5 @@ public class CalendarSliceTest {
         assertNotEquals(
                 android.content.pm.PackageManager.PERMISSION_GRANTED,
                 context().checkSelfPermission(Manifest.permission.READ_CALL_LOG));
-    }
-
-    private static class MemoryLedger implements SliceEngine.Ledger {
-        public SliceEngine.Result transaction(SliceEngine.Work w) {
-            return w.run();
-        }
-
-        public SliceEngine.Entry get(String key, long calendar) {
-            return null;
-        }
-
-        public void put(String key, long calendar, SliceEngine.Entry e) {
-            throw new AssertionError("No writes expected");
-        }
     }
 }

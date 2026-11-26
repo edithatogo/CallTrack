@@ -10,6 +10,9 @@ from pathlib import Path
 import re
 import subprocess
 
+if not __debug__:
+    raise RuntimeError('Conductor verification requires assertions; do not use optimized Python')
+
 ROOT = Path(__file__).resolve().parents[1]
 
 

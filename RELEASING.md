@@ -1,9 +1,8 @@
 # Release qualification runbook
 
-Status: development only. Track5 has prepared this protocol; M4 has not passed.
-A frozen unsigned development candidate is locally qualified. No production key,
-public repository or supported production release is established. Track4 parity is the prerequisite. Public release is outside this
-track's scope; use a separately authorised execution after these gates pass.
+Track 5 owns the first release. Publish CallTrack Community 0.1.0 as a GitHub Release
+with a signed APK and corresponding source after the release and observation gates pass.
+Track 4 parity is a prerequisite.
 
 ## Candidate and source evidence
 
@@ -11,14 +10,12 @@ track's scope; use a separately authorised execution after these gates pass.
    limitation; physical-call acceptance now awaits a selected connected phone and
    participating controlled second phone. Emulator
    evidence cannot establish OEM telephony or cloud-account behaviour.
-2. Select the permanent application ID, name/icon, initial version and distribution
-   route. The current `org.calltrack.community.dev`, versionCode10/0.1.0-dev is a
-   disposable development identity. Do not overwrite the old CallTrack installation
-   or claim its signing/branding rights. Audit inherited assets/translations.
-3. Freeze a clean Git commit. Build from a fresh checkout with JDK17, Gradle8.13,
-   AGP8.13.2, Kotlin/KGP2.3.21, compile/target36 and build-tools35.0.0, or explicitly qualify any
-   changes. Follow CONTRIBUTING.md and preserve all test/build evidence. No private
-   reference checkout or APK may be required for the root build.
+2. Verify CallTrack Community uses `io.github.edithatogo.calltrack`, version code 1
+   and version name 0.1.0. Preserve the original and development installations.
+   Audit inherited assets and translations.
+3. Freeze a clean Git commit. Build from a fresh checkout using the selections in the
+   [build guide](README.md#build-and-qualification) and the [contributor guide](CONTRIBUTING.md).
+   Preserve test and build evidence. The root build must work from the public source.
 4. Capture the actual releaseRuntimeClasspath graph and all artifact licences and
    notices. Audit repositories, resolved versions and plugin/tooling dependencies
    as well as direct declarations. Review dependency locks and verification
@@ -27,8 +24,8 @@ track's scope; use a separately authorised execution after these gates pass.
    an SBOM. Retained legacy code remains part of the shipped artifact audit.
 5. Build the unsigned release variant on two clean isolated environments from
    that source. Compare artifacts; investigate nondeterminism and document tools,
-   OS, dependency graph and hashes. Two clean same-host builds of the current
-   Kotlin app match; independent-environment reproduction remains pending. If claiming F-Droid
+   OS, dependency graph and hashes. Reproduce those candidate bytes in the
+   cache-disabled hosted Linux workflow. If claiming F-Droid
    upstream-signature reproducibility, test its exact recipe/comparator and the
    build-tools35 signing compatibility issue identified in Track5 findings.
 6. Keep source archive/commit, build scripts/configuration, toolchain manifest,
@@ -53,10 +50,9 @@ records raw dependency reports and APK badging, verifies the expected unsigned
 signature result with apksigner, and compares unsigned APK SHA256.
 It does not sign, install, upload, or use private reference inputs. Failure leaves
 a failed receipt; keep it and use a fresh output directory after investigating.
-Both checkouts share the host and dependency cache. A byte match is same-host
-repeatability only, not independent-environment reproduction, checksum trust,
-licence clearance, upgrade acceptance or production readiness. The current
-development identity remains unchanged.
+Both checkouts share the host and dependency cache. Use the cold Linux workflow
+below for independent reproduction and retain the separate security, licence,
+upgrade and readiness checks.
 
 ## Local development upgrade probe
 
@@ -65,11 +61,13 @@ development identity remains unchanged.
   --output "$PWD/.local/release-evidence/UNIQUE-UPGRADE-RUN"
 ```
 
-Only the exact dedicated emulator is accepted; both development packages must be
+Set up the verified local JDK bundle and archive as described in [README](README.md)
+before running this check. Only the exact dedicated emulator is accepted; both development packages must be
 absent. Requires the existing debug key and successful source-matched debug/test
 receipt. A clean committed-source checkout uses a recorded temporary Gradle
-`finalizeDsl` overlay to build release mode at versionCode11 with that existing
-key. Committed app configuration stays versionCode10 and unsigned for release.
+`finalizeDsl` overlay and `calltrackDevelopmentRelease` to build release mode
+at version code 11 with that existing key. The development baseline is version
+code 10. The distribution variant is built unsigned for owner-local signing.
 The probe seeds synthetic private state at10, force-stops its app, upgrades in
 place to11, reads back state, then verifies downgrade and wrong-certificate
 rejections followed by unchanged state. The latter uses a one-day disposable
@@ -86,7 +84,7 @@ full matrix below before supported release acceptance.
 
 ```sh
 .venv/bin/python scripts/audit_release_artifacts.py \
-  --inventory conductor/tracks/kotlin_20261020/runtime-artifacts-20261021.json \
+  --inventory .local/release-runtime.json \
   --output .local/release-evidence/UNIQUE-RUNTIME-AUDIT
 ```
 
@@ -119,18 +117,17 @@ packages on the dedicated emulator; cleanup is mandatory.
 
 ## Signing and channels
 
-Choose key custodian, offline recovery copy/access procedure and channel policy
-before creating the first production key. Record public certificate fingerprints
-in release metadata; never put private keys/passwords in Git, command arguments,
-logs or issue attachments. Keep CI unsigned until key custody and protected signing
-are deliberately configured. Distinguish Play upload key from app signing key.
+Use the owner-custodied app-signing key and verify the encrypted recovery copy can
+be opened. Record the public certificate fingerprint in release metadata. Keep
+private keys and passwords out of Git, command arguments, logs and issue
+attachments. Build unsigned in CI and sign locally from the exact qualified APK.
 Prefer a consistent signing identity across intended update routes; separately
 signed channels require an explicit migration strategy rather than assumed updates.
 
 Verify each signed candidate using the pinned tool:
 
 ```sh
-"$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs CANDIDATE.apk
+"$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs CANDIDATE.apk
 ```
 
 Compare the observed certificate against the recorded intended identity and inspect
@@ -167,9 +164,8 @@ recovery. Calendar cleanup must target known fixture events only and preserve ed
 
 ## Support matrix and alpha observation
 
-The declared floor is API26, not tested support. Before advertising a supported
-range, qualify the minimum, an intermediate version and the current target on
-emulators, then representative real devices/OEM restrictions. Record exact source,
+The minimum and target are both API 37. Qualify that API on the dedicated emulator,
+then test representative physical phones and their OEM restrictions. Record exact source,
 OS/API, device category, calendar/provider category, native results, cleanup and
 limits. Test LOCAL and account-backed calendars separately; verify the actual
 remote account if cloud sync is claimed. Avoid publishing device serials/accounts.
@@ -203,7 +199,7 @@ approval or operational acceptance.
 The asset replacement/provenance is in [ASSET_PROVENANCE.md](ASSET_PROVENANCE.md).
 The preferred editable vector sources and active English/German strings are tracked;
 uncertain inherited launcher/store artwork and unused endpoint strings are removed.
-The new development label does not choose a permanent release identity.
+The development label identifies the separately installable development package.
 
 After freezing the source and completing matching unsigned builds:
 
@@ -223,7 +219,7 @@ The bundle rejects dirty/mismatched source, changed runtime graphs, incomplete o
 modified source/POM inputs, missing APK notices and private/unsafe archive paths.
 It includes the Git snapshot, exact-source revision, build/qualification scripts,
 preferred vector sources, licences/notices and published source/POM material for
-all63 runtime coordinates. Every payload is hashed and read back after archiving;
+all selected runtime coordinates. Every payload is hashed and read back after archiving;
 two independently written archive files must match. It never includes Git history,
 private `.local` inputs, signing keys, SDK/JDK archives or original CallTrack APKs.
 
@@ -238,19 +234,26 @@ implied. Retain previous source/artifact evidence rather than relabelling it.
 ## Cold Linux reproduction
 
 The manual `.github/workflows/release-reproduction.yml` workflow builds an exact
-candidate using the digest-pinned Temurin17 Linux image, new SDK downloads and a
+candidate using the digest-pinned Temurin 25 Linux image, new SDK downloads and a
 new Gradle user home. It uses separate tooling and candidate checkouts and uploads
 only the unsigned APK and evidence. No cache restore, signing credential, device,
 cloud-account integration or SDK licence acceptance command is configured.
 The SDK terms must already be authorised for the builder; package origins/sizes,
 Google checksums and reviewed SHA256 values are in
 `qualification/release/linux-sdk-inputs.json`.
+The cold build reads Google's matching package descriptor for the pinned Android
+37.1 archive so AGP recognises the installed minor SDK. The receipt records the
+catalogue and descriptor hashes.
 
 Use `scripts/qualify_linux_build.py --help` for a direct Linux runner. Its output
 directory must not exist; a dirty/wrong candidate, reused output, wrong SDK origin,
 archive traversal, changed checksum or differing APK fails closed. Retain failures
 and audit newly requested dependency metadata against canonical origins; never
 turn off verification or blindly generate checksums to obtain a green build.
+
+Supply the exact release JVM test count from the two matching macOS builds for
+the selected commit. Linux must run that count, with at least 119 tests and zero
+failures, errors, or skips.
 
 A Docker/Linux guest with no host mounts and fresh SDK/JDK/Gradle dependencies
 provides a separate software environment, but still shares this physical computer.
@@ -262,25 +265,24 @@ readback only after an authorised repository upload and workflow execution.
 ## First-release baseline
 
 The [installation and supported-upgrade policy](conductor/tracks/release_20261020/first-release-baseline.md)
-selects fresh installation for the first public release, with no issued predecessor
-and no in-place migration claim from other packages or unpublished development
-builds. The development identity remains unchanged while permanent identity/key
-custody is pending. A version label alone never identifies a frozen candidate.
+selects fresh installation for the first public release. Existing packages and
+unpublished development builds retain their separate installation identities.
+Record the exact source revision, APK hashes and certificate with each candidate.
 
-To bind emulator fresh-install and forward-compatibility tests to the exact unsigned
-release payload, add `--release-build-receipt MATCHING-BUILDS/receipt.json` to
-`scripts/qualify_release_upgrade.py --provider-schema`. The existing development
-key signs a local test copy only; all original APK entries must remain identical.
-The probe checks fresh state and the actual launcher before synthetic10→11 upgrade
-acceptance. The11 overlay is separately hashed and is not the frozen10 candidate.
+For the exact development-payload variant of the fresh-install and same-key
+upgrade probe, build with `qualify_release_build.py --development-fixture` and pass
+its receipt to `qualify_release_upgrade.py --provider-schema --release-build-receipt`.
+The probe checks that signing preserves every original APK entry and tests fresh
+state and the actual launcher before the synthetic 10→11 upgrade. Verify the
+signed distribution package's fresh installation independently.
 
 
 ## Physical calls and account-backed calendars
 
 Follow the [physical and account-route procedure](conductor/tracks/release_20261020/physical-calendar-qualification.md).
-Use the frozen development-signed release payload on the selected physical phone,
-normal user-granted permissions and controlled calls. Existing destructive fixture
-and emulator harnesses remain emulator-only. Qualify app→Android provider→existing
+Use the exact production-signed candidate on the selected Android 17 phone, with
+normal user-granted permissions and controlled calls. Run destructive fixtures
+only on the dedicated emulator. Qualify app→Android provider→existing
 sync adapter→the exact remote account/calendar; a connector-created event or a
 calendar visible only in Outlook is insufficient. Current physical/remote results
 remain pending until actual participation and readback occur.
@@ -289,8 +291,7 @@ remain pending until actual participation and readback occur.
 ## Seven-day operational follow-through
 
 Use the [observation protocol](conductor/tracks/release_20261020/seven-day-observation.md)
-and private cohort/day journal. The daily follow-up checks prerequisites first;
-only actual qualified physical use starts the clock. Unknown observations remain
-unknown. Seven scheduler runs are not seven accepted days, and final review/fixes
-must use the actual candidate's outcomes. One active calendar is supported per
-installation; each operational route claim needs its own accounted window.
+and private cohort/day journal. Start the clock with qualified physical use.
+Record missing observations as unknown. Use 168 elapsed hours and the actual
+candidate's outcomes for the final review. Each operational route claim needs
+its own accounted window. The first-release cohort uses the selected Google Calendar.

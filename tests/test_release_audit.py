@@ -1,16 +1,147 @@
 import io
+import hashlib
+from email.message import Message
 from pathlib import Path
 import sys
 import unittest
 import tempfile
 import json
+import os
+import stat
+import xml.etree.ElementTree as ET
 from unittest.mock import patch
+from urllib.response import addinfourl
 import zipfile
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import audit_release_artifacts as audit
+import audit_release_toolchain as toolchain
+import qualify_linux_build as linux
 
 
 class AuditTest(unittest.TestCase):
+    def audit_under(self, root, inventory, output, inventory_root=None):
+        with patch.object(audit, 'OUTPUT_ROOT', root), \
+             patch.object(audit, 'REPOSITORY_ROOT', inventory_root or inventory.parent):
+            return audit.audit(inventory, output)
+
+    def publication_transport(self, routes, visited, responses=None):
+        def open_request(_handler, request):
+            visited.append(request.full_url)
+            status, content = routes[request.full_url]
+            headers = Message()
+            if status != 200:
+                headers['Location'] = content
+                content = b''
+            response = addinfourl(io.BytesIO(content), headers, request.full_url, status)
+            response.msg = 'OK' if status == 200 else 'Redirect'
+            if responses is not None:
+                responses.append(response)
+            return response
+        return open_request
+
+    def test_publication_rejects_insecure_intermediate_redirect_before_contact(self):
+        start = 'https://repo.example.test/start'
+        insecure = 'http://relay.example.test/intermediate'
+        final = 'https://repo.example.test/final'
+        routes = {start: (302, insecure), insecure: (302, final), final: (200, b'artifact')}
+        visited = []
+        responses = []
+        transport = self.publication_transport(routes, visited, responses)
+        with patch.object(audit.urllib.request.HTTPSHandler, 'https_open', new=transport), \
+             patch.object(audit.urllib.request.HTTPHandler, 'http_open', new=transport):
+            with self.assertRaisesRegex(ValueError, 'Insecure publication redirect'):
+                audit.read_publication(start)
+        self.assertEqual([start], visited)
+        self.assertTrue(responses[0].closed)
+
+    def test_publication_allows_secure_relative_and_cross_host_redirects(self):
+        start = 'https://repo.example.test/folder/start'
+        mirror = 'https://mirror.example.test/folder/file'
+        final = 'https://mirror.example.test/final'
+        routes = {start: (302, mirror), mirror: (301, '../final'), final: (200, b'artifact')}
+        visited = []
+        transport = self.publication_transport(routes, visited)
+        with patch.object(audit.urllib.request.HTTPSHandler, 'https_open', new=transport), \
+             patch.object(audit.urllib.request.HTTPHandler, 'http_open', new=transport):
+            self.assertEqual(b'artifact', audit.read_publication(start))
+        self.assertEqual([start, mirror, final], visited)
+
+    def test_tool_download_blocks_insecure_intermediate_before_contact(self):
+        start = 'https://tools.example.test/archive'
+        insecure = 'http://relay.example.test/archive'
+        final = 'https://tools.example.test/final'
+        routes = {start: (302, insecure), insecure: (302, final), final: (200, b'tool')}
+        visited = []
+        transport = self.publication_transport(routes, visited)
+        with tempfile.TemporaryDirectory() as directory, \
+             patch.object(audit.urllib.request.HTTPSHandler, 'https_open', new=transport), \
+             patch.object(audit.urllib.request.HTTPHandler, 'http_open', new=transport):
+            destination = Path(directory) / 'archive'
+            with self.assertRaisesRegex(ValueError, 'Insecure tool archive redirect'):
+                toolchain.fetch(start, destination)
+            self.assertFalse(destination.exists())
+        self.assertEqual([start], visited)
+
+    def test_tool_download_allows_secure_mirror_redirect(self):
+        start = 'https://tools.example.test/archive'
+        mirror = 'https://mirror.example.test/archive'
+        payload = b'tool'
+        visited = []
+        transport = self.publication_transport({start: (302, mirror), mirror: (200, payload)}, visited)
+        with tempfile.TemporaryDirectory() as directory, \
+             patch.object(audit.urllib.request.HTTPSHandler, 'https_open', new=transport):
+            destination = Path(directory) / 'archive'
+            self.assertEqual(hashlib.sha256(payload).hexdigest(), toolchain.fetch(start, destination))
+            self.assertEqual(payload, destination.read_bytes())
+        self.assertEqual([start, mirror], visited)
+
+    def test_sdk_download_rejects_unapproved_hop_and_accepts_official_redirect(self):
+        start = 'https://dl.google.com/android/repository/start'
+        outside = 'https://other.example.test/android/repository/archive'
+        final = 'https://dl.google.com/android/repository/archive'
+        payload = b'sdk'
+        row = {'size': len(payload), 'checksum_algorithm': 'sha1',
+               'checksum': hashlib.sha1(payload).hexdigest()}
+        for redirect, accepted in [(outside, False),
+                                   ('http://dl.google.com/android/repository/archive', False),
+                                   ('https://dl.google.com/android/repository/%2e%2e/other', False),
+                                   ('/android/repository/archive', True)]:
+            with self.subTest(redirect=redirect), tempfile.TemporaryDirectory() as directory:
+                visited = []
+                routes = {start: (302, redirect), final: (200, payload)}
+                transport = self.publication_transport(routes, visited)
+                destination = Path(directory) / 'archive'
+                with patch.object(audit.urllib.request.HTTPSHandler, 'https_open', new=transport), \
+                     patch.object(audit.urllib.request.HTTPHandler, 'http_open', new=transport):
+                    if accepted:
+                        linux.download_sdk_archive(start, destination, row)
+                        self.assertEqual(payload, destination.read_bytes())
+                    else:
+                        with self.assertRaisesRegex(ValueError, 'Unapproved SDK archive origin'):
+                            linux.download_sdk_archive(start, destination, row)
+                        self.assertFalse(destination.exists())
+                self.assertEqual([start, final] if accepted else [start], visited)
+
+    def test_sdk_download_keeps_size_and_checksum_gates(self):
+        url = 'https://dl.google.com/android/repository/archive'
+        payload = b'sdk'
+        valid_sha1 = hashlib.sha1(payload).hexdigest()
+        cases = [
+            ({'size': 2, 'checksum_algorithm': 'sha1', 'checksum': valid_sha1}, 'exceeds declared size'),
+            ({'size': 4, 'checksum_algorithm': 'sha1', 'checksum': valid_sha1}, 'checksum/size mismatch'),
+            ({'size': 3, 'checksum_algorithm': 'sha1', 'checksum': '0' * 40}, 'checksum/size mismatch'),
+            ({'size': 3, 'checksum_algorithm': 'sha1', 'checksum': valid_sha1,
+              'sha256': '0' * 64}, 'checksum/size mismatch'),
+        ]
+        for row, message in cases:
+            with self.subTest(row=row), tempfile.TemporaryDirectory() as directory:
+                visited = []
+                transport = self.publication_transport({url: (200, payload)}, visited)
+                with patch.object(audit.urllib.request.HTTPSHandler, 'https_open', new=transport):
+                    with self.assertRaisesRegex(ValueError, message):
+                        linux.download_sdk_archive(url, Path(directory) / 'archive', row)
+                self.assertEqual([url], visited)
+
     def test_uses_original_artifact_name_and_canonical_repository(self):
         row = dict(coordinate='androidx.room:room-runtime-android:2.7.0', name='room-runtime-android-2.7.0.aar')
         self.assertEqual('https://dl.google.com/dl/android/maven2/androidx/room/room-runtime-android/2.7.0/room-runtime-android-2.7.0.aar', audit.repository_url(row))
@@ -20,6 +151,50 @@ class AuditTest(unittest.TestCase):
 
     def test_missing_pom_declaration_is_not_invented(self):
         self.assertEqual([], audit.declarations(b'<project xmlns="http://maven.apache.org/POM/4.0.0"/>'))
+
+    def test_pom_dtd_is_rejected_before_entity_expansion(self):
+        project = '<project xmlns="http://maven.apache.org/POM/4.0.0"><licenses><license><name>&x;</name></license></licenses></project>'
+        for dtd in ('<!DOCTYPE project [<!ENTITY x "expanded">]>',
+                    '<!DOCTYPE project [<!ENTITY x invalid>]>',
+                    '<!DOCTYPE project SYSTEM "file:///nonexistent/external.dtd">'):
+            for encoding in ('utf-8', 'utf-16'):
+                data = (dtd + project).encode(encoding)
+                with self.subTest(dtd=dtd, encoding=encoding):
+                    for parser in (audit.declarations, lambda value: audit.inherited_licences(value, [])):
+                        with self.assertRaisesRegex(ET.ParseError, 'DTD declarations are not allowed'):
+                            parser(data)
+
+    def test_normal_pom_entities_comments_and_parse_errors_are_preserved(self):
+        pom = ('<project xmlns="http://maven.apache.org/POM/4.0.0">'
+               '<!-- literal <!DOCTYPE project> is only a comment -->'
+               '<licenses><license><name>Research &amp; Development</name></license></licenses></project>')
+        for encoding in ('utf-8', 'utf-16'):
+            with self.subTest(encoding=encoding):
+                self.assertEqual('Research & Development', audit.declarations(pom.encode(encoding))[0]['name'])
+        with self.assertRaises(ET.ParseError):
+            audit.declarations(b'<project>')
+
+    def test_rejected_pom_prevents_successful_artifact_audit(self):
+        archive = io.BytesIO()
+        with zipfile.ZipFile(archive, 'w') as bundle:
+            bundle.writestr('META-INF/LICENSE', 'license')
+        artifact = archive.getvalue()
+        pom = b'<!DOCTYPE project [<!ENTITY x "expanded">]><project><name>&x;</name></project>'
+        def response(url, **_kwargs):
+            stream = io.BytesIO(pom if url.endswith('.pom') else artifact)
+            stream.url = url
+            return stream
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': [dict(
+                coordinate='org.test:test:1', name='test-1.jar', sha256=hashlib.sha256(artifact).hexdigest())]}))
+            with patch.object(audit.PUBLICATION_OPENER, 'open', side_effect=response):
+                result = self.audit_under(root, inventory, root / 'output')
+            self.assertTrue(result['artifacts'][0]['repository_bytes_match'])
+            self.assertIn('DTD declarations are not allowed', result['artifacts'][0]['error'])
+            self.assertFalse(result['all_repository_bytes_match'])
+            self.assertFalse(json.loads((root / 'output/receipt.json').read_text())['release_ready'])
 
     def test_nested_aar_notices_are_hashed_without_extraction(self):
         jar = io.BytesIO()
@@ -51,14 +226,227 @@ class AuditTest(unittest.TestCase):
             inventory = root / 'inventory.json'
             inventory.write_text(json.dumps({'artifacts': [dict(coordinate='org.test:test:1', name='test-1.jar', sha256='0' * 64)]}))
             output = root / 'audit'
-            with patch.object(audit.urllib.request, 'urlopen', side_effect=response):
-                result = audit.audit(inventory, output)
+            with patch.object(audit.PUBLICATION_OPENER, 'open', side_effect=response):
+                result = self.audit_under(root, inventory, output)
             self.assertFalse(result['all_repository_bytes_match'])
             self.assertFalse(json.loads((output / 'receipt.json').read_text())['release_ready'])
             before = (output / 'receipt.json').read_bytes()
             with self.assertRaises(FileExistsError):
-                audit.audit(inventory, output)
+                self.audit_under(root, inventory, output)
             self.assertEqual(before, (output / 'receipt.json').read_bytes())
+
+    def test_download_does_not_follow_an_existing_output_link(self):
+        data = io.BytesIO()
+        with zipfile.ZipFile(data, 'w') as archive:
+            archive.writestr('LICENSE', 'licence')
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': [dict(
+                coordinate='org.test:test:1', name='test-1.jar', sha256=audit.digest(data.getvalue()))]}))
+            output = root / 'output'
+            sentinel = root / 'retain.txt'
+            sentinel.write_text('keep')
+
+            def publication(_url):
+                (output / '0-artifact').symlink_to(sentinel)
+                return data.getvalue()
+
+            with patch.object(audit, 'read_publication', side_effect=publication):
+                result = self.audit_under(root, inventory, output)
+            self.assertEqual('keep', sentinel.read_text())
+            self.assertFalse(result['all_repository_bytes_match'])
+            self.assertIn('error', result['artifacts'][0])
+            self.assertFalse(json.loads((output / 'receipt.json').read_text())['release_ready'])
+
+    def test_receipt_does_not_follow_an_existing_output_link(self):
+        data = io.BytesIO()
+        with zipfile.ZipFile(data, 'w') as archive:
+            archive.writestr('LICENSE', 'licence')
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': [dict(
+                coordinate='org.test:test:1', name='test-1.jar', sha256=audit.digest(data.getvalue()))]}))
+            output = root / 'output'
+            sentinel = root / 'retain.txt'
+            sentinel.write_text('keep')
+
+            def publication(url):
+                if url.endswith('.pom'):
+                    (output / 'receipt.json').symlink_to(sentinel)
+                    return b'<project xmlns="http://maven.apache.org/POM/4.0.0"/>'
+                return data.getvalue()
+
+            with patch.object(audit, 'read_publication', side_effect=publication):
+                with self.assertRaises(FileExistsError):
+                    self.audit_under(root, inventory, output)
+            self.assertEqual('keep', sentinel.read_text())
+
+    def test_replaced_output_directory_fails_without_writing_to_replacement(self):
+        data = io.BytesIO()
+        with zipfile.ZipFile(data, 'w') as archive:
+            archive.writestr('LICENSE', 'licence')
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': [dict(
+                coordinate='org.test:test:1', name='test-1.jar', sha256=audit.digest(data.getvalue()))]}))
+            output = root / 'output'
+            moved = root / 'moved'
+            replacement = root / 'replacement'
+            replacement.mkdir()
+            swapped = False
+
+            def publication(url):
+                nonlocal swapped
+                if not swapped:
+                    output.rename(moved)
+                    output.symlink_to(replacement, target_is_directory=True)
+                    swapped = True
+                return (b'<project xmlns="http://maven.apache.org/POM/4.0.0"/>'
+                        if url.endswith('.pom') else data.getvalue())
+
+            with patch.object(audit, 'read_publication', side_effect=publication):
+                with self.assertRaisesRegex(RuntimeError, 'output directory changed'):
+                    self.audit_under(root, inventory, output)
+            self.assertEqual([], list(replacement.iterdir()))
+            self.assertFalse((moved / 'receipt.json').exists())
+
+    def test_audit_rejects_inventory_outside_the_repository_root(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            repository = root / 'repository'
+            repository.mkdir()
+            outside = root / 'outside'
+            outside.mkdir()
+            sibling = root / 'repository-sibling'
+            sibling.mkdir()
+            for folder in (outside, sibling):
+                (folder / 'inventory.json').write_text(json.dumps({'artifacts': []}))
+            (repository / 'link').symlink_to(outside, target_is_directory=True)
+            output = repository / 'evidence' / 'output'
+            for inventory in (outside / 'inventory.json',
+                              repository / '..' / 'outside' / 'inventory.json',
+                              sibling / 'inventory.json', repository / 'link' / 'inventory.json'):
+                with self.subTest(inventory=inventory):
+                    with self.assertRaisesRegex(ValueError, 'repository root'):
+                        self.audit_under(output.parent, inventory, output, inventory_root=repository)
+            self.assertFalse(output.exists())
+
+    def test_audit_rejects_inventory_parent_replaced_by_link_during_open(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            repository = root / 'repository'
+            nested = repository / 'nested'
+            nested.mkdir(parents=True)
+            inventory = nested / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': []}))
+            outside = root / 'outside'
+            outside.mkdir()
+            (outside / 'inventory.json').write_text(json.dumps({'artifacts': []}))
+            original_open = os.open
+            swapped = False
+            def open_with_swap(path, flags, *args, **kwargs):
+                nonlocal swapped
+                if path == 'nested' and not swapped:
+                    nested.rename(repository / 'retained')
+                    nested.symlink_to(outside, target_is_directory=True)
+                    swapped = True
+                return original_open(path, flags, *args, **kwargs)
+            output = repository / 'evidence' / 'output'
+            with patch.object(audit.os, 'open', side_effect=open_with_swap):
+                with self.assertRaises(OSError):
+                    self.audit_under(output.parent, inventory, output, inventory_root=repository)
+            self.assertTrue(swapped)
+            self.assertFalse(output.exists())
+
+    def test_audit_rejects_output_outside_the_evidence_root(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            evidence = root / 'evidence'
+            evidence.mkdir()
+            outside = root / 'outside'
+            outside.mkdir()
+            sibling = root / 'evidence-sibling'
+            sibling.mkdir()
+            (evidence / 'link').symlink_to(outside, target_is_directory=True)
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': []}))
+            for output in (outside / 'audit', evidence / '..' / 'outside' / 'audit',
+                           sibling / 'audit', evidence / 'link' / 'audit'):
+                with self.subTest(output=output):
+                    with self.assertRaisesRegex(ValueError, 'evidence root'):
+                        self.audit_under(evidence, inventory, output)
+            self.assertEqual([], list(outside.iterdir()))
+            self.assertEqual([], list(sibling.iterdir()))
+
+    def test_audit_rejects_an_existing_dangling_output_link(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            evidence = root / 'evidence'
+            evidence.mkdir()
+            output = evidence / 'output'
+            target = evidence / 'target'
+            output.symlink_to(target, target_is_directory=True)
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': []}))
+            with self.assertRaises(FileExistsError):
+                self.audit_under(evidence, inventory, output)
+            self.assertFalse(target.exists())
+            self.assertTrue(output.is_symlink())
+
+    def test_audit_rejects_parent_replaced_by_a_link_during_creation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            evidence = root / 'evidence'
+            nested = evidence / 'nested'
+            nested.mkdir(parents=True)
+            outside = root / 'outside'
+            outside.mkdir()
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': []}))
+            original_open = os.open
+            swapped = False
+            def open_with_swap(path, flags, *args, **kwargs):
+                nonlocal swapped
+                if path == 'nested' and not swapped:
+                    nested.rename(evidence / 'retained')
+                    nested.symlink_to(outside, target_is_directory=True)
+                    swapped = True
+                return original_open(path, flags, *args, **kwargs)
+            with patch.object(audit.os, 'open', side_effect=open_with_swap):
+                with self.assertRaises(OSError):
+                    self.audit_under(evidence, inventory, nested / 'output')
+            self.assertTrue(swapped)
+            self.assertEqual([], list(outside.iterdir()))
+            self.assertEqual([], list((evidence / 'retained').iterdir()))
+
+    def test_audit_output_is_private_with_a_zero_umask(self):
+        archive = io.BytesIO()
+        with zipfile.ZipFile(archive, 'w') as bundle:
+            bundle.writestr('LICENSE', 'license')
+        artifact = archive.getvalue()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            evidence = root / 'evidence'
+            inventory = root / 'inventory.json'
+            inventory.write_text(json.dumps({'artifacts': [dict(
+                coordinate='org.test:test:1', name='test-1.jar', sha256=audit.digest(artifact))]}))
+            output = evidence / 'nested' / 'output'
+            def publication(url):
+                return b'<project xmlns="http://maven.apache.org/POM/4.0.0"/>' if url.endswith('.pom') else artifact
+            original_umask = os.umask(0)
+            try:
+                with patch.object(audit, 'read_publication', side_effect=publication):
+                    result = self.audit_under(evidence, inventory, output)
+            finally:
+                os.umask(original_umask)
+            self.assertTrue(result['all_repository_bytes_match'])
+            for path in (evidence, output.parent, output):
+                self.assertEqual(0o700, stat.S_IMODE(path.stat().st_mode))
+            for name in ('0-artifact', '0-pom', 'receipt.json'):
+                self.assertEqual(0o600, stat.S_IMODE((output / name).stat().st_mode))
 
     def test_classes_named_notice_are_not_licence_documents(self):
         data = io.BytesIO()
@@ -82,11 +470,11 @@ class AuditTest(unittest.TestCase):
             audit.embedded_notices(data.getvalue())
 
     def test_insecure_origin_and_redirect_are_rejected(self):
-        with patch.object(audit.urllib.request, 'urlopen') as request:
+        with patch.object(audit.PUBLICATION_OPENER, 'open') as request:
             with self.assertRaisesRegex(ValueError, 'HTTPS'):
                 audit.read_publication('http://example.test/artifact')
             request.assert_not_called()
         response = io.BytesIO(b'untrusted redirect'); response.url = 'http://example.test/artifact'
-        with patch.object(audit.urllib.request, 'urlopen', return_value=response):
+        with patch.object(audit.PUBLICATION_OPENER, 'open', return_value=response):
             with self.assertRaisesRegex(ValueError, 'Insecure'):
                 audit.read_publication('https://example.test/artifact')

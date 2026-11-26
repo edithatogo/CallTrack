@@ -4,10 +4,13 @@ Observed implementation as of 2026-10-21; this is not a published store privacy
 policy or a claim that all planned retention controls exist. See the
 [release readiness track](conductor/tracks/release_20261020/index.md).
 
-With permission, the manual action reads the latest call; explicitly enabled
+With permission, the manual action reads the latest phone call. Explicitly enabled
 automatic logging and confirmed historical imports read bounded call metadata.
 Fields include row ID, time, duration, type, cached name, number, number presentation
-and phone-account ID. It does not request contacts, SMS,
+and phone-account ID. App routes also use the system's shared call history and
+record the calling app's package in its calendar entry. The source picker uses
+targeted installed-app lookups and inspects app attribution from shared entries.
+It does not request contacts, SMS,
 microphone or location access. The manifest omits INTERNET. Calendar software may
 still synchronize an event to the chosen account and disclose it to that calendar's
 members. Private/free event flags do not encrypt content or revoke calendar access.
@@ -15,7 +18,7 @@ members. Private/free event flags do not encrypt content or revoke calendar acce
 | Location | Data and purpose | Retention/deletion behaviour now |
 |---|---|---|
 | Android call-log provider | Source call metadata | Owned by the system; this app does not delete source rows |
-| Private `slice` preferences | Random source namespace, selected calendar ID and versioned automatic activation settings (generation, enabled state, destination ID, timezone, start and type flags) | Retained across restart; no in-app reset workflow |
+| Private `slice` preferences | Random source namespace, selected calendar ID and versioned automatic activation settings (generation, enabled state, selected source and calendar pairs, calendar identity hashes, timezone, start and type flags) | Retained across restart; no in-app reset workflow |
 | Private `calltrack-ledger.db`, schema6 | Source/destination keys, event IDs, fingerprints, outbox state, operation owner/generation and source instant/actual duration/raw type/presentation | Retained for duplicate prevention and recovery; no age-based expiry |
 | Outbox personal payload | Frozen event title/description/time data for interrupted delivery | DurableDelivery clears payload on confirmed/review/suppressed transitions; remaining payload expires seven days after storage, checked on access and in bounded maintenance batches; migration gives existing payloads of unknown age seven days from migration |
 | Private scan checkpoints | Operation owner/generation, source namespace, frozen upper and last processed IDs and hashed source bindings | Retained for recovery; no expiry or automatic cleanup yet; no caller names/numbers stored |

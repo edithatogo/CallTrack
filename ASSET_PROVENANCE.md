@@ -1,6 +1,6 @@
 # Application asset provenance
 
-Audit date:2026-10-22. Scope is the current app, not historical Git revisions.
+This page records the 22 October 2026 artwork and asset audit. The [Android 17 architecture](conductor/architecture-android17.md) defines current platform support.
 
 | Material | Origin and reuse basis | Current disposition |
 |---|---|---|
@@ -13,13 +13,14 @@ Audit date:2026-10-22. Scope is the current app, not historical Git revisions.
 | Library resources | Exact63 runtime artifacts from Google Maven/Maven Central; Apache2 declarations/source headers | Covered by third-party inventory, licence text and retained notices; not relabelled as project artwork |
 | Fonts, screenshots, audio, original CallTrack APK/resources | None included in current project app | No reuse assumed; the private APK remains outside source/archive inputs |
 
-The working package remains `org.calltrack.community.dev`; the label is
+At the audit date the working package was `org.calltrack.community.dev`; the label was
 “CallTrack Community (dev)”. This is a development label, not selection or clearance
 of a permanent release name/logo/trademark. App namespace/schema/receipt ownership
 are unaffected. A store screenshot/banner/icon package is deliberately absent
 until a channel and production identity are selected.
 
-[Asset inventory](qualification/release/assets-provenance.json) binds every current
-non-code file under `app/src/main` to a SHA256 and provenance class. The old audit
-is preserved as historical evidence. A source bundle uses a current Git snapshot;
-it never exports repository history containing superseded artwork.
+The [dated asset inventory](qualification/release/assets-provenance.json)
+records the SHA-256 and origin of each non-code file in the audited snapshot.
+The [release verification](conductor/tracks/release_20261020/verification.md)
+covers the exact candidate selected for release. Source bundles use a Git
+snapshot of the selected revision and exclude repository history.

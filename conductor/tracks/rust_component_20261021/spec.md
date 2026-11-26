@@ -40,3 +40,12 @@ working outputs until parity/recovery. Windows/Linux are outside this sequence.
 iOS implementation is stage9 and cannot be advanced past unresolved stages1–8.
 A justified deferral must state reason, evidence, consequences and reconsideration
 trigger; it cannot turn unavailable features into supported claims.
+
+## Serde applicability decision — 18 November 2026
+
+Current Rust code is the bounded identity experiment under `prototypes/rust-identity`, whose direct dependency is `sha2`; there is no production Rust data interchange format or Serde consumer. The existing track correctly records a deferral of production Rust. **Do not add Serde or migrate Kotlin/KMP/native app components merely to serialize them.** Serde does not replace cryptographic identity hashing, native Android call-log permissions or platform backups.
+
+- [ ] Only if an existing sanctioned Rust component is resumed with a demonstrable stable backup/portable-data consumer, compare typed Serde DTOs to that consumer's frozen Kotlin/Android/iOS wire fixtures.
+- [ ] Test exact call identity, timestamps, timezone, provenance, privacy-sensitive metadata, duplicate records and round-trip retention; do not export real call logs to public CI or attach patient/private data.
+- [ ] Keep any codec optional and out of the platform hot paths; pass existing per-device, compiler, privacy and human review gates before altering the Rust deferral.
+- [ ] Otherwise retain the explicit no-go and do not reopen this completed evaluation or introduce another track.
